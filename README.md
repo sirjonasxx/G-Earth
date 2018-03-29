@@ -19,7 +19,7 @@ FEATURES:
 
 
 WORKING ON:
-* Using IPtables instead of editting the hosts file
+* Using IPtables instead of editting the hosts file (removes needed root permission)
 * Auto detect hotel
 * Retrieve the RC4 key from memory in order to be a third-party to the outgoing messages
 
