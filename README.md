@@ -5,8 +5,7 @@ Habbo packet logger & manipulator for Linux distributions (for now).
 - Byte to string & string to byte encoding is slightly different from the Habbo PacketLogger standards. (on purpose)
 
 Execution command (temporary, verified in Ubuntu):
-
-$ sudo -E java -jar G-Earth.jar 
+> $ sudo -E java -jar G-Earth.jar 
 
 
 
