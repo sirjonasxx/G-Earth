@@ -10,7 +10,7 @@ Execution command (temporary, verified in Ubuntu):
 
 
 FEATURES:
-* Client side packet logging & injection
+* Client & server side packet logging & injection
 * Easily blocking & replacing packets (not yet in the UI)
 * Packet expressions
 * Responsive UI
@@ -19,10 +19,7 @@ FEATURES:
 
 
 WORKING ON:
-* Using IPtables instead of editting the hosts file (removes needed root permission)
 * Auto detect hotel
-* Retrieve the RC4 key from memory in order to be a third-party to the outgoing messages
-
 
 
 TO-DO:
