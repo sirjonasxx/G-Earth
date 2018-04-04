@@ -56,10 +56,8 @@ public class Rc4Obtainer {
             // STEP ONE: filtering to obtain one area containing the rc4 data field
             int foundbuffersize = 0;
             while (foundbuffersize == 0) {
-                client.pauseProcess();
                 diff = client.createMemorySnippetList();
                 client.fetchMemory(diff);
-                client.resumeProcess();
                 this.addedBytes = 0;
 
                 Random rand = new Random();
@@ -123,34 +121,44 @@ public class Rc4Obtainer {
             outgoingHandler.fakePongAlert();
             sleep(70);
 
-            byte[] data1 = new byte[256];
-            for (int i = 0; i < 256; i++) data1[i] = snippet1.getData()[i*4 + result_start_index];
-
             byte[] lastPongPacket = new byte[6];
             List<Byte> encodedbytelistraw = outgoingHandler.getEncryptedBuffer();
             for (int i = 0; i < 6; i++) {
                 lastPongPacket[i] = encodedbytelistraw.get(encodedbytelistraw.size() - 6 + i);
             }
 
+            int counter = 0;
             RC4 result = null;
 
-            //dont panic this runs extremely fast xo
-            outerloop:
-            for (int x = 0; x < 256; x++) {
-                for (int y = 0; y < 256; y++) {
-                    byte[] copy = new byte[256];
-                    for (int i = 0; i < 256; i++) {
-                        copy[i] = data1[i];
-                    }
-                    RC4 rc4Tryout = new RC4(copy, x, y);
+            while (result == null && counter < 4) {
 
-                    HPacket tryout = new HPacket(rc4Tryout.rc4(lastPongPacket));
-                    if (!tryout.isCorrupted()) {
-                        result = rc4Tryout;
-                        break outerloop;
+                byte[] data1 = new byte[256];
+                for (int i = 0; i < 256; i++) data1[i] = snippet1.getData()[i*4 + result_start_index];
+
+                //dont panic this runs extremely fast xo
+                outerloop:
+                for (int x = 0; x < 256; x++) {
+                    for (int y = 0; y < 256; y++) {
+                        byte[] copy = new byte[256];
+                        for (int i = 0; i < 256; i++) {
+                            copy[i] = data1[i];
+                        }
+                        RC4 rc4Tryout = new RC4(copy, x, y);
+
+                        HPacket tryout = new HPacket(rc4Tryout.rc4(lastPongPacket));
+                        if (!tryout.isCorrupted()) {
+                            result = rc4Tryout;
+                            break outerloop;
+                        }
                     }
                 }
+                if (result == null) {
+                    result_start_index -= 4;
+                }
+                counter++;
             }
+
+            //if result = null ud better reload
 
 
 
@@ -180,15 +188,10 @@ public class Rc4Obtainer {
     }
 
 
-
-
-
     private List<MemorySnippet> searchForPossibleRC4Tables(List<MemorySnippet> snippets) {
         List<MemorySnippet> result;
-        client.pauseProcess();
         result = client.differentiate2(snippets, ((addedBytes * 2) / 3), addedBytes * 2, 1028);
         addedBytes = 0;
-        client.resumeProcess();
 
         return result;
     }
