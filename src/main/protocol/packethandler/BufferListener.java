@@ -3,6 +3,6 @@ package main.protocol.packethandler;
 
 public interface BufferListener {
 
-    void act();
+    void act(int addedbytes);
 
 }

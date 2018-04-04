@@ -12,8 +12,8 @@ public abstract class Handler {
 
     volatile PayloadBuffer payloadBuffer = new PayloadBuffer();
     volatile OutputStream out;
-    private volatile Object[] listeners = null; //get notified on packet send
-    private volatile boolean isTempBlocked = false;
+    volatile Object[] listeners = null; //get notified on packet send
+    volatile boolean isTempBlocked = false;
     volatile boolean isDataStream = false;
     volatile int currentIndex = 0;
 
@@ -32,15 +32,10 @@ public abstract class Handler {
 
         if (isDataStream)	{
             payloadBuffer.push(buffer);
-            notifyBufferListeners();
+            notifyBufferListeners(buffer.length);
 
             if (!isTempBlocked) {
                 flush();
-            }
-            else {
-                if (this instanceof OutgoingHandler) {
-                    System.out.println("blocked outgoing bytes with size: "+ buffer.length);
-                }
             }
         }
         else  {
@@ -88,9 +83,9 @@ public abstract class Handler {
     public void removeBufferListener(BufferListener listener) {
         bufferListeners.remove(listener);
     }
-    private void notifyBufferListeners() {
+    void notifyBufferListeners(int addedbytes) {
         for (int i = bufferListeners.size() - 1; i >= 0; i -= 1) {
-            bufferListeners.get(i).act();
+            bufferListeners.get(i).act(addedbytes);
         }
     }
 

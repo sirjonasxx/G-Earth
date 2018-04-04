@@ -21,12 +21,14 @@ public class HPacket {
         packetInBytes = fromStringToBytes(fromExpressionToString(packet));
     }
     public HPacket(int header) {
-        packetInBytes = new byte[]{0,0,0,4,0,0};
+        packetInBytes = new byte[]{0,0,0,2,0,0};
         replaceUShort(4, header);
+        isEdited = false;
     }
     public HPacket(int header, byte[] bytes) {
-        packetInBytes = new byte[4];
+        this(header);
         appendBytes(bytes);
+        isEdited = false;
     }
 
     public String toString()	{

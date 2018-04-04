@@ -13,34 +13,35 @@ public class IncomingHandler extends Handler {
         super(outputStream);
     }
 
-    @Override
-    public void setAsDataStream() {
-        super.setAsDataStream();
-        Rc4Obtainer.rc4Obtainer.setIncomingHandler(this);
-    }
+    private final Object lock = new Object();
 
     @Override
     public void sendToStream(byte[] buffer) {
-        try {
-            out.write(buffer);
-            out.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
+        synchronized (lock) {
+            try {
+                out.write(buffer);
+                out.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
     @Override
     public void flush() throws IOException {
-        HPacket[] hpackets = payloadBuffer.receive();
+        synchronized (lock) {
+            HPacket[] hpackets = payloadBuffer.receive();
 
-        for (HPacket hpacket : hpackets){
-            HMessage hMessage = new HMessage(hpacket, HMessage.Side.TOCLIENT, currentIndex);
-            notifyListeners(hMessage);
+            for (HPacket hpacket : hpackets){
+                HMessage hMessage = new HMessage(hpacket, HMessage.Side.TOCLIENT, currentIndex);
+                notifyListeners(hMessage);
 
-            if (!hMessage.isBlocked())	{
-                out.write(hMessage.getPacket().toBytes());
+                if (!hMessage.isBlocked())	{
+                    out.write(hMessage.getPacket().toBytes());
+                }
+                currentIndex++;
             }
-            currentIndex++;
         }
+
     }
 }

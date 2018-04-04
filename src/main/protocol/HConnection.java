@@ -1,6 +1,7 @@
 package main.protocol;
 
 import main.OSValidator;
+import main.protocol.memory.Rc4Obtainer;
 import main.protocol.packethandler.Handler;
 import main.protocol.packethandler.IncomingHandler;
 import main.protocol.packethandler.OutgoingHandler;
@@ -126,10 +127,13 @@ public class HConnection {
 
         final boolean[] aborted = new boolean[1];
 
+        Rc4Obtainer rc4Obtainer = new Rc4Obtainer();
+
         // wachten op data van client
         new Thread(() -> {
             try {
                 OutgoingHandler handler = new OutgoingHandler(habbo_server_out);
+                rc4Obtainer.setOutgoingHandler(handler);
 
                 while (!client.isClosed() && (state == State.WAITING_FOR_CLIENT || state == State.CONNECTED)) {
                     byte[] buffer;
@@ -179,6 +183,7 @@ public class HConnection {
         new Thread(() -> {
             try {
                 IncomingHandler handler = new IncomingHandler(client_out);
+                rc4Obtainer.setIncomingHandler(handler);
 
                 while (!habbo_server.isClosed() && (state == State.CONNECTED || state == State.WAITING_FOR_CLIENT)) {
                     byte[] buffer;

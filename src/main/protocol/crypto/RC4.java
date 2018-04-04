@@ -35,6 +35,10 @@ package main.protocol.crypto;
 
 import main.protocol.HPacket;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * This is a simple implementation of the RC4 (tm) encryption algorithm.  The
  * author implemented this class for some simple applications
@@ -111,6 +115,17 @@ public class RC4 {
 
     }
 
+    public RC4(byte[] state, int x, int y) {
+        this.x = x;
+        this.y = y;
+        this.state = state;
+    }
+
+    //copyconstructor
+    public RC4 deepCopy() {
+        return new RC4(Arrays.copyOf(state, 256), x, y);
+    }
+
     /**
      * RC4 encryption/decryption.
      *
@@ -169,36 +184,100 @@ public class RC4 {
         return result;
     }
 
+    public void undoRc4(byte[] buf) {
+
+        byte tmp;
+
+        for (int i = buf.length - 1; i >= 0; i--) {
+
+            tmp = state[x];
+            state[x] = state[y];
+            state[y] = tmp;
+
+            y = (y - (state[x] & 0xff)) & 0xff;
+            x = (x - 1) & 0xff;
+        }
+
+    }
+
 
     public void printKey() {
         System.out.println(new HPacket(state).toString());
     }
 
+
+    private static void printState(byte[] booleans) {
+        StringBuilder builder = new StringBuilder("state: ");
+        for (byte bool : booleans) {
+            builder.append(bool);
+            builder.append(",");
+        }
+        System.out.println(builder);
+    }
+
     public static void main(String[] args) {
+
         byte[] sharedKey = new byte[27];
-
+        List<Byte> allbytesEncrypted = new ArrayList<>();
         RC4 p1 = new RC4(sharedKey);
-        RC4 p2 = new RC4(sharedKey);
 
-        p1.printKey();
-        p2.printKey();
-        byte[] enc = p1.rc4("hallo".getBytes());
-        System.out.println(new String(p2.rc4(enc)));
+        System.out.println("original:");
+        printState(p1.state);
+        System.out.println("x: " + p1.x + ", y: " + p1.y);
 
-        p1.printKey();
-        p2.printKey();
+        byte[] enc1 = p1.rc4("hallo dit istoch wel redelijk veel tekst ofzo denk k".getBytes());
+        for (int i = 0; i < enc1.length; i++) {
+            allbytesEncrypted.add(enc1[i]);
+        }
 
-        enc = p1.rc4("hallo".getBytes());
-        System.out.println(new String(p2.rc4(enc)));
+        byte[] enc2 = p1.rc4("dit is ook redelijk wa tekst maar mag nog veel meer zijn eigelijk in principe hoor".getBytes());
+        for (int i = 0; i < enc2.length; i++) {
+            allbytesEncrypted.add(enc2[i]);
+        }
 
-        p1.printKey();
-        p2.printKey();
+        System.out.println("-----------");
+        System.out.println("after being sent:");
+        printState(p1.state);
+        System.out.println("x: " + p1.x + ", y: " + p1.y);
 
-        enc = p1.rc4("meneeeer dit zijn echt veel meer dan 27 characters dus latne we dit even proberen".getBytes());
-        System.out.println(new String(p2.rc4(enc)));
 
-        p1.printKey();
-        p2.printKey();
+        byte[] allencrypted = new byte[allbytesEncrypted.size()];
+        for (int i = 0; i < allbytesEncrypted.size(); i++) {
+            allencrypted[i] = allbytesEncrypted.get(i);
+        }
+
+        p1.undoRc4(allencrypted);
+
+        System.out.println("-----------");
+        System.out.println("after undo:");
+        printState(p1.state);
+        System.out.println("x: " + p1.x + ", y: " + p1.y);
+
+
+//        byte[] sharedKey = new byte[27];
+//
+//        RC4 p1 = new RC4(sharedKey);
+//        RC4 p2 = new RC4(sharedKey);
+//
+//        p1.printKey();
+//        p2.printKey();
+//        byte[] enc = p1.rc4("hallo".getBytes());
+//        System.out.println(new String(p2.rc4(enc)));
+//
+//        p1.printKey();
+//        p2.printKey();
+//
+//        enc = p1.rc4("hallo".getBytes());
+//        System.out.println(new String(p2.rc4(enc)));
+//
+//        p1.printKey();
+//        p2.printKey();
+//
+//        enc = p1.rc4("meneeeer dit zijn echt veel meer dan 27 characters dus latne we dit even proberen".getBytes());
+//        System.out.println(new String(p2.rc4(enc)));
+//
+//        p1.printKey();
+//        p2.printKey();
     }
 
 //    public static void main(String[] args) {
