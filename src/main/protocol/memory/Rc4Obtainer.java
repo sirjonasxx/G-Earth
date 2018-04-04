@@ -20,7 +20,6 @@ public class Rc4Obtainer {
         client = HabboClient.create();
     }
 
-
     private boolean hashappened1 = false;
     public void setOutgoingHandler(OutgoingHandler handler) {
         outgoingHandler = handler;
@@ -32,7 +31,6 @@ public class Rc4Obtainer {
             }
         });
     }
-
     public void setIncomingHandler(IncomingHandler handler) {
         incomingHandler = handler;
     }

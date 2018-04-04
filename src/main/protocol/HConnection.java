@@ -1,11 +1,11 @@
 package main.protocol;
 
-import main.OSValidator;
+import main.protocol.hostreplacer.HostReplacer;
+import main.protocol.hostreplacer.HostReplacerFactory;
 import main.protocol.memory.Rc4Obtainer;
 import main.protocol.packethandler.Handler;
 import main.protocol.packethandler.IncomingHandler;
 import main.protocol.packethandler.OutgoingHandler;
-import sun.plugin2.util.SystemUtil;
 
 import java.io.*;
 import java.net.InetAddress;
@@ -25,13 +25,9 @@ public class HConnection {
         CONNECTED           // CONNECTED
     }
 
-    private static final String hostsFileLocation;
-    static {
-        if (OSValidator.isWindows()) hostsFileLocation = System.getenv("WinDir") + "\\system32\\drivers\\etc\\hosts";
-        else hostsFileLocation = "/etc/hosts"; // confirmed location on linux & mac
-    }
+    private static final HostReplacer hostsReplacer = HostReplacerFactory.get();
 
-    private volatile boolean hostFileEdited = false;
+    private volatile boolean hostRedirected = false;
     private volatile Object[] trafficListeners = {new ArrayList<TrafficListener>(), new ArrayList<TrafficListener>(), new ArrayList<TrafficListener>()};
     private volatile List<StateChangeListener> stateChangeListeners = new ArrayList<>();
     private volatile State state = State.NOT_CONNECTED;
@@ -59,8 +55,9 @@ public class HConnection {
         this.actual_domain = domain;
         this.port = port;
 
-        if (hostFileEdited)	{
-            removeFromHostsFile(detourIP() + " " + domain);
+        if (hostRedirected)	{
+            hostsReplacer.removeRedirect(domain, detourIP());
+            hostRedirected = false;
         }
 
         try {
@@ -80,8 +77,9 @@ public class HConnection {
             if (DEBUG) System.out.println("waiting for client on port: " + port);
 
             setState(State.WAITING_FOR_CLIENT);
-            if (!hostFileEdited)	{
-                addToHostsFile(detourIP() + " " + input_domain);
+            if (!hostRedirected)	{
+                hostsReplacer.addRedirect(input_domain, detourIP());
+                hostRedirected = true;
             }
 
             proxy = new ServerSocket(port);
@@ -229,8 +227,9 @@ public class HConnection {
         }
     }
     private void onConnect()	{
-        if (hostFileEdited)	{
-            removeFromHostsFile(detourIP() + " " + input_domain);
+        if (hostRedirected)	{
+            hostsReplacer.removeRedirect(input_domain, detourIP());
+            hostRedirected = false;
         }
 
         if (proxy != null && !proxy.isClosed())	{
@@ -243,8 +242,9 @@ public class HConnection {
         }
     }
     public void abort()	{
-        if (hostFileEdited)	{
-            removeFromHostsFile(detourIP() + " " + input_domain);
+        if (hostRedirected)	{
+            hostsReplacer.removeRedirect(input_domain, detourIP());
+            hostRedirected = false;
         }
         port = -1;
         setState(State.NOT_CONNECTED);
@@ -256,81 +256,6 @@ public class HConnection {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-        }
-    }
-
-    private void addToHostsFile(String text)	{
-        if (DEBUG) System.out.println("try add hostsfile: " + text);
-        try
-        {
-            ArrayList<String> lines = new ArrayList<String>();
-            File f1 = new File(hostsFileLocation);
-            FileReader fr = new FileReader(f1);
-            BufferedReader br = new BufferedReader(fr);
-            String line = null;
-            boolean containmmm = false;
-            while ((line = br.readLine()) != null)
-            {
-                if (line.equals(text))
-                    containmmm = true;
-                lines.add(line);
-
-            }
-            fr.close();
-            br.close();
-
-            FileWriter fw = new FileWriter(f1);
-            BufferedWriter out = new BufferedWriter(fw);
-
-            if (!containmmm)	{
-                out.write(text);
-            }
-
-            for (int i = 0; i < lines.size(); i++)	{
-                out.write("\n"+ lines.get(i));
-            }
-
-            out.flush();
-            out.close();
-            hostFileEdited = true;
-        }
-        catch (Exception ex)
-        {
-            ex.printStackTrace();
-        }
-    }
-    private void removeFromHostsFile(String text)	{
-        try
-        {
-            if (DEBUG) System.out.println("try remove hostsfile: " + text);
-            ArrayList<String> lines = new ArrayList<String>();
-            File f1 = new File(hostsFileLocation);
-            FileReader fr = new FileReader(f1);
-            BufferedReader br = new BufferedReader(fr);
-            String line = null;
-            while ((line = br.readLine()) != null)
-            {
-                if (!line.contains(text))
-                    lines.add(line);
-
-            }
-            fr.close();
-            br.close();
-
-            FileWriter fw = new FileWriter(f1);
-            BufferedWriter out = new BufferedWriter(fw);
-
-            for (int i = 0; i < lines.size(); i++)	{
-                out.write(lines.get(i));
-                if (i != lines.size() - 1) out.write("\n");
-            }
-            out.flush();
-            out.close();
-            hostFileEdited = false;
-        }
-        catch (Exception ex)
-        {
-            ex.printStackTrace();
         }
     }
 
@@ -381,7 +306,7 @@ public class HConnection {
 
     public boolean sendToClient(HPacket message) {
         if (inHandler == null) return false;
-        new Thread(() -> inHandler.sendToStream(message.toBytes())).start();
+        inHandler.sendToStream(message.toBytes());
         return true;
     }
     public boolean sendToServer(HPacket message) {
