@@ -1,12 +1,13 @@
 package main.protocol.memory;
 
-import main.irrelevant.Timer;
-
 import java.io.*;
-import java.lang.reflect.Array;
+import java.nio.file.Files;
 import java.util.*;
 
 public class FlashClient {
+
+
+    private static final String[] potentialProcessNames = {"--ppapi-flash-args", "plugin-container"};
 
     private int PID;
     private List<long[]> maps;
@@ -20,10 +21,16 @@ public class FlashClient {
         do {
             File[] fileList = folder.listFiles();
             for (File file : fileList) {
-                if (file.isDirectory() && MemoryUtils.stringIsNumeric(file.getName())) {
+                if (file.isDirectory() && stringIsNumeric(file.getName())) {
                     String path = "/proc/" + file.getName() + "/cmdline";
-                    if (MemoryUtils.fileContainsString(path, "--ppapi-flash-args") ||
-                            MemoryUtils.fileContainsString(path, "plugin-container")) {
+                    boolean isHabboProcess = false;
+                    for (String s : potentialProcessNames) {
+                        if (fileContainsString(path, s)) {
+                            isHabboProcess = true;
+                            break;
+                        }
+                    }
+                    if (isHabboProcess) {
                         client = new FlashClient();
                         client.PID = Integer.parseInt(file.getName());
                         client.maps = new ArrayList<>();
@@ -151,33 +158,24 @@ public class FlashClient {
         return result;
     }
 
-    public static void main(String[] args) throws InterruptedException {
-        FlashClient client = FlashClient.create();
-        client.refreshMemoryMaps();
 
-//        List<Long> gameHostOccurences = client.searchOffsetForString("game-nl.habbo.com");
-//        List<Long> rsaOccurences = client.searchOffsetForString("xIBlMDUyODA4YzFhYmVmNjlhMWE2MmMzOTYzOTZiODU5NTVlMmZmNTIy");
-//        List<Long> occ = client.searchOffsetForString("sirjonasxx");
+    static boolean stringIsNumeric(String str) {
+        for (char c : str.toCharArray()) {
+            if (c < '0' || c > '9') return false;
+        }
+        return true;
+    }
+    static boolean fileContainsString(String path, String contains) {
 
-//        List<MemorySnippet> l = client.createMemorySnippetList();
-//        client.fetchMemory(l);
-//        Thread.sleep(1000);
-//        //what didnt change in the last 1000ms?
-//        List<MemorySnippet> l2 = client.differentiate(l, false, 0);
-//        Thread.sleep(1000);
-//        //what changed in the last 1000ms?
-//        List<MemorySnippet> l3 = client.differentiate(l2, true, 0);
-//        Thread.sleep(1000);
-//        //what didnt change in the last 1000ms?
-//        List<MemorySnippet> l4 = client.differentiate(l3, false, 0);
-//        Thread.sleep(1000);
-//        //what changed in the last 1000ms?
-//        List<MemorySnippet> l5 = client.differentiate(l4, true, 0);
-
-//        client.updateMapLocationsSnippetList(l);
-
+        try {
+            List<String> lines = Files.readAllLines(new File(path).toPath());
+            for (String line : lines) {
+                if (line.contains(contains)) return true;
+            }
+        } catch (Exception e) {
+            // process of specified path not running anymore
+        }
+        return false;
 
     }
-
-
 }
