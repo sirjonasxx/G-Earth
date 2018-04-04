@@ -11,7 +11,7 @@ import main.protocol.HConnection;
 import main.protocol.HPacket;
 import main.ui.SubForm;
 
-public class InjectionForm extends SubForm {
+public class Injection extends SubForm {
     public TextArea inputPacket;
     public Text lbl_corrruption;
     public Text lbl_pcktInfo;

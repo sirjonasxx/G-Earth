@@ -4,7 +4,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.util.*;
 
-public class FlashClient {
+public class HabboClient {
 
 
     private static final String[] potentialProcessNames = {"--ppapi-flash-args", "plugin-container"};
@@ -14,9 +14,9 @@ public class FlashClient {
 
     private static final boolean DEBUG = false;
 
-    public static FlashClient create() {
+    public static HabboClient create() {
         File folder = new File("/proc");
-                FlashClient client = null;
+                HabboClient client = null;
 
         do {
             File[] fileList = folder.listFiles();
@@ -31,7 +31,7 @@ public class FlashClient {
                         }
                     }
                     if (isHabboProcess) {
-                        client = new FlashClient();
+                        client = new HabboClient();
                         client.PID = Integer.parseInt(file.getName());
                         client.maps = new ArrayList<>();
                     }

@@ -13,7 +13,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 
-public class ToolsForm extends SubForm {
+public class Tools extends SubForm {
     public TextField txt_intDecoded;
     public TextField txt_intEncoded;
     public TextField txt_ushortDecoded;

@@ -16,7 +16,7 @@ import main.ui.SubForm;
 
 import java.io.IOException;
 
-public class ConnectionForm extends SubForm {
+public class Connection extends SubForm {
 
     public ComboBox<String> inpPort;
     public ComboBox<String> inpHost;

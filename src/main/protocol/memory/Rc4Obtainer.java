@@ -1,14 +1,10 @@
 package main.protocol.memory;
 
-import javafx.application.Platform;
 import main.protocol.HPacket;
 import main.protocol.crypto.RC4;
-import main.protocol.packethandler.BufferListener;
 import main.protocol.packethandler.IncomingHandler;
 import main.protocol.packethandler.OutgoingHandler;
-import main.protocol.memory.FlashClient;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -16,12 +12,12 @@ public class Rc4Obtainer {
 
     public static final boolean DEBUG = false;
 
-    FlashClient client = null;
+    HabboClient client = null;
     OutgoingHandler outgoingHandler = null;
     IncomingHandler incomingHandler = null;
 
     public Rc4Obtainer() {
-        client = FlashClient.create();
+        client = HabboClient.create();
     }
 
 
@@ -187,7 +183,6 @@ public class Rc4Obtainer {
         }).start();
     }
 
-
     private List<MemorySnippet> searchForPossibleRC4Tables(List<MemorySnippet> snippets) {
         List<MemorySnippet> result;
         result = client.differentiate2(snippets, ((addedBytes * 2) / 3), addedBytes * 2, 1028);
@@ -196,13 +191,6 @@ public class Rc4Obtainer {
         return result;
     }
 
-    private void printBooleanArray(boolean[] booleans) {
-        StringBuilder builder = new StringBuilder();
-        for (boolean bool : booleans) {
-            builder.append(bool ? "1" : "0");
-        }
-        System.out.println(builder);
-    }
     private void printByteArray(byte[] booleans) {
         StringBuilder builder = new StringBuilder();
         for (byte bool : booleans) {
@@ -226,65 +214,4 @@ public class Rc4Obtainer {
         }
     }
 
-
-    //        System.out.println("[+] receive pubkey");
-//        incomingHandler.block();
-//        client.pauseProcess();
-//        fullmemorybeforekey = client.createMemorySnippetList();
-//        client.fetchMemory(fullmemorybeforekey);
-//        System.out.println("[-] receive pubkey");
-//        incomingHandler.unblock();
-//        client.resumeProcess();
-
-    //        client.pauseProcess();
-//
-//        client.refreshMemoryMaps();
-//        List<String> result = client.findSharedKey2();
-//        System.out.println("result size: "+ result);
-//
-//        client.resumeProcess();
-
-//        System.out.println("[+] send encrypted");
-//        client.pauseProcess();
-//        client.updateMapLocationsSnippetList(fullmemorybeforekey);
-//
-//        List<FlashClient.MemorySnippet> diff = client.differentiate(fullmemorybeforekey, true, 54);
-//
-//        List<String> results = client.findSharedKey(diff);
-//        System.out.println("results: " +results.size());
-//        for (String s : results) {
-//            System.out.println(s);
-//        }
-//        System.out.println("[-] send encrypted");
-//        client.resumeProcess();
-
-//     payloadBuffer.push(buffer);
-//    buffer = new byte[]{};
-//    tempBlockIncoming = true;
-//    client = FlashClient.create();
-//     client.pauseProcess();
-//    fullmemoryb4publickey = client.createMemorySnippetList();
-//      client.fetchMemory(fullmemoryb4publickey);
-//      client.resumeProcess();
-
-
-
-//     if (!doneFlash) {
-//        tempBlockEncrypted = true;
-//        FlashClient client = IncomingHandler.client;
-//        List<FlashClient.MemorySnippet> mem = IncomingHandler.fullmemoryb4publickey;
-//        client.pauseProcess();
-//        client.updateMapLocationsSnippetList(mem);
-//        List<FlashClient.MemorySnippet> diff = client.differentiate(mem, true, 54);
-//        IncomingHandler.fullmemoryb4publickey = null;
-//        List<String> results = client.findSharedKey(diff);
-//        System.out.println("results: " +results.size());
-//        for (String s : results) {
-//            System.out.println(s);
-//        }
-//        client.resumeProcess();
-//        tempBlockEncrypted = false;
-//        IncomingHandler.tempBlockIncoming = false;
-//        doneFlash = true;
-//    }
 }

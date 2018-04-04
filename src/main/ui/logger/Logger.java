@@ -17,7 +17,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
-public class LoggerForm extends SubForm {
+public class Logger extends SubForm {
 
 
     public TextField txtPacketLimit;

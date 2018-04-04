@@ -1,28 +1,22 @@
 package main.ui;
 
-import javafx.event.EventHandler;
-import javafx.fxml.FXML;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import main.protocol.HConnection;
-import main.ui.connection.ConnectionForm;
-import main.ui.injection.InjectionForm;
-import main.ui.logger.LoggerForm;
-import main.ui.tools.ToolsForm;
-
-import java.awt.*;
+import main.ui.connection.Connection;
+import main.ui.injection.Injection;
+import main.ui.logger.Logger;
+import main.ui.tools.Tools;
 
 public class GEarthController {
 
     private Stage stage = null;
     private volatile HConnection hConnection;
 
-    public ConnectionForm connectionController;
-    public InjectionForm injectionController;
-    public LoggerForm loggerController;
-    public ToolsForm toolsController;
+    public Connection connectionController;
+    public Injection injectionController;
+    public Logger loggerController;
+    public Tools toolsController;
     public Pane mover;
 
     public GEarthController() {
