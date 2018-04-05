@@ -21,6 +21,10 @@ public class HMessage {
         isBlocked = false;
     }
 
+    public int getIndex() {
+        return index;
+    }
+
     public void setBlocked(boolean block) {
         isBlocked = block;
     }

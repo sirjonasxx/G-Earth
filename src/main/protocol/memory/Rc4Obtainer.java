@@ -1,9 +1,14 @@
 package main.protocol.memory;
 
+import main.Cacher;
+import main.protocol.HConnection;
+import main.protocol.HMessage;
 import main.protocol.HPacket;
+import main.protocol.TrafficListener;
 import main.protocol.crypto.RC4;
 import main.protocol.packethandler.IncomingHandler;
 import main.protocol.packethandler.OutgoingHandler;
+import sun.misc.Cache;
 
 import java.util.List;
 import java.util.Random;
@@ -15,6 +20,9 @@ public class Rc4Obtainer {
     HabboClient client = null;
     OutgoingHandler outgoingHandler = null;
     IncomingHandler incomingHandler = null;
+
+    String habboVersion = "";
+    int pingHeader = -1;
 
     public Rc4Obtainer() {
         client = HabboClient.create();
@@ -35,14 +43,33 @@ public class Rc4Obtainer {
         incomingHandler = handler;
     }
 
+    public void setHConnection(HConnection hConnection) {
+        hConnection.addTrafficListener(0, message -> {
+            if (message.getIndex() == 0 && message.getDestination() == HMessage.Side.TOSERVER) {
+                habboVersion = message.getPacket().readString(6);
+                if (Cacher.exists(habboVersion +"-pingHeader")) {
+                    pingHeader = Integer.parseInt(Cacher.get(habboVersion +"-pingHeader"));
+                }
+            }
+            if (pingHeader == -1 && message.getDestination() == HMessage.Side.TOCLIENT && message.getPacket().length() == 2) {
+                pingHeader = message.getPacket().headerId();
+                Cacher.add(habboVersion +"-pingHeader", pingHeader+"");
+            }
+        });
+    }
+
     private volatile int addedBytes = 0;
     private void onSendFirstEncryptedMessage() {
-        incomingHandler.block();
         outgoingHandler.block();
         new Thread(() -> {
 
             if (DEBUG) System.out.println("[+] send encrypted");
             sleep(20);
+
+            while (pingHeader == -1) {
+                sleep(50);
+            }
+            incomingHandler.block();
 
             List<MemorySnippet> diff = null;
 
@@ -63,7 +90,7 @@ public class Rc4Obtainer {
                     if (i % 2 == 1) {
                         am = rand.nextInt(30) + 1;
                         for (int j = 0; j < am; j++) {
-                            incomingHandler.sendToStream(new HPacket(3794).toBytes());
+                            incomingHandler.sendToStream(new HPacket(pingHeader).toBytes());
                             outgoingHandler.fakePongAlert();
                             sleep(20);
                         }
@@ -111,7 +138,7 @@ public class Rc4Obtainer {
 
             MemorySnippet snippet1 = new MemorySnippet(snippet.getOffset(), new byte[snippet.getData().length]);
             client.fetchMemory(snippet1);
-            incomingHandler.sendToStream(new HPacket(3794).toBytes());
+            incomingHandler.sendToStream(new HPacket(pingHeader).toBytes());
             outgoingHandler.fakePongAlert();
             sleep(70);
 
@@ -154,6 +181,12 @@ public class Rc4Obtainer {
 
             //if result = null ud better reload
 
+            if (result == null) {
+                System.out.println("please try again.");
+                System.out.println("found RC4 table:");
+                printByteArray(data);
+                return;
+            }
 
 
             // STEP FOUR: undo all sent packets in the rc4 stream

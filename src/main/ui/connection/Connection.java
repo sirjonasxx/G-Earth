@@ -78,7 +78,12 @@ public class Connection extends SubForm {
     public void btnConnect_clicked(ActionEvent actionEvent) {
         if (!isBusy) {
             isBusy = true;
-            getHConnection().prepare(inpHost.getEditor().getText(), Integer.parseInt(inpPort.getEditor().getText()));
+            if (cbx_autodetect.isSelected()) {
+                getHConnection().prepare();
+            }
+            else {
+                getHConnection().prepare(inpHost.getEditor().getText(), Integer.parseInt(inpPort.getEditor().getText()));
+            }
 
             if (HConnection.DEBUG) System.out.println("connecting");
 
