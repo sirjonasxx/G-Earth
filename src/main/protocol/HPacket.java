@@ -544,7 +544,7 @@ public class HPacket {
                     continue out;
                 }
             }
-            if (i+5 < packetInBytes.length && !mask[i+5]) continue;
+            if (!mask[i-1] || (i+5 < packetInBytes.length && !mask[i+5])) continue;
 
             if ((readByte(i) == 0 || readByte(i) == 1) && (readInteger(i+1) > 1 || readInteger(i+1) < 0)) {
                 //decide the first byte to be the a boolean
@@ -784,6 +784,8 @@ public class HPacket {
         packet = new HPacket("[0][0][0]ã[4]Ù[0][0][0][12][0][0][0][1][0][18]Vetste Evenementen[0][0][0][0][2][0][16]Feesten & Muziek[1][0][0][0][3][0][10]Rollenspel[1][0][0][0][4][0][9]Help Desk[1][0][0][0][5][0][6]Ruilen[1][0][0][0][6][0][5]Games[1][0][0][0][7][0][7]Bouwers[1][0][0][0][8][0][21]Debatten & Discussies[1][0][0][0][9][0][9]Friending[1][0][0][0][10][0][10]Habbo Werk[1][0][0][0][11][0][9]Evenement[1][0][0][0][12][0][17]Groepsevenementen[0]");
         System.out.println(packet.toExpression());
 
+        packet = new HPacket("[0][0][0][14][12]ã[0][0][0][4][0][0][0][0][1][26]#»");
+        System.out.println(packet.toExpression());
     }
 
 

@@ -158,6 +158,32 @@ public class HabboClient {
         return result;
     }
 
+    @SuppressWarnings("Duplicates")
+    public void pauseProcess() {
+        String[] args = new String[] {"kill", "-STOP", PID+""};
+        Process proc;
+        try {
+            proc = new ProcessBuilder(args).start();
+            proc.waitFor();
+            proc.destroy();
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @SuppressWarnings("Duplicates")
+    public void resumeProcess()  {
+        String[] args = new String[] {"kill", "-CONT", PID+""};
+        Process proc;
+        try {
+            proc = new ProcessBuilder(args).start();
+            proc.waitFor();
+            proc.destroy();
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     static boolean stringIsNumeric(String str) {
         for (char c : str.toCharArray()) {

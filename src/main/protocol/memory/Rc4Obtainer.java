@@ -15,7 +15,7 @@ import java.util.Random;
 
 public class Rc4Obtainer {
 
-    public static final boolean DEBUG = false;
+    public static final boolean DEBUG = true;
 
     HabboClient client = null;
     OutgoingHandler outgoingHandler = null;
@@ -77,8 +77,11 @@ public class Rc4Obtainer {
             // STEP ONE: filtering to obtain one area containing the rc4 data field
             int foundbuffersize = 0;
             while (foundbuffersize == 0) {
+
+                client.pauseProcess();
                 diff = client.createMemorySnippetList();
                 client.fetchMemory(diff);
+                client.resumeProcess();
                 this.addedBytes = 0;
 
                 Random rand = new Random();
@@ -87,8 +90,8 @@ public class Rc4Obtainer {
                 int i = 0;
                 while (getTotalBytesLengthOfDiff(diff) > 2000) {
                     int am = 0;
-                    if (i % 2 == 1) {
-                        am = rand.nextInt(30) + 1;
+                    if (i == 0 || i > 1) {
+                        am = rand.nextInt(25) + 5;
                         for (int j = 0; j < am; j++) {
                             incomingHandler.sendToStream(new HPacket(pingHeader).toBytes());
                             outgoingHandler.fakePongAlert();
@@ -97,7 +100,9 @@ public class Rc4Obtainer {
                     }
                     sleep(50);
                     int rem = addedBytes;
+                    if (i == 0) client.pauseProcess();
                     diff = searchForPossibleRC4Tables(diff);
+                    if (i == 0) client.resumeProcess();
                     if (DEBUG) System.out.println("size: " + getTotalBytesLengthOfDiff(diff) + " with changed bytes: " + rem + " should be: " + am * 6);
                     i++;
                 }
@@ -216,7 +221,7 @@ public class Rc4Obtainer {
 
     private List<MemorySnippet> searchForPossibleRC4Tables(List<MemorySnippet> snippets) {
         List<MemorySnippet> result;
-        result = client.differentiate2(snippets, ((addedBytes * 2) / 3), addedBytes * 2, 1028);
+        result = client.differentiate2(snippets, addedBytes, addedBytes * 2, 1028);
         addedBytes = 0;
 
         return result;
