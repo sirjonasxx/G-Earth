@@ -46,7 +46,6 @@ public class HPacket {
         return teststring;
     }
 
-
     /**
      * returns "" if invalid expression, replaces all {} occurences except {l}
      * @return
@@ -490,11 +489,302 @@ public class HPacket {
         isEdited = remember;
     }
 
+
+    /**
+     * returns "" if not found or not sure enough
+     * dont hate on the coding quality in this function, its pretty effective.
+     */
+    public String toExpression() {
+        if (isCorrupted()) return "";
+
+        boolean[] mask = new boolean[packetInBytes.length];
+        String[] resultTest = new String[packetInBytes.length];
+
+        for (int i = 0; i < 6; i++) {
+            mask[i] = true;
+        }
+
+        resultTest[0] = "{l}";
+        resultTest[4] = "{u:"+headerId()+"}";
+
+        outerloop:
+        for (int i = 6; i < packetInBytes.length - 1; i++) {
+            int potentialstringlength = readUshort(i);
+            if ((potentialstringlength >= 0 && potentialstringlength < 3) || potentialstringlength > packetInBytes.length - i - 2) continue;
+
+            for (int j = i; j < potentialstringlength+i+2; j++) {
+                if (mask[j]) continue outerloop;
+            }
+
+            for (int j = i+2; j < potentialstringlength+i+2; j++) {
+                if (readByte(j) >= 0 && readByte(j) < 6) continue  outerloop;
+            }
+
+            if (i + 2 + potentialstringlength >= packetInBytes.length - 3 ||
+                    (packetInBytes[i+2+potentialstringlength] >= 0 &&
+                            packetInBytes[i+2+potentialstringlength] < 6 )) {
+
+                for (int j = i; j < potentialstringlength+i+2; j++) {
+                    mask[j] = true;
+                }
+                resultTest[i] = "{s:"+readString(i)+"}";
+                i += (1 + potentialstringlength);
+            }
+        }
+
+        //TODO add special case for seperated 5, 6 and 7 bytes here
+        // long live the shitty code.
+
+        //5
+        out:
+        for (int i = 6; i < packetInBytes.length - 4; i++) {
+            for (int j = i; j < i+5; j++) {
+                if (mask[j]) {
+                    i = j;
+                    continue out;
+                }
+            }
+            if (i+5 < packetInBytes.length && !mask[i+5]) continue;
+
+            if ((readByte(i) == 0 || readByte(i) == 1) && (readInteger(i+1) > 1 || readInteger(i+1) < 0)) {
+                //decide the first byte to be the a boolean
+                resultTest[i] = "{b:"+(readBoolean(i) ? "true" : "false")+"}";
+                resultTest[i+1] = "{i:"+readInteger(i+1)+"}";
+                for (int j = i; j < i+5; j++) {
+                    mask[j] = true;
+                }
+            }
+
+        }
+
+//        //6
+//        out:
+//        for (int i = 6; i < packetInBytes.length - 5; i++) {
+//            for (int j = i; j < i+6; j++) {
+//                if (mask[j]) {
+//                    i = j;
+//                    continue out;
+//                }
+//            }
+//            if (i+6 < packetInBytes.length && !mask[i+6]) continue;
+//
+//
+//
+//        }
+//
+//        //7
+//        out:
+//        for (int i = 6; i < packetInBytes.length - 6; i++) {
+//            for (int j = i; j < i+7; j++) {
+//                if (mask[j]) {
+//                    i = j;
+//                    continue out;
+//                }
+//            }
+//            if (i+7 < packetInBytes.length && !mask[i+7]) continue;
+//
+//
+//
+//        }
+
+        lp22:
+        for (int i = 6; i < packetInBytes.length - 3; i++) {
+            for (int j = i; j < i + 4; j++) {
+                if (mask[j]) {
+                    continue lp22;
+                }
+            }
+
+            int num = readInteger(i);
+            if (num == -1 || (num >= 0 && num < 256)) {
+                for (int j = i; j < i+4; j++) {
+                    mask[j] = true;
+                }
+                resultTest[i] = "{i:"+num+"}";
+                i += 3;
+            }
+        }
+
+
+        boolean changed = true;
+        boolean isfirst = true;
+
+        while (changed) {
+            changed = false;
+            // filtering strings
+            outerloop:
+            for (int i = 6; i < packetInBytes.length - 1; i++) {
+                int potentialstringlength = readUshort(i);
+                if ((potentialstringlength >= 0 && potentialstringlength < 3) || potentialstringlength > packetInBytes.length - i - 2) continue;
+
+                for (int j = i; j < potentialstringlength+i+2; j++) {
+                    if (mask[j]) continue outerloop;
+                }
+
+                for (int j = i+2; j < potentialstringlength+i+2; j++) {
+                    if (readByte(j) >= 0 && readByte(j) < 6) continue  outerloop;
+                }
+
+                if (i + 2 + potentialstringlength >= packetInBytes.length - 3 ||
+                        (packetInBytes[i+2+potentialstringlength] >= 0 &&
+                                packetInBytes[i+2+potentialstringlength] < 6 )) {
+
+                    for (int j = i; j < potentialstringlength+i+2; j++) {
+                        mask[j] = true;
+                    }
+                    changed = true;
+                    resultTest[i] = "{s:"+readString(i)+"}";
+                    i += (1 + potentialstringlength);
+                }
+            }
+
+            if (isfirst) {
+                int count = 0;
+                for (int i = 6; i < packetInBytes.length; i++) {
+                    if (!mask[i]) count++;
+                }
+                if (count > 300) return "";
+            }
+            isfirst = false;
+
+            // filtering integers
+            boolean hasfoundsomtin = true;
+            while (hasfoundsomtin) {
+                hasfoundsomtin = false;
+                outerloop2:
+                for (int i = 6; i < packetInBytes.length - 3; i++) {
+                    for (int j = i; j < i + 4; j++) {
+                        if (mask[j]) {
+                            continue outerloop2;
+                        }
+                    }
+
+                    if (i + 4 == packetInBytes.length || mask[i+4] || mask[i-1]) {
+                        if (packetInBytes[i+1] == 2) { //could be an unfiltered string; don't filter yet
+                            if (((packetInBytes[i+2] >= '0' && packetInBytes[i+2] <= '9') ||
+                                    (packetInBytes[i+2] >= 'a' && packetInBytes[i+2] <= 'z') ||
+                                    (packetInBytes[i+2] >= 'A' && packetInBytes[i+2] <= 'Z')) &&
+                                    ((packetInBytes[i+3] >= '0' && packetInBytes[i+3] <= '9') ||
+                                            (packetInBytes[i+3] >= 'a' && packetInBytes[i+3] <= 'z') ||
+                                            (packetInBytes[i+3] >= 'A' && packetInBytes[i+3] <= 'Z'))) {
+                                changed = true;
+                                for (int j = i; j < i + 4; j++) {
+                                    mask[j] = true;
+                                }
+                                hasfoundsomtin = true;
+                                resultTest[i] = "{i:"+readInteger(i)+"}";
+                                continue;
+                            }
+                            continue ;
+                        }
+                        else {
+                            for (int j = i; j < i + 4; j++) {
+                                mask[j] = true;
+                            }
+                            hasfoundsomtin = true;
+                            changed = true;
+                            resultTest[i] = "{i:"+readInteger(i)+"}";
+                            continue;
+                        }
+                    }
+                    if (readInteger(i) < 65536) {
+                        for (int j = i; j < i + 4; j++) {
+                            mask[j] = true;
+                        }
+                        hasfoundsomtin = true;
+                        resultTest[i] = "{i:"+readInteger(i)+"}";
+                        changed = true;
+                        continue;
+                    }
+
+                }
+            }
+
+
+            // filtering strings
+
+            outerloop3:
+            for (int i = 6; i < packetInBytes.length - 1; i++) {
+                int potentialstringlength = readUshort(i);
+                if (potentialstringlength > packetInBytes.length - i - 2) continue;
+
+                for (int j = i; j < potentialstringlength+i+2; j++) {
+                    if (mask[j]) continue outerloop3;
+                }
+
+                for (int j = i+2; j < potentialstringlength+i+2; j++) {
+                    if (readByte(j) >= 0 && readByte(j) < 6) continue outerloop3;
+                }
+
+                for (int j = i; j < potentialstringlength+i+2; j++) {
+                    mask[j] = true;
+                }
+                resultTest[i] = "{s:"+readString(i)+"}";
+                i += (1 + potentialstringlength);
+                changed = true;
+            }
+        }
+
+        int opeenvolging = 0;
+        for (int i = 6; i < packetInBytes.length; i++) {
+            if (!mask[i]) {
+                opeenvolging++;
+                if (opeenvolging == 4) return "";
+                if (i+1 == packetInBytes.length || mask[i+1]) {
+                    for (int j = i - opeenvolging + 1; j <= i; j++) {
+                        mask[j] = true;
+                        if (packetInBytes[j] == 1 || packetInBytes[j] == 0) {
+                            resultTest[j] = "{b:"+(packetInBytes[j] == 1 ? "true" : "false")+"}";
+                        }
+                        else {
+                            resultTest[j] = "{b:"+packetInBytes[j]+"}";
+                        }
+                    }
+                    opeenvolging = 0;
+
+
+                }
+            }
+        }
+
+
+        // if all values in mask are true, go further
+        for (boolean bool : mask) {
+            if (!bool) return "";
+        }
+
+        StringBuilder expression = new StringBuilder();
+        for (int i = 0; i < resultTest.length; i++) {
+            if (resultTest[i] != null) expression.append(resultTest[i]);
+        }
+
+        return expression.toString();
+    }
+
     public static void main(String[] args) {
-        HPacket packet = new HPacket("[0][0][0]4[15] [0]!PRODUCTION-201802201205-141713395[0][5]FLASH[0][0][0][1][0][0][0][0]");
-        packet.replaceFirstString("FLASH", "HTML");
-        System.out.println(packet);
+//        HPacket packet = new HPacket("[0][0][0]4[15] [0]!PRODUCTION-201802201205-141713395[0][5]FLASH[0][0][0][1][0][0][0][0]");
+//        packet.replaceFirstString("FLASH", "HTML");
+//        System.out.println(packet);
+
+        HPacket packet = new HPacket("[0][0][0]![14][134][0][21]99% kans je leest dit[0][0][0][0][0][0][0][29]");
+        System.out.println(packet.toExpression());
+
+        packet = new HPacket("[0][0][0]+[0]µ[0][10]Navigation[0][0][0][11]go.official[0][8]27636336[0][0][0][0]");
+        System.out.println(packet.toExpression());
+
+        packet = new HPacket("[0][0][0][11][7]/[0][0][0][2][0][0][0][0][0]");
+        System.out.println(packet.toExpression());
+
+        packet = new HPacket("[0][0][4]ÿ[5]×[0][0][0]<[0][7]new_ads[0][14]friend_finding[0][10]staffpicks[0][15]campaign_target[0][13]friends_rooms[0][6]groups[0][8]metadata[0][12]history_freq[0][13]highest_score[0][11]competition[0][21]category__Habbo Leven[0] category__Global Chat & Discussi[0] category__GLOBAL BUILDING AND DE[0][25]category__global official[0][22]category__global party[0][22]category__global games[0][22]category__global trade[0][24]category__global fansite[0][21]category__global help[0][31]category__global personal space[0][24]category__global reviews[0][19]category__global bc[0][31]category__global personal space[0] eventcategory__Vetste Evenemente[0][31]eventcategory__Feesten & Muziek[0][25]eventcategory__Rollenspel[0][24]eventcategory__Help Desk[0][21]eventcategory__Ruilen[0][20]eventcategory__Games[0][22]eventcategory__Bouwers[0] eventcategory__Debatten & Discus[0][24]eventcategory__Friending[0][25]eventcategory__Habbo Werk[0][24]eventcategory__Evenement[0] eventcategory__Groepsevenementen[0][9]favorites[0][16]eventcategory__2[0][15]official_134070[0][15]official_134072[0][15]official_134073[0][15]official_134074[0][15]official_134910[0][15]official_134912[0][15]official_134913[0][15]official_135420[0][15]official_135422[0][15]official_135423[0][15]official_135424[0][16]eventcategory__5[0][15]official_144124[0][15]official_144126[0][15]official_144127[0][16]category__Ruilen[0] category__Global Chat & Discussi[0] category__GLOBAL BUILDING AND DE[0][15]official_148980[0][15]official_148981[0][15]official_148982[0][15]official_148984[0][15]official_148985");
+        System.out.println(packet.toExpression());
+
+        packet = new HPacket("[0][0][0][18][2][144][0][12]myworld_view[0][0]");
+        System.out.println(packet.toExpression());
+
+        packet = new HPacket("[0][0][0]ã[4]Ù[0][0][0][12][0][0][0][1][0][18]Vetste Evenementen[0][0][0][0][2][0][16]Feesten & Muziek[1][0][0][0][3][0][10]Rollenspel[1][0][0][0][4][0][9]Help Desk[1][0][0][0][5][0][6]Ruilen[1][0][0][0][6][0][5]Games[1][0][0][0][7][0][7]Bouwers[1][0][0][0][8][0][21]Debatten & Discussies[1][0][0][0][9][0][9]Friending[1][0][0][0][10][0][10]Habbo Werk[1][0][0][0][11][0][9]Evenement[1][0][0][0][12][0][17]Groepsevenementen[0]");
+        System.out.println(packet.toExpression());
 
     }
+
 
 }

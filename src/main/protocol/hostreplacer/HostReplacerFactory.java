@@ -9,11 +9,10 @@ public class HostReplacerFactory {
 
     public static HostReplacer get() {
 
-        if (OSValidator.isUnix()) return new LinuxHostReplacer();
+        if (OSValidator.isUnix() || OSValidator.isMac()) return new UnixHostReplacer();
         if (OSValidator.isWindows()) return new WindowsHostReplacer();
-        if (OSValidator.isMac()) return new MacOSHostReplacer();
 
-        return new LinuxHostReplacer();
+        return new UnixHostReplacer();
     }
 
 }

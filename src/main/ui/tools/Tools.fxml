@@ -126,22 +126,22 @@
                   <Insets />
                </GridPane.margin>
                <children>
-                  <Button disable="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="------&gt;" GridPane.columnIndex="1" GridPane.halignment="CENTER">
+                  <Button fx:id="btn_toExpr" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#btn_toExpr_clicked" text="------&gt;" GridPane.columnIndex="1" GridPane.halignment="CENTER">
                      <GridPane.margin>
                         <Insets bottom="7.0" left="5.0" right="5.0" top="7.0" />
                      </GridPane.margin>
                   </Button>
-                  <TextArea disable="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="200.0" prefWidth="200.0" GridPane.halignment="CENTER">
+                  <TextArea fx:id="txt_packetArea" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="200.0" prefWidth="200.0" wrapText="true" GridPane.halignment="CENTER">
                      <GridPane.margin>
                         <Insets bottom="7.0" left="7.0" right="5.0" top="7.0" />
                      </GridPane.margin>
                   </TextArea>
-                  <Button disable="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="&lt;------" GridPane.columnIndex="2" GridPane.halignment="CENTER">
+                  <Button fx:id="btn_toPacket" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#btn_toPacket_clicked" text="&lt;------" GridPane.columnIndex="2" GridPane.halignment="CENTER">
                      <GridPane.margin>
                         <Insets bottom="7.0" left="5.0" right="5.0" top="7.0" />
                      </GridPane.margin>
                   </Button>
-                  <TextArea disable="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="3" GridPane.halignment="CENTER">
+                  <TextArea fx:id="txt_exprArea" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="200.0" prefWidth="200.0" wrapText="true" GridPane.columnIndex="3" GridPane.halignment="CENTER">
                      <GridPane.margin>
                         <Insets bottom="7.0" left="5.0" right="7.0" top="7.0" />
                      </GridPane.margin>

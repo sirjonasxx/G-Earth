@@ -6,11 +6,11 @@ import java.util.ArrayList;
 /**
  * Created by Jeunez on 04/04/18.
  */
-class LinuxHostReplacer implements HostReplacer {
+class UnixHostReplacer implements HostReplacer {
 
     protected String hostsFileLocation;
 
-    LinuxHostReplacer() {
+    UnixHostReplacer() {
         hostsFileLocation = "/etc/hosts";
     }
 

@@ -7,10 +7,7 @@ import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import main.protocol.HConnection;
 import main.ui.SubForm;
 
@@ -24,6 +21,7 @@ public class Connection extends SubForm {
     public Label lblState;
     public TextField outHost;
     public TextField outPort;
+    public CheckBox cbx_autodetect;
 
     private boolean isBusy = false;
 
@@ -36,6 +34,10 @@ public class Connection extends SubForm {
             catch (Exception e) {
                 btnConnect.setDisable(true);
             }
+        });
+        cbx_autodetect.selectedProperty().addListener(observable -> {
+            inpPort.setDisable(cbx_autodetect.isSelected());
+            inpHost.setDisable(cbx_autodetect.isSelected());
         });
 
         inpPort.getItems().addAll("30000", "38101");

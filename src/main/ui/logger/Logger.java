@@ -12,6 +12,8 @@ import javafx.scene.text.TextFlow;
 import main.protocol.HConnection;
 import main.protocol.HMessage;
 import main.ui.SubForm;
+import main.ui.logger.loggerdisplays.PacketLogger;
+import main.ui.logger.loggerdisplays.PacketLoggerFactory;
 
 import java.util.Calendar;
 import java.util.HashMap;
@@ -28,43 +30,24 @@ public class Logger extends SubForm {
     public CheckBox cbx_useLog;
     public TextFlow txt_logField;
     public Button btnUpdate;
+    public CheckBox cbx_showstruct;
 
     private int packetLimit = 8000;
 
-    public final static Map<String, String> colorizePackets;
-
-    static {
-        //FOR GNOME ONLY, shows up colorized packets
-        colorizePackets = new HashMap<>();
-        colorizePackets.put("BLOCKED", (char)27 + "[35m");     // some kind of grey
-        colorizePackets.put("INCOMING", (char)27 + "[31m");    // red
-        colorizePackets.put("OUTGOING", (char)27 + "[34m");    // blue
-        colorizePackets.put("REPLACED", (char)27 + "[33m");    // yellow
-
-        // others:
-        colorizePackets.put("INJECTED", "");
-        colorizePackets.put("SKIPPED", (char)27 + "[36m");
-        colorizePackets.put("DEFAULT", (char)27 + "[0m");
-
-        if (System.getenv("XDG_CURRENT_DESKTOP") == null || !System.getenv("XDG_CURRENT_DESKTOP").toLowerCase().contains("gnome")) {
-            for (String key : colorizePackets.keySet()) {
-                colorizePackets.put(key, "");
-            }
-        }
-    }
-
+    private PacketLogger packetLogger = PacketLoggerFactory.get();
 
     public void onParentSet(){
-
         getHConnection().addStateChangeListener((oldState, newState) -> Platform.runLater(() -> {
             if (newState == HConnection.State.PREPARING) {
                 miniLogText(Color.ORANGE, "Connecting to "+getHConnection().getDomain() + ":" + getHConnection().getPort());
             }
             if (newState == HConnection.State.CONNECTED) {
                 miniLogText(Color.GREEN, "Connecting to "+getHConnection().getDomain() + ":" + getHConnection().getPort());
+                packetLogger.start();
             }
             if (newState == HConnection.State.NOT_CONNECTED) {
                 miniLogText(Color.RED, "End of connection");
+                packetLogger.stop();
             }
         }));
 
@@ -72,32 +55,23 @@ public class Logger extends SubForm {
             if (message.getDestination() == HMessage.Side.TOCLIENT && cbx_blockIn.isSelected() ||
                     message.getDestination() == HMessage.Side.TOSERVER && cbx_blockOut.isSelected()) return;
 
-            String splitter = cbx_splitPackets.isSelected() ? "-----------------------------------\n" : "";
-
-            String type = message.getDestination() == HMessage.Side.TOCLIENT ?"" +
-                            colorizePackets.get("INCOMING") + "INCOMING" :
-                            colorizePackets.get("OUTGOING") + "OUTGOING";
-
-            String additionalData = " ";
-            if (!message.isCorrupted() && cbx_showAdditional.isSelected()) {
-                additionalData = " (h:"+ message.getPacket().headerId() +", l:"+message.getPacket().length()+") ";
+            if (cbx_splitPackets.isSelected()) {
+                packetLogger.appendSplitLine();
             }
 
-            String arrow = "--> ";
+            int types = 0;
+            if (message.getDestination() == HMessage.Side.TOCLIENT) types |= PacketLogger.MESSAGE_TYPE.INCOMING.getValue();
+            else if (message.getDestination() == HMessage.Side.TOSERVER) types |= PacketLogger.MESSAGE_TYPE.OUTGOING.getValue();
+            if (message.getPacket().length() >= packetLimit) types |= PacketLogger.MESSAGE_TYPE.SKIPPED.getValue();
+            if (message.isBlocked()) types |= PacketLogger.MESSAGE_TYPE.BLOCKED.getValue();
+            if (message.getPacket().isReplaced()) types |= PacketLogger.MESSAGE_TYPE.REPLACED.getValue();
+            if (cbx_showAdditional.isSelected()) types |= PacketLogger.MESSAGE_TYPE.SHOW_ADDITIONAL_DATA.getValue();
 
-            String packet = message.isCorrupted() ?
-                    message.getPacket().getBytesLength() + " (encrypted)": // message.getPacket().toString() : // TEMP CODE TO VIEW ENCRYPTED BODY
-                    message.getPacket().length() < packetLimit ?
-                            message.getPacket().toString() :
-                            colorizePackets.get("SKIPPED") + "<packet skipped (length >= " + (packetLimit) + ")>";
+            packetLogger.appendMessage(message.getPacket(), types);
 
-
-            String skipStyle = colorizePackets.get("DEFAULT");
-
-            String isBlocked = message.isBlocked() ? colorizePackets.get("BLOCKED") + "[BLOCKED] " : "";
-            String isEdited = !message.getPacket().isReplaced() || message.isBlocked() ? "" : colorizePackets.get("REPLACED") + "[REPLACED] ";
-            System.out.println(splitter + isBlocked + isEdited + type + additionalData + arrow + packet + skipStyle);
-
+            if (cbx_showstruct.isSelected() && message.getPacket().length() < packetLimit) {
+                packetLogger.appendStructure(message.getPacket());
+            }
         });
         });
     }

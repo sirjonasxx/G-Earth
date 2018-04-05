@@ -72,7 +72,7 @@
                 <VBox alignment="BOTTOM_LEFT" prefHeight="99.0" prefWidth="198.0" spacing="8.0" GridPane.rowIndex="1">
                     <children>
                         <CheckBox fx:id="cbx_showAdditional" mnemonicParsing="false" selected="true" text="Show additional data" />
-                        <CheckBox disable="true" mnemonicParsing="false" selected="true" text="Show packet structure" />
+                        <CheckBox fx:id="cbx_showstruct" mnemonicParsing="false" selected="true" text="Show packet structure" />
                         <CheckBox fx:id="cbx_splitPackets" mnemonicParsing="false" selected="true" text="Split packets" />
                     </children>
                     <GridPane.margin>

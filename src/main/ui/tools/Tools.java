@@ -3,6 +3,7 @@ package main.ui.tools;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -23,6 +24,12 @@ public class Tools extends SubForm {
     public Button btnEncodeUShort;
     public Button btnDecodeUshort;
 
+    public Button btn_toExpr;
+    public TextArea txt_packetArea;
+    public Button btn_toPacket;
+    public TextArea txt_exprArea;
+
+    //TODO: toExpression() without bytelength limit for this use only
 
     public void initialize() {
         txt_intDecoded.textProperty().addListener(observable -> {
@@ -98,11 +105,9 @@ public class Tools extends SubForm {
         HPacket packet = new HPacket(b.array());
         txt_intEncoded.setText(packet.toString());
     }
-
     public void btnDecodeInt_clicked(ActionEvent actionEvent) {
         txt_intDecoded.setText(new HPacket(txt_intEncoded.getText()).readInteger(0) + "");
     }
-
     public void btnEncodeUShort_clicked(ActionEvent actionEvent) {
         ByteBuffer b = ByteBuffer.allocate(4);
         b.putInt(Integer.parseInt(txt_ushortDecoded.getText()));
@@ -110,8 +115,16 @@ public class Tools extends SubForm {
         HPacket packet = new HPacket(new byte[]{b.array()[2], b.array()[3]});
         txt_ushortEncoded.setText(packet.toString());
     }
-
     public void btnDecodeUshort_clicked(ActionEvent actionEvent) {
         txt_ushortDecoded.setText(new HPacket(txt_ushortEncoded.getText()).readUshort(0) + "");
+    }
+
+
+    public void btn_toExpr_clicked(ActionEvent actionEvent) {
+        txt_exprArea.setText(new HPacket(txt_packetArea.getText()).toExpression());
+    }
+
+    public void btn_toPacket_clicked(ActionEvent actionEvent) {
+        txt_packetArea.setText(new HPacket(txt_exprArea.getText()).toString());
     }
 }

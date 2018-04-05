@@ -13,7 +13,9 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class HConnection {
 
@@ -25,6 +27,20 @@ public class HConnection {
         CONNECTED           // CONNECTED
     }
 
+    private static Set<String> autoDetectHosts;
+    static {
+        autoDetectHosts = new HashSet<>();
+        autoDetectHosts.add("game-us.habbo.com:38101");
+        autoDetectHosts.add("game-nl.habbo.com:30000");
+        autoDetectHosts.add("game-br.habbo.com:30000");
+        autoDetectHosts.add("game-es.habbo.com:30000");
+        autoDetectHosts.add("game-fr.habbo.com:30000");
+        autoDetectHosts.add("game-nl.habbo.com:30000");
+        autoDetectHosts.add("game-tr.habbo.com:30000");
+    }
+
+
+    public final static boolean DEBUG = false;
     private static final HostReplacer hostsReplacer = HostReplacerFactory.get();
 
     private volatile boolean hostRedirected = false;
@@ -40,7 +56,6 @@ public class HConnection {
     private volatile Handler inHandler = null;
     private volatile Handler outHandler = null;
 
-    public final static boolean DEBUG = false;
 
     public State getState() {
         return state;
@@ -277,7 +292,7 @@ public class HConnection {
      * 1 = modification
      * 2 = after modification   ¹
      *
-     * ¹don't modificate (block, replace)
+     * ¹don't edit the packet (block, replace)
      */
     public void addTrafficListener(int order, TrafficListener listener) {
         ((List<TrafficListener>)trafficListeners[order]).add(listener);

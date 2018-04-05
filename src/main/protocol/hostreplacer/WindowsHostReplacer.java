@@ -3,7 +3,7 @@ package main.protocol.hostreplacer;
 /**
  * Created by Jonas on 04/04/18.
  */
-class WindowsHostReplacer extends LinuxHostReplacer {
+class WindowsHostReplacer extends UnixHostReplacer {
 
     WindowsHostReplacer() {
         super();
