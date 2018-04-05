@@ -53,12 +53,12 @@ public class HabboClient {
             String line;
 
             while ((line = reader.readLine()) != null)	{
-                String[] split = line.split("[- ]");
-                if (split[2].startsWith("rw")) {  //if (split[2].startsWith("rw")) {
+                String[] split = line.split("[ ]");
+                if (split.length == 5 && split[1].equals("rw-p") && split[2].equals("00000000") && split[3].equals("00:00") && split[4].equals("0")) {  //if (split[2].startsWith("rw")) {
 
                     try {
-                        long start = Long.parseLong(split[0], 16);
-                        long end = Long.parseLong(split[1], 16);
+                        long start = Long.parseLong(split[0].split("-")[0], 16);
+                        long end = Long.parseLong(split[0].split("-")[1], 16);
                         maps.add(new long[]{start, end});
                     }
                     catch (Exception e){
@@ -242,9 +242,7 @@ public class HabboClient {
             }
 
 
-//            boolean[] mask = new boolean[256];
             int maskCount = 0;
-//            Map<Integer, Integer> posToRemoveNumber = new HashMap<>();
             int[] nToMap = new int[256];
             int[] removeMap = new int[256];
             for (int i = 0; i < removeMap.length; i++) {
