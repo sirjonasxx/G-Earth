@@ -78,6 +78,9 @@ public class HabboClient {
 
     public List<MemorySnippet> createMemorySnippetList () {
         refreshMemoryMaps();
+        return createMemorySnippetList(maps);
+    }
+    private static List<MemorySnippet> createMemorySnippetList (List<long[]> maps) {
         List<MemorySnippet> result = new ArrayList<>();
 
         for (long[] map : maps) {
@@ -89,6 +92,7 @@ public class HabboClient {
         }
         return result;
     }
+
     public void fetchMemory(List<MemorySnippet> snippets) {
         for (MemorySnippet snippet : snippets) {
             fetchMemory(snippet);
@@ -203,5 +207,96 @@ public class HabboClient {
         }
         return false;
 
+    }
+
+    public void printmemmaps() {
+        refreshMemoryMaps();
+
+        System.out.println( "---- MEMORY MAPS:");
+        for (long[] map : maps) {
+            long begin = map[0];
+            long end = map[1];
+
+            System.out.println(begin + " - " + end);
+        }
+    }
+
+    public List<MemorySnippet> createMemorySnippetListForRC4() {
+        refreshMemoryMaps();
+        String memoryPath = "/proc/" + PID + "/mem";
+
+        List<MemorySnippet> result = new ArrayList<>();
+        for (long[] map : maps) {
+            long start = map[0];
+            long end = map[1];
+
+            byte[] data = new byte[(int)(end - start)];
+            try {
+                RandomAccessFile raf = new RandomAccessFile(memoryPath, "r");
+                raf.seek(start);
+                raf.read(data);
+                raf.close();
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+
+
+//            boolean[] mask = new boolean[256];
+            int maskCount = 0;
+//            Map<Integer, Integer> posToRemoveNumber = new HashMap<>();
+            int[] nToMap = new int[256];
+            int[] removeMap = new int[256];
+            for (int i = 0; i < removeMap.length; i++) {
+                removeMap[i] = -1;
+                nToMap[i] = -1;
+            }
+
+
+            int matchStart = -1;
+            int matchEnd = -1;
+
+            for (int i = 0; i < data.length; i+=4) {
+                int b = (((int)data[i]) + 128) % 256;
+                int indInMap = (i/4) % 256;
+
+                int deletedNumber = removeMap[indInMap];
+                if (deletedNumber != -1) {
+                    nToMap[deletedNumber] = -1;
+                    maskCount --;
+                    removeMap[indInMap] = -1;
+                }
+
+                if (nToMap[b] == -1) {
+                    maskCount ++;
+                    removeMap[indInMap] = b;
+                    nToMap[b] = indInMap;
+                }
+                else {
+                    removeMap[nToMap[b]] = -1;
+                    removeMap[indInMap] = b;
+                    nToMap[b] = indInMap;
+                }
+
+                if (maskCount == 256) {
+                    if (matchStart == -1) {
+                        matchStart = i - 1020;
+                        matchEnd = i;
+                    }
+
+                    if (matchEnd < i - 1020) {
+                        result.add(new MemorySnippet(start + matchStart, new byte[matchEnd - matchStart + 4]));
+                        matchStart = i - 1020;
+                    }
+                    matchEnd = i;
+                }
+
+            }
+
+            if (matchStart != -1) {
+                result.add(new MemorySnippet(start + matchStart, new byte[matchEnd - matchStart + 4]));
+            }
+        }
+        return result;
     }
 }

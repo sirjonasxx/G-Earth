@@ -4,18 +4,16 @@ import main.Cacher;
 import main.protocol.HConnection;
 import main.protocol.HMessage;
 import main.protocol.HPacket;
-import main.protocol.TrafficListener;
 import main.protocol.crypto.RC4;
 import main.protocol.packethandler.IncomingHandler;
 import main.protocol.packethandler.OutgoingHandler;
-import sun.misc.Cache;
 
 import java.util.List;
 import java.util.Random;
 
 public class Rc4Obtainer {
 
-    public static final boolean DEBUG = true;
+    public static final boolean DEBUG = false;
 
     HabboClient client = null;
     OutgoingHandler outgoingHandler = null;
@@ -79,7 +77,8 @@ public class Rc4Obtainer {
             while (foundbuffersize == 0) {
 
                 client.pauseProcess();
-                diff = client.createMemorySnippetList();
+//                diff = client.createMemorySnippetList();
+                diff = client.createMemorySnippetListForRC4();
                 client.fetchMemory(diff);
                 client.resumeProcess();
                 this.addedBytes = 0;
@@ -129,6 +128,10 @@ public class Rc4Obtainer {
                 }
             }
 
+            if (DEBUG) System.out.println("OFFSET RC4 TABLE: " + (snippet.getOffset() + result_start_index));
+
+//            client.printmemmaps();
+
             byte[] data = new byte[256]; // dis is the friggin key
             for (int i = 0; i < 256; i++) data[i] = wannabeRC4data[i*4 + result_start_index];
 
@@ -156,7 +159,7 @@ public class Rc4Obtainer {
             int counter = 0;
             RC4 result = null;
 
-            while (result == null && counter < 4) {
+            while (result == null && counter < 4 && result_start_index >= 0) {
 
                 byte[] data1 = new byte[256];
                 for (int i = 0; i < 256; i++) data1[i] = snippet1.getData()[i*4 + result_start_index];
@@ -221,7 +224,7 @@ public class Rc4Obtainer {
 
     private List<MemorySnippet> searchForPossibleRC4Tables(List<MemorySnippet> snippets) {
         List<MemorySnippet> result;
-        result = client.differentiate2(snippets, addedBytes, addedBytes * 2, 1028);
+        result = client.differentiate2(snippets, addedBytes, addedBytes * 2, 1024);
         addedBytes = 0;
 
         return result;
