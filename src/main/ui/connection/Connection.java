@@ -9,6 +9,8 @@ import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.scene.control.*;
 import main.protocol.HConnection;
+import main.protocol.HMessage;
+import main.protocol.TrafficListener;
 import main.ui.SubForm;
 
 import java.io.IOException;
@@ -38,6 +40,18 @@ public class Connection extends SubForm {
         cbx_autodetect.selectedProperty().addListener(observable -> {
             inpPort.setDisable(cbx_autodetect.isSelected());
             inpHost.setDisable(cbx_autodetect.isSelected());
+            if (cbx_autodetect.isSelected()) {
+                btnConnect.setDisable(false);
+            }
+            else {
+                try {
+                    int i = Integer.parseInt(inpPort.getEditor().getText());
+                    btnConnect.setDisable(i < 0 || i >= 256 * 256);
+                }
+                catch (Exception e) {
+                    btnConnect.setDisable(true);
+                }
+            }
         });
 
         inpPort.getItems().addAll("30000", "38101");
@@ -65,7 +79,7 @@ public class Connection extends SubForm {
 
             if (newState == HConnection.State.CONNECTED) {
                 lblState.setText("Connected");
-                outHost.setText(getHConnection().getHost());
+                outHost.setText(getHConnection().getDomain());
                 outPort.setText(getHConnection().getPort()+"");
             }
             if (newState == HConnection.State.WAITING_FOR_CLIENT) {

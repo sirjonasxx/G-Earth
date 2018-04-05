@@ -42,7 +42,7 @@ public class Logger extends SubForm {
                 miniLogText(Color.ORANGE, "Connecting to "+getHConnection().getDomain() + ":" + getHConnection().getPort());
             }
             if (newState == HConnection.State.CONNECTED) {
-                miniLogText(Color.GREEN, "Connecting to "+getHConnection().getDomain() + ":" + getHConnection().getPort());
+                miniLogText(Color.GREEN, "Connected to "+getHConnection().getDomain() + ":" + getHConnection().getPort());
                 packetLogger.start();
             }
             if (newState == HConnection.State.NOT_CONNECTED) {

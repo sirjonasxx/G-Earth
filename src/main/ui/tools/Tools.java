@@ -32,6 +32,27 @@ public class Tools extends SubForm {
     //TODO: toExpression() without bytelength limit for this use only
 
     public void initialize() {
+        txt_packetArea.textProperty().addListener(observable -> {
+            btn_toExpr.setDisable(new HPacket(txt_packetArea.getText()).isCorrupted());
+        });
+
+        txt_packetArea.setOnKeyPressed(event -> {
+            if(event.getCode().equals(KeyCode.ENTER) && !btn_toExpr.isDisable()) {
+                btn_toExpr_clicked(null);
+            }
+        });
+
+        txt_exprArea.textProperty().addListener(observable -> {
+            btn_toPacket.setDisable(new HPacket(txt_exprArea.getText()).isCorrupted());
+        });
+
+        txt_exprArea.setOnKeyPressed(event -> {
+            if(event.getCode().equals(KeyCode.ENTER) && !btn_toPacket.isDisable()) {
+                btn_toPacket_clicked(null);
+            }
+        });
+
+
         txt_intDecoded.textProperty().addListener(observable -> {
             boolean isInt = true;
 
