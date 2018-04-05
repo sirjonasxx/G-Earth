@@ -1,5 +1,5 @@
 # G-Earth
-Habbo packet logger & manipulator for Linux distributions (for now). 
+Habbo packet logger & manipulator, currently only for Linux distributions. 
 
 - Requires Java 8
 - Byte to string & string to byte encoding is slightly different from the Habbo PacketLogger standards. (on purpose)
