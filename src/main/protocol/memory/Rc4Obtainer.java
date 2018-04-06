@@ -64,8 +64,13 @@ public class Rc4Obtainer {
             if (DEBUG) System.out.println("[+] send encrypted");
             sleep(20);
 
-            while (pingHeader == -1) {
+            int count = 0;
+            while (pingHeader == -1 && count < 500) {
                 sleep(50);
+                count++;
+            }
+            if (count == 500) {
+                System.out.println("are you connected to a retro? trying other things (might take a while)..");
             }
             incomingHandler.block();
 
@@ -88,21 +93,26 @@ public class Rc4Obtainer {
                 if (DEBUG) System.out.println("size: " + getTotalBytesLengthOfDiff(diff));
                 int i = 0;
                 while (getTotalBytesLengthOfDiff(diff) > 2000) {
-                    int am = 0;
-                    if (i == 0 || i > 1) {
-                        am = rand.nextInt(25) + 5;
-                        for (int j = 0; j < am; j++) {
-                            incomingHandler.sendToStream(new HPacket(pingHeader).toBytes());
-                            outgoingHandler.fakePongAlert();
-                            sleep(20);
+                    if (pingHeader != -1) {
+                        int am = 0;
+                        if (i == 0 || i > 1) {
+                            am = rand.nextInt(25) + 5;
+                            for (int j = 0; j < am; j++) {
+                                incomingHandler.sendToStream(new HPacket(pingHeader).toBytes());
+                                outgoingHandler.fakePongAlert();
+                                sleep(20);
+                            }
                         }
+                        sleep(50);
                     }
-                    sleep(50);
-                    int rem = addedBytes;
-                    if (i == 0) client.pauseProcess();
+                    else {
+                        while (addedBytes == 0) {
+                            sleep(50);
+                        }
+                        System.out.println("making progress..");
+                    }
+
                     diff = searchForPossibleRC4Tables(diff);
-                    if (i == 0) client.resumeProcess();
-                    if (DEBUG) System.out.println("size: " + getTotalBytesLengthOfDiff(diff) + " with changed bytes: " + rem + " should be: " + am * 6);
                     i++;
                 }
 
@@ -146,15 +156,33 @@ public class Rc4Obtainer {
 
             MemorySnippet snippet1 = new MemorySnippet(snippet.getOffset(), new byte[snippet.getData().length]);
             client.fetchMemory(snippet1);
-            incomingHandler.sendToStream(new HPacket(pingHeader).toBytes());
-            outgoingHandler.fakePongAlert();
+            if (pingHeader != -1) {
+                incomingHandler.sendToStream(new HPacket(pingHeader).toBytes());
+                outgoingHandler.fakePongAlert();
+            }
+
             sleep(70);
 
-            byte[] lastPongPacket = new byte[6];
-            List<Byte> encodedbytelistraw = outgoingHandler.getEncryptedBuffer();
-            for (int i = 0; i < 6; i++) {
-                lastPongPacket[i] = encodedbytelistraw.get(encodedbytelistraw.size() - 6 + i);
+            byte[] lastOutgoingPacket;
+            if (pingHeader != -1) {
+                lastOutgoingPacket = new byte[6];
             }
+            else {
+                int size = outgoingHandler.getEncryptedBuffer().size();
+                int copy = size;
+                while (copy == size) {
+                    sleep(1);
+                    copy = outgoingHandler.getEncryptedBuffer().size();
+                }
+                lastOutgoingPacket = new byte[copy - size];
+                System.out.println("size: " + lastOutgoingPacket.length);
+            }
+
+            for (int i = 0; i < lastOutgoingPacket.length; i++) {
+                List<Byte> encodedbytelistraw = outgoingHandler.getEncryptedBuffer();
+                lastOutgoingPacket[i] = encodedbytelistraw.get(encodedbytelistraw.size() - lastOutgoingPacket.length + i);
+            }
+
 
             int counter = 0;
             RC4 result = null;
@@ -174,7 +202,7 @@ public class Rc4Obtainer {
                         }
                         RC4 rc4Tryout = new RC4(copy, x, y);
 
-                        HPacket tryout = new HPacket(rc4Tryout.rc4(lastPongPacket));
+                        HPacket tryout = new HPacket(rc4Tryout.rc4(lastOutgoingPacket));
                         if (!tryout.isCorrupted()) {
                             result = rc4Tryout;
                             break outerloop;

@@ -29,29 +29,10 @@ public class Connection extends SubForm {
 
     public void initialize() {
         inpPort.getEditor().textProperty().addListener(observable -> {
-            try {
-                int i = Integer.parseInt(inpPort.getEditor().getText());
-                btnConnect.setDisable(i < 0 || i >= 256 * 256);
-            }
-            catch (Exception e) {
-                btnConnect.setDisable(true);
-            }
+            updateInputUI();
         });
         cbx_autodetect.selectedProperty().addListener(observable -> {
-            inpPort.setDisable(cbx_autodetect.isSelected());
-            inpHost.setDisable(cbx_autodetect.isSelected());
-            if (cbx_autodetect.isSelected()) {
-                btnConnect.setDisable(false);
-            }
-            else {
-                try {
-                    int i = Integer.parseInt(inpPort.getEditor().getText());
-                    btnConnect.setDisable(i < 0 || i >= 256 * 256);
-                }
-                catch (Exception e) {
-                    btnConnect.setDisable(true);
-                }
-            }
+            updateInputUI();
         });
 
         inpPort.getItems().addAll("30000", "38101");
@@ -61,19 +42,35 @@ public class Connection extends SubForm {
         inpHost.getSelectionModel().selectFirst();
     }
 
+    private void updateInputUI() {
+        if (cbx_autodetect.isSelected()) {
+            btnConnect.setDisable(false);
+        }
+        else {
+            try {
+                int i = Integer.parseInt(inpPort.getEditor().getText());
+                btnConnect.setDisable(i < 0 || i >= 256 * 256);
+            }
+            catch (Exception e) {
+                btnConnect.setDisable(true);
+            }
+        }
+
+        inpHost.setDisable(getHConnection().getState() != HConnection.State.NOT_CONNECTED || cbx_autodetect.isSelected());
+        inpPort.setDisable(getHConnection().getState() != HConnection.State.NOT_CONNECTED || cbx_autodetect.isSelected());
+    }
+
     public void onParentSet(){
         getHConnection().addStateChangeListener((oldState, newState) -> Platform.runLater(() -> {
             if (newState == HConnection.State.NOT_CONNECTED) {
-                inpHost.setDisable(false);
-                inpPort.setDisable(false);
+                updateInputUI();
                 lblState.setText("Not connected");
                 btnConnect.setText("Connect");
                 outHost.setText("");
                 outPort.setText("");
             }
             else if (oldState == HConnection.State.NOT_CONNECTED) {
-                inpHost.setDisable(true);
-                inpPort.setDisable(true);
+                updateInputUI();
                 btnConnect.setText("Abort");
             }
 
