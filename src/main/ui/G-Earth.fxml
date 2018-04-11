@@ -29,10 +29,26 @@
                     <fx:include fx:id="tools" source="tools/Tools.fxml" />
                 </content>
             </Tab>
-            <Tab disable="true" text="Scheduler" />
-            <Tab disable="true" text="Settings" />
-            <Tab disable="true" text="Extensions" />
-            <Tab disable="true" text="Info" />
+            <Tab text="Scheduler">
+                <content>
+                    <fx:include fx:id="scheduler" source="scheduler/Scheduler.fxml" />
+                </content>
+            </Tab>
+            <Tab text="Settings">
+                <content>
+                    <fx:include fx:id="settings" source="settings/Settings.fxml" />
+                </content>
+            </Tab>
+            <Tab text="Extensions">
+                <content>
+                    <fx:include fx:id="extensions" source="extensions/Extensions.fxml" />
+                </content>
+            </Tab>
+            <Tab text="Info">
+                <content>
+                    <fx:include fx:id="info" source="info/Info.fxml" />
+                </content>
+            </Tab>
         </tabs>
     </TabPane>
 

@@ -4,8 +4,12 @@ import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import main.protocol.HConnection;
 import main.ui.connection.Connection;
+import main.ui.extensions.Extensions;
+import main.ui.info.Info;
 import main.ui.injection.Injection;
 import main.ui.logger.Logger;
+import main.ui.scheduler.Scheduler;
+import main.ui.settings.Settings;
 import main.ui.tools.Tools;
 
 public class GEarthController {
@@ -17,6 +21,11 @@ public class GEarthController {
     public Injection injectionController;
     public Logger loggerController;
     public Tools toolsController;
+    public Scheduler schedulerController;
+    public Settings settingsController;
+    public Info infoController;
+    public Extensions extensionsController;
+
     public Pane mover;
 
     public GEarthController() {
@@ -28,6 +37,12 @@ public class GEarthController {
         injectionController.setParentController(this);
         loggerController.setParentController(this);
         toolsController.setParentController(this);
+        schedulerController.setParentController(this);
+        settingsController.setParentController(this);
+        infoController.setParentController(this);
+        extensionsController.setParentController(this);
+
+
         //custom header bar
 //        final Point[] startpos = {null};
 //        final Double[] xx = {0.0};

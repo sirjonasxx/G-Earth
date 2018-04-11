@@ -758,7 +758,7 @@ public class HPacket {
             if (resultTest[i] != null) expression.append(resultTest[i]);
         }
 
-        return expression.toString();
+        return expression.toString().replace("{i:0}{b:false}{b:true}", "{s:}{i:1}");
     }
 
     public static void main(String[] args) {
