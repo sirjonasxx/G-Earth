@@ -7,6 +7,9 @@ Habbo packet logger & manipulator, currently only for Linux distributions.
 Execution command (temporary, verified in Ubuntu):
 > $ sudo -E java -jar G-Earth.jar 
 
+Execute this command if u get the following error:
+> Invalid MIT-MAGIC-COOKIE-1 keyInvalid MIT-MAGIC-COOKIE-1 keyException
+> xhost +local:
 
 
 FEATURES:
