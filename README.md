@@ -22,7 +22,7 @@ FEATURES:
 * Auto detect hotel
 
 DOING:
-* Scheduler
+* Scheduler (packetsending not consistent yet)
 
 TO-DO:
 * Block specific packets from displaying in the logger (in Logger tab)
