@@ -1,5 +1,5 @@
 # G-Earth
-Habbo packet logger & manipulator for Linux distributions (for now). 
+Habbo packet logger & manipulator, currently only for Linux distributions. 
 
 - Requires Java 8
 - Byte to string & string to byte encoding is slightly different from the Habbo PacketLogger standards. (on purpose)
@@ -15,15 +15,14 @@ FEATURES:
 * Packet expressions
 * Responsive UI
 * Encoding/decoding
-
-
-
-WORKING ON:
 * Auto detect hotel
 
 
 TO-DO:
+* Block packets from displaying in the logger (in Logger tab)
 * Scheduler
-* Block incoming packets from UI
 * Extension support
-
+* In settings -> enable CS admin on connect
+* In settings -> block/replace packets, replace Strings & ints & .. in all packets
+* Info tab
+* Cross-platform support
