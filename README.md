@@ -9,6 +9,7 @@ Execution command (temporary, verified in Ubuntu):
 
 Execute this command if u get the following error:
 > Invalid MIT-MAGIC-COOKIE-1 keyInvalid MIT-MAGIC-COOKIE-1 keyException
+
 > xhost +local:
 
 
