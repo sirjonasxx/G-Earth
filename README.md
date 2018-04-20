@@ -17,12 +17,13 @@ FEATURES:
 * Encoding/decoding
 * Auto detect hotel
 
+DOING:
+* Scheduler
 
 TO-DO:
-* Block packets from displaying in the logger (in Logger tab)
-* Scheduler
+* Block specific packets from displaying in the logger (in Logger tab)
 * Extension support
-* In settings -> enable CS admin on connect
+* In settings -> enable CS admin on connect (wow fun)
 * In settings -> block/replace packets, replace Strings & ints & .. in all packets
 * Info tab
 * Cross-platform support
