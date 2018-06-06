@@ -194,7 +194,15 @@ public class HConnection {
             for (int i = 0; i < actual_domain.size(); i++) {
                 if (actual_domain.get(i) == null) continue;
 
-                ServerSocket proxy = new ServerSocket(port.get(i), 10, InetAddress.getByName("127.0.0." + (i+1)));
+                ServerSocket proxy;
+                try {
+                    proxy = new ServerSocket(port.get(i), 10, InetAddress.getByName("127.0.0." + (i+1)));
+                }
+                catch (IOException e) {
+                    System.err.println("Could not setup proxy server for " + input_domain.get(i)+ " on " + "127.0.0." + (i+1) + ":" + port.get(i));
+                    continue;
+                }
+
                 this.proxy.add(proxy);
                 String dom = actual_domain.get(i);
                 Integer port2 = port.get(i);

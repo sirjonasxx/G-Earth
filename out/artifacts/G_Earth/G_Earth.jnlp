@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<jnlp spec="1.0" xmlns:jfx="http://javafx.com" href="G_Earth.jnlp">
+  <information>
+    <title>G-Earth</title>
+    <vendor>sirjonasxx</vendor>
+    <description>Habbo Hotel Packet Manipulator</description>
+    <offline-allowed/>
+  </information>
+  <resources>
+    <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
+    <jar href="G_Earth.jar" size="169412" download="eager" />
+    <jar href="json-simple-1.1.1.jar" size="23737" download="eager" />
+  </resources>
+  <jfx:javafx-desc  width="600" height="400" main-class="main.Main"  name="G-Earth" />
+  <update check="background"/>
+</jnlp>
