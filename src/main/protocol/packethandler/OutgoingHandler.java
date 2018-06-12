@@ -20,8 +20,8 @@ public class OutgoingHandler extends Handler {
     private RC4 servercipher = null;
     private List<Byte> tempEncryptedBuffer = new ArrayList<>();
 
-    public OutgoingHandler(OutputStream outputStream) {
-        super(outputStream);
+    public OutgoingHandler(OutputStream outputStream, Object[] listeners) {
+        super(outputStream, listeners);
     }
 
     private void dataStreamCheck(byte[] buffer)	{
@@ -32,9 +32,8 @@ public class OutgoingHandler extends Handler {
     }
 
     @Override
-    public void act(byte[] buffer, Object[] listeners) throws IOException {
+    public void act(byte[] buffer) throws IOException {
         dataStreamCheck(buffer);
-        this.listeners = listeners;
 
         if (isDataStream)	{
 
@@ -84,7 +83,7 @@ public class OutgoingHandler extends Handler {
         }
 
         try {
-            act(encrbuffer, this.listeners);
+            act(encrbuffer);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -100,7 +99,7 @@ public class OutgoingHandler extends Handler {
             HPacket[] hpackets = payloadBuffer.receive();
             for (HPacket hpacket : hpackets){
                 HMessage hMessage = new HMessage(hpacket, HMessage.Side.TOSERVER, currentIndex);
-                notifyListeners(hMessage);
+                if (isDataStream) notifyListeners(hMessage);
                 if (!hMessage.isBlocked())	{
                     out.write(
                             currentIndex < encryptOffset ? hMessage.getPacket().toBytes() :

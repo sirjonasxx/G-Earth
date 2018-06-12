@@ -9,8 +9,8 @@ import java.io.OutputStream;
 
 public class IncomingHandler extends Handler {
 
-    public IncomingHandler(OutputStream outputStream) {
-        super(outputStream);
+    public IncomingHandler(OutputStream outputStream, Object[] listeners) {
+        super(outputStream, listeners);
     }
 
     private final Object lock = new Object();
@@ -34,7 +34,7 @@ public class IncomingHandler extends Handler {
 
             for (HPacket hpacket : hpackets){
                 HMessage hMessage = new HMessage(hpacket, HMessage.Side.TOCLIENT, currentIndex);
-                notifyListeners(hMessage);
+                if (isDataStream) notifyListeners(hMessage);
 
                 if (!hMessage.isBlocked())	{
                     out.write(hMessage.getPacket().toBytes());

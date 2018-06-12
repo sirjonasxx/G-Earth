@@ -11,7 +11,7 @@ import java.util.List;
 public class Cacher {
 
     private static String getCacheDir() {
-        return System.getProperty("user.home") + File.separator + ".G-Earth/";
+        return System.getProperty("user.home") + File.separator + ".G-Earth" + File.separator;
     }
 
     public static boolean exists(String key) {

@@ -18,7 +18,8 @@ public abstract class Handler {
     volatile int currentIndex = 0;
 
 
-    public Handler(OutputStream outputStream) {
+    public Handler(OutputStream outputStream, Object[] listeners) {
+        this.listeners = listeners;
         out = outputStream;
     }
 
@@ -27,9 +28,7 @@ public abstract class Handler {
         isDataStream = true;
     }
 
-    public void act(byte[] buffer, Object[] listeners) throws IOException {
-        this.listeners = listeners;
-
+    public void act(byte[] buffer) throws IOException {
         if (isDataStream)	{
             payloadBuffer.push(buffer);
             notifyBufferListeners(buffer.length);

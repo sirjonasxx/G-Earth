@@ -178,7 +178,7 @@ public class HConnection {
         // wachten op data van client
         new Thread(() -> {
             try {
-                OutgoingHandler handler = new OutgoingHandler(habbo_server_out);
+                OutgoingHandler handler = new OutgoingHandler(habbo_server_out, trafficListeners);
                 rc4Obtainer.setOutgoingHandler(handler);
 
                 while (!client.isClosed() && (state == State.WAITING_FOR_CLIENT || state == State.CONNECTED)) {
@@ -186,7 +186,7 @@ public class HConnection {
                     while (client_in.available() > 0)	{
                         client_in.read(buffer = new byte[client_in.available()]);
 
-                        handler.act(buffer, trafficListeners);
+                        handler.act(buffer);
                         if (!datastream[0] && handler.isDataStream())	{
                             datastream[0] = true;
                             setState(State.CONNECTED);
@@ -228,7 +228,7 @@ public class HConnection {
         // wachten op data van server
         new Thread(() -> {
             try {
-                IncomingHandler handler = new IncomingHandler(client_out);
+                IncomingHandler handler = new IncomingHandler(client_out, trafficListeners);
                 rc4Obtainer.setIncomingHandler(handler);
 
                 while (!habbo_server.isClosed() && (state == State.CONNECTED || state == State.WAITING_FOR_CLIENT)) {
@@ -239,7 +239,7 @@ public class HConnection {
                             handler.setAsDataStream();
                             inHandler = handler;
                         }
-                        handler.act(buffer, trafficListeners);
+                        handler.act(buffer);
                     }
                     Thread.sleep(1);
                 }
