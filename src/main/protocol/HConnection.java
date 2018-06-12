@@ -174,7 +174,6 @@ public class HConnection {
         final boolean[] aborted = new boolean[1];
 
         Rc4Obtainer rc4Obtainer = new Rc4Obtainer();
-        rc4Obtainer.setHConnection(this);
 
         // wachten op data van client
         new Thread(() -> {

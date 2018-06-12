@@ -14,7 +14,7 @@ public class HabboClient {
 
     private static final boolean DEBUG = false;
 
-    public static HabboClient create() {
+    static HabboClient create() {
         File folder = new File("/proc");
                 HabboClient client = null;
 
@@ -43,7 +43,7 @@ public class HabboClient {
         if (DEBUG) System.out.println("* Found flashclient process: " + client.PID);
         return client;
     }
-    public void refreshMemoryMaps() {
+    private void refreshMemoryMaps() {
         String filename = "/proc/"+this.PID+"/maps";
         BufferedReader reader;
         maps = new ArrayList<>();
@@ -76,10 +76,6 @@ public class HabboClient {
         if (DEBUG) System.out.println("* Found memory maps (amount: " + maps.size() + ")");
     }
 
-    public List<MemorySnippet> createMemorySnippetList () {
-        refreshMemoryMaps();
-        return createMemorySnippetList(maps);
-    }
     private static List<MemorySnippet> createMemorySnippetList (List<long[]> maps) {
         List<MemorySnippet> result = new ArrayList<>();
 
@@ -93,12 +89,12 @@ public class HabboClient {
         return result;
     }
 
-    public void fetchMemory(List<MemorySnippet> snippets) {
+    private void fetchMemory(List<MemorySnippet> snippets) {
         for (MemorySnippet snippet : snippets) {
             fetchMemory(snippet);
         }
     }
-    public void fetchMemory(MemorySnippet snippet) {
+    private void fetchMemory(MemorySnippet snippet) {
         String memoryPath = "/proc/" + PID + "/mem";
         long begin = snippet.offset;
         try {
@@ -108,82 +104,6 @@ public class HabboClient {
             raf.close();
         }
         catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-    public List<MemorySnippet> differentiate2(List<MemorySnippet> original, int minChangedBytes, int maxChangedBytes, int range) {
-        List<MemorySnippet> upToDate = new ArrayList<>();
-        for (MemorySnippet memorySnippet : original) {
-            upToDate.add(new MemorySnippet(memorySnippet.getOffset(), new byte[memorySnippet.getData().length]));
-        }
-        fetchMemory(upToDate);
-        List<MemorySnippet> result = new ArrayList<>();
-        Queue<Integer> wachter = new LinkedList<>();
-        for (int i = 0; i < original.size(); i++) {
-            wachter.clear();
-            int wachtersize = 0;
-
-            MemorySnippet org = original.get(i);
-            byte[] orgdata = org.getData();
-            MemorySnippet upd = upToDate.get(i);
-            byte[] upddata = upd.getData();
-
-            int curstartoffset = -1;
-            int lastendbuffer = -1;
-
-            for (int p = 0; p < org.getData().length; p++) {
-                if (wachtersize > 0 && p == wachter.peek()) {
-                    wachter.poll();
-                    wachtersize--;
-                }
-                if (orgdata[p] != upddata[p]) {
-                    wachter.add(p + range);
-                    wachtersize++;
-                }
-
-                if (p >= range - 1 && wachtersize >= minChangedBytes && wachtersize <= maxChangedBytes) {
-                    if (curstartoffset == -1) {
-                        curstartoffset = p - range + 1;
-                    }
-                    else if (lastendbuffer < p - range) {
-                        MemorySnippet snippet = new MemorySnippet(curstartoffset + org.getOffset(), new byte[lastendbuffer - curstartoffset + 1]);
-                        result.add(snippet);
-                        curstartoffset = p - range + 1;
-                    }
-                    lastendbuffer = p;
-                }
-            }
-            if (curstartoffset != -1) {
-                MemorySnippet snippet = new MemorySnippet(curstartoffset + org.getOffset(), new byte[lastendbuffer - curstartoffset + 1]);
-                result.add(snippet);
-            }
-        }
-        fetchMemory(result);
-        return result;
-    }
-
-    @SuppressWarnings("Duplicates")
-    public void pauseProcess() {
-        String[] args = new String[] {"kill", "-STOP", PID+""};
-        Process proc;
-        try {
-            proc = new ProcessBuilder(args).start();
-            proc.waitFor();
-            proc.destroy();
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @SuppressWarnings("Duplicates")
-    public void resumeProcess()  {
-        String[] args = new String[] {"kill", "-CONT", PID+""};
-        Process proc;
-        try {
-            proc = new ProcessBuilder(args).start();
-            proc.waitFor();
-            proc.destroy();
-        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
     }
@@ -209,19 +129,31 @@ public class HabboClient {
 
     }
 
-    public void printmemmaps() {
-        refreshMemoryMaps();
+    List<byte[]> getRC4possibilities() {
+        int offset = 4;
 
-        System.out.println( "---- MEMORY MAPS:");
-        for (long[] map : maps) {
-            long begin = map[0];
-            long end = map[1];
+        List<MemorySnippet> possibilities = createMemorySnippetListForRC4();
+        fetchMemory(possibilities);
 
-            System.out.println(begin + " - " + end);
+        List<byte[]> resultSet = new ArrayList<>();
+
+        for (MemorySnippet snippet : possibilities) {
+            if (snippet.getData().length >= 1024 && snippet.getData().length <= 1024+2*offset) {
+                for (int i = 0; i < (snippet.getData().length - ((256 - 1) * offset)); i+=offset) {
+                    byte[] wannabeRC4data = Arrays.copyOfRange(snippet.getData(), i, 1025 + i);
+                    byte[] data = new byte[256]; // dis is the friggin key
+                    for (int j = 0; j < 256; j++) data[j] = wannabeRC4data[j*4];
+                    resultSet.add(data);
+                }
+            }
         }
+        return resultSet;
     }
 
-    public List<MemorySnippet> createMemorySnippetListForRC4() {
+    private List<MemorySnippet> createMemorySnippetListForRC4() {
+
+        int offset = 4;
+
         refreshMemoryMaps();
         String memoryPath = "/proc/" + PID + "/mem";
 
@@ -254,7 +186,7 @@ public class HabboClient {
             int matchStart = -1;
             int matchEnd = -1;
 
-            for (int i = 0; i < data.length; i+=4) {
+            for (int i = 0; i < data.length; i+=offset) {
                 int b = (((int)data[i]) + 128) % 256;
                 int indInMap = (i/4) % 256;
 
@@ -278,13 +210,13 @@ public class HabboClient {
 
                 if (maskCount == 256) {
                     if (matchStart == -1) {
-                        matchStart = i - 1020;
+                        matchStart = i - ((256 - 1) * offset);
                         matchEnd = i;
                     }
 
-                    if (matchEnd < i - 1020) {
+                    if (matchEnd < i - ((256 - 1) * offset)) {
                         result.add(new MemorySnippet(start + matchStart, new byte[matchEnd - matchStart + 4]));
-                        matchStart = i - 1020;
+                        matchStart = i - ((256 - 1) * offset);
                     }
                     matchEnd = i;
                 }

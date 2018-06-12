@@ -184,6 +184,10 @@ public class RC4 {
         return result;
     }
 
+    public boolean couldBeFresh() {
+        return (x == 0 && y == 0);
+    }
+
     public void undoRc4(byte[] buf) {
 
         byte tmp;

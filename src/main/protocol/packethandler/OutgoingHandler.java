@@ -27,7 +27,7 @@ public class OutgoingHandler extends Handler {
     private void dataStreamCheck(byte[] buffer)	{
         if (!isDataStream) {
             HPacket hpacket = new HPacket(buffer);
-            isDataStream = (hpacket.getBytesLength() > 6 && hpacket.headerId() == 4000 && hpacket.headerId() == 4000);
+            isDataStream = (hpacket.getBytesLength() > 6 && hpacket.headerId() == 4000);
         }
     }
 
@@ -94,24 +94,11 @@ public class OutgoingHandler extends Handler {
         return tempEncryptedBuffer;
     }
 
-
-    //as pings & pongs are used in order to find the RC4 table, we really don't want it to be displayed
-    //or even be sent to the server, we can fix that by calling this method everytime we fakesend a ping
-    private int skipPongAmount = 0;
-    public void fakePongAlert() {
-        skipPongAmount ++;
-    }
-
     @Override
     public void flush() throws IOException {
         synchronized (lock) {
             HPacket[] hpackets = payloadBuffer.receive();
             for (HPacket hpacket : hpackets){
-                if (skipPongAmount > 0 && hpacket.length() == 2) {
-                    skipPongAmount --;
-                    continue;
-                }
-
                 HMessage hMessage = new HMessage(hpacket, HMessage.Side.TOSERVER, currentIndex);
                 notifyListeners(hMessage);
                 if (!hMessage.isBlocked())	{
