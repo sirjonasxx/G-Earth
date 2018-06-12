@@ -1,18 +1,16 @@
 package main.protocol.memory;
 
-import main.Cacher;
-import main.protocol.HConnection;
-import main.protocol.HMessage;
 import main.protocol.HPacket;
 import main.protocol.crypto.RC4;
+import main.protocol.memory.habboclient.HabboClient;
+import main.protocol.memory.habboclient.HabboClientFactory;
+import main.protocol.memory.habboclient.linux.LinuxHabboClient;
 import main.protocol.packethandler.IncomingHandler;
 import main.protocol.packethandler.OutgoingHandler;
 import main.protocol.packethandler.PayloadBuffer;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
-import java.util.function.Consumer;
 
 public class Rc4Obtainer {
 
@@ -23,7 +21,7 @@ public class Rc4Obtainer {
     IncomingHandler incomingHandler = null;
 
     public Rc4Obtainer() {
-        client = HabboClient.create();
+        client = HabboClientFactory.get();
     }
 
     private boolean hashappened1 = false;

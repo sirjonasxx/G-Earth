@@ -1,10 +1,12 @@
-package main.protocol.memory;
+package main.protocol.memory.habboclient.linux;
+
+import main.protocol.memory.habboclient.HabboClient;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.util.*;
 
-public class HabboClient {
+public class LinuxHabboClient implements HabboClient {
 
 
     private static final String[] potentialProcessNames = {"--ppapi-flash-args", "plugin-container"};
@@ -14,9 +16,10 @@ public class HabboClient {
 
     private static final boolean DEBUG = false;
 
-    static HabboClient create() {
+    public LinuxHabboClient() {
         File folder = new File("/proc");
-                HabboClient client = null;
+
+        boolean found = false;
 
         do {
             File[] fileList = folder.listFiles();
@@ -31,18 +34,18 @@ public class HabboClient {
                         }
                     }
                     if (isHabboProcess) {
-                        client = new HabboClient();
-                        client.PID = Integer.parseInt(file.getName());
-                        client.maps = new ArrayList<>();
+                        this.PID = Integer.parseInt(file.getName());
+                        this.maps = new ArrayList<>();
+                        found = true;
                     }
                 }
             }
-        } while (client == null);
+        } while (!found);
 
-
-        if (DEBUG) System.out.println("* Found flashclient process: " + client.PID);
-        return client;
+        if (DEBUG) System.out.println("* Found flashclient process: " + PID);
     }
+
+
     private void refreshMemoryMaps() {
         String filename = "/proc/"+this.PID+"/maps";
         BufferedReader reader;
@@ -76,25 +79,25 @@ public class HabboClient {
         if (DEBUG) System.out.println("* Found memory maps (amount: " + maps.size() + ")");
     }
 
-    private static List<MemorySnippet> createMemorySnippetList (List<long[]> maps) {
-        List<MemorySnippet> result = new ArrayList<>();
+    private static List<LinuxMemorySnippet> createMemorySnippetList (List<long[]> maps) {
+        List<LinuxMemorySnippet> result = new ArrayList<>();
 
         for (long[] map : maps) {
             long begin = map[0];
             long end = map[1];
 
-            MemorySnippet snippet = new MemorySnippet(begin, new byte[(int)(end - begin)] );
+            LinuxMemorySnippet snippet = new LinuxMemorySnippet(begin, new byte[(int)(end - begin)] );
             result.add(snippet);
         }
         return result;
     }
 
-    private void fetchMemory(List<MemorySnippet> snippets) {
-        for (MemorySnippet snippet : snippets) {
+    private void fetchMemory(List<LinuxMemorySnippet> snippets) {
+        for (LinuxMemorySnippet snippet : snippets) {
             fetchMemory(snippet);
         }
     }
-    private void fetchMemory(MemorySnippet snippet) {
+    private void fetchMemory(LinuxMemorySnippet snippet) {
         String memoryPath = "/proc/" + PID + "/mem";
         long begin = snippet.offset;
         try {
@@ -129,15 +132,15 @@ public class HabboClient {
 
     }
 
-    List<byte[]> getRC4possibilities() {
+    public List<byte[]> getRC4possibilities() {
         int offset = 4;
 
-        List<MemorySnippet> possibilities = createMemorySnippetListForRC4();
+        List<LinuxMemorySnippet> possibilities = createMemorySnippetListForRC4();
         fetchMemory(possibilities);
 
         List<byte[]> resultSet = new ArrayList<>();
 
-        for (MemorySnippet snippet : possibilities) {
+        for (LinuxMemorySnippet snippet : possibilities) {
             if (snippet.getData().length >= 1024 && snippet.getData().length <= 1024+2*offset) {
                 for (int i = 0; i < (snippet.getData().length - ((256 - 1) * offset)); i+=offset) {
                     byte[] wannabeRC4data = Arrays.copyOfRange(snippet.getData(), i, 1025 + i);
@@ -150,14 +153,14 @@ public class HabboClient {
         return resultSet;
     }
 
-    private List<MemorySnippet> createMemorySnippetListForRC4() {
+    private List<LinuxMemorySnippet> createMemorySnippetListForRC4() {
 
         int offset = 4;
 
         refreshMemoryMaps();
         String memoryPath = "/proc/" + PID + "/mem";
 
-        List<MemorySnippet> result = new ArrayList<>();
+        List<LinuxMemorySnippet> result = new ArrayList<>();
         for (long[] map : maps) {
             long start = map[0];
             long end = map[1];
@@ -215,7 +218,7 @@ public class HabboClient {
                     }
 
                     if (matchEnd < i - ((256 - 1) * offset)) {
-                        result.add(new MemorySnippet(start + matchStart, new byte[matchEnd - matchStart + 4]));
+                        result.add(new LinuxMemorySnippet(start + matchStart, new byte[matchEnd - matchStart + 4]));
                         matchStart = i - ((256 - 1) * offset);
                     }
                     matchEnd = i;
@@ -224,7 +227,7 @@ public class HabboClient {
             }
 
             if (matchStart != -1) {
-                result.add(new MemorySnippet(start + matchStart, new byte[matchEnd - matchStart + 4]));
+                result.add(new LinuxMemorySnippet(start + matchStart, new byte[matchEnd - matchStart + 4]));
             }
         }
         return result;

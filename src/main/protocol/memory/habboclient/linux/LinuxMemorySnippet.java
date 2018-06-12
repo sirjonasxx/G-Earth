@@ -1,10 +1,10 @@
-package main.protocol.memory;
+package main.protocol.memory.habboclient.linux;
 
-public class MemorySnippet {
+public class LinuxMemorySnippet {
     long offset;
     byte[] data;
 
-    public MemorySnippet(long offset, byte[] data) {
+    public LinuxMemorySnippet(long offset, byte[] data) {
         this.offset = offset;
         this.data = data;
     }
