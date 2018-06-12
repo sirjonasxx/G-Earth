@@ -7,6 +7,10 @@ Habbo packet logger & manipulator, currently only for Linux distributions.
 Execution command (temporary, verified in Ubuntu):
 > $ sudo -E java -jar G-Earth.jar 
 
+Execute this command if u get the following error:
+> Invalid MIT-MAGIC-COOKIE-1 keyInvalid MIT-MAGIC-COOKIE-1 keyException
+
+> $ xhost +local:
 
 
 FEATURES:
@@ -17,12 +21,13 @@ FEATURES:
 * Encoding/decoding
 * Auto detect hotel
 
+DOING:
+* Scheduler (packetsending not consistent yet)
 
 TO-DO:
-* Block packets from displaying in the logger (in Logger tab)
-* Scheduler
+* Block specific packets from displaying in the logger (in Logger tab)
 * Extension support
-* In settings -> enable CS admin on connect
+* In settings -> enable CS admin on connect (wow fun)
 * In settings -> block/replace packets, replace Strings & ints & .. in all packets
 * Info tab
 * Cross-platform support
