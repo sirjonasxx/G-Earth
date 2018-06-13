@@ -155,81 +155,100 @@ public class LinuxHabboClient implements HabboClient {
 
     private List<LinuxMemorySnippet> createMemorySnippetListForRC4() {
 
-        int offset = 4;
+        Object lock = new Object();
 
         refreshMemoryMaps();
         String memoryPath = "/proc/" + PID + "/mem";
 
+        int[] count = {0};
+
         List<LinuxMemorySnippet> result = new ArrayList<>();
         for (long[] map : maps) {
-            long start = map[0];
-            long end = map[1];
+            new Thread(() -> {
+                int offset = 4;
+                long start = map[0];
+                long end = map[1];
 
-            byte[] data = new byte[(int)(end - start)];
-            try {
-                RandomAccessFile raf = new RandomAccessFile(memoryPath, "r");
-                raf.seek(start);
-                raf.read(data);
-                raf.close();
-            }
-            catch (Exception e) {
-                e.printStackTrace();
-            }
-
-
-            int maskCount = 0;
-            int[] nToMap = new int[256];
-            int[] removeMap = new int[256];
-            for (int i = 0; i < removeMap.length; i++) {
-                removeMap[i] = -1;
-                nToMap[i] = -1;
-            }
-
-
-            int matchStart = -1;
-            int matchEnd = -1;
-
-            for (int i = 0; i < data.length; i+=offset) {
-                int b = (((int)data[i]) + 128) % 256;
-                int indInMap = (i/4) % 256;
-
-                int deletedNumber = removeMap[indInMap];
-                if (deletedNumber != -1) {
-                    nToMap[deletedNumber] = -1;
-                    maskCount --;
-                    removeMap[indInMap] = -1;
+                byte[] data = new byte[(int)(end - start)];
+                try {
+                    RandomAccessFile raf = new RandomAccessFile(memoryPath, "r");
+                    raf.seek(start);
+                    raf.read(data);
+                    raf.close();
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
                 }
 
-                if (nToMap[b] == -1) {
-                    maskCount ++;
-                    removeMap[indInMap] = b;
-                    nToMap[b] = indInMap;
-                }
-                else {
-                    removeMap[nToMap[b]] = -1;
-                    removeMap[indInMap] = b;
-                    nToMap[b] = indInMap;
+
+                int maskCount = 0;
+                int[] nToMap = new int[256];
+                int[] removeMap = new int[256];
+                for (int i = 0; i < removeMap.length; i++) {
+                    removeMap[i] = -1;
+                    nToMap[i] = -1;
                 }
 
-                if (maskCount == 256) {
-                    if (matchStart == -1) {
-                        matchStart = i - ((256 - 1) * offset);
+
+                int matchStart = -1;
+                int matchEnd = -1;
+
+                for (int i = 0; i < data.length; i+=offset) {
+                    int b = (((int)data[i]) + 128) % 256;
+                    int indInMap = (i/4) % 256;
+
+                    int deletedNumber = removeMap[indInMap];
+                    if (deletedNumber != -1) {
+                        nToMap[deletedNumber] = -1;
+                        maskCount --;
+                        removeMap[indInMap] = -1;
+                    }
+
+                    if (nToMap[b] == -1) {
+                        maskCount ++;
+                        removeMap[indInMap] = b;
+                        nToMap[b] = indInMap;
+                    }
+                    else {
+                        removeMap[nToMap[b]] = -1;
+                        removeMap[indInMap] = b;
+                        nToMap[b] = indInMap;
+                    }
+
+                    if (maskCount == 256) {
+                        if (matchStart == -1) {
+                            matchStart = i - ((256 - 1) * offset);
+                            matchEnd = i;
+                        }
+
+                        if (matchEnd < i - ((256 - 1) * offset)) {
+                            result.add(new LinuxMemorySnippet(start + matchStart, new byte[matchEnd - matchStart + 4]));
+                            matchStart = i - ((256 - 1) * offset);
+                        }
                         matchEnd = i;
                     }
 
-                    if (matchEnd < i - ((256 - 1) * offset)) {
-                        result.add(new LinuxMemorySnippet(start + matchStart, new byte[matchEnd - matchStart + 4]));
-                        matchStart = i - ((256 - 1) * offset);
-                    }
-                    matchEnd = i;
                 }
 
-            }
+                if (matchStart != -1) {
+                    result.add(new LinuxMemorySnippet(start + matchStart, new byte[matchEnd - matchStart + 4]));
+                }
 
-            if (matchStart != -1) {
-                result.add(new LinuxMemorySnippet(start + matchStart, new byte[matchEnd - matchStart + 4]));
+                synchronized (lock) {
+                    count[0] ++;
+                }
+
+            }).start();
+        }
+
+        while (count[0] < maps.size()) {
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
+
         return result;
     }
 }
