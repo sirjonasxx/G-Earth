@@ -12,7 +12,9 @@ import main.protocol.HPacket;
 import main.ui.SubForm;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by Jonas on 06/04/18.
@@ -49,7 +51,11 @@ public class Scheduler extends SubForm {
         updateUI();
 
         new Thread(() -> {
-            long i = 0;
+            long t = System.currentTimeMillis();
+            long changed = 1;
+
+            Set<ScheduleItem> set = new HashSet<>();
+
             while (true) {
                 try {
                     Thread.sleep(1);
@@ -57,17 +63,31 @@ public class Scheduler extends SubForm {
                     e.printStackTrace();
                 }
 
-                for (ScheduleItem item : scheduleItemList) {
+                set.clear();
+                for (int i = scheduleItemList.size() - 1; i >= 0; i--) {
+                    set.add(scheduleItemList.get(i));
+                }
+
+                for (ScheduleItem item : set) {
                     if (!item.getPausedProperty().get()) {
                         Interval cur = item.getDelayProperty().get();
-                        if (i % cur.getDelay() == cur.getOffset()) {
-                            getHConnection().sendToServerAsync(item.getPacketProperty().get());
+                        for (int i = 0; i < changed; i++) {
+                            if ((t - i) % cur.getDelay() == cur.getOffset()) {
+                                if (item.getDestinationProperty().getValue() == HMessage.Side.TOSERVER) {
+                                    getHConnection().sendToServerAsync(item.getPacketProperty().get());
+                                }
+                                else {
+                                    getHConnection().sendToClient(item.getPacketProperty().get());
+                                }
+                            }
                         }
                     }
 
                 }
 
-                i++;
+                long newT = System.currentTimeMillis();
+                changed = newT - t;
+                t = newT;
             }
         }).start();
 
@@ -99,42 +119,7 @@ public class Scheduler extends SubForm {
                     new HPacket(txt_packet.getText()),
                     rb_incoming.isSelected() ? HMessage.Side.TOCLIENT : HMessage.Side.TOSERVER);
 
-            new ScheduleItemContainer(newItem, schedulecontainer, scrollpane);
-            scheduleItemList.add(newItem);
-
-
-            newItem.onDelete(observable -> {
-                if (isBeingEdited == newItem) {
-                    setInputDefault();
-                    isBeingEdited = null;
-                }
-                scheduleItemList.remove(newItem);
-                for (int i = 0; i < scheduleItemList.size(); i++) {
-                    scheduleItemList.get(i).getIndexProperty().set(i);
-                }
-            });
-            newItem.onEdit(observable -> {
-                if (isBeingEdited != null) {
-                    isBeingEdited.isUpdatedTrigger();
-                }
-
-                if (isBeingEdited != newItem) {
-                    txt_packet.setText(newItem.getPacketProperty().get().toString());
-                    txt_delay.setText(newItem.getDelayProperty().get().toString());
-                    rb_incoming.setSelected(newItem.getDestinationProperty().get() == HMessage.Side.TOCLIENT);
-                    rb_outgoing.setSelected(newItem.getDestinationProperty().get() == HMessage.Side.TOSERVER);
-
-                    isBeingEdited = newItem;
-                    btn_addoredit.setText("Edit schedule item"); //Add to scheduler
-                    updateUI();
-                    newItem.onIsBeingUpdatedTrigger();
-                }
-                else {
-                    setInputDefault();
-                    isBeingEdited.isUpdatedTrigger();
-                    isBeingEdited = null;
-                }
-            });
+            addItem(newItem);
         }
         else {
 
@@ -147,6 +132,45 @@ public class Scheduler extends SubForm {
             setInputDefault();
         }
 
+    }
+
+    private void addItem(ScheduleItem newItem) {
+        new ScheduleItemContainer(newItem, schedulecontainer, scrollpane);
+        scheduleItemList.add(newItem);
+
+
+        newItem.onDelete(observable -> {
+            if (isBeingEdited == newItem) {
+                setInputDefault();
+                isBeingEdited = null;
+            }
+            scheduleItemList.remove(newItem);
+            for (int i = 0; i < scheduleItemList.size(); i++) {
+                scheduleItemList.get(i).getIndexProperty().set(i);
+            }
+        });
+        newItem.onEdit(observable -> {
+            if (isBeingEdited != null) {
+                isBeingEdited.isUpdatedTrigger();
+            }
+
+            if (isBeingEdited != newItem) {
+                txt_packet.setText(newItem.getPacketProperty().get().toString());
+                txt_delay.setText(newItem.getDelayProperty().get().toString());
+                rb_incoming.setSelected(newItem.getDestinationProperty().get() == HMessage.Side.TOCLIENT);
+                rb_outgoing.setSelected(newItem.getDestinationProperty().get() == HMessage.Side.TOSERVER);
+
+                isBeingEdited = newItem;
+                btn_addoredit.setText("Edit schedule item"); //Add to scheduler
+                updateUI();
+                newItem.onIsBeingUpdatedTrigger();
+            }
+            else {
+                setInputDefault();
+                isBeingEdited.isUpdatedTrigger();
+                isBeingEdited = null;
+            }
+        });
     }
 
     private void setInputDefault() {
