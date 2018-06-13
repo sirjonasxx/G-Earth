@@ -1,6 +1,6 @@
 package main.protocol.memory.habboclient;
 
-import main.OSValidator;
+import main.misc.OSValidator;
 import main.protocol.memory.habboclient.linux.LinuxHabboClient;
 
 /**

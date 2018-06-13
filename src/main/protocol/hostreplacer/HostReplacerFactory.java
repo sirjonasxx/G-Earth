@@ -1,6 +1,6 @@
 package main.protocol.hostreplacer;
 
-import main.OSValidator;
+import main.misc.OSValidator;
 
 /**
  * Created by Jonas on 04/04/18.

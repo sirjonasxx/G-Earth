@@ -4,6 +4,7 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import main.misc.StringifyAble;
 import main.protocol.HMessage;
 import main.protocol.HPacket;
 
@@ -13,20 +14,28 @@ import java.util.List;
 /**
  * Created by Jonas on 07/04/18.
  */
-public class ScheduleItem {
+public class ScheduleItem implements StringifyAble {
 
-    private SimpleIntegerProperty indexProperty;
-    private SimpleBooleanProperty pausedProperty;
-    private SimpleObjectProperty<Interval> delayProperty;
-    private SimpleObjectProperty<HPacket> packetProperty;
-    private SimpleObjectProperty<HMessage.Side> destinationProperty;
+    private SimpleIntegerProperty indexProperty = null;
+    private SimpleBooleanProperty pausedProperty = null;
+    private SimpleObjectProperty<Interval> delayProperty = null;
+    private SimpleObjectProperty<HPacket> packetProperty = null;
+    private SimpleObjectProperty<HMessage.Side> destinationProperty = null;
 
     ScheduleItem (int index, boolean paused, Interval delay, HPacket packet, HMessage.Side destination) {
+        construct(index, paused, delay, packet, destination);
+    }
+
+    private void construct(int index, boolean paused, Interval delay, HPacket packet, HMessage.Side destination) {
         this.indexProperty = new SimpleIntegerProperty(index);
         this.pausedProperty = new SimpleBooleanProperty(paused);
         this.delayProperty = new SimpleObjectProperty<>(delay);
         this.packetProperty = new SimpleObjectProperty<>(packet);
         this.destinationProperty = new SimpleObjectProperty<>(destination);
+    }
+
+    ScheduleItem(String stringifyAbleRepresentation) {
+        constructFromString(stringifyAbleRepresentation);
     }
 
     public SimpleIntegerProperty getIndexProperty() {
@@ -90,4 +99,33 @@ public class ScheduleItem {
         }
     }
 
+    @Override
+    public String stringify() {
+        StringBuilder b = new StringBuilder();
+        b       .append(indexProperty.get())
+                .append("\t")
+                .append(pausedProperty.get() ? "true" : "false")
+                .append("\t")
+                .append(delayProperty.get().toString())
+                .append("\t")
+                .append(packetProperty.get().toString())
+                .append("\t")
+                .append(destinationProperty.get().name());
+        return b.toString();
+    }
+
+    @Override
+    public void constructFromString(String str) {
+        String[] parts = str.split("\t");
+        if (parts.length == 5) {
+            int index = Integer.parseInt(parts[0]);
+            boolean paused = parts[1].equals("true");
+            Interval delay = new Interval(parts[2]);
+            HPacket packet = new HPacket(parts[3]);
+            HMessage.Side side = parts[4].equals(HMessage.Side.TOSERVER.name()) ? HMessage.Side.TOSERVER : HMessage.Side.TOCLIENT;
+
+            construct(index, paused, delay, packet, side);
+
+        }
+    }
 }

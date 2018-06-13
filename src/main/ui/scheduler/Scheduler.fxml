@@ -65,10 +65,13 @@
             <Insets bottom="10.0" left="17.0" right="17.0" />
          </GridPane.margin>
          <children>
-            <GridPane>
+            <GridPane hgap="7.0">
               <columnConstraints>
-                <ColumnConstraints hgrow="SOMETIMES" maxWidth="63.0" minWidth="10.0" prefWidth="63.0" />
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="63.0" minWidth="63.0" prefWidth="63.0" />
                 <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="468.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="70.0" prefWidth="70.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="35.0" prefWidth="35.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="35.0" prefWidth="35.0" />
               </columnConstraints>
               <rowConstraints>
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -76,7 +79,7 @@
                <children>
                   <TextField fx:id="txt_packet" text="[0][0][0][2][0][0]" GridPane.columnIndex="1">
                      <GridPane.margin>
-                        <Insets />
+                        <Insets left="-7.0" />
                      </GridPane.margin>
                   </TextField>
                   <Label maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Packet:" textFill="#000000bb">
@@ -84,6 +87,9 @@
                         <Insets left="3.0" />
                      </GridPane.margin>
                   </Label>
+                  <Button fx:id="btn_clear" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#clearBtnClicked" text="Clear" GridPane.columnIndex="2" />
+                  <Button fx:id="btn_save" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#saveBtnClicked" text="S" GridPane.columnIndex="3" />
+                  <Button fx:id="btn_load" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#loadBtnClicked" text="L" GridPane.columnIndex="4" />
                </children>
             </GridPane>
             <GridPane prefHeight="33.0" prefWidth="502.0" GridPane.rowIndex="1">

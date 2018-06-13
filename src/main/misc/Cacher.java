@@ -1,4 +1,4 @@
-package main;
+package main.misc;
 
 import java.io.*;
 import java.nio.file.Files;

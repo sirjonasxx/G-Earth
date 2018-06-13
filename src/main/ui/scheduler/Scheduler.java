@@ -36,6 +36,10 @@ public class Scheduler extends SubForm {
     public RadioButton rb_incoming;
     public RadioButton rb_outgoing;
 
+    public Button btn_clear;
+    public Button btn_save;
+    public Button btn_load;
+
     private ScheduleItem isBeingEdited = null;
 
     private List<ScheduleItem> scheduleItemList = new ArrayList<>();
@@ -47,6 +51,10 @@ public class Scheduler extends SubForm {
 
         txt_packet.textProperty().addListener(event -> Platform.runLater(this::updateUI));
         txt_delay.textProperty().addListener(event -> Platform.runLater(this::updateUI));
+
+        btn_clear.setTooltip(new Tooltip("Clear all items"));
+        btn_save.setTooltip(new Tooltip("Save to file"));
+        btn_load.setTooltip(new Tooltip("Load from file"));
 
         updateUI();
 
@@ -73,7 +81,7 @@ public class Scheduler extends SubForm {
                         Interval cur = item.getDelayProperty().get();
                         for (int i = 0; i < changed; i++) {
                             if ((t - i) % cur.getDelay() == cur.getOffset()) {
-                                if (item.getDestinationProperty().getValue() == HMessage.Side.TOSERVER) {
+                                if (item.getDestinationProperty().get() == HMessage.Side.TOSERVER) {
                                     getHConnection().sendToServerAsync(item.getPacketProperty().get());
                                 }
                                 else {
@@ -181,5 +189,30 @@ public class Scheduler extends SubForm {
 
         btn_addoredit.setText("Add to scheduler");
         updateUI();
+    }
+
+
+    private void clear() {
+        for (int i = scheduleItemList.size() - 1; i >= 0; i--) {
+            scheduleItemList.get(i).delete();
+        }
+    }
+    private void load(List<ScheduleItem> list) {
+        clear();
+
+        for (ScheduleItem item : list) {
+            addItem(item);
+        }
+    }
+
+
+    public void clearBtnClicked(ActionEvent actionEvent) {
+        clear();
+    }
+
+    public void saveBtnClicked(ActionEvent actionEvent) {
+    }
+
+    public void loadBtnClicked(ActionEvent actionEvent) {
     }
 }
