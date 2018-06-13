@@ -46,6 +46,7 @@ public class Rc4Obtainer {
 
 
             List<byte[]> results = client.getRC4possibilities();
+            outerloop:
             for (byte[] possible : results) {
 
                 byte[] encBuffer = new byte[outgoingHandler.getEncryptedBuffer().size()];
@@ -53,7 +54,6 @@ public class Rc4Obtainer {
                     encBuffer[i] = outgoingHandler.getEncryptedBuffer().get(i);
                 }
 
-                outerloop:
                 for (int i = 0; i < 256; i++) {
 //                    System.out.println(i);
                     for (int j = 0; j < 256; j++) {

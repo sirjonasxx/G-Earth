@@ -27,14 +27,13 @@ public class OutgoingHandler extends Handler {
     private void dataStreamCheck(byte[] buffer)	{
         if (!isDataStream) {
             HPacket hpacket = new HPacket(buffer);
-            isDataStream = (hpacket.getBytesLength() > 6 && hpacket.headerId() == 4000);
+            isDataStream = (hpacket.getBytesLength() > 6 && hpacket.length() < 100);
         }
     }
 
     @Override
     public void act(byte[] buffer) throws IOException {
         dataStreamCheck(buffer);
-
         if (isDataStream)	{
 
             if (currentIndex < encryptOffset) {
