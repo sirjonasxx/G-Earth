@@ -14,8 +14,47 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.PriorityQueue;
+import java.util.Queue;
 
 public class HConnection {
+
+
+    private volatile Queue<HPacket> sendToClientAsyncQueue = new PriorityQueue<>();
+    private volatile Queue<HPacket> sendToServerAsyncQueue = new PriorityQueue<>();
+    public HConnection() {
+        new Thread(() -> {
+            while (true) {
+                if (inHandler != null) {
+                    HPacket packet;
+                    while ((packet = sendToClientAsyncQueue.poll()) != null) {
+                        sendToClient(packet);
+                    }
+                }
+                try {
+                    Thread.sleep(1);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+
+        new Thread(() -> {
+            while (true) {
+                if (outHandler != null) {
+                    HPacket packet;
+                    while ((packet = sendToServerAsyncQueue.poll()) != null) {
+                        sendToServer(packet);
+                    }
+                }
+                try {
+                    Thread.sleep(1);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
 
     public enum State {
         NOT_CONNECTED,
@@ -386,18 +425,14 @@ public class HConnection {
     public boolean sendToServer(HPacket message) {
         if (outHandler == null) return false;
         outHandler.sendToStream(message.toBytes());
-        return false;
+        return true;
     }
 
     public void sendToClientAsync(HPacket message) {
-        new Thread(() -> {
-            sendToClient(message);
-        }).start();
+        sendToClientAsyncQueue.add(message);
     }
     public void sendToServerAsync(HPacket message) {
-        new Thread(() -> {
-            sendToServer(message);
-        }).start();
+        sendToServerAsyncQueue.add(message);
     }
 
 }
