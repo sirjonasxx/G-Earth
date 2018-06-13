@@ -25,15 +25,13 @@ public class HConnection {
     public HConnection() {
         new Thread(() -> {
             while (true) {
-                if (inHandler != null) {
-                    HPacket packet;
-                    while ((packet = sendToClientAsyncQueue.poll()) != null) {
-                        sendToClient(packet);
-                    }
+                HPacket packet;
+                while ((packet = sendToClientAsyncQueue.poll()) != null) {
+                    sendToClient(packet);
                 }
                 try {
                     Thread.sleep(1);
-                } catch (InterruptedException e) {
+                } catch (InterruptedException e) { //java........................................
                     e.printStackTrace();
                 }
             }
@@ -41,11 +39,9 @@ public class HConnection {
 
         new Thread(() -> {
             while (true) {
-                if (outHandler != null) {
-                    HPacket packet;
-                    while ((packet = sendToServerAsyncQueue.poll()) != null) {
-                        sendToServer(packet);
-                    }
+                HPacket packet;
+                while ((packet = sendToServerAsyncQueue.poll()) != null) {
+                    sendToServer(packet);
                 }
                 try {
                     Thread.sleep(1);
