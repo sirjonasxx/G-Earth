@@ -20,9 +20,10 @@ FEATURES:
 * Responsive UI
 * Encoding/decoding
 * Auto detect hotel
+* Scheduler
 
 DOING:
-* Scheduler (packetsending not consistent yet)
+* Scheduler (save & load functionality)
 
 TO-DO:
 * Block specific packets from displaying in the logger (in Logger tab)
