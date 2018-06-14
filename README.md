@@ -14,15 +14,16 @@ Execute this command if you get the following error:
 
 
 FEATURES:
-* Client & server side packet logging & injection
-* Easily blocking & replacing packets (not yet in the UI)
+* Log outgoing and incoming packets
+* Injection, both sides
+* Blocking & replacing packets functionality
 * Packet expressions
-* Responsive UI
 * Encoding/decoding
 * Auto detect hotel
+* Scheduler
 
 DOING:
-* Scheduler (packetsending not consistent yet)
+* Scheduler (save & load functionality)
 
 TO-DO:
 * Block specific packets from displaying in the logger (in Logger tab)
