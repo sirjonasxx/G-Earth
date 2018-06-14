@@ -14,8 +14,9 @@ Execute this command if you get the following error:
 
 
 FEATURES:
-* Client & server side packet logging & injection
-* Easily blocking & replacing packets (not yet in the UI)
+* Log outgoing and incoming packets
+* Injection, both sides
+* Blocking & replacing packets functionality
 * Packet expressions
 * Encoding/decoding
 * Auto detect hotel
