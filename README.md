@@ -17,7 +17,6 @@ FEATURES:
 * Client & server side packet logging & injection
 * Easily blocking & replacing packets (not yet in the UI)
 * Packet expressions
-* Responsive UI
 * Encoding/decoding
 * Auto detect hotel
 * Scheduler
