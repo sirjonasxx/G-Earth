@@ -12,23 +12,23 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.PriorityQueue;
-import java.util.Queue;
+import java.util.*;
 
 public class HConnection {
 
 
-    private volatile Queue<HPacket> sendToClientAsyncQueue = new PriorityQueue<>();
-    private volatile Queue<HPacket> sendToServerAsyncQueue = new PriorityQueue<>();
+    private final Queue<HPacket> sendToClientAsyncQueue = new LinkedList<>();
+    private final Queue<HPacket> sendToServerAsyncQueue = new LinkedList<>();
     public HConnection() {
         new Thread(() -> {
             while (true) {
                 HPacket packet;
-                while ((packet = sendToClientAsyncQueue.poll()) != null) {
-                    sendToClient(packet);
+                synchronized (sendToClientAsyncQueue) {
+                    while ((packet = sendToClientAsyncQueue.poll()) != null) {
+                        sendToClient(packet);
+                    }
                 }
+
                 try {
                     Thread.sleep(1);
                 } catch (InterruptedException e) { //java........................................
@@ -40,9 +40,12 @@ public class HConnection {
         new Thread(() -> {
             while (true) {
                 HPacket packet;
-                while ((packet = sendToServerAsyncQueue.poll()) != null) {
-                    sendToServer(packet);
+                synchronized (sendToServerAsyncQueue) {
+                    while ((packet = sendToServerAsyncQueue.poll()) != null) {
+                        sendToServer(packet);
+                    }
                 }
+
                 try {
                     Thread.sleep(1);
                 } catch (InterruptedException e) {
@@ -365,6 +368,10 @@ public class HConnection {
     }
 
     private void setState(State state) {
+        if (state == State.CONNECTED) {
+            sendToClientAsyncQueue.clear();
+            sendToServerAsyncQueue.clear();
+        }
         if (state != this.state) {
             State buffer = this.state;
             this.state = state;
@@ -425,10 +432,15 @@ public class HConnection {
     }
 
     public void sendToClientAsync(HPacket message) {
-        sendToClientAsyncQueue.add(message);
+        synchronized (sendToClientAsyncQueue) {
+            sendToClientAsyncQueue.add(message);
+        }
+
     }
     public void sendToServerAsync(HPacket message) {
-        sendToServerAsyncQueue.add(message);
+        synchronized (sendToServerAsyncQueue) {
+            sendToServerAsyncQueue.add(message);
+        }
     }
 
 }

@@ -9,7 +9,7 @@ import java.awt.*;
 
 public class SubForm {
 
-    GEarthController parentController;
+    protected GEarthController parentController;
 
     public void setParentController(GEarthController controller) {
         parentController = controller;

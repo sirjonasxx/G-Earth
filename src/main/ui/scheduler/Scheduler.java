@@ -7,10 +7,12 @@ import javafx.event.ActionEvent;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import main.protocol.HMessage;
 import main.protocol.HPacket;
 import main.ui.SubForm;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -211,8 +213,68 @@ public class Scheduler extends SubForm {
     }
 
     public void saveBtnClicked(ActionEvent actionEvent) {
+        FileChooser fileChooser = new FileChooser();
+
+        //Set extension filter
+        FileChooser.ExtensionFilter extFilter =
+                new FileChooser.ExtensionFilter("SCHED files (*.sched)", "*.sched");
+        fileChooser.getExtensionFilters().add(extFilter);
+        fileChooser.setTitle("Save Schedule File");
+
+        //Show save file dialog
+        File file = fileChooser.showSaveDialog(parentController.getStage());
+
+        if(file != null){
+
+            try {
+                FileWriter fileWriter = new FileWriter(file);
+                BufferedWriter out = new BufferedWriter(fileWriter);
+
+                for (int i = 0; i < scheduleItemList.size(); i++) {
+                    out.write(scheduleItemList.get(i).stringify());
+                    if (i != scheduleItemList.size() - 1) out.write("\n");
+                }
+
+                out.flush();
+                out.close();
+                fileWriter.close();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+
+        }
     }
 
     public void loadBtnClicked(ActionEvent actionEvent) {
+        List<ScheduleItem> list = new ArrayList<>();
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Load Schedule File");
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Schedule Files", "*.sched"));
+        File selectedFile = fileChooser.showOpenDialog(parentController.getStage());
+        if (selectedFile != null) {
+
+            FileReader fr = null;
+            try {
+                fr = new FileReader(selectedFile);
+                BufferedReader br = new BufferedReader(fr);
+                String line = null;
+
+                while ((line = br.readLine()) != null)
+                {
+                    list.add(new ScheduleItem(line));
+                }
+
+                fr.close();
+                br.close();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        load(list);
+
     }
 }
