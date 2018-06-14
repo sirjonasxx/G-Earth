@@ -26,8 +26,10 @@ DOING:
 * Extension support
 
 TO-DO:
-* Block specific packets from displaying in the logger (in Logger tab)
-* Extension -> enable CS admin on connect
 * Extension -> block/replace packets, replace Strings & ints & .. in all packets
 * Info tab
 * Cross-platform support
+
+EXTRA TO-DO's:
+* Block specific packets from displaying in the logger (in Logger tab)
+* Extension -> enable CS admin on connect
