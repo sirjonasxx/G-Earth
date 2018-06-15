@@ -9,7 +9,7 @@
 
 <VBox xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.ui.GEarthController">
    <Pane fx:id="mover" maxHeight="0.0" minHeight="0.0" prefWidth="200.0" />
-    <TabPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="295.0" prefWidth="565.0" tabClosingPolicy="UNAVAILABLE">
+    <TabPane fx:id="tabBar" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="295.0" prefWidth="565.0" tabClosingPolicy="UNAVAILABLE">
         <tabs>
             <Tab text="Connection">
                 <content>
@@ -34,7 +34,7 @@
                     <fx:include fx:id="scheduler" source="scheduler/Scheduler.fxml" />
                 </content>
             </Tab>
-            <Tab text="Settings">
+            <Tab fx:id="tab_Settings" text="Settings">
                 <content>
                     <fx:include fx:id="settings" source="settings/Settings.fxml" />
                 </content>

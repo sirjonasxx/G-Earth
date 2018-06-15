@@ -1,5 +1,7 @@
 package main.ui;
 
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import main.protocol.HConnection;
@@ -14,6 +16,8 @@ import main.ui.tools.Tools;
 
 public class GEarthController {
 
+    public Tab tab_Settings;
+    public TabPane tabBar;
     private Stage stage = null;
     private volatile HConnection hConnection;
 
@@ -41,6 +45,8 @@ public class GEarthController {
         settingsController.setParentController(this);
         infoController.setParentController(this);
         extensionsController.setParentController(this);
+
+        tabBar.getTabs().remove(tab_Settings);
 
 
         //custom header bar
