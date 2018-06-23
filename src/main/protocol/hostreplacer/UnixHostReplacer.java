@@ -44,7 +44,6 @@ class UnixHostReplacer implements HostReplacer {
             out = new BufferedWriter(fw);
 
             if (!containmmm)	{
-                System.out.println(text);
                 out.write(text);
             }
 
