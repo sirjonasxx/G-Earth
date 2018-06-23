@@ -1,5 +1,7 @@
 package main.protocol;
 
+import main.misc.StringifyAble;
+
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -8,7 +10,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-public class HPacket {
+public class HPacket implements StringifyAble {
     // te komen: toExpressions (+impl. expressies)
     private boolean isEdited = false;
     private byte[] packetInBytes;
@@ -403,7 +405,6 @@ public class HPacket {
     }
     public HPacket replaceAllString(String oldS, String newS) {
         while (replaceFirstString(oldS, newS)) {}
-
         return this;
     }
 
@@ -737,7 +738,7 @@ public class HPacket {
                             resultTest[j] = "{b:"+(packetInBytes[j] == 1 ? "true" : "false")+"}";
                         }
                         else {
-                            resultTest[j] = "{b:"+packetInBytes[j]+"}";
+                            resultTest[j] = "{b:"+((((int)packetInBytes[j])+256)%256)+"}";
                         }
                     }
                     opeenvolging = 0;
@@ -761,4 +762,23 @@ public class HPacket {
         return expression.toString().replace("{i:0}{b:false}{b:true}", "{s:}{i:1}");
     }
 
+    @Override
+    public String stringify() {
+        String st = (isEdited ? "1" : "0") + this.toString();
+        return st;
+    }
+
+    @Override
+    public void constructFromString(String str) {
+        this.isEdited = str.charAt(0) == '1';
+        packetInBytes = fromStringToBytes(str.substring(1));
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (!(object instanceof HPacket)) return false;
+
+        HPacket packet2 = (HPacket) object;
+        return Arrays.equals(packetInBytes, packet2.packetInBytes) && (isEdited == packet2.isEdited);
+    }
 }

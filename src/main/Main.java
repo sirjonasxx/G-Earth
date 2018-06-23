@@ -38,8 +38,10 @@ public class Main extends Application {
 
     }
 
+    public static String[] args;
 
     public static void main(String[] args) {
+        Main.args = args;
         launch(args);
     }
 }
