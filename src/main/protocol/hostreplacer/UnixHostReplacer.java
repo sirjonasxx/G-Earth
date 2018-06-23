@@ -25,7 +25,7 @@ class UnixHostReplacer implements HostReplacer {
 
         try
         {
-            ArrayList<String> lines = new ArrayList<String>();
+            ArrayList<String> lines = new ArrayList<>();
             File f1 = new File(hostsFileLocation);
             fr = new FileReader(f1);
             br = new BufferedReader(fr);
@@ -36,7 +36,6 @@ class UnixHostReplacer implements HostReplacer {
                 if (line.equals(text))
                     containmmm = true;
                 lines.add(line);
-
             }
             fr.close();
             br.close();
@@ -45,25 +44,20 @@ class UnixHostReplacer implements HostReplacer {
             out = new BufferedWriter(fw);
 
             if (!containmmm)	{
+                System.out.println(text);
                 out.write(text);
             }
 
             for (int i = 0; i < lines.size(); i++)	{
-                out.write(System.getProperty("line.separator")+ lines.get(i));
+                out.write(((containmmm && i == 0) ? "" : System.getProperty("line.separator"))+ lines.get(i));
             }
+            out.flush();
+            fw.close();
+            out.close();
         }
         catch (Exception ex)
         {
             ex.printStackTrace();
-        }
-        finally {
-            try {
-                if (fr != null) fr.close();
-                if (br != null) br.close();
-                if (fw != null) fw.close();
-                if (out != null) out.close();
-            }
-            catch (Exception e) {}
         }
     }
 
@@ -99,19 +93,13 @@ class UnixHostReplacer implements HostReplacer {
                 out.write(lines.get(i));
                 if (i != lines.size() - 1) out.write(System.getProperty("line.separator"));
             }
+            out.flush();
+            fw.close();
+            out.close();
         }
         catch (Exception ex)
         {
             ex.printStackTrace();
-        }
-        finally {
-            try {
-                if (fr != null) fr.close();
-                if (br != null) br.close();
-                if (fw != null) fw.close();
-                if (out != null) out.close();
-            }
-            catch (Exception e) {}
         }
     }
 }
