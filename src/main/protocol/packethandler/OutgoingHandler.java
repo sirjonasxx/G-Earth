@@ -104,6 +104,7 @@ public class OutgoingHandler extends Handler {
                             currentIndex < encryptOffset ? hMessage.getPacket().toBytes() :
                                     servercipher.rc4(hMessage.getPacket().toBytes())
                     );
+                    out.flush();
                 }
                 currentIndex ++;
             }

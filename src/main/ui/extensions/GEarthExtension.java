@@ -4,6 +4,7 @@ import main.protocol.HMessage;
 import main.protocol.HPacket;
 import main.protocol.packethandler.PayloadBuffer;
 
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
@@ -30,39 +31,34 @@ public class GEarthExtension {
                 connection.getOutputStream().write((new HPacket(Extensions.OUTGOING_MESSAGES_IDS.INFOREQUEST)).toBytes());
                 connection.getOutputStream().flush();
 
-                PayloadBuffer payloadBuffer = new PayloadBuffer();
                 InputStream inputStream = connection.getInputStream();
+                DataInputStream dIn = new DataInputStream(inputStream);
 
-                outerloop:
                 while (!connection.isClosed()) {
-                    if (inputStream.available() > 0) {
-                        byte[] incoming = new byte[inputStream.available()];
-                        inputStream.read(incoming);
-                        payloadBuffer.push(incoming);
+
+                    int length = dIn.readInt();
+                    byte[] headerandbody = new byte[length + 4];
+                    int amountRead = dIn.read(headerandbody, 4, length);
+
+                    if (amountRead != length) break;
+                    HPacket packet = new HPacket(headerandbody);
+                    packet.fixLength();
+
+                    if (packet.headerId() == Extensions.INCOMING_MESSAGES_IDS.EXTENSIONINFO) {
+                        GEarthExtension gEarthExtension = new GEarthExtension(
+                                packet.readString(),
+                                packet.readString(),
+                                packet.readString(),
+                                packet.readString(),
+                                connection,
+                                onDisconnectedCallback
+                        );
+                        callback.act(gEarthExtension);
+                        break;
                     }
-
-                    HPacket[] hPackets = payloadBuffer.receive();
-                    for (HPacket packet : hPackets) { // it should be only one packet
-                        if (packet.headerId() == Extensions.INCOMING_MESSAGES_IDS.EXTENSIONINFO) {
-
-                            GEarthExtension gEarthExtension = new GEarthExtension(
-                                    packet.readString(),
-                                    packet.readString(),
-                                    packet.readString(),
-                                    packet.readString(),
-                                    connection,
-                                    onDisconnectedCallback
-                            );
-                            callback.act(gEarthExtension);
-
-                            break outerloop;
-                        }
-                    }
-
-                    Thread.sleep(1);
                 }
 
-            } catch (IOException | InterruptedException ignored) {}
+            } catch (IOException ignored) {}
         }).start();
 
     }
@@ -77,29 +73,35 @@ public class GEarthExtension {
         GEarthExtension selff = this;
         new Thread(() -> {
             try {
-                PayloadBuffer payloadBuffer = new PayloadBuffer();
                 InputStream inputStream = connection.getInputStream();
+                DataInputStream dIn = new DataInputStream(inputStream);
 
                 while (!connection.isClosed()) {
-                    if (inputStream.available() > 0) {
-                        byte[] incoming = new byte[inputStream.available()];
-                        inputStream.read(incoming);
-                        payloadBuffer.push(incoming);
+                    int length = dIn.readInt();
+                    byte[] headerandbody = new byte[length + 4];
+                    int amountRead = dIn.read(headerandbody, 4, length);
+
+                    if (amountRead != length) break;
+                    HPacket packet = new HPacket(headerandbody);
+                    packet.fixLength();
+
+                    for (int i = receiveMessageListeners.size() - 1; i >= 0; i--) {
+                        receiveMessageListeners.get(i).act(packet);
                     }
 
-                    HPacket[] hPackets = payloadBuffer.receive();
-                    for (HPacket packet : hPackets) {
-                        for (int i = receiveMessageListeners.size() - 1; i >= 0; i--) {
-                            receiveMessageListeners.get(i).act(packet);
-                        }
-                    }
-
-                    Thread.sleep(1);
                 }
                 onDisconnectedCallback.act(selff);
 
-            } catch (IOException | InterruptedException e) {
+            } catch (IOException e) {
                 e.printStackTrace();
+            } finally {
+                if (!connection.isClosed()) {
+                    try {
+                        connection.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
         }).start();
 

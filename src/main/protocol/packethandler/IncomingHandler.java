@@ -38,6 +38,7 @@ public class IncomingHandler extends Handler {
 
                 if (!hMessage.isBlocked())	{
                     out.write(hMessage.getPacket().toBytes());
+                    out.flush();
                 }
                 currentIndex++;
             }

@@ -5,6 +5,7 @@ import main.protocol.HPacket;
 import main.protocol.packethandler.PayloadBuffer;
 import main.ui.extensions.Extensions;
 
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -50,90 +51,106 @@ public abstract class Extension {
             }
         }
 
-
+        Socket gEarthExtensionServer = null;
         try {
-            Socket GEarthExtensionServer = new Socket("localhost", port);
+            gEarthExtensionServer = new Socket("localhost", port);
 
-            InputStream in = GEarthExtensionServer.getInputStream();
-            out = GEarthExtensionServer.getOutputStream();
+            InputStream in = gEarthExtensionServer.getInputStream();
+            DataInputStream dIn = new DataInputStream(in);
+            out = gEarthExtensionServer.getOutputStream();
 
-            PayloadBuffer buffer = new PayloadBuffer();
-            while (!GEarthExtensionServer.isClosed()) {
-                if (in.available() > 0) {
-                    byte[] data = new byte[in.available()];
-                    in.read(data);
-                    buffer.push(data);
+            while (!gEarthExtensionServer.isClosed()) {
 
-                    HPacket[] packets = buffer.receive();
-                    for (HPacket packet : packets) {
-                        if (packet.headerId() == Extensions.OUTGOING_MESSAGES_IDS.INFOREQUEST) {
-                            HPacket response = new HPacket(Extensions.INCOMING_MESSAGES_IDS.EXTENSIONINFO);
-                            response.appendString(getTitle())
-                                    .appendString(getAuthor())
-                                    .appendString(getVersion())
-                                    .appendString(getDescription());
-                            writeToStream(response.toBytes());
-                        }
-                        else if (packet.headerId() == Extensions.OUTGOING_MESSAGES_IDS.CONNECTIONSTART) {
-                            onStartConnection();
-                        }
-                        else if (packet.headerId() == Extensions.OUTGOING_MESSAGES_IDS.CONNECTIONEND) {
-                            onEndConnection();
-                        }
-                        else if (packet.headerId() == Extensions.OUTGOING_MESSAGES_IDS.FLAGSCHECK) {
-                            // body = an array of G-Earths main flags
-                            if (flagRequestCallback != null) {
-                                int arraysize = packet.readInteger();
-                                String[] gEarthArgs = new String[arraysize];
-                                for (int i = 0; i < gEarthArgs.length; i++) {
-                                    gEarthArgs[i] = packet.readString();
-                                }
-                                flagRequestCallback.act(gEarthArgs);
-                            }
-                            flagRequestCallback = null;
-                        }
-                        else if (packet.headerId() == Extensions.OUTGOING_MESSAGES_IDS.INIT) {
-                            init();
-                        }
-                        else if (packet.headerId() == Extensions.OUTGOING_MESSAGES_IDS.FREEFLOW) {
-                            // nothing to be done yet
-                        }
-                        else if (packet.headerId() == Extensions.OUTGOING_MESSAGES_IDS.ONDOUBLECLICK) {
-                            onDoubleClick();
-                        }
-                        else if (packet.headerId() == Extensions.OUTGOING_MESSAGES_IDS.PACKETINTERCEPT) {
-                            HMessage habboMessage = new HMessage(packet.readString());
-                            HPacket habboPacket = habboMessage.getPacket();
+                int length = dIn.readInt();
+                byte[] headerandbody = new byte[length + 4];
+                int amountRead = dIn.read(headerandbody, 4, length);
 
-                            Map<Integer, List<MessageListener>> listeners =
-                                    habboMessage.getDestination() == HMessage.Side.TOCLIENT ?
-                                            incomingMessageListeners :
-                                            outgoingMessageListeners;
+                if (amountRead != length) break;
 
-                            if (listeners.containsKey(-1)) { // registered on all packets
-                                for (int i = listeners.get(-1).size() - 1; i >= 0; i--) {
-                                    listeners.get(-1).get(i).act(habboMessage);
-                                }
-                            }
-                            if (listeners.containsKey(habboPacket.headerId())) {
-                                for (int i = listeners.get(habboPacket.headerId()).size() - 1; i >= 0; i--) {
-                                    listeners.get(habboPacket.headerId()).get(i).act(habboMessage);
-                                }
-                            }
+                HPacket packet = new HPacket(headerandbody);
+                packet.fixLength();
 
-                            HPacket response = new HPacket(Extensions.INCOMING_MESSAGES_IDS.MANIPULATEDPACKET);
-                            response.appendString(habboMessage.stringify());
 
-                            writeToStream(response.toBytes());
+                if (packet.headerId() == Extensions.OUTGOING_MESSAGES_IDS.INFOREQUEST) {
+                    HPacket response = new HPacket(Extensions.INCOMING_MESSAGES_IDS.EXTENSIONINFO);
+                    response.appendString(getTitle())
+                            .appendString(getAuthor())
+                            .appendString(getVersion())
+                            .appendString(getDescription());
+                    writeToStream(response.toBytes());
+                }
+                else if (packet.headerId() == Extensions.OUTGOING_MESSAGES_IDS.CONNECTIONSTART) {
+                    onStartConnection();
+                }
+                else if (packet.headerId() == Extensions.OUTGOING_MESSAGES_IDS.CONNECTIONEND) {
+                    onEndConnection();
+                }
+                else if (packet.headerId() == Extensions.OUTGOING_MESSAGES_IDS.FLAGSCHECK) {
+                    // body = an array of G-Earths main flags
+                    if (flagRequestCallback != null) {
+                        int arraysize = packet.readInteger();
+                        String[] gEarthArgs = new String[arraysize];
+                        for (int i = 0; i < gEarthArgs.length; i++) {
+                            gEarthArgs[i] = packet.readString();
+                        }
+                        flagRequestCallback.act(gEarthArgs);
+                    }
+                    flagRequestCallback = null;
+                }
+                else if (packet.headerId() == Extensions.OUTGOING_MESSAGES_IDS.INIT) {
+                    init();
+                }
+                else if (packet.headerId() == Extensions.OUTGOING_MESSAGES_IDS.FREEFLOW) {
+                    // nothing to be done yet
+                }
+                else if (packet.headerId() == Extensions.OUTGOING_MESSAGES_IDS.ONDOUBLECLICK) {
+                    onDoubleClick();
+                }
+                else if (packet.headerId() == Extensions.OUTGOING_MESSAGES_IDS.PACKETINTERCEPT) {
+                    String stringifiedMessage = packet.readString();
+                    HMessage habboMessage = new HMessage(stringifiedMessage);
+                    HPacket habboPacket = habboMessage.getPacket();
+//
+//                            System.out.println("----------");
+//                            System.out.println(stringifiedMessage);
+//                            System.out.println(habboPacket);
+
+                    Map<Integer, List<MessageListener>> listeners =
+                            habboMessage.getDestination() == HMessage.Side.TOCLIENT ?
+                                    incomingMessageListeners :
+                                    outgoingMessageListeners;
+
+                    if (listeners.containsKey(-1)) { // registered on all packets
+                        for (int i = listeners.get(-1).size() - 1; i >= 0; i--) {
+                            listeners.get(-1).get(i).act(habboMessage);
                         }
                     }
+                    if (listeners.containsKey(habboPacket.headerId())) {
+                        for (int i = listeners.get(habboPacket.headerId()).size() - 1; i >= 0; i--) {
+                            listeners.get(habboPacket.headerId()).get(i).act(habboMessage);
+                        }
+                    }
+
+                    HPacket response = new HPacket(Extensions.INCOMING_MESSAGES_IDS.MANIPULATEDPACKET);
+                    response.appendString(habboMessage.stringify());
+
+                    writeToStream(response.toBytes());
                 }
-                Thread.sleep(1);
             }
 
 
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
+        } catch (IOException e) {
+//            e.printStackTrace();
+            System.out.println("ERROR");
+        }
+        finally {
+            if (gEarthExtensionServer != null && !gEarthExtensionServer.isClosed()) {
+                try {
+                    gEarthExtensionServer.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 

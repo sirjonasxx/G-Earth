@@ -484,7 +484,7 @@ public class HPacket implements StringifyAble {
         return isEdited;
     }
 
-    private void fixLength() {
+    public void fixLength() {
         boolean remember = isEdited;
         replaceInt(0, packetInBytes.length - 4);
         isEdited = remember;
