@@ -139,16 +139,16 @@ public class Extensions extends SubForm {
 
             String stringified = message.stringify();
             HPacket manipulatePacketRequest = new HPacket(OUTGOING_MESSAGES_IDS.PACKETINTERCEPT);
-            manipulatePacketRequest.appendString(stringified);
+            manipulatePacketRequest.appendLongString(stringified);
 
             boolean[] isblock = new boolean[1];
 
-            for (GEarthExtension extension : gEarthExtensions) {
+            for (GEarthExtension extension : collection) {
                 GEarthExtension.ReceiveMessageListener respondCallback = new GEarthExtension.ReceiveMessageListener() {
                     @Override
                     public void act(HPacket packet) {
                         if (packet.headerId() == INCOMING_MESSAGES_IDS.MANIPULATEDPACKET) {
-                            String stringifiedresponse = packet.readString();
+                            String stringifiedresponse = packet.readLongString();
                             HMessage responseMessage = new HMessage(stringifiedresponse);
                             if (responseMessage.getDestination() == message.getDestination() && responseMessage.getIndex() == message.getIndex()) {
                                 if (!message.equals(responseMessage)) {
@@ -157,7 +157,10 @@ public class Extensions extends SubForm {
                                         isblock[0] = true;
                                     }
                                 }
-                                collection.remove(extension);
+                                synchronized (collection) {
+                                    collection.remove(extension);
+                                }
+
                                 extension.removeOnReceiveMessageListener(this);
                             }
                         }
@@ -171,12 +174,15 @@ public class Extensions extends SubForm {
             //block untill all extensions have responded
             List<GEarthExtension> willdelete = new ArrayList<>();
             while (!collection.isEmpty()) {
-                for (GEarthExtension extension : collection) {
-                    if (!gEarthExtensions.contains(extension)) willdelete.add(extension);
-                }
-                for (int i = willdelete.size() - 1; i >= 0; i--) {
-                    collection.remove(willdelete.get(i));
-                    willdelete.remove(i);
+
+                synchronized (collection) {
+                    for (GEarthExtension extension : collection) {
+                        if (!gEarthExtensions.contains(extension)) willdelete.add(extension);
+                    }
+                    for (int i = willdelete.size() - 1; i >= 0; i--) {
+                        collection.remove(willdelete.get(i));
+                        willdelete.remove(i);
+                    }
                 }
 
                 try {Thread.sleep(1);} catch (InterruptedException e) {e.printStackTrace();}

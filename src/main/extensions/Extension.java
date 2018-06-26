@@ -51,6 +51,11 @@ public abstract class Extension {
             }
         }
 
+        HPacket lastwrapper = null;
+        HMessage lastM = null;
+        HPacket last = null;
+
+
         Socket gEarthExtensionServer = null;
         try {
             gEarthExtensionServer = new Socket("localhost", port);
@@ -63,9 +68,11 @@ public abstract class Extension {
 
                 int length = dIn.readInt();
                 byte[] headerandbody = new byte[length + 4];
-                int amountRead = dIn.read(headerandbody, 4, length);
 
-                if (amountRead != length) break;
+                int amountRead = 0;
+                while (amountRead < length) {
+                    amountRead += dIn.read(headerandbody, 4 + amountRead, Math.min(dIn.available(), length - amountRead));
+                }
 
                 HPacket packet = new HPacket(headerandbody);
                 packet.fixLength();
@@ -107,13 +114,13 @@ public abstract class Extension {
                     onDoubleClick();
                 }
                 else if (packet.headerId() == Extensions.OUTGOING_MESSAGES_IDS.PACKETINTERCEPT) {
-                    String stringifiedMessage = packet.readString();
+                    String stringifiedMessage = packet.readLongString();
                     HMessage habboMessage = new HMessage(stringifiedMessage);
                     HPacket habboPacket = habboMessage.getPacket();
-//
-//                            System.out.println("----------");
-//                            System.out.println(stringifiedMessage);
-//                            System.out.println(habboPacket);
+
+                    lastwrapper = packet;
+                    lastM = habboMessage;
+                    last = habboPacket;
 
                     Map<Integer, List<MessageListener>> listeners =
                             habboMessage.getDestination() == HMessage.Side.TOCLIENT ?
@@ -125,6 +132,7 @@ public abstract class Extension {
                             listeners.get(-1).get(i).act(habboMessage);
                         }
                     }
+
                     if (listeners.containsKey(habboPacket.headerId())) {
                         for (int i = listeners.get(habboPacket.headerId()).size() - 1; i >= 0; i--) {
                             listeners.get(habboPacket.headerId()).get(i).act(habboMessage);
@@ -132,16 +140,15 @@ public abstract class Extension {
                     }
 
                     HPacket response = new HPacket(Extensions.INCOMING_MESSAGES_IDS.MANIPULATEDPACKET);
-                    response.appendString(habboMessage.stringify());
+                    response.appendLongString(habboMessage.stringify());
 
                     writeToStream(response.toBytes());
                 }
             }
 
 
-        } catch (IOException e) {
-//            e.printStackTrace();
-            System.out.println("ERROR");
+        } catch (IOException | ArrayIndexOutOfBoundsException e) {
+            e.printStackTrace();
         }
         finally {
             if (gEarthExtensionServer != null && !gEarthExtensionServer.isClosed()) {
@@ -157,7 +164,6 @@ public abstract class Extension {
     private void writeToStream(byte[] bytes) throws IOException {
         synchronized (out) {
             out.write(bytes);
-            out.flush();
         }
     }
 

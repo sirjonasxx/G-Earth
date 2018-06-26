@@ -5,9 +5,11 @@ import main.protocol.HPacket;
 import main.protocol.packethandler.PayloadBuffer;
 
 import java.io.DataInputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,8 +30,9 @@ public class GEarthExtension {
 
         new Thread(() -> {
             try {
-                connection.getOutputStream().write((new HPacket(Extensions.OUTGOING_MESSAGES_IDS.INFOREQUEST)).toBytes());
-                connection.getOutputStream().flush();
+                synchronized (connection.getOutputStream()) {
+                    connection.getOutputStream().write((new HPacket(Extensions.OUTGOING_MESSAGES_IDS.INFOREQUEST)).toBytes());
+                }
 
                 InputStream inputStream = connection.getInputStream();
                 DataInputStream dIn = new DataInputStream(inputStream);
@@ -38,9 +41,12 @@ public class GEarthExtension {
 
                     int length = dIn.readInt();
                     byte[] headerandbody = new byte[length + 4];
-                    int amountRead = dIn.read(headerandbody, 4, length);
 
-                    if (amountRead != length) break;
+                    int amountRead = 0;
+                    while (amountRead < length) {
+                        amountRead += dIn.read(headerandbody, 4 + amountRead, Math.min(dIn.available(), length - amountRead));
+                    }
+
                     HPacket packet = new HPacket(headerandbody);
                     packet.fixLength();
 
@@ -79,9 +85,12 @@ public class GEarthExtension {
                 while (!connection.isClosed()) {
                     int length = dIn.readInt();
                     byte[] headerandbody = new byte[length + 4];
-                    int amountRead = dIn.read(headerandbody, 4, length);
 
-                    if (amountRead != length) break;
+                    int amountRead = 0;
+                    while (amountRead < length) {
+                        amountRead += dIn.read(headerandbody, 4 + amountRead, Math.min(dIn.available(), length - amountRead));
+                    }
+
                     HPacket packet = new HPacket(headerandbody);
                     packet.fixLength();
 
@@ -90,16 +99,16 @@ public class GEarthExtension {
                     }
 
                 }
-                onDisconnectedCallback.act(selff);
 
             } catch (IOException e) {
-                e.printStackTrace();
+                // An extension disconnected, which is OK
             } finally {
+                onDisconnectedCallback.act(selff);
                 if (!connection.isClosed()) {
                     try {
                         connection.close();
                     } catch (IOException e) {
-                        e.printStackTrace();
+//                        e.printStackTrace();
                     }
                 }
             }
@@ -141,8 +150,9 @@ public class GEarthExtension {
 
     public boolean sendMessage(HPacket message) {
         try {
-            connection.getOutputStream().write(message.toBytes());
-            connection.getOutputStream().flush();
+            synchronized (connection.getOutputStream()) {
+                connection.getOutputStream().write(message.toBytes());
+            }
             return true;
         } catch (IOException e) {
             return false;

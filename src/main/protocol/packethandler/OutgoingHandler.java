@@ -64,7 +64,6 @@ public class OutgoingHandler extends Handler {
         synchronized (lock) {
             try {
                 out.write(servercipher.rc4(buffer));
-                out.flush();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -104,7 +103,6 @@ public class OutgoingHandler extends Handler {
                             currentIndex < encryptOffset ? hMessage.getPacket().toBytes() :
                                     servercipher.rc4(hMessage.getPacket().toBytes())
                     );
-                    out.flush();
                 }
                 currentIndex ++;
             }

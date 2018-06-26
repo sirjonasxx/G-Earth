@@ -20,7 +20,6 @@ public class IncomingHandler extends Handler {
         synchronized (lock) {
             try {
                 out.write(buffer);
-                out.flush();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -38,7 +37,6 @@ public class IncomingHandler extends Handler {
 
                 if (!hMessage.isBlocked())	{
                     out.write(hMessage.getPacket().toBytes());
-                    out.flush();
                 }
                 currentIndex++;
             }

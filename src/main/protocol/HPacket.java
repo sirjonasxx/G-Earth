@@ -280,27 +280,37 @@ public class HPacket implements StringifyAble {
     }
 
     public String readString()	{
-        int length = readUshort();
-        byte[] x = new byte[length];
-        for (int i = 0; i < x.length; i++)	x[i] = readByte();
+        String r = readString(readIndex);
+        readIndex += (2 + r.length());
+        return r;
+    }
+    public String readString(int index)	{
+        int length = readUshort(index);
+        index+=2;
 
+        return readString(index, length);
+    }
+
+    private String readString(int index, int length) {
+        byte[] x = new byte[length];
+        for (int i = 0; i < x.length; i++)	{ x[i] = readByte(index); index++;	}
         try {
             return new String(x, "ISO-8859-1");
         } catch (UnsupportedEncodingException e) {	}
 
         return null;
     }
-    public String readString(int index)	{
-        int length = readUshort(index);
-        index+=2;
-        byte[] x = new byte[length];
-        for (int i = 0; i < x.length; i++)	{ x[i] = readByte(index); index++;	}
 
-        try {
-            return new String(x, "ISO-8859-1");
-        } catch (UnsupportedEncodingException e) {	}
+    public String readLongString()	{
+        String r = readLongString(readIndex);
+        readIndex += (4 + r.length());
+        return r;
+    }
+    public String readLongString(int index) {
+        int length = readInteger(index);
+        index += 4;
 
-        return null;
+        return readString(index, length);
     }
 
     public boolean readBoolean()	{
@@ -463,6 +473,12 @@ public class HPacket implements StringifyAble {
     public HPacket appendString(String s) {
         isEdited = true;
         appendUShort(s.length());
+        appendBytes(s.getBytes(StandardCharsets.ISO_8859_1));
+        return this;
+    }
+    public HPacket appendLongString(String s) {
+        isEdited = true;
+        appendInt(s.length());
         appendBytes(s.getBytes(StandardCharsets.ISO_8859_1));
         return this;
     }
