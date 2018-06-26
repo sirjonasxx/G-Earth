@@ -30,7 +30,7 @@ public class GEarthExtension {
 
         new Thread(() -> {
             try {
-                synchronized (connection.getOutputStream()) {
+                synchronized (connection) {
                     connection.getOutputStream().write((new HPacket(Extensions.OUTGOING_MESSAGES_IDS.INFOREQUEST)).toBytes());
                 }
 
@@ -96,6 +96,7 @@ public class GEarthExtension {
 
                     for (int i = receiveMessageListeners.size() - 1; i >= 0; i--) {
                         receiveMessageListeners.get(i).act(packet);
+                        packet.setReadIndex(6);
                     }
 
                 }
@@ -150,7 +151,7 @@ public class GEarthExtension {
 
     public boolean sendMessage(HPacket message) {
         try {
-            synchronized (connection.getOutputStream()) {
+            synchronized (this) {
                 connection.getOutputStream().write(message.toBytes());
             }
             return true;

@@ -57,7 +57,7 @@ public class HMessage implements StringifyAble {
 
     @Override
     public void constructFromString(String str) {
-        String[] parts = str.split("\t");
+        String[] parts = str.split("\t", 4);
         this.isBlocked = parts[0].equals("1");
         this.index = Integer.parseInt(parts[1]);
         this.side = parts[2].equals("TOCLIENT") ? Side.TOCLIENT : Side.TOSERVER;

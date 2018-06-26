@@ -9,11 +9,19 @@ import java.net.Socket;
  */
 public class GEarthExtensionsRegistrer {
 
-    final ServerSocket serverSocket;
+    private ServerSocket serverSocket;
 
     GEarthExtensionsRegistrer(ExtensionRegisterObserver observer) throws IOException {
 
-        serverSocket = new ServerSocket(0);
+//        serverSocket = new ServerSocket(0);
+        int port = 9092;
+        boolean serverSetup = false;
+        while (!serverSetup) {
+            serverSetup = createServer(port);
+            port++;
+        }
+
+
         new Thread(() -> {
             try {
                 while (!serverSocket.isClosed()) {
@@ -22,6 +30,15 @@ public class GEarthExtensionsRegistrer {
                 }
             } catch (IOException e) {e.printStackTrace();}
         }).start();
+    }
+
+    private boolean createServer(int port) {
+        try {
+            serverSocket = new ServerSocket(port);
+            return true;
+        } catch (IOException e) {
+            return false;
+        }
     }
 
     public int getPort() {

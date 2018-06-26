@@ -780,14 +780,15 @@ public class HPacket implements StringifyAble {
 
     @Override
     public String stringify() {
-        String st = (isEdited ? "1" : "0") + this.toString();
+        String st = null;
+        st = (isEdited ? "1" : "0") + new String(packetInBytes, StandardCharsets.ISO_8859_1);
         return st;
     }
 
     @Override
     public void constructFromString(String str) {
         this.isEdited = str.charAt(0) == '1';
-        packetInBytes = fromStringToBytes(str.substring(1));
+        packetInBytes = str.substring(1).getBytes(StandardCharsets.ISO_8859_1);
     }
 
     @Override
@@ -796,5 +797,37 @@ public class HPacket implements StringifyAble {
 
         HPacket packet2 = (HPacket) object;
         return Arrays.equals(packetInBytes, packet2.packetInBytes) && (isEdited == packet2.isEdited);
+    }
+
+    public static void main(String[] args) {
+//        HPacket packet = new HPacket("{l}{u:500}{i:4}{s:heey}{b:false}");
+//        System.out.println(packet);
+//
+//        String stringified = packet.stringify();
+//        System.out.println("stringified: " + stringified);
+//        System.out.println(stringified.length());
+//
+//
+//        HPacket packet1 = new HPacket(new byte[0]);
+//        packet1.constructFromString(stringified);
+//
+//        System.out.println(packet1);
+//        System.out.println(packet.equals(packet1));
+
+        HPacket packet = new HPacket(555);
+        for (int i = -128; i < 128; i++) {
+            packet.appendByte((byte)i);
+        }
+        System.out.println(packet);
+
+        String stringified = packet.stringify();
+        System.out.println(stringified.length());
+
+
+        HPacket packet1 = new HPacket(new byte[0]);
+        packet1.constructFromString(stringified);
+
+        System.out.println(packet1);
+        System.out.println(packet.equals(packet1));
     }
 }

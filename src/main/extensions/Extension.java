@@ -70,6 +70,7 @@ public abstract class Extension {
                 byte[] headerandbody = new byte[length + 4];
 
                 int amountRead = 0;
+
                 while (amountRead < length) {
                     amountRead += dIn.read(headerandbody, 4 + amountRead, Math.min(dIn.available(), length - amountRead));
                 }
@@ -118,10 +119,6 @@ public abstract class Extension {
                     HMessage habboMessage = new HMessage(stringifiedMessage);
                     HPacket habboPacket = habboMessage.getPacket();
 
-                    lastwrapper = packet;
-                    lastM = habboMessage;
-                    last = habboPacket;
-
                     Map<Integer, List<MessageListener>> listeners =
                             habboMessage.getDestination() == HMessage.Side.TOCLIENT ?
                                     incomingMessageListeners :
@@ -130,12 +127,14 @@ public abstract class Extension {
                     if (listeners.containsKey(-1)) { // registered on all packets
                         for (int i = listeners.get(-1).size() - 1; i >= 0; i--) {
                             listeners.get(-1).get(i).act(habboMessage);
+                            habboMessage.getPacket().setReadIndex(6);
                         }
                     }
 
                     if (listeners.containsKey(habboPacket.headerId())) {
                         for (int i = listeners.get(habboPacket.headerId()).size() - 1; i >= 0; i--) {
                             listeners.get(habboPacket.headerId()).get(i).act(habboMessage);
+                            habboMessage.getPacket().setReadIndex(6);
                         }
                     }
 
@@ -143,6 +142,7 @@ public abstract class Extension {
                     response.appendLongString(habboMessage.stringify());
 
                     writeToStream(response.toBytes());
+
                 }
             }
 
@@ -162,7 +162,7 @@ public abstract class Extension {
     }
 
     private void writeToStream(byte[] bytes) throws IOException {
-        synchronized (out) {
+        synchronized (this) {
             out.write(bytes);
         }
     }

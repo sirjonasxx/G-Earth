@@ -148,14 +148,14 @@ public class Extensions extends SubForm {
                     @Override
                     public void act(HPacket packet) {
                         if (packet.headerId() == INCOMING_MESSAGES_IDS.MANIPULATEDPACKET) {
-                            String stringifiedresponse = packet.readLongString();
+                            String stringifiedresponse = packet.readLongString(6);
                             HMessage responseMessage = new HMessage(stringifiedresponse);
                             if (responseMessage.getDestination() == message.getDestination() && responseMessage.getIndex() == message.getIndex()) {
                                 if (!message.equals(responseMessage)) {
                                     message.constructFromString(stringifiedresponse);
-                                    if (responseMessage.isBlocked()) {
-                                        isblock[0] = true;
-                                    }
+                                }
+                                if (responseMessage.isBlocked()) {
+                                    isblock[0] = true;
                                 }
                                 synchronized (collection) {
                                     collection.remove(extension);
