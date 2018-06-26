@@ -6,6 +6,13 @@ import main.protocol.HPacket;
 /**
  * Created by Jonas on 24/06/18.
  */
+
+/**
+ *  - getTitle(), getDescription(), getVersion() and getAuthor() must be implemented
+ *
+ */
+
+
 public class SimpleTestExtension extends Extension {
 
     public static void main(String[] args) {
@@ -19,7 +26,6 @@ public class SimpleTestExtension extends Extension {
     @Override
     protected void init() {
         System.out.println("init");
-
         intercept(HMessage.Side.TOSERVER, 1926, this::onSendMessage);
     }
 
@@ -27,7 +33,6 @@ public class SimpleTestExtension extends Extension {
         HPacket packet = message.getPacket();
 
         String watchasaid = packet.readString();
-
         System.out.println("you said: " + watchasaid);
 
         if (watchasaid.equals("blocked")) {
@@ -52,22 +57,16 @@ public class SimpleTestExtension extends Extension {
         System.out.println("connection ended");
     }
 
-    @Override
+
     protected String getTitle() {
         return "Simple Test!";
     }
-
-    @Override
     protected String getDescription() {
         return "But just for testing purpose";
     }
-
-    @Override
     protected String getVersion() {
         return "0.1";
     }
-
-    @Override
     protected String getAuthor() {
         return "sirjonasxx";
     }

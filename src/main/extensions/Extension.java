@@ -2,7 +2,6 @@ package main.extensions;
 
 import main.protocol.HMessage;
 import main.protocol.HPacket;
-import main.protocol.packethandler.PayloadBuffer;
 import main.ui.extensions.Extensions;
 
 import java.io.DataInputStream;
@@ -36,7 +35,10 @@ public abstract class Extension {
     private FlagsCheckListener flagRequestCallback = null;
 
 
-
+    /**
+     * Makes the connection with G-Earth, pass the arguments given in the Main method "super(args)"
+     * @param args arguments
+     */
     public Extension(String[] args) {
         //obtain port
         int port = 0;
@@ -50,11 +52,6 @@ public abstract class Extension {
                 }
             }
         }
-
-        HPacket lastwrapper = null;
-        HMessage lastM = null;
-        HPacket last = null;
-
 
         Socket gEarthExtensionServer = null;
         try {
@@ -167,10 +164,20 @@ public abstract class Extension {
         }
     }
 
-    //methods returns if succeed
+    /**
+     * Send a message to the client
+     * @param packet packet to be sent
+     * @return success or failure
+     */
     protected boolean sendToClient(HPacket packet) {
         return send(packet, HMessage.Side.TOCLIENT);
     }
+
+    /**
+     * Send a message to the server
+     * @param packet packet to be sent
+     * @return success or failure
+     */
     protected boolean sendToServer(HPacket packet) {
         return send(packet, HMessage.Side.TOSERVER);
     }
@@ -187,6 +194,12 @@ public abstract class Extension {
         }
     }
 
+    /**
+     * Register a listener on a specific packet Type
+     * @param side ToClient or ToServer
+     * @param headerId the packet header ID
+     * @param messageListener the callback
+     */
     protected void intercept(HMessage.Side side, int headerId, MessageListener messageListener) {
         Map<Integer, List<MessageListener>> listeners =
                 side == HMessage.Side.TOCLIENT ?
@@ -199,17 +212,32 @@ public abstract class Extension {
 
         listeners.get(headerId).add(messageListener);
     }
+
+    /**
+     * Register a listener on all packets
+     * @param side ToClient or ToServer
+     * @param messageListener the callback
+     */
     protected void intercept(HMessage.Side side, MessageListener messageListener) {
         intercept(side, -1, messageListener);
     }
 
-    //returns "false" if another flag requester was busy
+    /**
+     * Requests the flags which have been given to G-Earth when it got executed
+     * For example, you might want this extension to do a specific thing if the flag "-e" was given
+     * @param flagRequestCallback callback
+     * @return if the request was successful, will return false if another flagrequest is busy
+     */
     protected boolean requestFlags(FlagsCheckListener flagRequestCallback) {
         if (this.flagRequestCallback != null) return false;
         this.flagRequestCallback = flagRequestCallback;
         return true;
     }
 
+    /**
+     * Write to the console in G-Earth
+     * @param s the text to be written
+     */
     protected void writeToConsole(String s) {
         HPacket packet = new HPacket(Extensions.INCOMING_MESSAGES_IDS.EXTENSIONCONSOLELOG);
         packet.appendString(s);
@@ -220,11 +248,27 @@ public abstract class Extension {
         }
     }
 
-    // All methods under here block the stream, use threads if needed.
-    protected abstract void init();
-    protected abstract void onDoubleClick();
-    protected abstract void onStartConnection();
-    protected abstract void onEndConnection();
+
+    /**
+     * Gets called when a connection has been established with G-Earth.
+     * This does not imply a connection with Habbo is setup.
+     */
+    protected void init(){}
+
+    /**
+     * The application got doubleclicked from the G-Earth interface. Doing something here is optional
+     */
+    protected void onDoubleClick(){}
+
+    /**
+     * A connection with Habbo has been started
+     */
+    protected void onStartConnection(){}
+
+    /**
+     * A connection with Habbo has ended
+     */
+    protected void onEndConnection(){}
 
     protected abstract String getTitle();
     protected abstract String getDescription();
