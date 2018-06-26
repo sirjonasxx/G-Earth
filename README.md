@@ -24,11 +24,11 @@ FEATURES:
 
 DOING:
 * Extension support
+* Cross-platform support
 
 TO-DO:
 * Extension -> block/replace packets, replace Strings & ints & .. in all packets
 * Info tab
-* Cross-platform support
 
 EXTRA TO-DO's:
 * Block specific packets from displaying in the logger (in Logger tab)
