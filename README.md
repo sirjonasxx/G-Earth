@@ -27,9 +27,9 @@ DOING:
 * Cross-platform support
 
 TO-DO:
-* Extension -> block/replace packets, replace Strings & ints & .. in all packets
+* Block/replace packets, replace Strings & ints & .. in all packets - extension
+* Packetlogger extension for devices with no colored terminal like the Gnome terminal
 * Info tab
 
 EXTRA TO-DO's:
 * Block specific packets from displaying in the logger (in Logger tab)
-* Extension -> enable CS admin on connect
