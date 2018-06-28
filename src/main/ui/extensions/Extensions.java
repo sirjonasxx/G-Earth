@@ -114,7 +114,7 @@ public class Extensions extends SubForm {
 
 
 
-    private List<GEarthExtension> gEarthExtensions = new ArrayList<>();
+    private final List<GEarthExtension> gEarthExtensions = new ArrayList<>();
 
     public void initialize() {
 
@@ -135,7 +135,11 @@ public class Extensions extends SubForm {
         });
 
         getHConnection().addTrafficListener(1, message -> {
-            Set<GEarthExtension> collection = new HashSet<>(gEarthExtensions);
+            Set<GEarthExtension> collection;
+            synchronized (gEarthExtensions) {
+                collection = new HashSet<>(gEarthExtensions);
+            }
+
 
             String stringified = message.stringify();
             HPacket manipulatePacketRequest = new HPacket(OUTGOING_MESSAGES_IDS.PACKETINTERCEPT);
@@ -177,7 +181,9 @@ public class Extensions extends SubForm {
 
                 synchronized (collection) {
                     for (GEarthExtension extension : collection) {
-                        if (!gEarthExtensions.contains(extension)) willdelete.add(extension);
+                        synchronized (gEarthExtensions) {
+                            if (!gEarthExtensions.contains(extension)) willdelete.add(extension);
+                        }
                     }
                     for (int i = willdelete.size() - 1; i >= 0; i--) {
                         collection.remove(willdelete.get(i));
@@ -200,7 +206,10 @@ public class Extensions extends SubForm {
             extensionsRegistrer = new GEarthExtensionsRegistrer(new GEarthExtensionsRegistrer.ExtensionRegisterObserver() {
                 @Override
                 public void onConnect(GEarthExtension extension) {
-                    gEarthExtensions.add(extension);
+                    synchronized (gEarthExtensions) {
+                        gEarthExtensions.add(extension);
+                    }
+
                     GEarthExtension.ReceiveMessageListener receiveMessageListener = message -> {
                         if (message.headerId() == INCOMING_MESSAGES_IDS.REQUESTFLAGS) { // no body
                             HPacket packet = new HPacket(OUTGOING_MESSAGES_IDS.FLAGSCHECK);
@@ -237,7 +246,9 @@ public class Extensions extends SubForm {
 
                 @Override
                 public void onDisconnect(GEarthExtension extension) {
-                    gEarthExtensions.remove(extension);
+                    synchronized (gEarthExtensions) {
+                        gEarthExtensions.remove(extension);
+                    }
 
                     extension.removeOnReceiveMessageListener(messageListeners.get(extension));
                     messageListeners.remove(extension);
@@ -247,7 +258,6 @@ public class Extensions extends SubForm {
             e.printStackTrace();
         }
         System.out.println("Extension server registered on port: " + extensionsRegistrer.getPort());
-
     }
 
 }
