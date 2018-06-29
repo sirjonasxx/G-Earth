@@ -229,7 +229,7 @@ public class HConnection {
                         handler.act(buffer);
                         if (!datastream[0] && handler.isDataStream())	{
                             clientHostAndPort = client.getInetAddress().getHostAddress() + ":" + client.getPort();
-                            System.out.println(clientHostAndPort);
+                            if (DEBUG) System.out.println(clientHostAndPort);
                             datastream[0] = true;
                             setState(State.CONNECTED);
                             onConnect();
@@ -359,15 +359,19 @@ public class HConnection {
     }
 
     private void addToHosts() {
+        String[] lines = new String[input_domain.size()];
         for (int i = 0; i < input_domain.size(); i++) {
-            hostsReplacer.addRedirect(input_domain.get(i), "127.0.0." + (i+1));
+            lines[i] = ("127.0.0." + (i+1)) + " " + input_domain.get(i);
         }
+        hostsReplacer.addRedirect(lines);
         hostRedirected = true;
     }
     private void removeFromHosts(){
+        String[] lines = new String[input_domain.size()];
         for (int i = 0; i < input_domain.size(); i++) {
-            hostsReplacer.removeRedirect(input_domain.get(i), "127.0.0." + (i+1));
+            lines[i] = ("127.0.0." + (i+1)) + " " + input_domain.get(i);
         }
+        hostsReplacer.removeRedirect(lines);
         hostRedirected = false;
     }
 

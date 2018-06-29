@@ -2,6 +2,7 @@ package main.protocol.hostreplacer;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Jeunez on 04/04/18.
@@ -15,8 +16,11 @@ class UnixHostReplacer implements HostReplacer {
     }
 
     @Override
-    public void addRedirect(String original, String redirect) {
-        String text = redirect + " " + original + "\t# G-Earth replacement";
+    public void addRedirect(String[] lines) {
+        List<String> adders = new ArrayList<>();
+        for (int i = 0; i < lines.length; i++) {
+            adders.add(lines[i] + "\t# G-Earth replacement");
+        }
 
         FileReader fr = null;
         BufferedReader br = null;
@@ -25,17 +29,15 @@ class UnixHostReplacer implements HostReplacer {
 
         try
         {
-            ArrayList<String> lines = new ArrayList<>();
+            ArrayList<String> fileLines = new ArrayList<>();
             File f1 = new File(hostsFileLocation);
             fr = new FileReader(f1);
             br = new BufferedReader(fr);
             String line = null;
-            boolean containmmm = false;
             while ((line = br.readLine()) != null)
             {
-                if (line.equals(text))
-                    containmmm = true;
-                lines.add(line);
+                adders.remove(line);
+                fileLines.add(line);
             }
             fr.close();
             br.close();
@@ -43,12 +45,12 @@ class UnixHostReplacer implements HostReplacer {
             fw = new FileWriter(f1);
             out = new BufferedWriter(fw);
 
-            if (!containmmm)	{
-                out.write(text);
+            for (String li : adders) {
+                out.write(li + System.getProperty("line.separator"));
             }
 
-            for (int i = 0; i < lines.size(); i++)	{
-                out.write(((containmmm && i == 0) ? "" : System.getProperty("line.separator"))+ lines.get(i));
+            for (int i = 0; i < fileLines.size(); i++)	{
+                out.write(((i == 0) ? "" : System.getProperty("line.separator"))+ fileLines.get(i));
             }
             out.flush();
             fw.close();
@@ -61,8 +63,11 @@ class UnixHostReplacer implements HostReplacer {
     }
 
     @Override
-    public void removeRedirect(String original, String redirect) {
-        String text = redirect + " " + original + "\t# G-Earth replacement";
+    public void removeRedirect(String[] lines) {
+        ArrayList<String> removers = new ArrayList<>();
+        for (int i = 0; i < lines.length; i++) {
+            removers.add(lines[i] + "\t# G-Earth replacement");
+        }
 
         FileReader fr = null;
         BufferedReader br = null;
@@ -71,16 +76,15 @@ class UnixHostReplacer implements HostReplacer {
 
         try
         {
-            ArrayList<String> lines = new ArrayList<String>();
+            ArrayList<String> fileLines = new ArrayList<String>();
             File f1 = new File(hostsFileLocation);
             fr = new FileReader(f1);
             br = new BufferedReader(fr);
             String line = null;
             while ((line = br.readLine()) != null)
             {
-                if (!line.equals(text))
-                    lines.add(line);
-
+                if (!removers.contains(line))
+                    fileLines.add(line);
             }
             fr.close();
             br.close();
@@ -88,9 +92,9 @@ class UnixHostReplacer implements HostReplacer {
             fw = new FileWriter(f1);
             out = new BufferedWriter(fw);
 
-            for (int i = 0; i < lines.size(); i++)	{
-                out.write(lines.get(i));
-                if (i != lines.size() - 1) out.write(System.getProperty("line.separator"));
+            for (int i = 0; i < fileLines.size(); i++)	{
+                out.write(fileLines.get(i));
+                if (i != fileLines.size() - 1) out.write(System.getProperty("line.separator"));
             }
             out.flush();
             fw.close();
