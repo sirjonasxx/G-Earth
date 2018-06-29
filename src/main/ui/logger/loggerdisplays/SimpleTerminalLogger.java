@@ -48,6 +48,8 @@ class SimpleTerminalLogger implements PacketLogger {
                 "<packet skipped>" :
                 packet.toString()
         );
+
+        System.out.println(output.toString());
     }
 
     @Override

@@ -96,6 +96,8 @@ public class HConnection {
 
     private volatile boolean autoDetectHost = false;
 
+    private volatile String clientHostAndPort = "";
+
 
     public State getState() {
         return state;
@@ -211,7 +213,7 @@ public class HConnection {
 
         final boolean[] aborted = new boolean[1];
 
-        Rc4Obtainer rc4Obtainer = new Rc4Obtainer();
+        Rc4Obtainer rc4Obtainer = new Rc4Obtainer(this);
 
         // wachten op data van client
         new Thread(() -> {
@@ -226,6 +228,8 @@ public class HConnection {
 
                         handler.act(buffer);
                         if (!datastream[0] && handler.isDataStream())	{
+                            clientHostAndPort = client.getInetAddress().getHostAddress() + ":" + client.getPort();
+                            System.out.println(clientHostAndPort);
                             datastream[0] = true;
                             setState(State.CONNECTED);
                             onConnect();
@@ -373,6 +377,10 @@ public class HConnection {
             sendToServerAsyncQueue.clear();
         }
         if (state != this.state) {
+            if (state != State.CONNECTED) {
+                clientHostAndPort = "";
+            }
+
             State buffer = this.state;
             this.state = state;
             for (StateChangeListener listener : stateChangeListeners) {
@@ -441,6 +449,10 @@ public class HConnection {
         synchronized (sendToServerAsyncQueue) {
             sendToServerAsyncQueue.add(message);
         }
+    }
+
+    public String getClientHostAndPort() {
+        return clientHostAndPort;
     }
 
 }

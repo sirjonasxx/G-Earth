@@ -1,5 +1,6 @@
 package main.protocol.memory;
 
+import main.protocol.HConnection;
 import main.protocol.HPacket;
 import main.protocol.crypto.RC4;
 import main.protocol.memory.habboclient.HabboClient;
@@ -20,8 +21,8 @@ public class Rc4Obtainer {
     OutgoingHandler outgoingHandler = null;
     IncomingHandler incomingHandler = null;
 
-    public Rc4Obtainer() {
-        client = HabboClientFactory.get();
+    public Rc4Obtainer(HConnection hConnection) {
+        client = HabboClientFactory.get(hConnection);
     }
 
     private boolean hashappened1 = false;

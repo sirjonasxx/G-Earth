@@ -1,12 +1,13 @@
 package main.protocol.memory.habboclient.linux;
 
+import main.protocol.HConnection;
 import main.protocol.memory.habboclient.HabboClient;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.util.*;
 
-public class LinuxHabboClient implements HabboClient {
+public class LinuxHabboClient extends HabboClient {
 
 
     private static final String[] potentialProcessNames = {"--ppapi-flash-args", "plugin-container"};
@@ -16,7 +17,9 @@ public class LinuxHabboClient implements HabboClient {
 
     private static final boolean DEBUG = false;
 
-    public LinuxHabboClient() {
+    public LinuxHabboClient(HConnection connection) {
+        super(connection);
+
         File folder = new File("/proc");
 
         boolean found = false;
