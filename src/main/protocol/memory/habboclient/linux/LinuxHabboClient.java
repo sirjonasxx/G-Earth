@@ -233,11 +233,10 @@ public class LinuxHabboClient extends HabboClient {
 
                 }
 
-                if (matchStart != -1) {
-                    result.add(new LinuxMemorySnippet(start + matchStart, new byte[matchEnd - matchStart + 4]));
-                }
-
                 synchronized (lock) {
+                    if (matchStart != -1) {
+                        result.add(new LinuxMemorySnippet(start + matchStart, new byte[matchEnd - matchStart + 4]));
+                    }
                     count[0] ++;
                 }
 
