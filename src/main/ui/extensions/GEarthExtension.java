@@ -1,5 +1,6 @@
 package main.ui.extensions;
 
+import javafx.beans.InvalidationListener;
 import main.protocol.HMessage;
 import main.protocol.HPacket;
 import main.protocol.packethandler.PayloadBuffer;
@@ -179,4 +180,34 @@ public class GEarthExtension {
         void act(GEarthExtension extension); // returns itself
     }
 
+
+    private List<InvalidationListener> onRemoveClickListener = new ArrayList<>();
+    public void onRemoveClick(InvalidationListener listener) {
+        onRemoveClickListener.add(listener);
+    }
+    public void isRemoveClickTrigger() {
+        for (int i = onRemoveClickListener.size() - 1; i >= 0; i--) {
+            onRemoveClickListener.get(i).invalidated(null);
+        }
+    }
+
+    private List<InvalidationListener> onClickListener = new ArrayList<>();
+    public void onClick(InvalidationListener listener) {
+        onClickListener.add(listener);
+    }
+    public void isClickTrigger() {
+        for (int i = onClickListener.size() - 1; i >= 0; i--) {
+            onClickListener.get(i).invalidated(null);
+        }
+    }
+
+    private List<InvalidationListener> onDeleteListeners = new ArrayList<>();
+    public void onDelete(InvalidationListener listener) {
+        onDeleteListeners.add(listener);
+    }
+    public void delete() {
+        for (int i = onDeleteListeners.size() - 1; i >= 0; i--) {
+            onDeleteListeners.get(i).invalidated(null);
+        }
+    }
 }

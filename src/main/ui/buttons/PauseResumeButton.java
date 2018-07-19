@@ -1,4 +1,4 @@
-package main.ui.scheduler.buttons;
+package main.ui.buttons;
 
 import javafx.beans.InvalidationListener;
 import javafx.event.EventHandler;

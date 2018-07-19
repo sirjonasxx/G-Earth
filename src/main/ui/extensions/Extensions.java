@@ -1,5 +1,14 @@
 package main.ui.extensions;
 
+import javafx.application.Platform;
+import javafx.beans.*;
+import javafx.beans.Observable;
+import javafx.event.ActionEvent;
+import javafx.scene.control.Button;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 import main.Main;
 import main.protocol.*;
 import main.ui.SubForm;
@@ -91,6 +100,14 @@ import java.util.*;
 
 public class Extensions extends SubForm {
 
+
+    public Button btn_install;
+    public Button btn_remove;
+    public TextField ext_port;
+    public VBox extensioncontainer;
+    public GridPane header_ext;
+    public ScrollPane scroller;
+
     public static class OUTGOING_MESSAGES_IDS {
         public static final int ONDOUBLECLICK = 1;
         public static final int INFOREQUEST = 2;        // backend: implemented
@@ -117,7 +134,7 @@ public class Extensions extends SubForm {
     private final List<GEarthExtension> gEarthExtensions = new ArrayList<>();
 
     public void initialize() {
-
+        scroller.widthProperty().addListener(observable -> header_ext.setPrefWidth(scroller.getWidth()));
     }
 
     protected void onParentSet() {
@@ -242,6 +259,15 @@ public class Extensions extends SubForm {
                     if (getHConnection().getState() == HConnection.State.CONNECTED) {
                         extension.sendMessage(new HPacket(OUTGOING_MESSAGES_IDS.CONNECTIONSTART));
                     }
+                    Platform.runLater(() -> new ExtensionItemContainer(extension, extensioncontainer, scroller));
+                    extension.onRemoveClick(observable -> {
+                        try {
+                            extension.getConnection().close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    });
+                    extension.onClick(observable -> extension.sendMessage(new HPacket(OUTGOING_MESSAGES_IDS.ONDOUBLECLICK)));
                 }
 
                 @Override
@@ -252,12 +278,18 @@ public class Extensions extends SubForm {
 
                     extension.removeOnReceiveMessageListener(messageListeners.get(extension));
                     messageListeners.remove(extension);
+                    Platform.runLater(extension::delete);
                 }
             });
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println("Extension server registered on port: " + extensionsRegistrer.getPort());
+
+        ext_port.setText(extensionsRegistrer.getPort()+"");
+//        System.out.println("Extension server registered on port: " + extensionsRegistrer.getPort());
     }
 
+
+    public void installBtnClicked(ActionEvent actionEvent) {
+    }
 }

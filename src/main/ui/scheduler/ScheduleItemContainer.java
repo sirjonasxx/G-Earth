@@ -1,8 +1,5 @@
 package main.ui.scheduler;
 
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
@@ -10,9 +7,9 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
-import main.ui.scheduler.buttons.DeleteButton;
-import main.ui.scheduler.buttons.EditButton;
-import main.ui.scheduler.buttons.PauseResumeButton;
+import main.ui.buttons.DeleteButton;
+import main.ui.buttons.EditButton;
+import main.ui.buttons.PauseResumeButton;
 
 /**
  * Created by Jonas on 07/04/18.

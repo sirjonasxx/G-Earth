@@ -38,7 +38,11 @@ public class AdminOnConnect extends Extension {
 
     protected void onStartConnection() {
         done = false;
+    }
 
+    @Override
+    protected void onClick() {
+        System.out.println("clicked");
     }
 
     protected String getTitle() {

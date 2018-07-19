@@ -1,4 +1,4 @@
-package main.ui.scheduler.buttons;
+package main.ui.buttons;
 
 public class EditButton extends BoxButton {
 

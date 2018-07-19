@@ -25,13 +25,14 @@ public class SpeechColorizer extends Extension {
         super(args);
     }
 
-    private static final int SPEECH_ID = 1926;
+    private static final int SPEECH_ID = 3373;
     private static final String[] COLORS = {"red", "blue", "cyan", "green", "purple"};
     private static final Random r = new Random();
 
     @Override
     protected void init() {
         intercept(HMessage.Side.TOSERVER, SPEECH_ID, this::onSendMessage);
+        System.out.println("test");
     }
 
     private void onSendMessage(HMessage message) {

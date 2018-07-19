@@ -109,7 +109,7 @@ public abstract class Extension {
                     // nothing to be done yet
                 }
                 else if (packet.headerId() == Extensions.OUTGOING_MESSAGES_IDS.ONDOUBLECLICK) {
-                    onDoubleClick();
+                    onClick();
                 }
                 else if (packet.headerId() == Extensions.OUTGOING_MESSAGES_IDS.PACKETINTERCEPT) {
                     String stringifiedMessage = packet.readLongString();
@@ -258,7 +258,7 @@ public abstract class Extension {
     /**
      * The application got doubleclicked from the G-Earth interface. Doing something here is optional
      */
-    protected void onDoubleClick(){}
+    protected void onClick(){}
 
     /**
      * A connection with Habbo has been started
