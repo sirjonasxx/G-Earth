@@ -14,10 +14,7 @@ public class OutgoingHandler extends Handler {
 
     private final Object lock = new Object();
 
-
     private final static int encryptOffset = 3; //all packets with index < 3 aren't encrypted
-    private RC4 clientcipher = null;
-    private RC4 servercipher = null;
     private List<Byte> tempEncryptedBuffer = new ArrayList<>();
 
     public OutgoingHandler(OutputStream outputStream, Object[] listeners) {
@@ -35,7 +32,6 @@ public class OutgoingHandler extends Handler {
     public void act(byte[] buffer) throws IOException {
         dataStreamCheck(buffer);
         if (isDataStream)	{
-
             if (currentIndex < encryptOffset) {
                 payloadBuffer.push(buffer);
             }
@@ -45,7 +41,11 @@ public class OutgoingHandler extends Handler {
                 }
             }
             else {
-                payloadBuffer.push(clientcipher.rc4(buffer));
+                byte[] tm = clientcipher.rc4(buffer);
+                if (DEBUG) {
+                    printForDebugging(tm);
+                }
+                payloadBuffer.push(tm);
             }
 
             notifyBufferListeners(buffer.length);
@@ -60,21 +60,9 @@ public class OutgoingHandler extends Handler {
     }
 
     @Override
-    public void sendToStream(byte[] buffer) {
-        synchronized (lock) {
-            try {
-                out.write(servercipher.rc4(buffer));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-    }
-
     public void setRc4(RC4 rc4) {
-        this.clientcipher = rc4;
-        this.servercipher = rc4.deepCopy();
-
+        super.setRc4(rc4);
+        
         byte[] encrbuffer = new byte[tempEncryptedBuffer.size()];
         for (int i = 0; i < tempEncryptedBuffer.size(); i++) {
             encrbuffer[i] = tempEncryptedBuffer.get(i);
@@ -87,6 +75,19 @@ public class OutgoingHandler extends Handler {
         }
         tempEncryptedBuffer = null;
     }
+
+    @Override
+    public void sendToStream(byte[] buffer) {
+        synchronized (lock) {
+            try {
+                out.write(servercipher.rc4(buffer));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
     public List<Byte> getEncryptedBuffer() {
         return tempEncryptedBuffer;
     }
@@ -108,5 +109,11 @@ public class OutgoingHandler extends Handler {
             }
         }
 
+    }
+
+
+    @Override
+    protected void printForDebugging(byte[] bytes) {
+        System.out.println("-- DEBUG OUTGOING -- " + new HPacket(bytes).toString() + " -- DEBUG --");
     }
 }

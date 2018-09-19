@@ -13,13 +13,48 @@ public class IncomingHandler extends Handler {
         super(outputStream, listeners);
     }
 
+
     private final Object lock = new Object();
+
+    private Boolean isEncryptedStream = null;
+
+
+    @Override
+    public void act(byte[] buffer) throws IOException {
+        if (isDataStream)	{
+            if (DEBUG) {
+                printForDebugging(buffer);
+            }
+
+
+            if (isEncryptedStream == null || !isEncryptedStream) {
+                payloadBuffer.push(buffer);
+            }
+            else {
+                payloadBuffer.push(servercipher.rc4(buffer));
+            }
+
+
+            notifyBufferListeners(buffer.length);
+
+            if (!isTempBlocked) {
+                flush();
+            }
+        }
+        else  {
+            out.write(buffer);
+        }
+    }
 
     @Override
     public void sendToStream(byte[] buffer) {
         synchronized (lock) {
             try {
-                out.write(buffer);
+                out.write(
+                        (isEncryptedStream == null || !isEncryptedStream)
+                                ? buffer
+                                : clientcipher.rc4(buffer)
+                );
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -33,14 +68,29 @@ public class IncomingHandler extends Handler {
 
             for (HPacket hpacket : hpackets){
                 HMessage hMessage = new HMessage(hpacket, HMessage.Side.TOCLIENT, currentIndex);
-                if (isDataStream) notifyListeners(hMessage);
+                if (isDataStream) {
+                    notifyListeners(hMessage);
+                }
 
                 if (!hMessage.isBlocked())	{
-                    out.write(hMessage.getPacket().toBytes());
+                    out.write(
+                            (isEncryptedStream == null || !isEncryptedStream)
+                            ? hMessage.getPacket().toBytes()
+                            : clientcipher.rc4(hMessage.getPacket().toBytes())
+                    );
+                }
+
+                if (isDataStream && isEncryptedStream == null && hpacket.length() == 261) {
+                    isEncryptedStream = hpacket.readBoolean(264);
                 }
                 currentIndex++;
             }
         }
 
+    }
+
+    @Override
+    protected void printForDebugging(byte[] bytes) {
+        System.out.println("-- DEBUG INCOMING -- " + new HPacket(bytes).toString() + " -- DEBUG --");
     }
 }
