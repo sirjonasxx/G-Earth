@@ -1,4 +1,4 @@
-package main.extensions.examples;
+package main.extensions.examples.speechcolorizer;
 
 import main.extensions.Extension;
 import main.protocol.HMessage;

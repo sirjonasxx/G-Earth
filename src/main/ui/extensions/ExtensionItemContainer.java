@@ -4,6 +4,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
@@ -66,6 +67,8 @@ public class ExtensionItemContainer extends GridPane {
 
 
         DeleteButton deleteButton = new DeleteButton();
+        Tooltip delete = new Tooltip("Close connection with this extension");
+        Tooltip.install(deleteButton,delete);
         deleteButton.show();
         deleteButton.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> item.isRemoveClickTrigger());
         SimpleClickButton clickButton = new SimpleClickButton();

@@ -258,11 +258,20 @@ public abstract class Extension {
 
     private boolean isOnClickMethodUsed() {
 
-        try {
-            return !getClass().getDeclaredMethod("onClick").getDeclaringClass().equals(Extension.class);
-        } catch (NoSuchMethodException e) {
-//            e.printStackTrace();
+        Class<? extends Extension> c = getClass();
+
+        while (c != Extension.class) {
+            try {
+                c.getDeclaredMethod("onClick");
+                // if it didnt error, onClick exists
+                return true;
+            } catch (NoSuchMethodException e) {
+//                e.printStackTrace();
+            }
+
+            c = (Class<? extends Extension>) c.getSuperclass();
         }
+
         return false;
     }
 
