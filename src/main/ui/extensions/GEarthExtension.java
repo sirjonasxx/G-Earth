@@ -23,6 +23,7 @@ public class GEarthExtension {
     private String author;
     private String version;
     private String description;
+    private boolean fireEventButtonVisible;
 
     private Socket connection;
 
@@ -57,6 +58,7 @@ public class GEarthExtension {
                                 packet.readString(),
                                 packet.readString(),
                                 packet.readString(),
+                                packet.readBoolean(),
                                 connection,
                                 onDisconnectedCallback
                         );
@@ -70,11 +72,12 @@ public class GEarthExtension {
 
     }
 
-    private GEarthExtension(String title, String author, String version, String description, Socket connection, OnDisconnectedCallback onDisconnectedCallback) {
+    private GEarthExtension(String title, String author, String version, String description, boolean fireEventButtonVisible, Socket connection, OnDisconnectedCallback onDisconnectedCallback) {
         this.title = title;
         this.author = author;
         this.version = version;
         this.description = description;
+        this.fireEventButtonVisible = fireEventButtonVisible;
         this.connection = connection;
 
         GEarthExtension selff = this;
@@ -137,6 +140,10 @@ public class GEarthExtension {
 
     public String getVersion() {
         return version;
+    }
+
+    public boolean isFireButtonUsed() {
+        return fireEventButtonVisible;
     }
 
 

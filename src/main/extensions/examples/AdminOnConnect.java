@@ -40,10 +40,10 @@ public class AdminOnConnect extends Extension {
         done = false;
     }
 
-    @Override
-    protected void onClick() {
-        System.out.println("clicked");
-    }
+//    @Override
+//    protected void onClick() {
+//        System.out.println("clicked");
+//    }
 
     protected String getTitle() {
         return "Always admin!";

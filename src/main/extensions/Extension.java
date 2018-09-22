@@ -86,7 +86,8 @@ public abstract class Extension {
                     response.appendString(getTitle())
                             .appendString(getAuthor())
                             .appendString(getVersion())
-                            .appendString(getDescription());
+                            .appendString(getDescription())
+                            .appendBoolean(isOnClickMethodUsed());
                     writeToStream(response.toBytes());
                 }
                 else if (packet.headerId() == Extensions.OUTGOING_MESSAGES_IDS.CONNECTIONSTART) {
@@ -254,6 +255,16 @@ public abstract class Extension {
         }
     }
 
+
+    private boolean isOnClickMethodUsed() {
+
+        try {
+            return !getClass().getDeclaredMethod("onClick").getDeclaringClass().equals(Extension.class);
+        } catch (NoSuchMethodException e) {
+//            e.printStackTrace();
+        }
+        return false;
+    }
 
     /**
      * Gets called when a connection has been established with G-Earth.
