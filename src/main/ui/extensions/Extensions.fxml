@@ -83,7 +83,7 @@
                                 <Insets left="3.0" />
                             </GridPane.margin>
                         </Label>
-                        <Button fx:id="btn_install" disable="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#installBtnClicked" text="Install" GridPane.columnIndex="3" />
+                        <Button fx:id="btn_install" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#installBtnClicked" text="Install" GridPane.columnIndex="3" />
                     </children>
                 </GridPane>
             </children>

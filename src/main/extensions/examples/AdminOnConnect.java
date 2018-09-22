@@ -20,7 +20,7 @@ public class AdminOnConnect extends Extension {
     private boolean done = true;
 
     protected void init() {
-        intercept(HMessage.Side.TOCLIENT, -1, message -> {
+        intercept(HMessage.Side.TOCLIENT, message -> {
             if (!done) {
                 HPacket packet = message.getPacket();
                 if (packet.length() == 11) {

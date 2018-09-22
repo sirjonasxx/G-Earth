@@ -4,10 +4,7 @@ import main.protocol.HMessage;
 import main.protocol.HPacket;
 import main.ui.extensions.Extensions;
 
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -63,7 +60,15 @@ public abstract class Extension {
 
             while (!gEarthExtensionServer.isClosed()) {
 
-                int length = dIn.readInt();
+                int length;
+                try {
+                    length = dIn.readInt();
+                }
+                catch(EOFException exception) {
+                    //g-earth closed the extension
+                    break;
+                }
+
                 byte[] headerandbody = new byte[length + 4];
 
                 int amountRead = 0;
@@ -142,10 +147,11 @@ public abstract class Extension {
 
                 }
             }
-
+            System.out.println("Extension closed");
 
         } catch (IOException | ArrayIndexOutOfBoundsException e) {
-            e.printStackTrace();
+            System.err.println("Connection failed; is G-Earth open?");
+//            e.printStackTrace();
         }
         finally {
             if (gEarthExtensionServer != null && !gEarthExtensionServer.isClosed()) {
