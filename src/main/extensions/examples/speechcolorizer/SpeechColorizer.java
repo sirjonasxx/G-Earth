@@ -1,6 +1,7 @@
 package main.extensions.examples.speechcolorizer;
 
 import main.extensions.Extension;
+import main.extensions.ExtensionInfo;
 import main.protocol.HMessage;
 import main.protocol.HPacket;
 
@@ -15,7 +16,12 @@ import java.util.Random;
  *
  */
 
-
+@ExtensionInfo(
+        Title = "Colorize me!",
+        Description = "Because we like to be weird",
+        Version = "1.0",
+        Author = "sirjonasxx"
+)
 public class SpeechColorizer extends Extension {
 
     public static void main(String[] args) {

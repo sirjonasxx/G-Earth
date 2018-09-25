@@ -32,28 +32,11 @@ public abstract class ExtensionForm extends Application {
             Platform.runLater(primaryStage::hide);
         });
         ExtensionForm thiss = this;
+
+        ExtensionInfo extInfo = getClass().getAnnotation(ExtensionInfo.class);
+
         Thread t = new Thread(() -> {
             extension = new Extension(args) {
-                @Override
-                protected String getTitle() {
-                    return thiss.getTitle();
-                }
-
-                @Override
-                protected String getDescription() {
-                    return thiss.getDescription();
-                }
-
-                @Override
-                protected String getVersion() {
-                    return thiss.getVersion();
-                }
-
-                @Override
-                protected String getAuthor() {
-                    return thiss.getAuthor();
-                }
-
                 @Override
                 protected void init() {
                     thiss.initExtension();
@@ -73,8 +56,15 @@ public abstract class ExtensionForm extends Application {
                 protected void onEndConnection() {
                     thiss.onEndConnection();
                 }
+
+                @Override
+                ExtensionInfo getInfoAnnotations() {
+                    return extInfo;
+                }
             };
-            Platform.runLater(primaryStage::close);
+//            Platform.runLater(primaryStage::close);
+            //when the extension has ended, close this process
+            Platform.exit();
         });
         t.start();
     }
@@ -125,10 +115,4 @@ public abstract class ExtensionForm extends Application {
      * A connection with Habbo has ended
      */
     protected void onEndConnection(){}
-
-    protected abstract String getTitle();
-    protected abstract String getDescription();
-    protected abstract String getVersion();
-    protected abstract String getAuthor();
-
 }

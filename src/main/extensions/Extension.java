@@ -5,11 +5,12 @@ import main.protocol.HPacket;
 import main.ui.extensions.Extensions;
 
 import java.io.*;
+import java.lang.annotation.Annotation;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.reflect.AnnotatedType;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by Jonas on 23/06/18.
@@ -27,8 +28,8 @@ public abstract class Extension {
     private static final String[] PORT_FLAG = {"--port", "-p"};
 
     private OutputStream out = null;
-    private Map<Integer, List<MessageListener>> incomingMessageListeners = new HashMap<>();
-    private Map<Integer, List<MessageListener>> outgoingMessageListeners = new HashMap<>();
+    private final Map<Integer, List<MessageListener>> incomingMessageListeners = new HashMap<>();
+    private final Map<Integer, List<MessageListener>> outgoingMessageListeners = new HashMap<>();
     private FlagsCheckListener flagRequestCallback = null;
 
 
@@ -38,6 +39,19 @@ public abstract class Extension {
      */
     public Extension(String[] args) {
         //obtain port
+
+        if (getInfoAnnotations() == null) {
+            System.err.println("Extension info not found\n\n" +
+                    "Usage:\n" +
+                    "@ExtensionInfo ( \n" +
+                    "       Title =  \"...\",\n" +
+                    "       Description =  \"...\",\n" +
+                    "       Version =  \"...\",\n" +
+                    "       Author =  \"...\"" +
+                    "\n)");
+            return;
+        }
+
         int port = 0;
 
         outerloop:
@@ -52,8 +66,7 @@ public abstract class Extension {
 
         Socket gEarthExtensionServer = null;
         try {
-            gEarthExtensionServer = new Socket("localhost", port);
-
+            gEarthExtensionServer = new Socket("127.0.0.2", port);
             InputStream in = gEarthExtensionServer.getInputStream();
             DataInputStream dIn = new DataInputStream(in);
             out = gEarthExtensionServer.getOutputStream();
@@ -82,11 +95,13 @@ public abstract class Extension {
 
 
                 if (packet.headerId() == Extensions.OUTGOING_MESSAGES_IDS.INFOREQUEST) {
+                    ExtensionInfo info = getInfoAnnotations();
+
                     HPacket response = new HPacket(Extensions.INCOMING_MESSAGES_IDS.EXTENSIONINFO);
-                    response.appendString(getTitle())
-                            .appendString(getAuthor())
-                            .appendString(getVersion())
-                            .appendString(getDescription())
+                    response.appendString(info.Title())
+                            .appendString(info.Author())
+                            .appendString(info.Version())
+                            .appendString(info.Description())
                             .appendBoolean(isOnClickMethodUsed());
                     writeToStream(response.toBytes());
                 }
@@ -127,19 +142,29 @@ public abstract class Extension {
                                     incomingMessageListeners :
                                     outgoingMessageListeners;
 
-                    if (listeners.containsKey(-1)) { // registered on all packets
-                        for (int i = listeners.get(-1).size() - 1; i >= 0; i--) {
-                            listeners.get(-1).get(i).act(habboMessage);
-                            habboMessage.getPacket().setReadIndex(6);
+                    Set<MessageListener> correctListeners = new HashSet<>();
+
+                    synchronized (incomingMessageListeners) {
+                        synchronized (outgoingMessageListeners) {
+                            if (listeners.containsKey(-1)) { // registered on all packets
+                                for (int i = listeners.get(-1).size() - 1; i >= 0; i--) {
+                                    correctListeners.add(listeners.get(-1).get(i));
+                                }
+                            }
+
+                            if (listeners.containsKey(habboPacket.headerId())) {
+                                for (int i = listeners.get(habboPacket.headerId()).size() - 1; i >= 0; i--) {
+                                    correctListeners.add(listeners.get(habboPacket.headerId()).get(i));
+                                }
+                            }
                         }
                     }
 
-                    if (listeners.containsKey(habboPacket.headerId())) {
-                        for (int i = listeners.get(habboPacket.headerId()).size() - 1; i >= 0; i--) {
-                            listeners.get(habboPacket.headerId()).get(i).act(habboMessage);
-                            habboMessage.getPacket().setReadIndex(6);
-                        }
+                    for(MessageListener listener : correctListeners) {
+                        habboMessage.getPacket().setReadIndex(6);
+                        listener.act(habboMessage);
                     }
+                    habboMessage.getPacket().setReadIndex(6);
 
                     HPacket response = new HPacket(Extensions.INCOMING_MESSAGES_IDS.MANIPULATEDPACKET);
                     response.appendLongString(habboMessage.stringify());
@@ -148,10 +173,9 @@ public abstract class Extension {
 
                 }
             }
-            System.out.println("Extension closed");
 
         } catch (IOException | ArrayIndexOutOfBoundsException e) {
-            System.err.println("Connection failed; is G-Earth open?");
+            System.err.println("Connection failed; is G-Earth active?");
 //            e.printStackTrace();
         }
         finally {
@@ -213,9 +237,12 @@ public abstract class Extension {
                         incomingMessageListeners :
                         outgoingMessageListeners;
 
-        if (!listeners.containsKey(headerId)) {
-            listeners.put(headerId, new ArrayList<>());
+        synchronized (listeners) {
+            if (!listeners.containsKey(headerId)) {
+                listeners.put(headerId, new ArrayList<>());
+            }
         }
+
 
         listeners.get(headerId).add(messageListener);
     }
@@ -296,8 +323,8 @@ public abstract class Extension {
      */
     protected void onEndConnection(){}
 
-    protected abstract String getTitle();
-    protected abstract String getDescription();
-    protected abstract String getVersion();
-    protected abstract String getAuthor();
+
+    ExtensionInfo getInfoAnnotations() {
+        return getClass().getAnnotation(ExtensionInfo.class);
+    }
 }

@@ -5,6 +5,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import main.extensions.ExtensionForm;
+import main.extensions.ExtensionInfo;
 import main.ui.GEarthController;
 
 import java.net.URL;
@@ -12,6 +13,14 @@ import java.net.URL;
 /**
  * Created by Jonas on 22/09/18.
  */
+
+
+@ExtensionInfo(
+        Title = "iManipulate",
+        Description = "Block &/ replace packets",
+        Version = "0.1",
+        Author = "sirjonasxx"
+)
 public class BlockAndReplacePackets extends ExtensionForm {
 
     public static void main(String[] args) {
@@ -31,18 +40,5 @@ public class BlockAndReplacePackets extends ExtensionForm {
 
         primaryStage.setTitle("Packet blocker and replacer");
         primaryStage.setScene(new Scene(root, 565, 262));
-    }
-
-    protected String getTitle() {
-        return "iManipulate";
-    }
-    protected String getDescription() {
-        return "Block &/ replace packets";
-    }
-    protected String getVersion() {
-        return "0.1";
-    }
-    protected String getAuthor() {
-        return "sirjonasxx";
     }
 }
