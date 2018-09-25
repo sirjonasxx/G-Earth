@@ -16,11 +16,18 @@ public class ExecutionInfo {
 
     static {
         extensionTypeToExecutionCommand = new HashMap<>();
-        extensionTypeToExecutionCommand.put("*.jar","java -jar {path} -p {port}");
-        extensionTypeToExecutionCommand.put("*.py","python {path} -p {port}");
-        extensionTypeToExecutionCommand.put("*.py3","python3 {path} -p {port}");
-        extensionTypeToExecutionCommand.put("*.sh","{path} -p {port}");
-        extensionTypeToExecutionCommand.put("*.exe","{path} -p {port}");
+        extensionTypeToExecutionCommand.put("*.jar","java -jar {path}");
+        extensionTypeToExecutionCommand.put("*.py","python {path}");
+        extensionTypeToExecutionCommand.put("*.py3","python3 {path}");
+        extensionTypeToExecutionCommand.put("*.sh","{path}");
+        extensionTypeToExecutionCommand.put("*.exe","{path}");
+
+        for(String type : extensionTypeToExecutionCommand.keySet()) {
+            extensionTypeToExecutionCommand.put(
+                    type,
+                    extensionTypeToExecutionCommand.get(type) + " -p {port} -f {filename}"
+                    );
+        }
 
         ALLOWEDEXTENSIONTYPES = new ArrayList<>(extensionTypeToExecutionCommand.keySet());
     }

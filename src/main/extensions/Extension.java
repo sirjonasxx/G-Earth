@@ -5,12 +5,11 @@ import main.protocol.HPacket;
 import main.ui.extensions.Extensions;
 
 import java.io.*;
-import java.lang.annotation.Annotation;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.reflect.AnnotatedType;
 import java.net.Socket;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Jonas on 23/06/18.
@@ -26,12 +25,23 @@ public abstract class Extension {
 
 
     private static final String[] PORT_FLAG = {"--port", "-p"};
+    private static final String[] FILE_FLAG = {"--filename", "-f"};
 
     private OutputStream out = null;
     private final Map<Integer, List<MessageListener>> incomingMessageListeners = new HashMap<>();
     private final Map<Integer, List<MessageListener>> outgoingMessageListeners = new HashMap<>();
     private FlagsCheckListener flagRequestCallback = null;
 
+    private String getArgument(String[] args, String... arg) {
+        for (int i = 0; i < args.length - 1; i++) {
+            for (String str : arg) {
+                if (args[i].toLowerCase().equals(str.toLowerCase())) {
+                    return args[i+1];
+                }
+            }
+        }
+        return null;
+    }
 
     /**
      * Makes the connection with G-Earth, pass the arguments given in the Main method "super(args)"
@@ -52,17 +62,8 @@ public abstract class Extension {
             return;
         }
 
-        int port = 0;
-
-        outerloop:
-        for (int i = 0; i < args.length - 1; i++) {
-            for (String str : PORT_FLAG) {
-                if (args[i].equals(str)) {
-                    port = Integer.parseInt(args[i+1]);
-                    break outerloop;
-                }
-            }
-        }
+        int port = Integer.parseInt(getArgument(args, PORT_FLAG));
+        String file = getArgument(args, FILE_FLAG);
 
         Socket gEarthExtensionServer = null;
         try {
@@ -102,7 +103,9 @@ public abstract class Extension {
                             .appendString(info.Author())
                             .appendString(info.Version())
                             .appendString(info.Description())
-                            .appendBoolean(isOnClickMethodUsed());
+                            .appendBoolean(isOnClickMethodUsed())
+                            .appendBoolean(file == null)
+                            .appendString(file == null ? "": file);
                     writeToStream(response.toBytes());
                 }
                 else if (packet.headerId() == Extensions.OUTGOING_MESSAGES_IDS.CONNECTIONSTART) {
@@ -142,7 +145,7 @@ public abstract class Extension {
                                     incomingMessageListeners :
                                     outgoingMessageListeners;
 
-                    Set<MessageListener> correctListeners = new HashSet<>();
+                    List<MessageListener> correctListeners = new ArrayList<>();
 
                     synchronized (incomingMessageListeners) {
                         synchronized (outgoingMessageListeners) {

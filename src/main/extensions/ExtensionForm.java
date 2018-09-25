@@ -2,16 +2,9 @@ package main.extensions;
 
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.event.EventHandler;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 import main.protocol.HMessage;
 import main.protocol.HPacket;
-import main.ui.GEarthController;
-
-import java.net.URL;
 
 /**
  * Created by Jonas on 22/09/18.

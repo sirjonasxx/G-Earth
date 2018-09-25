@@ -71,6 +71,7 @@ public class NormalExtensionRunner implements ExtensionRunner {
                     ExecutionInfo.getExecutionCommand(getFileExtension(path))
                     .replace("{path}", path)
                     .replace("{port}", port+"")
+                    .replace("{filename}", Paths.get(path).getFileName().toString())
             );
         } catch (IOException e) {
             e.printStackTrace();
@@ -86,6 +87,7 @@ public class NormalExtensionRunner implements ExtensionRunner {
         String[] split = name.split("\\.");
         return "*." + split[split.length - 1];
     }
+
     private boolean dirExists(String dir) {
         return Files.isDirectory(Paths.get(FileSystems.getDefault().getPath(".").toString(), dir));
     }

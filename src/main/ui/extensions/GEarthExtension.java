@@ -1,16 +1,12 @@
 package main.ui.extensions;
 
 import javafx.beans.InvalidationListener;
-import main.protocol.HMessage;
 import main.protocol.HPacket;
-import main.protocol.packethandler.PayloadBuffer;
 
 import java.io.DataInputStream;
-import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
-import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +20,9 @@ public class GEarthExtension {
     private String version;
     private String description;
     private boolean fireEventButtonVisible;
+
+    private boolean isInstalledExtension; // <- extension is in the extensions directory
+    private String fileName;
 
     private Socket connection;
 
@@ -59,6 +58,8 @@ public class GEarthExtension {
                                 packet.readString(),
                                 packet.readString(),
                                 packet.readBoolean(),
+                                packet.readBoolean(),
+                                packet.readString(),
                                 connection,
                                 onDisconnectedCallback
                         );
@@ -72,12 +73,16 @@ public class GEarthExtension {
 
     }
 
-    private GEarthExtension(String title, String author, String version, String description, boolean fireEventButtonVisible, Socket connection, OnDisconnectedCallback onDisconnectedCallback) {
+    private GEarthExtension(String title, String author, String version, String description, boolean fireEventButtonVisible, boolean isInstalledExtension, String fileName, Socket connection, OnDisconnectedCallback onDisconnectedCallback) {
         this.title = title;
         this.author = author;
         this.version = version;
         this.description = description;
         this.fireEventButtonVisible = fireEventButtonVisible;
+
+        this.isInstalledExtension = isInstalledExtension;
+        this.fileName = fileName;
+
         this.connection = connection;
 
         GEarthExtension selff = this;
@@ -146,7 +151,13 @@ public class GEarthExtension {
         return fireEventButtonVisible;
     }
 
+    public String getFileName() {
+        return fileName;
+    }
 
+    public boolean isInstalledExtension() {
+        return isInstalledExtension;
+    }
 
     public boolean closeConnection() {
         try {
