@@ -71,6 +71,8 @@ public abstract class ExtensionForm extends Application {
 
     public abstract void setStageData(Stage primaryStage) throws Exception;
 
+
+    //wrap extension methods
     protected boolean requestFlags(Extension.FlagsCheckListener flagRequestCallback){
         return extension.requestFlags(flagRequestCallback);
     }

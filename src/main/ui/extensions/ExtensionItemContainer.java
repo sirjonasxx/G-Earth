@@ -72,12 +72,15 @@ public class ExtensionItemContainer extends GridPane {
         deleteButton.show();
         deleteButton.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> item.isRemoveClickTrigger());
         SimpleClickButton clickButton = new SimpleClickButton();
-        if (item.isFireButtonUsed()) {
-            clickButton.show();
-        }
         clickButton.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> item.isClickTrigger());
 
         HBox buttonsBox = new HBox(clickButton, deleteButton);
+        if (item.isFireButtonUsed()) {
+            clickButton.show();
+        }
+        else {
+            HBox.setMargin(deleteButton, new Insets(0,0,0,26));
+        }
         buttonsBox.setSpacing(item.isFireButtonUsed() ? 10 : 0);
         buttonsBox.setAlignment(Pos.CENTER);
         GridPane.setMargin(buttonsBox, new Insets(0, 5, 0, 5));
