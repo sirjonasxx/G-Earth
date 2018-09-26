@@ -7,6 +7,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 
+import java.io.File;
+
 public class BoxButton extends StackPane {
 
     private ImageView imageView;
@@ -15,9 +17,9 @@ public class BoxButton extends StackPane {
     private boolean isVisible;
 
     //paths zijn relatief aan deze classpath
-    public BoxButton(String imagePath, String imageOnHoverPath) {
-        this.image = new Image(getClass().getResourceAsStream(imagePath));
-        this.imageOnHover = new Image(getClass().getResourceAsStream(imageOnHoverPath));
+    public BoxButton(String imageName, String imageOnHoverName) {
+        this.image = new Image(getClass().getResourceAsStream("files" + File.separator + imageName));
+        this.imageOnHover = new Image(getClass().getResourceAsStream("files" + File.separator + imageOnHoverName));
         this.imageView = new ImageView();
 
         setCursor(Cursor.DEFAULT);

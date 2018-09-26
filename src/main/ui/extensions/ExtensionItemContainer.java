@@ -2,17 +2,15 @@ package main.ui.extensions;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
-import main.ui.buttons.SimpleClickButton;
+import main.ui.buttons.*;
 import main.ui.scheduler.ScheduleItem;
-import main.ui.buttons.DeleteButton;
-import main.ui.buttons.EditButton;
-import main.ui.buttons.PauseResumeButton;
 
 /**
  * Created by Jonas on 19/07/18.
@@ -66,22 +64,22 @@ public class ExtensionItemContainer extends GridPane {
 
 
 
-        DeleteButton deleteButton = new DeleteButton();
+        ExitButton exitButton = new ExitButton();
         Tooltip delete = new Tooltip("Close connection with this extension");
-        Tooltip.install(deleteButton,delete);
-        deleteButton.show();
-        deleteButton.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> item.isRemoveClickTrigger());
+        Tooltip.install(exitButton,delete);
+        exitButton.show();
+        exitButton.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> item.isRemoveClickTrigger());
         SimpleClickButton clickButton = new SimpleClickButton();
         clickButton.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> item.isClickTrigger());
 
-        HBox buttonsBox = new HBox(clickButton, deleteButton);
+        HBox buttonsBox = new HBox(clickButton, exitButton);
         if (item.isFireButtonUsed()) {
             clickButton.show();
         }
         else {
-            HBox.setMargin(deleteButton, new Insets(0,0,0,26));
+            HBox.setMargin(exitButton, new Insets(0,0,0,24));
         }
-        buttonsBox.setSpacing(item.isFireButtonUsed() ? 10 : 0);
+        buttonsBox.setSpacing(item.isFireButtonUsed() ? 8 : 0);
         buttonsBox.setAlignment(Pos.CENTER);
         GridPane.setMargin(buttonsBox, new Insets(0, 5, 0, 5));
         add(buttonsBox, 4, 0);
