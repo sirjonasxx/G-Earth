@@ -121,7 +121,7 @@ public abstract class Extension {
                             .appendString(info.Version())
                             .appendString(info.Description())
                             .appendBoolean(isOnClickMethodUsed())
-                            .appendBoolean(file == null)
+                            .appendBoolean(file != null)
                             .appendString(file == null ? "": file)
                             .appendBoolean(CANLEAVE)
                             .appendBoolean(CANDELETE);

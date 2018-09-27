@@ -150,7 +150,7 @@ public class Extensions extends SubForm {
     }
 
     protected void onParentSet() {
-
+        ExtensionItemContainerProducer producer = new ExtensionItemContainerProducer(extensioncontainer, scroller);
 
         getHConnection().addStateChangeListener((oldState, newState) -> {
             if (newState == HConnection.State.CONNECTED) {
@@ -272,7 +272,7 @@ public class Extensions extends SubForm {
                     if (getHConnection().getState() == HConnection.State.CONNECTED) {
                         extension.sendMessage(new HPacket(OUTGOING_MESSAGES_IDS.CONNECTIONSTART));
                     }
-                    Platform.runLater(() -> new ExtensionItemContainer(extension, extensioncontainer, scroller));
+                    Platform.runLater(() -> producer.extensionConnected(extension));
                     extension.onRemoveClick(observable -> {
                         try {
                             extension.getConnection().close();
@@ -298,6 +298,7 @@ public class Extensions extends SubForm {
             e.printStackTrace();
         }
 
+        producer.setPort(extensionsRegistrer.getPort());
         ext_port.setText(extensionsRegistrer.getPort()+"");
 //        System.out.println("Extension server registered on port: " + extensionsRegistrer.getPort());
 

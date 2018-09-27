@@ -13,13 +13,13 @@ import java.util.Random;
  */
 public class NormalExtensionRunner implements ExtensionRunner {
 
-    String jarPath = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParent();
+    public static final String JARPATH = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParent();
 
     @Override
     public void runAllExtensions(int port) {
         if (dirExists(ExecutionInfo.EXTENSIONSDIRECTORY)){
             File folder =
-                    new File(jarPath +
+                    new File(JARPATH +
                             FileSystems.getDefault().getSeparator()+
                             ExecutionInfo.EXTENSIONSDIRECTORY);
 
@@ -47,7 +47,7 @@ public class NormalExtensionRunner implements ExtensionRunner {
 
         Path originalPath = Paths.get(path);
         Path newPath = Paths.get(
-                jarPath,
+                JARPATH,
                 ExecutionInfo.EXTENSIONSDIRECTORY,
                 newname
         );
@@ -81,6 +81,19 @@ public class NormalExtensionRunner implements ExtensionRunner {
         }
     }
 
+    @Override
+    public void uninstallExtension(String filename) {
+        try {
+            Files.delete(Paths.get(
+                    JARPATH,
+                    ExecutionInfo.EXTENSIONSDIRECTORY,
+                    filename
+            ));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void addExecPermission(String path) {
         //not needed at first sight
     }
@@ -92,12 +105,12 @@ public class NormalExtensionRunner implements ExtensionRunner {
     }
 
     private boolean dirExists(String dir) {
-        return Files.isDirectory(Paths.get(jarPath, dir));
+        return Files.isDirectory(Paths.get(JARPATH, dir));
     }
     private void createDirectory(String dir) {
         if (!dirExists(dir)) {
             try {
-                Files.createDirectories(Paths.get(jarPath, dir));
+                Files.createDirectories(Paths.get(JARPATH, dir));
             } catch (IOException e) {
                 e.printStackTrace();
             }

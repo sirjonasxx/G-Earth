@@ -15,4 +15,7 @@ public interface ExtensionRunner {
 
     void installAndRunExtension(String path, int port);
 
+    void tryRunExtension(String path, int port);
+
+    void uninstallExtension(String path);
 }
