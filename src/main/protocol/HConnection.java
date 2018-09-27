@@ -66,13 +66,15 @@ public class HConnection {
     private static List<String> autoDetectHosts;
     static {
         autoDetectHosts = new ArrayList<>();
-        autoDetectHosts.add("game-us.habbo.com:38101");
-        autoDetectHosts.add("game-nl.habbo.com:30000");
         autoDetectHosts.add("game-br.habbo.com:30000");
+        autoDetectHosts.add("game-de.habbo.com:30000");
         autoDetectHosts.add("game-es.habbo.com:30000");
+        autoDetectHosts.add("game-fi.habbo.com:30000");
         autoDetectHosts.add("game-fr.habbo.com:30000");
+        autoDetectHosts.add("game-it.habbo.com:30000");
         autoDetectHosts.add("game-nl.habbo.com:30000");
         autoDetectHosts.add("game-tr.habbo.com:30000");
+        autoDetectHosts.add("game-us.habbo.com:38101");
     }
 
 
