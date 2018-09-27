@@ -55,6 +55,7 @@ public abstract class ExtensionForm extends Application {
                     return extInfo;
                 }
             };
+            extension.run();
 //            Platform.runLater(primaryStage::close);
             //when the extension has ended, close this process
             Platform.exit();

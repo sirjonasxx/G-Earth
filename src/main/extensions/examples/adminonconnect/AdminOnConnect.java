@@ -20,7 +20,7 @@ import main.protocol.HPacket;
 public class AdminOnConnect extends Extension {
 
     public static void main(String[] args) {
-        new AdminOnConnect(args);
+        new AdminOnConnect(args).run();
     }
     public AdminOnConnect(String[] args) {
         super(args);

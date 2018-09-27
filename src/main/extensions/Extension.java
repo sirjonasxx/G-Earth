@@ -23,7 +23,11 @@ public abstract class Extension {
         void act(String[] args);
     }
 
+    protected static final boolean CANLEAVE = true;     // can you disconnect the ext
+    protected static final boolean CANDELETE = true;    // can you delete the ext (will be false for some built-in extensions)
 
+    private String[] args;
+    private boolean isCorrupted = false;
     private static final String[] PORT_FLAG = {"--port", "-p"};
     private static final String[] FILE_FLAG = {"--filename", "-f"};
 
@@ -49,6 +53,8 @@ public abstract class Extension {
      */
     public Extension(String[] args) {
         //obtain port
+        this.args = args;
+
 
         if (getInfoAnnotations() == null) {
             System.err.println("Extension info not found\n\n" +
@@ -59,6 +65,17 @@ public abstract class Extension {
                     "       Version =  \"...\",\n" +
                     "       Author =  \"...\"" +
                     "\n)");
+            isCorrupted = true;
+        }
+
+        if (getArgument(args, PORT_FLAG) == null) {
+            System.err.println("Don't forget to include G-Earth's port as program parameters (-p {port})");
+            isCorrupted = true;
+        }
+    }
+
+    public void run() {
+        if (isCorrupted) {
             return;
         }
 
@@ -67,7 +84,7 @@ public abstract class Extension {
 
         Socket gEarthExtensionServer = null;
         try {
-            gEarthExtensionServer = new Socket("127.0.0.2", port);
+            gEarthExtensionServer = new Socket("127.0.0.1", port);
             InputStream in = gEarthExtensionServer.getInputStream();
             DataInputStream dIn = new DataInputStream(in);
             out = gEarthExtensionServer.getOutputStream();
@@ -105,7 +122,9 @@ public abstract class Extension {
                             .appendString(info.Description())
                             .appendBoolean(isOnClickMethodUsed())
                             .appendBoolean(file == null)
-                            .appendString(file == null ? "": file);
+                            .appendString(file == null ? "": file)
+                            .appendBoolean(CANLEAVE)
+                            .appendBoolean(CANDELETE);
                     writeToStream(response.toBytes());
                 }
                 else if (packet.headerId() == Extensions.OUTGOING_MESSAGES_IDS.CONNECTIONSTART) {

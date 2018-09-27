@@ -25,7 +25,7 @@ import java.util.Random;
 public class SpeechColorizer extends Extension {
 
     public static void main(String[] args) {
-        new SpeechColorizer(args);
+        new SpeechColorizer(args).run();
     }
     private SpeechColorizer(String[] args) {
         super(args);
