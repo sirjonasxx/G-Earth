@@ -1,5 +1,7 @@
 package main.ui.extensions.executer;
 
+import main.Main;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
@@ -11,16 +13,17 @@ import java.util.Random;
  */
 public class NormalExtensionRunner implements ExtensionRunner {
 
+    String jarPath = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParent();
+
     @Override
     public void runAllExtensions(int port) {
         if (dirExists(ExecutionInfo.EXTENSIONSDIRECTORY)){
             File folder =
-                    new File(FileSystems.getDefault().getPath(".").toString() +
-                            FileSystems.getDefault().getSeparator() +
+                    new File(jarPath +
+                            FileSystems.getDefault().getSeparator()+
                             ExecutionInfo.EXTENSIONSDIRECTORY);
 
             File[] childs = folder.listFiles();
-
             for (File file : childs) {
                 tryRunExtension(file.getPath(), port);
             }
@@ -44,7 +47,7 @@ public class NormalExtensionRunner implements ExtensionRunner {
 
         Path originalPath = Paths.get(path);
         Path newPath = Paths.get(
-                FileSystems.getDefault().getPath(".").toString(),
+                jarPath,
                 ExecutionInfo.EXTENSIONSDIRECTORY,
                 newname
         );
@@ -65,7 +68,7 @@ public class NormalExtensionRunner implements ExtensionRunner {
 
     }
 
-    private void tryRunExtension(String path, int port) {
+    public void tryRunExtension(String path, int port) {
         try {
             Runtime.getRuntime().exec(
                     ExecutionInfo.getExecutionCommand(getFileExtension(path))
@@ -89,12 +92,12 @@ public class NormalExtensionRunner implements ExtensionRunner {
     }
 
     private boolean dirExists(String dir) {
-        return Files.isDirectory(Paths.get(FileSystems.getDefault().getPath(".").toString(), dir));
+        return Files.isDirectory(Paths.get(jarPath, dir));
     }
     private void createDirectory(String dir) {
         if (!dirExists(dir)) {
             try {
-                Files.createDirectories(Paths.get(FileSystems.getDefault().getPath(".").toString(), dir));
+                Files.createDirectories(Paths.get(jarPath, dir));
             } catch (IOException e) {
                 e.printStackTrace();
             }

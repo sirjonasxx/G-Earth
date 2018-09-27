@@ -60,10 +60,6 @@ public class ExtensionItemContainer extends GridPane {
         add(authorLabel, 2, 0);
         add(versionLabel, 3, 0);
 
-//        getChildren().addAll(indexLabel, packetLabel, delayLabel, destinationLabel);
-
-
-
         ExitButton exitButton = new ExitButton();
         Tooltip delete = new Tooltip("Close connection with this extension");
         Tooltip.install(exitButton,delete);

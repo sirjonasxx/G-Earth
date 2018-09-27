@@ -71,9 +71,6 @@ public class GEarthExtension {
     }
 
     private GEarthExtension(HPacket extensionInfo, Socket connection, OnDisconnectedCallback onDisconnectedCallback) {
-
-
-
         this.title = extensionInfo.readString();
         this.author = extensionInfo.readString();
         this.version = extensionInfo.readString();
