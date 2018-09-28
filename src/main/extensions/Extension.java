@@ -69,7 +69,7 @@ public abstract class Extension {
         }
 
         if (getArgument(args, PORT_FLAG) == null) {
-            System.err.println("Don't forget to include G-Earth's port as program parameters (-p {port})");
+            System.err.println("Don't forget to include G-Earth's port in your program parameters (-p {port})");
             isCorrupted = true;
         }
     }
