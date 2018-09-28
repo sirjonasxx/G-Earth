@@ -1,5 +1,6 @@
 package main.protocol;
 
+import main.misc.Cacher;
 import main.protocol.hostreplacer.HostReplacer;
 import main.protocol.hostreplacer.HostReplacerFactory;
 import main.protocol.memory.Rc4Obtainer;
@@ -16,6 +17,7 @@ import java.util.*;
 
 public class HConnection {
 
+    public static final String HOTELS_CACHE_KEY = "hotelsConnectionInfo";
 
     private final Queue<HPacket> sendToClientAsyncQueue = new LinkedList<>();
     private final Queue<HPacket> sendToServerAsyncQueue = new LinkedList<>();
@@ -63,7 +65,7 @@ public class HConnection {
         CONNECTED           // CONNECTED
     }
 
-    private static List<String> autoDetectHosts;
+    public static List<String> autoDetectHosts;
     static {
         autoDetectHosts = new ArrayList<>();
         autoDetectHosts.add("game-br.habbo.com:30000");
@@ -75,6 +77,15 @@ public class HConnection {
         autoDetectHosts.add("game-nl.habbo.com:30000");
         autoDetectHosts.add("game-tr.habbo.com:30000");
         autoDetectHosts.add("game-us.habbo.com:38101");
+
+        List<String> additionalCachedHotels = (List<String>) Cacher.get(HOTELS_CACHE_KEY);
+        if (additionalCachedHotels != null) {
+            for (String additionalHotel : additionalCachedHotels) {
+                if (!autoDetectHosts.contains(additionalHotel)) {
+                    autoDetectHosts.add(additionalHotel);
+                }
+            }
+        }
     }
 
 
@@ -112,6 +123,16 @@ public class HConnection {
 
     // manual method
     public void prepare(String domain, int port) {
+        List<String> additionalCachedHotels = (List<String>) Cacher.get(HOTELS_CACHE_KEY);
+        if (additionalCachedHotels == null) {
+            additionalCachedHotels = new ArrayList<>();
+        }
+        if (!additionalCachedHotels.contains(domain +":"+port)) {
+            additionalCachedHotels.add(domain+":"+port);
+            Cacher.put(HOTELS_CACHE_KEY, additionalCachedHotels);
+        }
+
+
         List<String> potentialHost = new ArrayList<>();
         potentialHost.add(domain+":"+port);
         prepare(potentialHost);
@@ -136,17 +157,29 @@ public class HConnection {
             removeFromHosts();
         }
 
-        try {
-            for (String host : allPotentialHosts) {
-                InetAddress address = InetAddress.getByName(host.split(":")[0]);
-                actual_domain.add(address.getHostAddress());
-            }
-            setState(State.PREPARED);
 
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-            setState(State.NOT_CONNECTED);
+        List<String> willremove = new ArrayList<>();
+        for (String host : allPotentialHosts) {
+            InetAddress address = null;
+            try {
+                address = InetAddress.getByName(host.split(":")[0]);
+                actual_domain.add(address.getHostAddress());
+            } catch (UnknownHostException e) {
+//                e.printStackTrace();
+                actual_domain.add(null);
+                willremove.add(host);
+            }
         }
+
+        List<String> additionalCachedHotels = (List<String>) Cacher.get(HOTELS_CACHE_KEY);
+        if (additionalCachedHotels != null) {
+            for (String host: willremove) {
+                additionalCachedHotels.remove(host);
+            }
+            Cacher.put(HOTELS_CACHE_KEY, additionalCachedHotels);
+        }
+
+        setState(State.PREPARED);
     }
 
     public void start() throws IOException	{
@@ -159,6 +192,8 @@ public class HConnection {
 
 
             for (int i = 0; i < actual_domain.size(); i++) {
+                if (actual_domain.get(i) == null) continue;
+
                 ServerSocket proxy = new ServerSocket(port.get(i), 10, InetAddress.getByName("127.0.0." + (i+1)));
                 this.proxy.add(proxy);
                 String dom = actual_domain.get(i);
@@ -188,7 +223,7 @@ public class HConnection {
 
                             } catch (IOException e1) {
                                 // TODO Auto-generated catch block
-                                //e1.printStackTrace();
+//                                e1.printStackTrace();
                             }
                         }
                     } catch (Exception e) {
@@ -361,17 +396,31 @@ public class HConnection {
     }
 
     private void addToHosts() {
-        String[] lines = new String[input_domain.size()];
+        List<String> linesTemp = new ArrayList<>();
         for (int i = 0; i < input_domain.size(); i++) {
-            lines[i] = ("127.0.0." + (i+1)) + " " + input_domain.get(i);
+            if (actual_domain.get(i) != null) {
+                linesTemp.add(("127.0.0." + (i+1)) + " " + input_domain.get(i));
+            }
+        }
+
+        String[] lines = new String[linesTemp.size()];
+        for (int i = 0; i < linesTemp.size(); i++) {
+            lines[i] = linesTemp.get(i);
         }
         hostsReplacer.addRedirect(lines);
         hostRedirected = true;
     }
     private void removeFromHosts(){
-        String[] lines = new String[input_domain.size()];
+        List<String> linesTemp = new ArrayList<>();
         for (int i = 0; i < input_domain.size(); i++) {
-            lines[i] = ("127.0.0." + (i+1)) + " " + input_domain.get(i);
+            if (actual_domain.get(i) != null) {
+                linesTemp.add(("127.0.0." + (i+1)) + " " + input_domain.get(i));
+            }
+        }
+
+        String[] lines = new String[linesTemp.size()];
+        for (int i = 0; i < linesTemp.size(); i++) {
+            lines[i] = linesTemp.get(i);
         }
         hostsReplacer.removeRedirect(lines);
         hostRedirected = false;
