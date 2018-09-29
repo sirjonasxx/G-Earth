@@ -1,16 +1,12 @@
 package main.ui.extensions;
 
 import javafx.beans.InvalidationListener;
-import main.protocol.HMessage;
 import main.protocol.HPacket;
-import main.protocol.packethandler.PayloadBuffer;
 
 import java.io.DataInputStream;
-import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
-import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,6 +19,13 @@ public class GEarthExtension {
     private String author;
     private String version;
     private String description;
+
+    private boolean fireEventButtonVisible;
+    private boolean leaveButtonVisible;
+    private boolean deleteButtonVisible;
+
+    private boolean isInstalledExtension; // <- extension is in the extensions directory
+    private String fileName;
 
     private Socket connection;
 
@@ -53,10 +56,7 @@ public class GEarthExtension {
 
                     if (packet.headerId() == Extensions.INCOMING_MESSAGES_IDS.EXTENSIONINFO) {
                         GEarthExtension gEarthExtension = new GEarthExtension(
-                                packet.readString(),
-                                packet.readString(),
-                                packet.readString(),
-                                packet.readString(),
+                                packet,
                                 connection,
                                 onDisconnectedCallback
                         );
@@ -70,11 +70,19 @@ public class GEarthExtension {
 
     }
 
-    private GEarthExtension(String title, String author, String version, String description, Socket connection, OnDisconnectedCallback onDisconnectedCallback) {
-        this.title = title;
-        this.author = author;
-        this.version = version;
-        this.description = description;
+    private GEarthExtension(HPacket extensionInfo, Socket connection, OnDisconnectedCallback onDisconnectedCallback) {
+        this.title = extensionInfo.readString();
+        this.author = extensionInfo.readString();
+        this.version = extensionInfo.readString();
+        this.description = extensionInfo.readString();
+        this.fireEventButtonVisible = extensionInfo.readBoolean();
+
+        this.isInstalledExtension = extensionInfo.readBoolean();
+        this.fileName = extensionInfo.readString();
+
+        this.leaveButtonVisible = extensionInfo.readBoolean();
+        this.deleteButtonVisible = extensionInfo.readBoolean();
+
         this.connection = connection;
 
         GEarthExtension selff = this;
@@ -126,20 +134,31 @@ public class GEarthExtension {
     public String getAuthor() {
         return author;
     }
-
     public String getDescription() {
         return description;
     }
-
     public String getTitle() {
         return title;
     }
-
     public String getVersion() {
         return version;
     }
+    public boolean isFireButtonUsed() {
+        return fireEventButtonVisible;
+    }
+    public String getFileName() {
+        return fileName;
+    }
+    public boolean isDeleteButtonVisible() {
+        return deleteButtonVisible;
+    }
+    public boolean isLeaveButtonVisible() {
+        return leaveButtonVisible;
+    }
 
-
+    public boolean isInstalledExtension() {
+        return isInstalledExtension;
+    }
 
     public boolean closeConnection() {
         try {

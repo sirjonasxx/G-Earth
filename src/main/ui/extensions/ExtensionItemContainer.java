@@ -1,17 +1,25 @@
 package main.ui.extensions;
 
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
-import main.ui.buttons.SimpleClickButton;
+import main.extensions.Extension;
+import main.misc.ConfirmationDialog;
+import main.ui.buttons.*;
+import main.ui.extensions.executer.ExecutionInfo;
+import main.ui.extensions.executer.ExtensionRunner;
+import main.ui.extensions.executer.ExtensionRunnerFactory;
+import main.ui.extensions.executer.NormalExtensionRunner;
 import main.ui.scheduler.ScheduleItem;
-import main.ui.buttons.DeleteButton;
-import main.ui.buttons.EditButton;
-import main.ui.buttons.PauseResumeButton;
+
+import javax.tools.Tool;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * Created by Jonas on 19/07/18.
@@ -19,17 +27,27 @@ import main.ui.buttons.PauseResumeButton;
 public class ExtensionItemContainer extends GridPane {
 
     public static final int[] columnWidths = {22, 34, 18, 13, 11};
-    GEarthExtension item;
+    private GEarthExtension item;
 
-    Label titleLabel;
-    Label descriptionLabel;
-    Label authorLabel;
-    Label versionLabel;
+    private Label titleLabel;
+    private Label descriptionLabel;
+    private Label authorLabel;
+    private Label versionLabel;
 
-    VBox parent;
+    private VBox parent;
 
-    ExtensionItemContainer(GEarthExtension item, VBox parent, ScrollPane scrollPane) {
+    private volatile int port;
+
+    private HBox buttonsBox = null;
+    private HBox additionalButtonBox = null;
+
+    private ExitButton exitButton;
+    private SimpleClickButton clickButton;
+    private ReloadButton reloadButton;
+
+    ExtensionItemContainer(GEarthExtension item, VBox parent, ScrollPane scrollPane, int port) {
         super();
+        this.port = port;
         setGridLinesVisible(true);
         VBox.setMargin(this, new Insets(2, -2, -2, -2));
 
@@ -61,28 +79,72 @@ public class ExtensionItemContainer extends GridPane {
         add(authorLabel, 2, 0);
         add(versionLabel, 3, 0);
 
-//        getChildren().addAll(indexLabel, packetLabel, delayLabel, destinationLabel);
-
-
-
-        DeleteButton deleteButton = new DeleteButton();
-        deleteButton.show();
-        deleteButton.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> item.isRemoveClickTrigger());
-        SimpleClickButton clickButton = new SimpleClickButton();
+        exitButton = new ExitButton();
+        Tooltip delete = new Tooltip("Close connection with this extension");
+        Tooltip.install(exitButton,delete);
+        exitButton.show();
+        exitButton.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> item.isRemoveClickTrigger());
+        clickButton = new SimpleClickButton();
         clickButton.show();
         clickButton.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> item.isClickTrigger());
 
-        HBox buttonsBox = new HBox(clickButton, deleteButton);
-        buttonsBox.setSpacing(10);
+        buttonsBox = new HBox(clickButton, exitButton);
+
+        reloadButton = new ReloadButton();
+        Tooltip reload = new Tooltip("Restart this extension");
+        Tooltip.install(reloadButton, reload);
+        reloadButton.show();
+        reloadButton.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+            reloadButton.setVisible(false);
+            ExtensionRunner runner = ExtensionRunnerFactory.get();
+            runner.tryRunExtension(Paths.get(NormalExtensionRunner.JARPATH, ExecutionInfo.EXTENSIONSDIRECTORY, item.getFileName()).toString(), port);
+        });
+
+        DeleteButton deleteButton = new DeleteButton();
+        Tooltip uninstall = new Tooltip("Uninstall this extension");
+        Tooltip.install(deleteButton, uninstall);
+        deleteButton.show();
+        GridPane this2 = this;
+        deleteButton.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+            boolean delet_dis = true;
+
+            if (ConfirmationDialog.showDialog) {
+                Alert alert = ConfirmationDialog.createAlertWithOptOut(Alert.AlertType.CONFIRMATION,
+                        "Confirmation Dialog", null,
+                        "Are you sure want to uninstall this extension?", "Do not ask again",
+                        ButtonType.YES, ButtonType.NO
+                );
+
+                if (!(alert.showAndWait().filter(t -> t == ButtonType.YES).isPresent())) {
+                    delet_dis = false;
+                }
+            }
+
+            if (delet_dis) {
+                ExtensionRunner runner = ExtensionRunnerFactory.get();
+                runner.uninstallExtension(item.getFileName());
+                parent.getChildren().remove(this2);
+            }
+        });
+
+        additionalButtonBox = new HBox(reloadButton, deleteButton);
+
+        clickButton.setVisible(item.isFireButtonUsed());
+        exitButton.setVisible(item.isLeaveButtonVisible());
+        deleteButton.setVisible(item.isDeleteButtonVisible());
+
+        buttonsBox.setSpacing(8);
         buttonsBox.setAlignment(Pos.CENTER);
+        additionalButtonBox.setSpacing(8);
+        additionalButtonBox.setAlignment(Pos.CENTER);
+
         GridPane.setMargin(buttonsBox, new Insets(0, 5, 0, 5));
+        GridPane.setMargin(additionalButtonBox, new Insets(0, 5, 0, 5));
         add(buttonsBox, 4, 0);
 
         parent.getChildren().add(this);
 
-
-        GridPane this2 = this;
-        item.onDelete(observable -> parent.getChildren().remove(this2));
+        initExtension();
     }
 
     private Label initNewLabelColumn(String text) {
@@ -91,5 +153,52 @@ public class ExtensionItemContainer extends GridPane {
         GridPane.setMargin(label, new Insets(0, 0, 0, 5));
         label.setText(text);
         return label;
+    }
+
+    private EventHandler<MouseEvent> onExit = null;
+    private EventHandler<MouseEvent> onClick = null;
+
+    void initExtension(){
+        if (onExit != null) {
+            exitButton.removeEventHandler(MouseEvent.MOUSE_CLICKED, onExit);
+            clickButton.removeEventHandler(MouseEvent.MOUSE_CLICKED, onClick);
+        }
+        onExit = event -> item.isRemoveClickTrigger();
+        onClick = event -> item.isClickTrigger();
+
+        exitButton.addEventHandler(MouseEvent.MOUSE_CLICKED, onExit);
+        clickButton.addEventHandler(MouseEvent.MOUSE_CLICKED, onClick);
+
+        ExtensionItemContainer this2 = this;
+        item.onDelete(observable -> {
+            if (item.isInstalledExtension()) {
+                setBackground(new Background(new BackgroundFill(Paint.valueOf("#cccccc"),null, null)));
+                getChildren().remove(buttonsBox);
+                add(additionalButtonBox, 4, 0);
+                reloadButton.setVisible(true);
+            }
+            else {
+                parent.getChildren().remove(this2);
+            }
+        });
+    }
+
+    void hasReconnected(GEarthExtension extension) {
+        item = extension;
+        initExtension();
+
+        setBackground(new Background(new BackgroundFill(Paint.valueOf("#ffffff"),null, null)));
+        getChildren().remove(additionalButtonBox);
+        if (buttonsBox != null) {
+            add(buttonsBox, 4, 0);
+        }
+    }
+
+    //returns null if there is none
+    String getExtensionFileName() {
+        if (item.isInstalledExtension()) {
+            return item.getFileName();
+        }
+        return null;
     }
 }

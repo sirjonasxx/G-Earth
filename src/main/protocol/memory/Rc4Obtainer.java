@@ -72,6 +72,7 @@ public class Rc4Obtainer {
 
                                 if (payloadBuffer.peak().length == 0) {
                                     outgoingHandler.setRc4(rc4Tryout);
+                                    incomingHandler.setRc4(rc4Tryout);
                                     break outerloop;
                                 }
 

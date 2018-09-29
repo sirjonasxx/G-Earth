@@ -8,6 +8,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,10 +32,10 @@ public class PauseResumeButton extends StackPane{
     public PauseResumeButton(boolean isPaused) {
         this.isPaused[0] = isPaused;
 
-        this.imagePause = new Image(getClass().getResourceAsStream("ButtonPause.png"));
-        this.imagePauseOnHover = new Image(getClass().getResourceAsStream("ButtonPauseHover.png"));
-        this.imageResume = new Image(getClass().getResourceAsStream("ButtonResume.png"));
-        this.imageResumeOnHover = new Image(getClass().getResourceAsStream("ButtonResumeHover.png"));
+        this.imagePause = new Image(getClass().getResourceAsStream("files"+ File.separator+"ButtonPause.png"));
+        this.imagePauseOnHover = new Image(getClass().getResourceAsStream("files"+ File.separator+"ButtonPauseHover.png"));
+        this.imageResume = new Image(getClass().getResourceAsStream("files"+ File.separator+"ButtonResume.png"));
+        this.imageResumeOnHover = new Image(getClass().getResourceAsStream("files"+ File.separator+"ButtonResumeHover.png"));
         this.imageView = new ImageView();
 
         setCursor(Cursor.DEFAULT);

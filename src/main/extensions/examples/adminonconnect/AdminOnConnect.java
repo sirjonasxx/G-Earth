@@ -1,17 +1,26 @@
-package main.extensions.examples;
+package main.extensions.examples.adminonconnect;
 
 import main.extensions.Extension;
+import main.extensions.ExtensionInfo;
 import main.protocol.HMessage;
 import main.protocol.HPacket;
 
 /**
  * Created by Jonas on 26/06/18.
  */
+
+
+
+@ExtensionInfo(
+        Title = "Always admin!",
+        Description = "Gives you admin permission on connect",
+        Version = "1.0",
+        Author = "sirjonasxx"
+)
 public class AdminOnConnect extends Extension {
 
-
     public static void main(String[] args) {
-        new AdminOnConnect(args);
+        new AdminOnConnect(args).run();
     }
     public AdminOnConnect(String[] args) {
         super(args);
@@ -38,23 +47,5 @@ public class AdminOnConnect extends Extension {
 
     protected void onStartConnection() {
         done = false;
-    }
-
-    @Override
-    protected void onClick() {
-        System.out.println("clicked");
-    }
-
-    protected String getTitle() {
-        return "Always admin!";
-    }
-    protected String getDescription() {
-        return "Gives you admin permission on connect";
-    }
-    protected String getVersion() {
-        return "1.0";
-    }
-    protected String getAuthor() {
-        return "sirjonasxx";
     }
 }

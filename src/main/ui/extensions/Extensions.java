@@ -9,10 +9,19 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import main.Main;
 import main.protocol.*;
 import main.ui.SubForm;
+import main.ui.extensions.executer.ExecutionInfo;
+import main.ui.extensions.executer.ExtensionRunner;
+import main.ui.extensions.executer.ExtensionRunnerFactory;
+import main.ui.scheduler.ScheduleItem;
+import sun.misc.ExtensionInfo;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.*;
@@ -108,6 +117,9 @@ public class Extensions extends SubForm {
     public GridPane header_ext;
     public ScrollPane scroller;
 
+    private ExtensionRunner extensionRunner = null;
+    private GEarthExtensionsRegistrer extensionsRegistrer = null;
+
     public static class OUTGOING_MESSAGES_IDS {
         public static final int ONDOUBLECLICK = 1;
         public static final int INFOREQUEST = 2;        // backend: implemented
@@ -138,6 +150,8 @@ public class Extensions extends SubForm {
     }
 
     protected void onParentSet() {
+        ExtensionItemContainerProducer producer = new ExtensionItemContainerProducer(extensioncontainer, scroller);
+
         getHConnection().addStateChangeListener((oldState, newState) -> {
             if (newState == HConnection.State.CONNECTED) {
                 for (GEarthExtension extension : gEarthExtensions) {
@@ -217,7 +231,6 @@ public class Extensions extends SubForm {
         });
 
 
-        GEarthExtensionsRegistrer extensionsRegistrer = null;
         HashMap<GEarthExtension, GEarthExtension.ReceiveMessageListener> messageListeners = new HashMap<>();
         try {
             extensionsRegistrer = new GEarthExtensionsRegistrer(new GEarthExtensionsRegistrer.ExtensionRegisterObserver() {
@@ -259,7 +272,7 @@ public class Extensions extends SubForm {
                     if (getHConnection().getState() == HConnection.State.CONNECTED) {
                         extension.sendMessage(new HPacket(OUTGOING_MESSAGES_IDS.CONNECTIONSTART));
                     }
-                    Platform.runLater(() -> new ExtensionItemContainer(extension, extensioncontainer, scroller));
+                    Platform.runLater(() -> producer.extensionConnected(extension));
                     extension.onRemoveClick(observable -> {
                         try {
                             extension.getConnection().close();
@@ -285,11 +298,25 @@ public class Extensions extends SubForm {
             e.printStackTrace();
         }
 
+        producer.setPort(extensionsRegistrer.getPort());
         ext_port.setText(extensionsRegistrer.getPort()+"");
 //        System.out.println("Extension server registered on port: " + extensionsRegistrer.getPort());
+
+        extensionRunner = ExtensionRunnerFactory.get();
+        extensionRunner.runAllExtensions(extensionsRegistrer.getPort());
     }
 
 
     public void installBtnClicked(ActionEvent actionEvent) {
+        List<ScheduleItem> list = new ArrayList<>();
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Install extension");
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("G-Earth extensions", ExecutionInfo.ALLOWEDEXTENSIONTYPES));
+        File selectedFile = fileChooser.showOpenDialog(parentController.getStage());
+        if (selectedFile != null) {
+            extensionRunner.installAndRunExtension(selectedFile.getPath(), extensionsRegistrer.getPort());
+        }
     }
 }

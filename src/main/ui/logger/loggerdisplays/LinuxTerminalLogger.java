@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * Created by Jonas on 04/04/18.
  */
-class GnomeTerminalLogger extends SimpleTerminalLogger {
+class LinuxTerminalLogger extends SimpleTerminalLogger {
 
     public final static Map<String, String> colorizePackets;
     static {

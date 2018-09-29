@@ -12,7 +12,7 @@ public class Info extends SubForm {
 
     public void initialize() {
         String[] lines = {
-                "G-Earth",
+                "G-Earth 0.1.1",
                 "Linux Habbo Packet Manipulator",
                 "",
                 "Made by:",

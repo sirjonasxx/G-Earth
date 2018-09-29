@@ -1,6 +1,7 @@
 package main;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -17,7 +18,6 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-
         FXMLLoader loader = new FXMLLoader(GEarthController.class.getResource("G-Earth.fxml"));
         Parent root = loader.load();
 
@@ -29,11 +29,11 @@ public class Main extends Application {
         primaryStage.setTitle("G-Earth");
         primaryStage.setScene(new Scene(root, 620, 295));
         primaryStage.show();
-
         primaryStage.getScene().getStylesheets().add(GEarthController.class.getResource("bootstrap3.css").toExternalForm());
 
         primaryStage.setOnCloseRequest( event -> {
             companion.abort();
+            Platform.exit();
         });
 
     }

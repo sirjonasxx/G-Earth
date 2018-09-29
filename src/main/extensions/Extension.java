@@ -4,10 +4,7 @@ import main.protocol.HMessage;
 import main.protocol.HPacket;
 import main.ui.extensions.Extensions;
 
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,14 +23,29 @@ public abstract class Extension {
         void act(String[] args);
     }
 
+    protected static final boolean CANLEAVE = true;     // can you disconnect the ext
+    protected static final boolean CANDELETE = true;    // can you delete the ext (will be false for some built-in extensions)
 
+    private String[] args;
+    private boolean isCorrupted = false;
     private static final String[] PORT_FLAG = {"--port", "-p"};
+    private static final String[] FILE_FLAG = {"--filename", "-f"};
 
     private OutputStream out = null;
-    private Map<Integer, List<MessageListener>> incomingMessageListeners = new HashMap<>();
-    private Map<Integer, List<MessageListener>> outgoingMessageListeners = new HashMap<>();
+    private final Map<Integer, List<MessageListener>> incomingMessageListeners = new HashMap<>();
+    private final Map<Integer, List<MessageListener>> outgoingMessageListeners = new HashMap<>();
     private FlagsCheckListener flagRequestCallback = null;
 
+    private String getArgument(String[] args, String... arg) {
+        for (int i = 0; i < args.length - 1; i++) {
+            for (String str : arg) {
+                if (args[i].toLowerCase().equals(str.toLowerCase())) {
+                    return args[i+1];
+                }
+            }
+        }
+        return null;
+    }
 
     /**
      * Makes the connection with G-Earth, pass the arguments given in the Main method "super(args)"
@@ -41,29 +53,53 @@ public abstract class Extension {
      */
     public Extension(String[] args) {
         //obtain port
-        int port = 0;
+        this.args = args;
 
-        outerloop:
-        for (int i = 0; i < args.length - 1; i++) {
-            for (String str : PORT_FLAG) {
-                if (args[i].equals(str)) {
-                    port = Integer.parseInt(args[i+1]);
-                    break outerloop;
-                }
-            }
+
+        if (getInfoAnnotations() == null) {
+            System.err.println("Extension info not found\n\n" +
+                    "Usage:\n" +
+                    "@ExtensionInfo ( \n" +
+                    "       Title =  \"...\",\n" +
+                    "       Description =  \"...\",\n" +
+                    "       Version =  \"...\",\n" +
+                    "       Author =  \"...\"" +
+                    "\n)");
+            isCorrupted = true;
         }
+
+        if (getArgument(args, PORT_FLAG) == null) {
+            System.err.println("Don't forget to include G-Earth's port in your program parameters (-p {port})");
+            isCorrupted = true;
+        }
+    }
+
+    public void run() {
+        if (isCorrupted) {
+            return;
+        }
+
+        int port = Integer.parseInt(getArgument(args, PORT_FLAG));
+        String file = getArgument(args, FILE_FLAG);
 
         Socket gEarthExtensionServer = null;
         try {
-            gEarthExtensionServer = new Socket("localhost", port);
-
+            gEarthExtensionServer = new Socket("127.0.0.1", port);
             InputStream in = gEarthExtensionServer.getInputStream();
             DataInputStream dIn = new DataInputStream(in);
             out = gEarthExtensionServer.getOutputStream();
 
             while (!gEarthExtensionServer.isClosed()) {
 
-                int length = dIn.readInt();
+                int length;
+                try {
+                    length = dIn.readInt();
+                }
+                catch(EOFException exception) {
+                    //g-earth closed the extension
+                    break;
+                }
+
                 byte[] headerandbody = new byte[length + 4];
 
                 int amountRead = 0;
@@ -77,11 +113,18 @@ public abstract class Extension {
 
 
                 if (packet.headerId() == Extensions.OUTGOING_MESSAGES_IDS.INFOREQUEST) {
+                    ExtensionInfo info = getInfoAnnotations();
+
                     HPacket response = new HPacket(Extensions.INCOMING_MESSAGES_IDS.EXTENSIONINFO);
-                    response.appendString(getTitle())
-                            .appendString(getAuthor())
-                            .appendString(getVersion())
-                            .appendString(getDescription());
+                    response.appendString(info.Title())
+                            .appendString(info.Author())
+                            .appendString(info.Version())
+                            .appendString(info.Description())
+                            .appendBoolean(isOnClickMethodUsed())
+                            .appendBoolean(file != null)
+                            .appendString(file == null ? "": file)
+                            .appendBoolean(CANLEAVE)
+                            .appendBoolean(CANDELETE);
                     writeToStream(response.toBytes());
                 }
                 else if (packet.headerId() == Extensions.OUTGOING_MESSAGES_IDS.CONNECTIONSTART) {
@@ -121,19 +164,29 @@ public abstract class Extension {
                                     incomingMessageListeners :
                                     outgoingMessageListeners;
 
-                    if (listeners.containsKey(-1)) { // registered on all packets
-                        for (int i = listeners.get(-1).size() - 1; i >= 0; i--) {
-                            listeners.get(-1).get(i).act(habboMessage);
-                            habboMessage.getPacket().setReadIndex(6);
+                    List<MessageListener> correctListeners = new ArrayList<>();
+
+                    synchronized (incomingMessageListeners) {
+                        synchronized (outgoingMessageListeners) {
+                            if (listeners.containsKey(-1)) { // registered on all packets
+                                for (int i = listeners.get(-1).size() - 1; i >= 0; i--) {
+                                    correctListeners.add(listeners.get(-1).get(i));
+                                }
+                            }
+
+                            if (listeners.containsKey(habboPacket.headerId())) {
+                                for (int i = listeners.get(habboPacket.headerId()).size() - 1; i >= 0; i--) {
+                                    correctListeners.add(listeners.get(habboPacket.headerId()).get(i));
+                                }
+                            }
                         }
                     }
 
-                    if (listeners.containsKey(habboPacket.headerId())) {
-                        for (int i = listeners.get(habboPacket.headerId()).size() - 1; i >= 0; i--) {
-                            listeners.get(habboPacket.headerId()).get(i).act(habboMessage);
-                            habboMessage.getPacket().setReadIndex(6);
-                        }
+                    for(MessageListener listener : correctListeners) {
+                        habboMessage.getPacket().setReadIndex(6);
+                        listener.act(habboMessage);
                     }
+                    habboMessage.getPacket().setReadIndex(6);
 
                     HPacket response = new HPacket(Extensions.INCOMING_MESSAGES_IDS.MANIPULATEDPACKET);
                     response.appendLongString(habboMessage.stringify());
@@ -143,9 +196,9 @@ public abstract class Extension {
                 }
             }
 
-
         } catch (IOException | ArrayIndexOutOfBoundsException e) {
-            e.printStackTrace();
+            System.err.println("Connection failed; is G-Earth active?");
+//            e.printStackTrace();
         }
         finally {
             if (gEarthExtensionServer != null && !gEarthExtensionServer.isClosed()) {
@@ -206,9 +259,12 @@ public abstract class Extension {
                         incomingMessageListeners :
                         outgoingMessageListeners;
 
-        if (!listeners.containsKey(headerId)) {
-            listeners.put(headerId, new ArrayList<>());
+        synchronized (listeners) {
+            if (!listeners.containsKey(headerId)) {
+                listeners.put(headerId, new ArrayList<>());
+            }
         }
+
 
         listeners.get(headerId).add(messageListener);
     }
@@ -249,6 +305,25 @@ public abstract class Extension {
     }
 
 
+    private boolean isOnClickMethodUsed() {
+
+        Class<? extends Extension> c = getClass();
+
+        while (c != Extension.class) {
+            try {
+                c.getDeclaredMethod("onClick");
+                // if it didnt error, onClick exists
+                return true;
+            } catch (NoSuchMethodException e) {
+//                e.printStackTrace();
+            }
+
+            c = (Class<? extends Extension>) c.getSuperclass();
+        }
+
+        return false;
+    }
+
     /**
      * Gets called when a connection has been established with G-Earth.
      * This does not imply a connection with Habbo is setup.
@@ -270,8 +345,8 @@ public abstract class Extension {
      */
     protected void onEndConnection(){}
 
-    protected abstract String getTitle();
-    protected abstract String getDescription();
-    protected abstract String getVersion();
-    protected abstract String getAuthor();
+
+    ExtensionInfo getInfoAnnotations() {
+        return getClass().getAnnotation(ExtensionInfo.class);
+    }
 }

@@ -2,6 +2,7 @@ package main.protocol.packethandler;
 
 import main.protocol.HMessage;
 import main.protocol.TrafficListener;
+import main.protocol.crypto.RC4;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -10,12 +11,17 @@ import java.util.List;
 
 public abstract class Handler {
 
+    protected static final boolean DEBUG = false;
+
     volatile PayloadBuffer payloadBuffer = new PayloadBuffer();
     volatile OutputStream out;
     volatile Object[] listeners = null; //get notified on packet send
     volatile boolean isTempBlocked = false;
     volatile boolean isDataStream = false;
     volatile int currentIndex = 0;
+
+    protected RC4 clientcipher = null;
+    protected RC4 servercipher = null;
 
 
     public Handler(OutputStream outputStream, Object[] listeners) {
@@ -28,18 +34,11 @@ public abstract class Handler {
         isDataStream = true;
     }
 
-    public void act(byte[] buffer) throws IOException {
-        if (isDataStream)	{
-            payloadBuffer.push(buffer);
-            notifyBufferListeners(buffer.length);
+    public abstract void act(byte[] buffer) throws IOException;
 
-            if (!isTempBlocked) {
-                flush();
-            }
-        }
-        else  {
-            out.write(buffer);
-        }
+    public void setRc4(RC4 rc4) {
+        this.clientcipher = rc4.deepCopy();
+        this.servercipher = rc4.deepCopy();
     }
 
     public void block() {
@@ -73,7 +72,7 @@ public abstract class Handler {
 
     public abstract void flush() throws IOException;
 
-
+    protected abstract void printForDebugging(byte[] bytes);
 
     private List<BufferListener> bufferListeners = new ArrayList<>();
     public void addBufferListener(BufferListener listener) {

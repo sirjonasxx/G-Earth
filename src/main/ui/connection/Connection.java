@@ -14,6 +14,10 @@ import main.protocol.TrafficListener;
 import main.ui.SubForm;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class Connection extends SubForm {
 
@@ -35,8 +39,24 @@ public class Connection extends SubForm {
             updateInputUI();
         });
 
-        inpPort.getItems().addAll("30000", "38101");
-        inpHost.getItems().addAll("game-nl.habbo.com", "game-us.habbo.com");
+        List<String> knownHosts = HConnection.autoDetectHosts;
+        Set<String> hosts = new HashSet<>();
+        Set<String> ports = new HashSet<>();
+
+        for (String h : knownHosts) {
+            String[] split = h.split(":");
+            hosts.add(split[0]);
+            ports.add(split[1]);
+        }
+
+        List<String> hostsSorted = new ArrayList<>(hosts);
+        hostsSorted.sort(String::compareTo);
+
+        List<String> portsSorted = new ArrayList<>(ports);
+        portsSorted.sort(String::compareTo);
+
+        inpPort.getItems().addAll(portsSorted);
+        inpHost.getItems().addAll(hostsSorted);
 
         inpPort.getSelectionModel().selectFirst();
         inpHost.getSelectionModel().selectFirst();
