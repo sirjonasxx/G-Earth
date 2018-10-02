@@ -40,8 +40,14 @@ public abstract class Handler {
         isDataStream = true;
     }
 
+    public boolean isEncryptedStream() {
+        return isEncryptedStream;
+    }
+
     public abstract void act(byte[] buffer) throws IOException;
     protected void continuedAct(byte[] buffer) throws IOException {
+        notifyBufferListeners(buffer.length);
+
         if (!isEncryptedStream) {
             payloadBuffer.push(buffer);
         }
@@ -57,8 +63,6 @@ public abstract class Handler {
             }
             payloadBuffer.push(tm);
         }
-
-        notifyBufferListeners(buffer.length);
 
         if (!isTempBlocked) {
             flush();
@@ -130,7 +134,7 @@ public abstract class Handler {
             HPacket[] hpackets = payloadBuffer.receive();
 
             for (HPacket hpacket : hpackets){
-                HMessage hMessage = new HMessage(hpacket, HMessage.Side.TOCLIENT, currentIndex);
+                HMessage hMessage = new HMessage(hpacket, getMessageSide(), currentIndex);
                 boolean isencrypted = isEncryptedStream;
                 if (isDataStream) {
                     notifyListeners(hMessage);
@@ -147,6 +151,8 @@ public abstract class Handler {
             }
         }
     }
+
+    public abstract HMessage.Side getMessageSide();
 
     public List<Byte> getEncryptedBuffer() {
         return tempEncryptedBuffer;

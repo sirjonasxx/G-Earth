@@ -15,9 +15,9 @@ public class IncomingHandler extends Handler {
         super(outputStream, listeners);
 
         ((List<TrafficListener>)listeners[0]).add(message -> {
-            if (isDataStream && onlyOnce && message.getPacket().length() == 261) {
+            if (isDataStream && onlyOnce && (message.getPacket().length() == 261 || message.getPacket().length() == 517)) {
                 onlyOnce = false;
-                isEncryptedStream = message.getPacket().readBoolean(264);
+                isEncryptedStream = message.getPacket().readBoolean(message.getPacket().length() + 3);
             }
         });
     }
@@ -30,6 +30,11 @@ public class IncomingHandler extends Handler {
         else  {
             out.write(buffer);
         }
+    }
+
+    @Override
+    public HMessage.Side getMessageSide() {
+        return HMessage.Side.TOCLIENT;
     }
 
     @Override

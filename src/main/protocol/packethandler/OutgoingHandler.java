@@ -36,6 +36,11 @@ public class OutgoingHandler extends Handler {
         }
     }
 
+    @Override
+    public HMessage.Side getMessageSide() {
+        return HMessage.Side.TOSERVER;
+    }
+
 
     @Override
     protected void printForDebugging(byte[] bytes) {
