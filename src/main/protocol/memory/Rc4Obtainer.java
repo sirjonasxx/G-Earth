@@ -35,9 +35,12 @@ public class Rc4Obtainer {
             }
         });
     }
+
+
     public void setIncomingHandler(IncomingHandler handler) {
         incomingHandler = handler;
     }
+
 
     private void onSendFirstEncryptedMessage() {
         outgoingHandler.block();

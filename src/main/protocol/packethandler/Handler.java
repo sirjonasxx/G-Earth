@@ -1,6 +1,7 @@
 package main.protocol.packethandler;
 
 import main.protocol.HMessage;
+import main.protocol.HPacket;
 import main.protocol.TrafficListener;
 import main.protocol.crypto.RC4;
 
@@ -20,8 +21,13 @@ public abstract class Handler {
     volatile boolean isDataStream = false;
     volatile int currentIndex = 0;
 
-    protected RC4 clientcipher = null;
-    protected RC4 servercipher = null;
+    protected final Object lock = new Object();
+
+    protected RC4 decryptcipher = null;
+    protected RC4 encryptcipher = null;
+
+    protected volatile List<Byte> tempEncryptedBuffer = new ArrayList<>();
+    protected volatile boolean isEncryptedStream = false;
 
 
     public Handler(OutputStream outputStream, Object[] listeners) {
@@ -35,10 +41,46 @@ public abstract class Handler {
     }
 
     public abstract void act(byte[] buffer) throws IOException;
+    protected void continuedAct(byte[] buffer) throws IOException {
+        if (!isEncryptedStream) {
+            payloadBuffer.push(buffer);
+        }
+        else if (decryptcipher == null) {
+            for (int i = 0; i < buffer.length; i++) {
+                tempEncryptedBuffer.add(buffer[i]);
+            }
+        }
+        else {
+            byte[] tm = decryptcipher.rc4(buffer);
+            if (DEBUG) {
+                printForDebugging(tm);
+            }
+            payloadBuffer.push(tm);
+        }
+
+        notifyBufferListeners(buffer.length);
+
+        if (!isTempBlocked) {
+            flush();
+        }
+    }
+
 
     public void setRc4(RC4 rc4) {
-        this.clientcipher = rc4.deepCopy();
-        this.servercipher = rc4.deepCopy();
+        this.decryptcipher = rc4.deepCopy();
+        this.encryptcipher = rc4.deepCopy();
+
+        byte[] encrbuffer = new byte[tempEncryptedBuffer.size()];
+        for (int i = 0; i < tempEncryptedBuffer.size(); i++) {
+            encrbuffer[i] = tempEncryptedBuffer.get(i);
+        }
+
+        try {
+            act(encrbuffer);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        tempEncryptedBuffer = null;
     }
 
     public void block() {
@@ -68,9 +110,47 @@ public abstract class Handler {
             listener.onCapture(message);
         }
     }
-    public abstract void sendToStream(byte[] buffer);
 
-    public abstract void flush() throws IOException;
+    public void sendToStream(byte[] buffer) {
+        synchronized (lock) {
+            try {
+                out.write(
+                        (!isEncryptedStream)
+                                ? buffer
+                                : encryptcipher.rc4(buffer)
+                );
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void flush() throws IOException {
+        synchronized (lock) {
+            HPacket[] hpackets = payloadBuffer.receive();
+
+            for (HPacket hpacket : hpackets){
+                HMessage hMessage = new HMessage(hpacket, HMessage.Side.TOCLIENT, currentIndex);
+                boolean isencrypted = isEncryptedStream;
+                if (isDataStream) {
+                    notifyListeners(hMessage);
+                }
+
+                if (!hMessage.isBlocked())	{
+                    out.write(
+                            (!isencrypted)
+                                    ? hMessage.getPacket().toBytes()
+                                    : encryptcipher.rc4(hMessage.getPacket().toBytes())
+                    );
+                }
+                currentIndex++;
+            }
+        }
+    }
+
+    public List<Byte> getEncryptedBuffer() {
+        return tempEncryptedBuffer;
+    }
 
     protected abstract void printForDebugging(byte[] bytes);
 
