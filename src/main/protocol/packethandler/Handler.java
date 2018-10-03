@@ -104,15 +104,12 @@ public abstract class Handler {
      * @param message
      */
     void notifyListeners(HMessage message) {
-        for (TrafficListener listener : (List<TrafficListener>)listeners[0]) {
-            listener.onCapture(message);
+        for (int x = 0; x < 3; x++) {
+            for (int i = ((List<TrafficListener>)listeners[x]).size() - 1; i >= 0; i--) {
+                ((List<TrafficListener>)listeners[x]).get(i).onCapture(message);
+            }
         }
-        for (TrafficListener listener : (List<TrafficListener>)listeners[1]) {
-            listener.onCapture(message);
-        }
-        for (TrafficListener listener : (List<TrafficListener>)listeners[2]) {
-            listener.onCapture(message);
-        }
+
     }
 
     public void sendToStream(byte[] buffer) {

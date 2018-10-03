@@ -10,16 +10,22 @@ import java.util.List;
 
 public class IncomingHandler extends Handler {
 
-    private volatile boolean onlyOnce = true;
     public IncomingHandler(OutputStream outputStream, Object[] listeners) {
         super(outputStream, listeners);
 
-        ((List<TrafficListener>)listeners[0]).add(message -> {
-            if (isDataStream && onlyOnce && (message.getPacket().length() == 261 || message.getPacket().length() == 517)) {
-                onlyOnce = false;
-                isEncryptedStream = message.getPacket().readBoolean(message.getPacket().length() + 3);
+        TrafficListener listener = new TrafficListener() {
+            @Override
+            public void onCapture(HMessage message) {
+                if (isDataStream && message.getPacket().structureEquals("s,b")) {
+                    ((List<TrafficListener>)listeners[0]).remove(this);
+                    HPacket packet = message.getPacket();
+                    packet.readString();
+                    isEncryptedStream = packet.readBoolean();
+                }
             }
-        });
+        };
+
+        ((List<TrafficListener>)listeners[0]).add(listener);
     }
 
     @Override
