@@ -109,7 +109,6 @@ public abstract class Handler {
                 ((List<TrafficListener>)listeners[x]).get(i).onCapture(message);
             }
         }
-
     }
 
     public void sendToStream(byte[] buffer) {
