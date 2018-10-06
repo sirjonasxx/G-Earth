@@ -87,6 +87,17 @@ public class HConnection {
                 }
             }
         }
+
+        if (OSValidator.isMac()) {
+            for (int i = 2; i < 255; i++) {
+                ProcessBuilder allowLocalHost = new ProcessBuilder("ifconfig", "lo0", "alias", ("127.0.0." + i), "up");
+                try {
+                    allowLocalHost.start();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
 
@@ -196,12 +207,6 @@ public class HConnection {
                 if (actual_domain.get(i) == null) continue;
 
                 String hostAdress = "127.0.0." + (i+1);
-
-                if (i > 0 && OSValidator.isMac()) {
-                    ProcessBuilder allowLocalHost = new ProcessBuilder("ifconfig", "lo0", "alias", hostAdress, "up");
-                    allowLocalHost.start();
-                }
-
                 ServerSocket proxy;
                 try {
                     proxy = new ServerSocket(port.get(i), 10, InetAddress.getByName(hostAdress));
