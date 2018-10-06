@@ -1,6 +1,7 @@
 package main.protocol;
 
 import main.misc.Cacher;
+import main.misc.OSValidator;
 import main.protocol.hostreplacer.HostReplacer;
 import main.protocol.hostreplacer.HostReplacerFactory;
 import main.protocol.memory.Rc4Obtainer;
@@ -194,12 +195,18 @@ public class HConnection {
             for (int i = 0; i < actual_domain.size(); i++) {
                 if (actual_domain.get(i) == null) continue;
 
+                String hostAdress = "127.0.0." + (i+1);
+
+                if (i > 0 && OSValidator.isMac()) {
+                    ProcessBuilder allowLocalHost = new ProcessBuilder("ifconfig", "lo0", "alias", hostAdress, "up");
+                }
+
                 ServerSocket proxy;
                 try {
-                    proxy = new ServerSocket(port.get(i), 10, InetAddress.getByName("127.0.0." + (i+1)));
+                    proxy = new ServerSocket(port.get(i), 10, InetAddress.getByName(hostAdress));
                 }
                 catch (IOException e) {
-                    System.err.println("Could not setup proxy server for " + input_domain.get(i)+ " on " + "127.0.0." + (i+1) + ":" + port.get(i));
+                    System.err.println("Could not setup proxy server for " + input_domain.get(i)+ " on " + hostAdress + ":" + port.get(i));
                     continue;
                 }
 
