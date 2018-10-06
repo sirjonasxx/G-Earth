@@ -199,6 +199,7 @@ public class HConnection {
 
                 if (i > 0 && OSValidator.isMac()) {
                     ProcessBuilder allowLocalHost = new ProcessBuilder("ifconfig", "lo0", "alias", hostAdress, "up");
+                    allowLocalHost.start();
                 }
 
                 ServerSocket proxy;
