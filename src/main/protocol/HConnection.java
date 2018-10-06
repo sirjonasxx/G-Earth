@@ -89,7 +89,7 @@ public class HConnection {
         }
 
         if (OSValidator.isMac()) {
-            for (int i = 2; i < 255; i++) {
+            for (int i = 2; i <= autoDetectHosts.size(); i++) {
                 ProcessBuilder allowLocalHost = new ProcessBuilder("ifconfig", "lo0", "alias", ("127.0.0." + i), "up");
                 try {
                     allowLocalHost.start();
