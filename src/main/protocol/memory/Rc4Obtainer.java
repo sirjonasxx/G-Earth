@@ -12,6 +12,7 @@ import main.protocol.packethandler.IncomingHandler;
 import main.protocol.packethandler.OutgoingHandler;
 import main.protocol.packethandler.PayloadBuffer;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -23,7 +24,7 @@ public class Rc4Obtainer {
     OutgoingHandler outgoingHandler = null;
     IncomingHandler incomingHandler = null;
 
-    public Rc4Obtainer(HConnection hConnection) {
+    public Rc4Obtainer(HConnection hConnection) throws IOException {
         client = HabboClientFactory.get(hConnection);
     }
 
