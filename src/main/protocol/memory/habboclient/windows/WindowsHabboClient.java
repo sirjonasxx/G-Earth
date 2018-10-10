@@ -224,12 +224,13 @@ public class WindowsHabboClient extends HabboClient {
         System.out.println("Getting Win Possibilities");
         List<byte[]> result = new ArrayList<>();
         try {
+            Thread.sleep(3000);
             ArrayList<String> possibleData = readPossibleBytes();
 
             for (String possibleHexStr : possibleData) {
                 result.add(DatatypeConverter.parseHexBinary(possibleHexStr));
             }
-        } catch (IOException | URISyntaxException e) {
+        } catch (IOException | URISyntaxException | InterruptedException e) {
             e.printStackTrace();
         }
         return result;
