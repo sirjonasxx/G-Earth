@@ -17,11 +17,15 @@ import com.sun.jna.win32.StdCallLibrary;
 import main.protocol.HConnection;
 import main.protocol.memory.habboclient.HabboClient;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import javax.xml.bind.DatatypeConverter;
+import java.io.*;
 import java.lang.reflect.Array;
-import java.util.*;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+
 
 /**
  * Created by Jeunez on 27/06/2018.
@@ -197,8 +201,40 @@ public class WindowsHabboClient extends HabboClient {
         }
     }
 
+    private ArrayList<String> readPossibleBytes() throws IOException, URISyntaxException {
+        ProcessBuilder pb = new ProcessBuilder(new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI()).getParent() + "\\G-WinMem.exe");
+        Process p = pb.start();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+
+        String line;
+        ArrayList<String> possibleData = new ArrayList<>();
+
+        while((line = reader.readLine()) !=  null) {
+            if (line.length() > 1) {
+                possibleData.add(line);
+                System.out.println(line);
+            }
+        }
+        p.destroy();
+        return possibleData;
+    }
+
     @Override
     public List<byte[]> getRC4possibilities() {
+        System.out.println("Getting Win Possibilities");
+        List<byte[]> result = new ArrayList<>();
+        try {
+            ArrayList<String> possibleData = readPossibleBytes();
+
+            for (String possibleHexStr : possibleData) {
+                result.add(DatatypeConverter.parseHexBinary(possibleHexStr));
+            }
+        } catch (IOException | URISyntaxException e) {
+            e.printStackTrace();
+        }
+        return result;
+
+        /*
 
         enableDebugPrivilege();
         obtain_PIDs();
@@ -230,6 +266,7 @@ public class WindowsHabboClient extends HabboClient {
         }
 
         return possibilities;
+        */
     }
 
     public List<byte[]> getRC4possibilities(int processID, int processMemorySize) {
