@@ -1,4 +1,0 @@
-﻿  stdafx.cpp
-  G-WinMem.cpp
-c:\users\jeunez\g-earth\g-winmem\g-winmem\g-winmem.cpp(119): warning C4244: 'argument': conversion from 'DWORD' to 'u_short', possible loss of data
-  G-WinMem.vcxproj -> C:\Users\Jeunez\G-Earth\G-WinMem\x64\Debug\G-WinMem.exe
