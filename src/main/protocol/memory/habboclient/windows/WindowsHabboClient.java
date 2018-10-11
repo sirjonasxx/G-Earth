@@ -31,7 +31,6 @@ public class WindowsHabboClient extends HabboClient {
         while((line = reader.readLine()) !=  null) {
             if (line.length() > 1) {
                 possibleData.add(line);
-                System.out.println(line);
             }
         }
         p.destroy();
@@ -42,13 +41,12 @@ public class WindowsHabboClient extends HabboClient {
     public List<byte[]> getRC4possibilities() {
         List<byte[]> result = new ArrayList<>();
         try {
-            Thread.sleep(3000);
             ArrayList<String> possibleData = readPossibleBytes();
 
             for (String possibleHexStr : possibleData) {
                 result.add(DatatypeConverter.parseHexBinary(possibleHexStr));
             }
-        } catch (IOException | URISyntaxException | InterruptedException e) {
+        } catch (IOException | URISyntaxException e) {
             e.printStackTrace();
         }
         return result;
