@@ -19,7 +19,7 @@ public class Info extends SubForm {
                 "Made by:",
                 "sirjonasxx",
                 "",
-                "Contributers:",
+                "Contributors:",
                 "XePeleato (Windows & Mac support)",
                 "LittleJ",
                 "ArachisH",
