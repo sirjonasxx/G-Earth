@@ -3,7 +3,6 @@ package main.protocol.memory.habboclient.windows;
 import main.protocol.HConnection;
 import main.protocol.memory.habboclient.HabboClient;
 
-import javax.xml.bind.DatatypeConverter;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -44,11 +43,21 @@ public class WindowsHabboClient extends HabboClient {
             ArrayList<String> possibleData = readPossibleBytes();
 
             for (String possibleHexStr : possibleData) {
-                result.add(DatatypeConverter.parseHexBinary(possibleHexStr));
+                result.add(hexStringToByteArray(possibleHexStr));
             }
         } catch (IOException | URISyntaxException e) {
             e.printStackTrace();
         }
         return result;
+    }
+    
+    public static byte[] hexStringToByteArray(String s) {
+        int len = s.length();
+        byte[] data = new byte[len / 2];
+        for (int i = 0; i < len; i += 2) {
+            data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
+                    + Character.digit(s.charAt(i+1), 16));
+        }
+        return data;
     }
 }
