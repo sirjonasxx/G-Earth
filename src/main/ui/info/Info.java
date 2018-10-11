@@ -9,6 +9,7 @@ import main.ui.SubForm;
 public class Info extends SubForm {
     public TextArea text;
 
+    // this is a TEMPORARY info tab
 
     public void initialize() {
         String[] lines = {
@@ -18,7 +19,8 @@ public class Info extends SubForm {
                 "Made by:",
                 "sirjonasxx",
                 "",
-                "Special thanks to:",
+                "Contributors:",
+                "XePeleato (Windows & Mac support)",
                 "LittleJ",
                 "ArachisH",
                 "",
