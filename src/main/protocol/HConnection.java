@@ -265,7 +265,7 @@ public class HConnection {
 
                         handler.act(buffer);
                         if (!datastream[0] && handler.isDataStream())	{
-                            clientHostAndPort = client.getInetAddress().getHostAddress() + ":" + client.getPort();
+                            clientHostAndPort = client.getLocalAddress().getHostAddress() + ":" + client.getPort();
                             if (DEBUG) System.out.println(clientHostAndPort);
                             datastream[0] = true;
                             setState(State.CONNECTED);
