@@ -146,10 +146,22 @@ public class LinuxHabboClient extends HabboClient {
         for (LinuxMemorySnippet snippet : possibilities) {
             if (snippet.getData().length >= 1024 && snippet.getData().length <= 1024+2*offset) {
                 for (int i = 0; i < (snippet.getData().length - ((256 - 1) * offset)); i+=offset) {
-                    byte[] wannabeRC4data = Arrays.copyOfRange(snippet.getData(), i, 1025 + i);
+                    byte[] wannabeRC4data = Arrays.copyOfRange(snippet.getData(), i, 1024 + i);
                     byte[] data = new byte[256]; // dis is the friggin key
-                    for (int j = 0; j < 256; j++) data[j] = wannabeRC4data[j*4];
-                    resultSet.add(data);
+
+                    boolean isvalid = true;
+                    for (int j = 0; j < 1024; j++) {
+                        if (j % 4 != 0 && wannabeRC4data[j] != 0) {
+                            isvalid = false;
+                            break;
+                        }
+                        if (j % 4 == 0) {
+                            data[j/4] = wannabeRC4data[j];
+                        }
+                    }
+                    if (isvalid) {
+                        resultSet.add(data);
+                    }
                 }
             }
         }

@@ -203,4 +203,8 @@ public class RC4 {
         }
 
     }
+
+    public byte[] getState () {
+        return state;
+    }
 }

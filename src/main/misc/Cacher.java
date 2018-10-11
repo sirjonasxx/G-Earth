@@ -1,5 +1,6 @@
 package main.misc;
 
+import main.Main;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -17,10 +18,10 @@ import java.util.Map;
  */
 public class Cacher {
 
-    private static final String CACHEFILENAME = "jsoncache.json";
+    private static final String CACHEFILENAME = "cache.json";
 
     private static String getCacheDir() {
-        return System.getProperty("user.home") + File.separator + ".G-Earth" + File.separator;
+        return new File(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParent();
     }
 
     private static boolean cacheFileExists() {

@@ -3,6 +3,9 @@ package main.extensions.examples.blockreplacepackets;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import main.extensions.ExtensionForm;
 import main.extensions.ExtensionInfo;
@@ -23,9 +26,20 @@ import java.net.URL;
 )
 public class BlockAndReplacePackets extends ExtensionForm {
 
+    public TextField txt_replacement;
+    public ComboBox<String> cmb_type;
+    public TextField txt_id;
+    public Button btn_add;
+
     public static void main(String[] args) {
         ExtensionForm.args = args;
         launch(args);
+    }
+
+    //initialize javaFX elements
+    public void initialize() {
+        cmb_type.getItems().addAll("Block OUT", "Block IN", "Replace OUT", "Replace IN");
+        cmb_type.getSelectionModel().selectFirst();
     }
 
     @Override
@@ -38,7 +52,8 @@ public class BlockAndReplacePackets extends ExtensionForm {
         FXMLLoader loader = new FXMLLoader(BlockAndReplacePackets.class.getResource("blockreplace.fxml"));
         Parent root = loader.load();
 
-        primaryStage.setTitle("Packet blocker and replacer");
-        primaryStage.setScene(new Scene(root, 565, 262));
+        primaryStage.setTitle("Packet blocker &/ replacer");
+        primaryStage.setScene(new Scene(root, 580, 262));
+        primaryStage.getScene().getStylesheets().add(GEarthController.class.getResource("bootstrap3.css").toExternalForm());
     }
 }

@@ -185,6 +185,46 @@ public class HPacket implements StringifyAble {
         return new byte[0];
     }
 
+    public boolean structureEquals(String structure) {
+        if (isCorrupted()) return false;
+
+        int indexbuffer = readIndex;
+        readIndex = 6;
+
+        String[] split = structure.split(",");
+
+        for (int i = 0; i < split.length; i++) {
+            String s = split[i];
+
+            if (s.equals("s")) {
+                if (readUshort(readIndex) + 2 + readIndex > getBytesLength()) return false;
+                readString();
+            }
+            else if (s.equals("i")) {
+                if (readIndex + 4 > getBytesLength()) return false;
+                readInteger();
+            }
+            else if (s.equals("u")) {
+                if (readIndex + 2 > getBytesLength()) return false;
+                readUshort();
+            }
+            else if (s.equals("b")) {
+                if (readIndex + 1 > getBytesLength()) return false;
+                readBoolean();
+            }
+        }
+
+        boolean result = (isEOF() == 1);
+        readIndex = indexbuffer;
+        return result;
+    }
+
+    public int isEOF() {
+        if (readIndex < getBytesLength()) return 0;
+        if (readIndex == getBytesLength()) return 1;
+        return 2;
+    }
+
     public byte[] toBytes()		{
         return packetInBytes;
     }
@@ -800,34 +840,5 @@ public class HPacket implements StringifyAble {
     }
 
     public static void main(String[] args) {
-//        HPacket packet = new HPacket("{l}{u:500}{i:4}{s:heey}{b:false}");
-//        System.out.println(packet);
-//
-//        String stringified = packet.stringify();
-//        System.out.println("stringified: " + stringified);
-//        System.out.println(stringified.length());
-//
-//
-//        HPacket packet1 = new HPacket(new byte[0]);
-//        packet1.constructFromString(stringified);
-//
-//        System.out.println(packet1);
-//        System.out.println(packet.equals(packet1));
-
-        HPacket packet = new HPacket(555);
-        for (int i = -128; i < 128; i++) {
-            packet.appendByte((byte)i);
-        }
-        System.out.println(packet);
-
-        String stringified = packet.stringify();
-        System.out.println(stringified.length());
-
-
-        HPacket packet1 = new HPacket(new byte[0]);
-        packet1.constructFromString(stringified);
-
-        System.out.println(packet1);
-        System.out.println(packet.equals(packet1));
     }
 }
