@@ -22,7 +22,7 @@ public class IncomingHandler extends Handler {
                     packet.readString();
                     isEncryptedStream = packet.readBoolean();
                 }
-                else if (message.getIndex() > 5) {
+                else if (message.getIndex() > 3) {
                     ((List<TrafficListener>)listeners[0]).remove(this);
                 }
             }
