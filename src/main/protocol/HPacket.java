@@ -197,7 +197,7 @@ public class HPacket implements StringifyAble {
             String s = split[i];
 
             if (s.equals("s")) {
-                if (readUshort(readIndex) + 2 + readIndex > getBytesLength()) return false;
+                if (readIndex + 2 > getBytesLength() || readUshort(readIndex) + 2 + readIndex > getBytesLength()) return false;
                 readString();
             }
             else if (s.equals("i")) {
@@ -840,5 +840,9 @@ public class HPacket implements StringifyAble {
     }
 
     public static void main(String[] args) {
+        HPacket packet = new HPacket("{l}{u:1442}");
+
+        System.out.println(packet.structureEquals("s,b"));
+
     }
 }
