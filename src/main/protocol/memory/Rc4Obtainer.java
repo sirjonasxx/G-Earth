@@ -58,51 +58,60 @@ public class Rc4Obtainer {
 
             if (DEBUG) System.out.println("[+] send encrypted");
 
-            List<byte[]> results = client.getRC4possibilities();
-            outerloop:
-            for (byte[] possible : results) {
+            List<byte[]> cached = client.getRC4cached();
+            boolean worked = onSendFirstEncryptedMessage(handler, cached);
 
-                byte[] encBuffer = new byte[handler.getEncryptedBuffer().size()];
-                for (int i = 0; i < encBuffer.length; i++) {
-                    encBuffer[i] = handler.getEncryptedBuffer().get(i);
+            if (!worked) {
+                worked = onSendFirstEncryptedMessage(handler, client.getRC4possibilities());
+                if (!worked) {
+                    System.err.println("COULD NOT FIND RC4 TABLE");
                 }
-
-                for (int i = 0; i < 256; i++) {
-                    for (int j = 0; j < 256; j++) {
-                        byte[] keycpy = Arrays.copyOf(possible, possible.length);
-                        RC4 rc4Tryout = new RC4(keycpy, i, j);
-
-                        if (handler.getMessageSide() == HMessage.Side.TOSERVER) rc4Tryout.undoRc4(encBuffer);
-                        if (rc4Tryout.couldBeFresh()) {
-                            byte[] encDataCopy = Arrays.copyOf(encBuffer, encBuffer.length);
-                            RC4 rc4TryCopy = rc4Tryout.deepCopy();
-
-                            try {
-                                PayloadBuffer payloadBuffer = new PayloadBuffer();
-                                byte[] decoded = rc4TryCopy.rc4(encDataCopy);
-                                HPacket[] checker = payloadBuffer.pushAndReceive(decoded);
-
-                                if (payloadBuffer.peak().length == 0) {
-                                    handler.setRc4(rc4Tryout);
-                                    break outerloop;
-                                }
-
-                            }
-                            catch (Exception e) {
-//                                e.printStackTrace();
-                            }
-
-                        }
-
-                    }
-                }
-                
-
             }
-            
+
+
 
             incomingHandler.unblock();
             outgoingHandler.unblock();
         }).start();
+    }
+
+    private boolean onSendFirstEncryptedMessage(Handler handler, List<byte[]> potentialRC4tables) {
+        for (byte[] possible : potentialRC4tables) {
+
+            byte[] encBuffer = new byte[handler.getEncryptedBuffer().size()];
+            for (int i = 0; i < encBuffer.length; i++) {
+                encBuffer[i] = handler.getEncryptedBuffer().get(i);
+            }
+
+            for (int i = 0; i < 256; i++) {
+                for (int j = 0; j < 256; j++) {
+                    byte[] keycpy = Arrays.copyOf(possible, possible.length);
+                    RC4 rc4Tryout = new RC4(keycpy, i, j);
+
+                    if (handler.getMessageSide() == HMessage.Side.TOSERVER) rc4Tryout.undoRc4(encBuffer);
+                    if (rc4Tryout.couldBeFresh()) {
+                        byte[] encDataCopy = Arrays.copyOf(encBuffer, encBuffer.length);
+                        RC4 rc4TryCopy = rc4Tryout.deepCopy();
+
+                        try {
+                            PayloadBuffer payloadBuffer = new PayloadBuffer();
+                            byte[] decoded = rc4TryCopy.rc4(encDataCopy);
+                            HPacket[] checker = payloadBuffer.pushAndReceive(decoded);
+
+                            if (payloadBuffer.peak().length == 0) {
+                                handler.setRc4(rc4Tryout);
+                                return true;
+                            }
+
+                        } catch (Exception e) {
+//                                e.printStackTrace();
+                        }
+
+                    }
+
+                }
+            }
+        }
+        return false;
     }
 }
