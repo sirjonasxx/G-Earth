@@ -106,9 +106,11 @@ public abstract class Handler {
     void notifyListeners(HMessage message) {
         for (int x = 0; x < 3; x++) {
             for (int i = ((List<TrafficListener>)listeners[x]).size() - 1; i >= 0; i--) {
+                message.getPacket().resetReadIndex();
                 ((List<TrafficListener>)listeners[x]).get(i).onCapture(message);
             }
         }
+        message.getPacket().resetReadIndex();
     }
 
     public void sendToStream(byte[] buffer) {

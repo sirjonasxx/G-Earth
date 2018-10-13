@@ -235,6 +235,9 @@ public class HPacket implements StringifyAble {
     public void setReadIndex(int number)	{
         readIndex = number;
     }
+    public void resetReadIndex() {
+        setReadIndex(6);
+    }
 
     public boolean isCorrupted()	{
 

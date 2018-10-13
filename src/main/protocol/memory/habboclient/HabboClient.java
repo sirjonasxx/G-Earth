@@ -15,5 +15,8 @@ public abstract class HabboClient {
         this.hConnection = connection;
     }
 
+    // optional
+    public abstract List<byte[]> getRC4cached();
+
     public abstract List<byte[]> getRC4possibilities();
 }

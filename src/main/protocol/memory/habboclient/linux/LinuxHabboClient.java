@@ -48,6 +48,11 @@ public class LinuxHabboClient extends HabboClient {
         if (DEBUG) System.out.println("* Found flashclient process: " + PID);
     }
 
+    @Override
+    public List<byte[]> getRC4cached() {
+        return new ArrayList<>();
+    }
+
 
     private void refreshMemoryMaps() {
         String filename = "/proc/"+this.PID+"/maps";

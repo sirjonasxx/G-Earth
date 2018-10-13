@@ -37,6 +37,11 @@ public class WindowsHabboClient extends HabboClient {
     }
 
     @Override
+    public List<byte[]> getRC4cached() {
+        return new ArrayList<>();
+    }
+
+    @Override
     public List<byte[]> getRC4possibilities() {
         List<byte[]> result = new ArrayList<>();
         try {
