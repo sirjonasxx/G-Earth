@@ -31,6 +31,10 @@ public class WindowsHabboClient extends HabboClient {
     private static final int PRODUCTIONID = 4000;
     private String production = "";
 
+    private String getOffsetsCacheKey() {
+        return production + "-RC4Offsets";
+    }
+
     @Override
     public List<byte[]> getRC4cached() {
         List<byte[]> result = new ArrayList<>();
@@ -50,7 +54,7 @@ public class WindowsHabboClient extends HabboClient {
 
     private ArrayList<String> readPossibleBytes(boolean useCache) throws IOException, URISyntaxException {
         ProcessBuilder pb = null;
-        List<String> cachedOffsets = (List<String>) Cacher.get("RC4Offsets");
+        List<String> cachedOffsets = (List<String>) Cacher.get(getOffsetsCacheKey());
         StringJoiner joiner = new StringJoiner(" ");
 
         if (useCache) {
@@ -75,19 +79,24 @@ public class WindowsHabboClient extends HabboClient {
         String line;
         ArrayList<String> possibleData = new ArrayList<>();
 
-        cachedOffsets = new ArrayList<>();
+        if (cachedOffsets == null) {
+            cachedOffsets = new ArrayList<>();
+        }
+
 
         int count = 0;
         while((line = reader.readLine()) !=  null) {
             if (line.length() > 1) {
                 if (!useCache && (count++ % 2 == 0)) {
-                    cachedOffsets.add(line);
+                    if (!cachedOffsets.contains(line)) {
+                        cachedOffsets.add(line);
+                    }
                 }
                 else
                     possibleData.add(line);
             }
         }
-        Cacher.put("RC4Offsets", cachedOffsets);
+        Cacher.put(getOffsetsCacheKey(), cachedOffsets);
         p.destroy();
         return possibleData;
     }
