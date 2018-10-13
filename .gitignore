@@ -1,5 +1,9 @@
 .idea/
 out/
 G-Earth2.iml
+/G-WinMem/.vs
+/G-WinMem/x64
+/G-WinMem/G-WinMem/x64
 /Extensions/
 G-Earth.iml
+/G-EarthWindows.iml
