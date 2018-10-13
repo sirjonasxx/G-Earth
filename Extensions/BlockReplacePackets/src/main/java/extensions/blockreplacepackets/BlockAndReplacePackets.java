@@ -1,5 +1,6 @@
 package extensions.blockreplacepackets;
 
+import gearth.ui.GEarthController;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -9,7 +10,6 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import gearth.extensions.ExtensionForm;
 import gearth.extensions.ExtensionInfo;
-import gearth.ui.GEarthController;
 
 /**
  * Created by Jonas on 22/09/18.
@@ -52,6 +52,6 @@ public class BlockAndReplacePackets extends ExtensionForm {
 
         primaryStage.setTitle("Packet blocker &/ replacer");
         primaryStage.setScene(new Scene(root, 580, 262));
-        primaryStage.getScene().getStylesheets().add(GEarthController.class.getResource("/gearth/ui/bootstrap3.css").toExternalForm());
+        primaryStage.getScene().getStylesheets().add(GEarthController.class.getResource("bootstrap3.css").toExternalForm());
     }
 }
