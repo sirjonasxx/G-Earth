@@ -41,7 +41,7 @@ void Process::PrintCachedResults(std::vector<u_char *> cache)
 
 		if (!ReadProcessMemory(mHandle, addr, rawMem, 1024, nullptr))
 		{
-			std::cout << "Failed to read memory at " << addr << std::endl;
+			std::cerr << "Failed to read memory at " << addr << std::endl;
 			return;
 		}
 
@@ -147,7 +147,7 @@ void Process::CreateMapFromChunk(MemoryChunk *chunk)
 
 	if (!ReadProcessMemory(mHandle, chunk->mStart, dump, chunk->mSize, nullptr))
 	{
-		std::cout << "Failed to read memory at: " << chunk->mStart << std::endl;
+		std::cerr << "Failed to read memory at: " << chunk->mStart << std::endl;
 		return;
 	}
 
@@ -240,7 +240,7 @@ void Process::FindMaps(SYSTEM_INFO sys_info)
 
 	while (addr < end) {
 		if (!VirtualQueryEx(mHandle, reinterpret_cast<LPCVOID>(addr), &mbi, sizeof(mbi))) {
-			std::cout << "Failed to get memory maps\n";
+			std::cerr << "Failed to get memory maps\n";
 			return;
 		}
 
