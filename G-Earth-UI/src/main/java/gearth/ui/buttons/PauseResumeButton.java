@@ -32,10 +32,10 @@ public class PauseResumeButton extends StackPane{
     public PauseResumeButton(boolean isPaused) {
         this.isPaused[0] = isPaused;
 
-        this.imagePause = new Image(getClass().getResourceAsStream("files"+ File.separator+"ButtonPause.png"));
-        this.imagePauseOnHover = new Image(getClass().getResourceAsStream("files"+ File.separator+"ButtonPauseHover.png"));
-        this.imageResume = new Image(getClass().getResourceAsStream("files"+ File.separator+"ButtonResume.png"));
-        this.imageResumeOnHover = new Image(getClass().getResourceAsStream("files"+ File.separator+"ButtonResumeHover.png"));
+        this.imagePause = new Image(getClass().getResourceAsStream("files/ButtonPause.png"));
+        this.imagePauseOnHover = new Image(getClass().getResourceAsStream("files/ButtonPauseHover.png"));
+        this.imageResume = new Image(getClass().getResourceAsStream("files/ButtonResume.png"));
+        this.imageResumeOnHover = new Image(getClass().getResourceAsStream("files/ButtonResumeHover.png"));
         this.imageView = new ImageView();
 
         setCursor(Cursor.DEFAULT);
