@@ -5,6 +5,7 @@ import main.protocol.HConnection;
 import main.protocol.HMessage;
 import main.protocol.TrafficListener;
 import main.protocol.memory.habboclient.HabboClient;
+import org.json.simple.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -32,7 +33,11 @@ public class WindowsHabboClient extends HabboClient {
     private String production = "";
 
     private String getOffsetsCacheKey() {
-        return production + "-RC4Offsets";
+        return "RC4Offsets";
+    }
+
+    private String getOffsetsRevision() {
+        return production;
     }
 
     @Override
@@ -54,7 +59,14 @@ public class WindowsHabboClient extends HabboClient {
 
     private ArrayList<String> readPossibleBytes(boolean useCache) throws IOException, URISyntaxException {
         ProcessBuilder pb = null;
-        List<String> cachedOffsets = (List<String>) Cacher.get(getOffsetsCacheKey());
+        JSONObject revisionList = (JSONObject) Cacher.get(getOffsetsCacheKey());
+
+        if (revisionList == null) {
+            Cacher.put(getOffsetsCacheKey(), new JSONObject());
+            revisionList = (JSONObject) Cacher.get(getOffsetsCacheKey()); // refresh
+        }
+
+        List<String> cachedOffsets = (List<String>) revisionList.get(getOffsetsRevision());
         StringJoiner joiner = new StringJoiner(" ");
 
         if (useCache) {
@@ -96,7 +108,8 @@ public class WindowsHabboClient extends HabboClient {
                     possibleData.add(line);
             }
         }
-        Cacher.put(getOffsetsCacheKey(), cachedOffsets);
+        revisionList.put(getOffsetsRevision(), cachedOffsets);
+        Cacher.put(getOffsetsCacheKey(), revisionList);
         p.destroy();
         return possibleData;
     }
