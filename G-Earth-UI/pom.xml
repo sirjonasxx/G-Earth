@@ -42,20 +42,20 @@
             </plugin>
 
             <!-- this would copy dependencies if we were building a non-standalone JAR -->
-            <!--<plugin>-->
-            <!--<artifactId>maven-dependency-plugin</artifactId>-->
-            <!--<executions>-->
-            <!--<execution>-->
-            <!--<phase>package</phase>-->
-            <!--<goals>-->
-            <!--<goal>copy-dependencies</goal>-->
-            <!--</goals>-->
-            <!--<configuration>-->
-            <!--<outputDirectory>${project.build.directory}/bin/lib</outputDirectory>-->
-            <!--</configuration>-->
-            <!--</execution>-->
-            <!--</executions>-->
-            <!--</plugin>-->
+            <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/bin/lib</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
 
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
@@ -80,24 +80,23 @@
             </plugin>
 
             <!-- this builds a non-standalone JAR file -->
-            <!--<plugin>-->
-            <!--<groupId>org.apache.maven.plugins</groupId>-->
-            <!--<artifactId>maven-jar-plugin</artifactId>-->
-            <!--<version>2.5</version>-->
-            <!--<configuration>-->
-            <!--<outputDirectory>${project.build.directory}/bin</outputDirectory>-->
-            <!--<archive>-->
-            <!--<manifest>-->
-            <!--<addDefaultImplementationEntries>true</addDefaultImplementationEntries>-->
-            <!--<addClasspath>true</addClasspath>-->
-            <!--<mainClass>main.Main</mainClass>-->
-            <!--<useUniqueVersions>false</useUniqueVersions>-->
-            <!--<classpathPrefix>lib/</classpathPrefix>-->
-            <!--<addDefaultImplementationEntries>true</addDefaultImplementationEntries>-->
-            <!--</manifest>-->
-            <!--</archive>-->
-            <!--</configuration>-->
-            <!--</plugin>-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.5</version>
+                <configuration>
+                    <outputDirectory>${project.build.directory}/bin</outputDirectory>
+                    <archive>
+                        <manifest>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>lib/</classpathPrefix>
+                            <mainClass>gearth.Main</mainClass>
+                            <useUniqueVersions>false</useUniqueVersions>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
 
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -110,14 +109,17 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <outputDirectory>${project.parent.basedir}/bin</outputDirectory>
                     <archive>
                         <manifest>
-                            <mainClass>main.Main</mainClass>
+                            <mainClass>gearth.Main</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
+                    <finalName>G-Earth-${project.version}</finalName>
+                    <appendAssemblyId>false</appendAssemblyId>
                 </configuration>
             </plugin>
         </plugins>
