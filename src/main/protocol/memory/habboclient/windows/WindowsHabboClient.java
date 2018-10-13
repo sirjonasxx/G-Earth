@@ -1,5 +1,6 @@
 package main.protocol.memory.habboclient.windows;
 
+import main.misc.Cacher;
 import main.protocol.HConnection;
 import main.protocol.HMessage;
 import main.protocol.TrafficListener;
@@ -32,22 +33,61 @@ public class WindowsHabboClient extends HabboClient {
 
     @Override
     public List<byte[]> getRC4cached() {
-        return new ArrayList<>();
+        List<byte[]> result = new ArrayList<>();
+        try {
+            List<String> possibleResults = readPossibleBytes(true);
+
+            if (possibleResults == null)
+                return new ArrayList<>();
+
+            for (String s : possibleResults)
+                result.add(hexStringToByteArray(s));
+        } catch (IOException | URISyntaxException e) {
+            e.printStackTrace();
+        }
+        return result;
     }
 
-    private ArrayList<String> readPossibleBytes() throws IOException, URISyntaxException {
-        ProcessBuilder pb = new ProcessBuilder(new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI()).getParent() + "\\G-WinMem.exe", hConnection.getClientHostAndPort().substring(0, hConnection.getClientHostAndPort().indexOf(':')) , Integer.toString(hConnection.getPort()));
+    private ArrayList<String> readPossibleBytes(boolean useCache) throws IOException, URISyntaxException {
+        ProcessBuilder pb = null;
+        List<String> cachedOffsets = (List<String>) Cacher.get("RC4Offsets");
+        StringJoiner joiner = new StringJoiner(" ");
+
+        if (useCache) {
+            if (cachedOffsets == null) {
+                return null;
+            }
+
+            for (String s : cachedOffsets) {
+                joiner.add(s);
+            }
+        }
+
+        if (!useCache)
+            pb = new ProcessBuilder(new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI()).getParent() + "\\G-WinMem.exe", hConnection.getClientHostAndPort().substring(0, hConnection.getClientHostAndPort().indexOf(':')) , Integer.toString(hConnection.getPort()));
+        else
+            pb = new ProcessBuilder(new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI()).getParent() + "\\G-WinMem.exe", hConnection.getClientHostAndPort().substring(0, hConnection.getClientHostAndPort().indexOf(':')) , Integer.toString(hConnection.getPort()), "-c" + joiner.toString());
+
+
         Process p = pb.start();
         BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
 
         String line;
         ArrayList<String> possibleData = new ArrayList<>();
 
+        cachedOffsets = new ArrayList<>();
+
+        int count = 0;
         while((line = reader.readLine()) !=  null) {
             if (line.length() > 1) {
-                possibleData.add(line);
+                if (!useCache && (count++ % 2 == 0)) {
+                    cachedOffsets.add(line);
+                }
+                else
+                    possibleData.add(line);
             }
         }
+        Cacher.put("RC4Offsets", cachedOffsets);
         p.destroy();
         return possibleData;
     }
@@ -56,7 +96,7 @@ public class WindowsHabboClient extends HabboClient {
     public List<byte[]> getRC4possibilities() {
         List<byte[]> result = new ArrayList<>();
         try {
-            ArrayList<String> possibleData = readPossibleBytes();
+            ArrayList<String> possibleData = readPossibleBytes(false);
 
             for (String possibleHexStr : possibleData) {
                 result.add(hexStringToByteArray(possibleHexStr));
