@@ -21,6 +21,7 @@ public class Info extends SubForm {
                 "",
                 "Contributors:",
                 "XePeleato (Windows & Mac support)",
+                "Scott Stamp",
                 "LittleJ",
                 "ArachisH",
                 "",
@@ -29,14 +30,14 @@ public class Info extends SubForm {
                 "darkbox.nl"
         };
 
-        String all = lines[0];
+        StringBuilder all = new StringBuilder(lines[0]);
         for (int i = 1; i < lines.length; i++) {
-            all += (System.lineSeparator() + lines[i]);
+            all.append(System.lineSeparator()).append(lines[i]);
         }
 
 
         text.setText(
-              all
+                all.toString()
         );
     }
 }

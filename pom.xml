@@ -7,7 +7,7 @@
     <groupId>G-Earth</groupId>
     <artifactId>G-Earth-Parent</artifactId>
     <packaging>pom</packaging>
-    <version>0.0.1-beta</version>
+    <version>0.1.2-beta</version>
 
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
@@ -16,7 +16,7 @@
 
     <name>G-Earth</name>
     <url>https://github.com/sirjonasxx/G-Earth</url>
-    <description></description>
+    <description>Cross Platform Habbo packetlogger/manipulator</description>
 
     <modules>
         <module>G-Earth-UI</module>
