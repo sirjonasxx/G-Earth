@@ -1,6 +1,8 @@
 package main.protocol.memory.habboclient.windows;
 
 import main.protocol.HConnection;
+import main.protocol.HMessage;
+import main.protocol.TrafficListener;
 import main.protocol.memory.habboclient.HabboClient;
 
 import java.io.BufferedReader;
@@ -17,6 +19,20 @@ import java.util.*;
 public class WindowsHabboClient extends HabboClient {
     public WindowsHabboClient(HConnection connection) {
         super(connection);
+
+        connection.addTrafficListener(0, message -> {
+            if (message.getDestination() == HMessage.Side.TOSERVER && message.getPacket().headerId() == PRODUCTIONID) {
+                production = message.getPacket().readString();
+            }
+        });
+    }
+
+    private static final int PRODUCTIONID = 4000;
+    private String production = "";
+
+    @Override
+    public List<byte[]> getRC4cached() {
+        return new ArrayList<>();
     }
 
     private ArrayList<String> readPossibleBytes() throws IOException, URISyntaxException {
@@ -37,11 +53,6 @@ public class WindowsHabboClient extends HabboClient {
     }
 
     @Override
-    public List<byte[]> getRC4cached() {
-        return new ArrayList<>();
-    }
-
-    @Override
     public List<byte[]> getRC4possibilities() {
         List<byte[]> result = new ArrayList<>();
         try {
@@ -55,7 +66,7 @@ public class WindowsHabboClient extends HabboClient {
         }
         return result;
     }
-    
+
     public static byte[] hexStringToByteArray(String s) {
         int len = s.length();
         byte[] data = new byte[len / 2];
