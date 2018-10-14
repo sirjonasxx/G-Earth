@@ -30,6 +30,9 @@ public class Main extends Application {
         primaryStage.setOnCloseRequest( event -> {
             companion.abort();
             Platform.exit();
+
+            // Platform.exit doesn't seem to be enough on Windows?
+            System.exit(0);
         });
 
     }
