@@ -4,6 +4,7 @@ import gearth.misc.Cacher;
 import gearth.protocol.HConnection;
 import gearth.protocol.HMessage;
 import gearth.protocol.memory.habboclient.HabboClient;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -60,7 +61,12 @@ public class WindowsHabboClient extends HabboClient {
         }
 
         assert revisionList != null;
-        List<Object> cachedOffsets = revisionList.getJSONArray(production).toList();
+        JSONArray cachedOffsets;
+        if (revisionList.has(production))
+            cachedOffsets = (JSONArray) revisionList.get(production);
+        else
+            cachedOffsets = null;
+
         StringJoiner joiner = new StringJoiner(" ");
 
         if (useCache) {
@@ -86,7 +92,7 @@ public class WindowsHabboClient extends HabboClient {
         ArrayList<String> possibleData = new ArrayList<>();
 
         if (cachedOffsets == null) {
-            cachedOffsets = new ArrayList<>();
+            cachedOffsets = new JSONArray();
         }
 
 
@@ -94,8 +100,8 @@ public class WindowsHabboClient extends HabboClient {
         while((line = reader.readLine()) !=  null) {
             if (line.length() > 1) {
                 if (!useCache && (count++ % 2 == 0)) {
-                    if (!cachedOffsets.contains(line)) {
-                        cachedOffsets.add(line);
+                    if (!cachedOffsets.toList().contains(line)) {
+                        cachedOffsets.put(line);
                     }
                 }
                 else
