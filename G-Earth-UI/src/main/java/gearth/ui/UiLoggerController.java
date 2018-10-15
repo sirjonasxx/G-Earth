@@ -2,7 +2,9 @@ package gearth.ui;
 
 import gearth.protocol.HPacket;
 import gearth.ui.logger.loggerdisplays.PacketLogger;
+import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
+import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
@@ -16,16 +18,20 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.ResourceBundle;
 
-public class LoggerController implements Initializable {
+public class UiLoggerController implements Initializable {
     public FlowPane flowPane;
     public BorderPane borderPane;
     public Label lblViewIncoming;
     public Label lblViewOutgoing;
+    public CheckMenuItem chkViewIncoming;
+    public CheckMenuItem chkViewOutgoing;
+    public CheckMenuItem chkDisplayStructure;
 
     private StyleClassedTextArea area;
 
     private boolean viewIncoming = true;
     private boolean viewOutgoing = true;
+    private boolean displayStructure = true;
 
     @Override
     public void initialize(URL arg0, ResourceBundle arg1) {
@@ -61,7 +67,7 @@ public class LoggerController implements Initializable {
             elements.add(new Element(" <- ", ""));
             elements.add(new Element(packet.toString(), "incoming"));
 
-            if (!expr.equals(""))
+            if (!expr.equals("") && displayStructure)
                 elements.add(new Element("\n" + expr, "incoming"));
         } else {
             elements.add(new Element("Outgoing[", "outgoing"));
@@ -71,7 +77,7 @@ public class LoggerController implements Initializable {
             elements.add(new Element(" -> ", ""));
             elements.add(new Element(packet.toString(), "outgoing"));
 
-            if (!expr.equals(""))
+            if (!expr.equals("") && displayStructure)
                 elements.add(new Element("\n" + expr, "outgoing"));
         }
 
@@ -99,11 +105,18 @@ public class LoggerController implements Initializable {
     public void toggleViewIncoming() {
         viewIncoming = !viewIncoming;
         lblViewIncoming.setText("View Incoming: " + (viewIncoming ? "True" : "False"));
+        chkViewIncoming.setSelected(viewIncoming);
     }
 
     public void toggleViewOutgoing() {
         viewOutgoing = !viewOutgoing;
         lblViewOutgoing.setText("View Outgoing: " + (viewOutgoing ? "True" : "False"));
+        chkViewOutgoing.setSelected(viewOutgoing);
+    }
+
+    public void toggleDisplayStructure() {
+        displayStructure = !displayStructure;
+        chkDisplayStructure.setSelected(displayStructure);
     }
 }
 

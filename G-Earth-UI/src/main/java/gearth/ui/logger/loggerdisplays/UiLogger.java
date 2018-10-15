@@ -1,7 +1,7 @@
 package gearth.ui.logger.loggerdisplays;
 
 import gearth.protocol.HPacket;
-import gearth.ui.LoggerController;
+import gearth.ui.UiLoggerController;
 import javafx.application.Platform;
 import javafx.event.Event;
 import javafx.event.EventHandler;
@@ -14,12 +14,13 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import org.scenicview.ScenicView;
 
 import java.io.IOException;
 
 public class UiLogger implements PacketLogger {
     private Stage stage;
-    private LoggerController controller;
+    private UiLoggerController controller;
 
     @Override
     public void start() {
@@ -55,6 +56,8 @@ public class UiLogger implements PacketLogger {
 
             stage.setScene(scene);
 
+//            ScenicView.show(scene);
+
             // don't let the user close this window on their own
             stage.setOnCloseRequest(Event::consume);
 
@@ -66,7 +69,8 @@ public class UiLogger implements PacketLogger {
 
     @Override
     public void stop() {
-        stage.close();
+        if (stage != null)
+            stage.close();
     }
 
     @Override

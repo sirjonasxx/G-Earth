@@ -1,26 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.CheckMenuItem?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
-<?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.FlowPane?>
 
-<BorderPane fx:id="borderPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gearth.ui.LoggerController">
+<BorderPane fx:id="borderPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gearth.ui.UiLoggerController">
     <top>
         <MenuBar BorderPane.alignment="CENTER">
             <Menu mnemonicParsing="false" text="View">
-                <MenuItem mnemonicParsing="false" onAction="#toggleViewIncoming" text="View Incoming (Ctrl+I)" />
-                <MenuItem mnemonicParsing="false" onAction="#toggleViewOutgoing" text="View Outgoing (Ctrl+O)" />
+            <Menu mnemonicParsing="false" text="Display Details">
+              <items>
+                  <CheckMenuItem fx:id="chkDisplayStructure" mnemonicParsing="false" onAction="#toggleDisplayStructure" selected="true" text="Structure" />
+              </items>
+            </Menu>
+            <CheckMenuItem fx:id="chkViewIncoming" mnemonicParsing="false" onAction="#toggleViewIncoming" selected="true" text="View Incoming (Ctrl+I)" />
+            <CheckMenuItem fx:id="chkViewOutgoing" mnemonicParsing="false" onAction="#toggleViewOutgoing" selected="true" text="View Outgoing (Ctrl+O)" />
             </Menu>
         </MenuBar>
     </top>
    <bottom>
-       <FlowPane fx:id="flowPane" prefHeight="30.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+       <FlowPane fx:id="flowPane" prefHeight="26.0" prefWidth="200.0" BorderPane.alignment="CENTER">
            <padding>
-               <Insets left="10.0" top="5.0" />
+               <Insets left="10.0" top="3.0" />
            </padding>
            <Label fx:id="lblViewIncoming" style="-fx-text-fill: black !important" text="View Incoming: True">
               <FlowPane.margin>

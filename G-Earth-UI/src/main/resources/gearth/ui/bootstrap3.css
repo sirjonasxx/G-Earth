@@ -152,7 +152,7 @@ VBox > .split-menu-button.last > .arrow-button {
 .font-menu-button,
 .split-menu-button > .label,.split-menu-button > .arrow-button {
     -fx-border-color: #cccccc;
-    -fx-text-fill: #333333;
+    -fx-text-fill: #000000;
 }
 /*just for the special split menu button*/
 .split-menu-button > .label {
@@ -342,7 +342,7 @@ VBox > .split-menu-button.last > .arrow-button {
 }
 
 .menu-item:focused > * {
-    -fx-text-fill: #262626;
+    -fx-text-fill: #000000;
 }
 .menu-item:focused .arrow {
     -fx-background-color: #333333;

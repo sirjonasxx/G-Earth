@@ -24,6 +24,10 @@
 }
 
 .label {
-    -fx-color-label-visible: #000000 !important;
     -fx-text-fill: #000000 !important;
+}
+
+.menu-bar .text, .menu .text {
+    -fx-text-fill: #000000 !important;
+    -fx-fill: #000000 !important;
 }
