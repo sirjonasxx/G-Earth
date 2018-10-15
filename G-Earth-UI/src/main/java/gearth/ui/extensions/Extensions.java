@@ -148,13 +148,17 @@ public class Extensions extends SubForm {
 
         getHConnection().addStateChangeListener((oldState, newState) -> {
             if (newState == HConnection.State.CONNECTED) {
-                for (GEarthExtension extension : gEarthExtensions) {
-                    extension.sendMessage(new HPacket(OUTGOING_MESSAGES_IDS.CONNECTIONSTART));
+                synchronized (gEarthExtensions) {
+                    for (GEarthExtension extension : gEarthExtensions) {
+                        extension.sendMessage(new HPacket(OUTGOING_MESSAGES_IDS.CONNECTIONSTART));
+                    }
                 }
             }
             if (oldState == HConnection.State.CONNECTED) {
-                for (GEarthExtension extension : gEarthExtensions) {
-                    extension.sendMessage(new HPacket(OUTGOING_MESSAGES_IDS.CONNECTIONEND));
+                synchronized (getHConnection()) {
+                    for (GEarthExtension extension : gEarthExtensions) {
+                        extension.sendMessage(new HPacket(OUTGOING_MESSAGES_IDS.CONNECTIONEND));
+                    }
                 }
             }
         });
@@ -172,7 +176,17 @@ public class Extensions extends SubForm {
 
             boolean[] isblock = new boolean[1];
 
-            for (GEarthExtension extension : collection) {
+            Iterator<GEarthExtension> it;
+            synchronized (collection) {
+                it = collection.iterator();
+            }
+            while (true) {
+                GEarthExtension extension;
+                synchronized (collection) {
+                    if (!it.hasNext()) break;
+                    extension = it.next();
+                }
+
                 GEarthExtension.ReceiveMessageListener respondCallback = new GEarthExtension.ReceiveMessageListener() {
                     @Override
                     public void act(HPacket packet) {
@@ -196,22 +210,26 @@ public class Extensions extends SubForm {
                     }
                 };
                 extension.addOnReceiveMessageListener(respondCallback);
-
                 extension.sendMessage(manipulatePacketRequest);
             }
 
             //block untill all extensions have responded
             List<GEarthExtension> willdelete = new ArrayList<>();
-            while (!collection.isEmpty()) {
-
+            while (true) {
                 synchronized (collection) {
+                    if (collection.isEmpty()) {
+                        break;
+                    }
+
                     for (GEarthExtension extension : collection) {
                         synchronized (gEarthExtensions) {
                             if (!gEarthExtensions.contains(extension)) willdelete.add(extension);
                         }
                     }
                     for (int i = willdelete.size() - 1; i >= 0; i--) {
-                        collection.remove(willdelete.get(i));
+                        synchronized (collection) {
+                            collection.remove(willdelete.get(i));
+                        }
                         willdelete.remove(i);
                     }
                 }
@@ -259,7 +277,9 @@ public class Extensions extends SubForm {
                             }
                         }
                     };
-                    messageListeners.put(extension, receiveMessageListener);
+                    synchronized (messageListeners) {
+                        messageListeners.put(extension, receiveMessageListener);
+                    }
                     extension.addOnReceiveMessageListener(receiveMessageListener);
 
                     extension.sendMessage(new HPacket(OUTGOING_MESSAGES_IDS.INIT));
@@ -283,8 +303,10 @@ public class Extensions extends SubForm {
                         gEarthExtensions.remove(extension);
                     }
 
+                    synchronized (messageListeners) {
                     extension.removeOnReceiveMessageListener(messageListeners.get(extension));
-                    messageListeners.remove(extension);
+                        messageListeners.remove(extension);
+                    }
                     Platform.runLater(extension::delete);
                 }
             });
