@@ -14,7 +14,6 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import org.scenicview.ScenicView;
 
 import java.io.IOException;
 
