@@ -13,7 +13,7 @@
     <parent>
         <groupId>G-Earth</groupId>
         <artifactId>G-Earth-Parent</artifactId>
-        <version>0.0.1-beta</version>
+        <version>0.1.2-beta</version>
     </parent>
 
     <build>
@@ -108,7 +108,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <outputDirectory>${project.parent.basedir}/bin</outputDirectory>
+                    <outputDirectory>${project.build.directory}/bin</outputDirectory>
                     <archive>
                         <manifest>
                             <mainClass>extensions.blockreplacepackets.BlockAndReplacePackets</mainClass>
@@ -117,7 +117,7 @@
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
-                    <finalName>BlockAndReplacePackets</finalName>
+                    <finalName>${artifactId}-Full</finalName>
                     <appendAssemblyId>false</appendAssemblyId>
                 </configuration>
             </plugin>

@@ -13,7 +13,7 @@
     <parent>
         <groupId>G-Earth</groupId>
         <artifactId>G-Earth-Parent</artifactId>
-        <version>0.0.1-beta</version>
+        <version>0.1.2-beta</version>
     </parent>
 
     <build>
@@ -94,6 +94,32 @@
                         </manifest>
                     </archive>
                     <finalName>${artifactId}</finalName>
+                </configuration>
+            </plugin>
+
+
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <outputDirectory>${project.build.directory}/bin</outputDirectory>
+                    <archive>
+                        <manifest>
+                            <mainClass>extensions.adminonconnect.AdminOnConnect</mainClass>
+                        </manifest>
+                    </archive>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                    <finalName>${artifactId}-Full</finalName>
+                    <appendAssemblyId>false</appendAssemblyId>
                 </configuration>
             </plugin>
         </plugins>
