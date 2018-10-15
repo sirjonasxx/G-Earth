@@ -14,7 +14,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-        FXMLLoader loader = new FXMLLoader(GEarthController.class.getResource("G-Earth.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/gearth/ui/G-Earth.fxml"));
         Parent root = loader.load();
 
         GEarthController companion = loader.getController();
@@ -25,7 +25,7 @@ public class Main extends Application {
         primaryStage.setTitle("G-Earth");
         primaryStage.setScene(new Scene(root, 620, 295));
         primaryStage.show();
-        primaryStage.getScene().getStylesheets().add(GEarthController.class.getResource("bootstrap3.css").toExternalForm());
+        primaryStage.getScene().getStylesheets().add(getClass().getResource("/gearth/ui/bootstrap3.css").toExternalForm());
 
         primaryStage.setOnCloseRequest( event -> {
             companion.abort();

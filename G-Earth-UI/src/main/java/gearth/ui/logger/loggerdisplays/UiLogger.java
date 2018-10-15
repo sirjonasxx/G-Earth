@@ -23,7 +23,7 @@ public class UiLogger implements PacketLogger {
 
     @Override
     public void start() {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/gearth/ui/Logger.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/gearth/ui/UiLogger.fxml"));
 
         try {
             Parent root = loader.load();

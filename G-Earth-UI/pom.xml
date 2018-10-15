@@ -8,28 +8,15 @@
 
     <packaging>jar</packaging>
 
-    <version>0.0.1-beta</version>
+    <version>0.1.2-beta</version>
 
     <parent>
         <groupId>G-Earth</groupId>
         <artifactId>G-Earth-Parent</artifactId>
-        <version>0.0.1-beta</version>
+        <version>0.1.2-beta</version>
     </parent>
 
     <build>
-        <resources>
-            <!-- Embedded FXML and CSS resources -->
-            <resource>
-                <filtering>false</filtering>
-                <directory>src/main/java</directory>
-                <includes>
-                    <include>**/*.fxml</include>
-                    <include>**/*.css</include>
-                    <include>**/*.png</include>
-                </includes>
-            </resource>
-        </resources>
-
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -109,7 +96,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <outputDirectory>${project.parent.basedir}/bin</outputDirectory>
+                    <outputDirectory>${project.build.directory}/bin</outputDirectory>
                     <archive>
                         <manifest>
                             <mainClass>gearth.Main</mainClass>

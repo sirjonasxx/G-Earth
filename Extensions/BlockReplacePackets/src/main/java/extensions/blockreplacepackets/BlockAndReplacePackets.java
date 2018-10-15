@@ -52,6 +52,6 @@ public class BlockAndReplacePackets extends ExtensionForm {
 
         primaryStage.setTitle("Packet blocker &/ replacer");
         primaryStage.setScene(new Scene(root, 580, 262));
-        primaryStage.getScene().getStylesheets().add(GEarthController.class.getResource("bootstrap3.css").toExternalForm());
+        primaryStage.getScene().getStylesheets().add(GEarthController.class.getResource("/gearth/ui/bootstrap3.css").toExternalForm());
     }
 }
