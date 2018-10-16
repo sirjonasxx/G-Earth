@@ -169,48 +169,43 @@ public class Extensions extends SubForm {
                 collection = new HashSet<>(gEarthExtensions);
             }
 
-
             String stringified = message.stringify();
             HPacket manipulatePacketRequest = new HPacket(OUTGOING_MESSAGES_IDS.PACKETINTERCEPT);
             manipulatePacketRequest.appendLongString(stringified);
 
+            HMessage result = new HMessage(message);
+
             boolean[] isblock = new boolean[1];
-
-            Iterator<GEarthExtension> it;
             synchronized (collection) {
-                it = collection.iterator();
-            }
-            while (true) {
-                GEarthExtension extension;
-                synchronized (collection) {
-                    if (!it.hasNext()) break;
-                    extension = it.next();
-                }
+                for (GEarthExtension extension : collection) {
+                    GEarthExtension.ReceiveMessageListener respondCallback = new GEarthExtension.ReceiveMessageListener() {
+                        @Override
+                        public void act(HPacket packet) {
+                            if (packet.headerId() == INCOMING_MESSAGES_IDS.MANIPULATEDPACKET) {
+                                String stringifiedresponse = packet.readLongString(6);
+                                HMessage responseMessage = new HMessage(stringifiedresponse);
+                                if (responseMessage.getDestination() == message.getDestination() && responseMessage.getIndex() == message.getIndex()) {
+                                    synchronized (result) {
+                                        if (!message.equals(responseMessage)) {
+                                            result.constructFromString(stringifiedresponse);
+                                        }
+                                        if (responseMessage.isBlocked()) {
+                                            isblock[0] = true;
+                                        }
+                                        synchronized (collection) {
+                                            collection.remove(extension);
+                                        }
 
-                GEarthExtension.ReceiveMessageListener respondCallback = new GEarthExtension.ReceiveMessageListener() {
-                    @Override
-                    public void act(HPacket packet) {
-                        if (packet.headerId() == INCOMING_MESSAGES_IDS.MANIPULATEDPACKET) {
-                            String stringifiedresponse = packet.readLongString(6);
-                            HMessage responseMessage = new HMessage(stringifiedresponse);
-                            if (responseMessage.getDestination() == message.getDestination() && responseMessage.getIndex() == message.getIndex()) {
-                                if (!message.equals(responseMessage)) {
-                                    message.constructFromString(stringifiedresponse);
+                                        extension.removeOnReceiveMessageListener(this);
+                                    }
                                 }
-                                if (responseMessage.isBlocked()) {
-                                    isblock[0] = true;
-                                }
-                                synchronized (collection) {
-                                    collection.remove(extension);
-                                }
-
-                                extension.removeOnReceiveMessageListener(this);
                             }
+
                         }
-                    }
-                };
-                extension.addOnReceiveMessageListener(respondCallback);
-                extension.sendMessage(manipulatePacketRequest);
+                    };
+                    extension.addOnReceiveMessageListener(respondCallback);
+                    extension.sendMessage(manipulatePacketRequest);
+                }
             }
 
             //block untill all extensions have responded
@@ -221,21 +216,23 @@ public class Extensions extends SubForm {
                         break;
                     }
 
-                    for (GEarthExtension extension : collection) {
-                        synchronized (gEarthExtensions) {
+                    synchronized (gEarthExtensions) {
+                        for (GEarthExtension extension : collection) {
                             if (!gEarthExtensions.contains(extension)) willdelete.add(extension);
                         }
                     }
+
                     for (int i = willdelete.size() - 1; i >= 0; i--) {
-                        synchronized (collection) {
-                            collection.remove(willdelete.get(i));
-                        }
+                        collection.remove(willdelete.get(i));
                         willdelete.remove(i);
                     }
                 }
 
+
                 try {Thread.sleep(1);} catch (InterruptedException e) {e.printStackTrace();}
             }
+
+            message.constructFromHMessage(result);
 
             if (isblock[0]) {
                 message.setBlocked(true);
@@ -286,7 +283,7 @@ public class Extensions extends SubForm {
                     if (getHConnection().getState() == HConnection.State.CONNECTED) {
                         extension.sendMessage(new HPacket(OUTGOING_MESSAGES_IDS.CONNECTIONSTART));
                     }
-                    Platform.runLater(() -> producer.extensionConnected(extension));
+
                     extension.onRemoveClick(observable -> {
                         try {
                             extension.getConnection().close();
@@ -295,6 +292,8 @@ public class Extensions extends SubForm {
                         }
                     });
                     extension.onClick(observable -> extension.sendMessage(new HPacket(OUTGOING_MESSAGES_IDS.ONDOUBLECLICK)));
+
+                    Platform.runLater(() -> producer.extensionConnected(extension));
                 }
 
                 @Override

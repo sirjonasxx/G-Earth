@@ -17,6 +17,10 @@ public class HPacket implements StringifyAble {
     public HPacket(byte[] packet)	{
         packetInBytes = packet.clone();
     }
+    public HPacket(HPacket packet) {
+        packetInBytes = packet.packetInBytes.clone();
+        isEdited = packet.isEdited;
+    }
     public HPacket(String packet)	{
         packetInBytes = fromStringToBytes(fromExpressionToString(packet));
     }

@@ -19,6 +19,10 @@ public class HMessage implements StringifyAble {
         constructFromString(fromString);
     }
 
+    public HMessage(HMessage message) {
+        constructFromHMessage(message);
+    }
+
     public HMessage(HPacket packet, Side side, int index) {
         this.side = side;
         this.hPacket = packet;
@@ -64,6 +68,13 @@ public class HMessage implements StringifyAble {
         HPacket p = new HPacket(new byte[0]);
         p.constructFromString(parts[3]);
         this.hPacket = p;
+    }
+
+    public void constructFromHMessage(HMessage message) {
+        this.isBlocked = message.isBlocked();
+        this.index = message.getIndex();
+        this.side = message.getDestination();
+        this.hPacket = new HPacket(message.getPacket());
     }
 
     @Override

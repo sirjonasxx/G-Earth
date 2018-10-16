@@ -103,9 +103,11 @@ public class GEarthExtension {
                     HPacket packet = new HPacket(headerandbody);
                     packet.fixLength();
 
-                    for (int i = receiveMessageListeners.size() - 1; i >= 0; i--) {
-                        receiveMessageListeners.get(i).act(packet);
-                        packet.setReadIndex(6);
+                    synchronized (receiveMessageListeners) {
+                        for (int i = receiveMessageListeners.size() - 1; i >= 0; i--) {
+                            receiveMessageListeners.get(i).act(packet);
+                            packet.setReadIndex(6);
+                        }
                     }
 
                 }
@@ -181,12 +183,16 @@ public class GEarthExtension {
     }
 
 
-    private List<ReceiveMessageListener> receiveMessageListeners = new ArrayList<>();
+    private final List<ReceiveMessageListener> receiveMessageListeners = new ArrayList<>();
     public void addOnReceiveMessageListener(ReceiveMessageListener receiveMessageListener) {
-        receiveMessageListeners.add(receiveMessageListener);
+        synchronized (receiveMessageListeners) {
+            receiveMessageListeners.add(receiveMessageListener);
+        }
     }
     public void removeOnReceiveMessageListener(ReceiveMessageListener receiveMessageListener) {
-        receiveMessageListeners.remove(receiveMessageListener);
+        synchronized (receiveMessageListeners) {
+            receiveMessageListeners.remove(receiveMessageListener);
+        }
     }
 
     public interface ReceiveMessageListener {
@@ -200,33 +206,45 @@ public class GEarthExtension {
     }
 
 
-    private List<InvalidationListener> onRemoveClickListener = new ArrayList<>();
+    private final List<InvalidationListener> onRemoveClickListener = new ArrayList<>();
     public void onRemoveClick(InvalidationListener listener) {
-        onRemoveClickListener.add(listener);
+        synchronized (onRemoveClickListener) {
+            onRemoveClickListener.add(listener);
+        }
     }
     public void isRemoveClickTrigger() {
-        for (int i = onRemoveClickListener.size() - 1; i >= 0; i--) {
-            onRemoveClickListener.get(i).invalidated(null);
+        synchronized (onRemoveClickListener) {
+            for (int i = onRemoveClickListener.size() - 1; i >= 0; i--) {
+                onRemoveClickListener.get(i).invalidated(null);
+            }
         }
     }
 
-    private List<InvalidationListener> onClickListener = new ArrayList<>();
+    private final List<InvalidationListener> onClickListener = new ArrayList<>();
     public void onClick(InvalidationListener listener) {
-        onClickListener.add(listener);
+        synchronized (onClickListener) {
+            onClickListener.add(listener);
+        }
     }
     public void isClickTrigger() {
-        for (int i = onClickListener.size() - 1; i >= 0; i--) {
-            onClickListener.get(i).invalidated(null);
+        synchronized (onClickListener) {
+            for (int i = onClickListener.size() - 1; i >= 0; i--) {
+                onClickListener.get(i).invalidated(null);
+            }
         }
     }
 
-    private List<InvalidationListener> onDeleteListeners = new ArrayList<>();
+    private final List<InvalidationListener> onDeleteListeners = new ArrayList<>();
     public void onDelete(InvalidationListener listener) {
-        onDeleteListeners.add(listener);
+        synchronized (onDeleteListeners) {
+            onDeleteListeners.add(listener);
+        }
     }
     public void delete() {
-        for (int i = onDeleteListeners.size() - 1; i >= 0; i--) {
-            onDeleteListeners.get(i).invalidated(null);
+        synchronized (onDeleteListeners) {
+            for (int i = onDeleteListeners.size() - 1; i >= 0; i--) {
+                onDeleteListeners.get(i).invalidated(null);
+            }
         }
     }
 }

@@ -43,4 +43,13 @@ public class Main extends Application {
         Main.args = args;
         launch(args);
     }
+
+    public static boolean hasFlag(String flag) {
+        for(String s : args) {
+            if (s.equals(flag)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

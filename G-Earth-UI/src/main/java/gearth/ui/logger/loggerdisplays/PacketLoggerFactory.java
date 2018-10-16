@@ -1,5 +1,6 @@
 package gearth.ui.logger.loggerdisplays;
 
+import gearth.Main;
 import gearth.misc.OSValidator;
 
 /**
@@ -8,13 +9,9 @@ import gearth.misc.OSValidator;
 public class PacketLoggerFactory {
 
     public static PacketLogger get() {
-//        if (OSValidator.isUnix()) {
-//            return new LinuxTerminalLogger();
-//        }
-//        if (System.getenv("XDG_CURRENT_DESKTOP") != null && System.getenv("XDG_CURRENT_DESKTOP").toLowerCase().contains("gnome")) {
-//            return new GnomeTerminalLogger();
-//        }
-//        return new SimpleTerminalLogger();
+        if (OSValidator.isUnix() && Main.hasFlag("-t")) {
+            return new LinuxTerminalLogger();
+        }
 
         return new UiLogger();
     }
