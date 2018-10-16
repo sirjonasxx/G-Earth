@@ -1,6 +1,7 @@
 package gearth.ui.extensions.executer;
 
 import gearth.Main;
+import gearth.ui.extensions.authentication.Authenticator;
 
 import java.io.File;
 import java.io.IOException;
@@ -70,11 +71,13 @@ public class NormalExtensionRunner implements ExtensionRunner {
 
     public void tryRunExtension(String path, int port) {
         try {
+            String filename = Paths.get(path).getFileName().toString();
             Runtime.getRuntime().exec(
                     ExecutionInfo.getExecutionCommand(getFileExtension(path))
                     .replace("{path}", path)
                     .replace("{port}", port+"")
-                    .replace("{filename}", Paths.get(path).getFileName().toString())
+                    .replace("{filename}", filename)
+                    .replace("{cookie}", Authenticator.generateCookieForExtension(filename))
             );
         } catch (IOException e) {
             e.printStackTrace();
@@ -119,7 +122,7 @@ public class NormalExtensionRunner implements ExtensionRunner {
     private String getRandomString() {
         StringBuilder builder = new StringBuilder();
         Random r = new Random();
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 12; i++) {
             builder.append(r.nextInt(10));
         }
 

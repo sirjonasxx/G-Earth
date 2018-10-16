@@ -101,12 +101,14 @@ public class ExtensionItemContainer extends GridPane {
         Tooltip.install(deleteButton, uninstall);
         deleteButton.show();
         GridPane this2 = this;
+
+        final String uninstallKey = "uninstallExtension";
         deleteButton.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
             boolean delet_dis = true;
 
-            if (ConfirmationDialog.showDialog) {
-                Alert alert = ConfirmationDialog.createAlertWithOptOut(Alert.AlertType.CONFIRMATION,
-                        "Confirmation Dialog", null,
+            if (ConfirmationDialog.showDialog(uninstallKey)) {
+                Alert alert = ConfirmationDialog.createAlertWithOptOut(Alert.AlertType.CONFIRMATION, uninstallKey
+                        ,"Confirmation Dialog", null,
                         "Are you sure want to uninstall this extension?", "Do not ask again",
                         ButtonType.YES, ButtonType.NO
                 );

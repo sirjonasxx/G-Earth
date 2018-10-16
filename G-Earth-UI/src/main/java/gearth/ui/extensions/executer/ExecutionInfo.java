@@ -25,7 +25,7 @@ public class ExecutionInfo {
         for(String type : extensionTypeToExecutionCommand.keySet()) {
             extensionTypeToExecutionCommand.put(
                     type,
-                    extensionTypeToExecutionCommand.get(type) + " -p {port} -f {filename}"
+                    extensionTypeToExecutionCommand.get(type) + " -p {port} -f {filename} -c {cookie}"
                     );
         }
 

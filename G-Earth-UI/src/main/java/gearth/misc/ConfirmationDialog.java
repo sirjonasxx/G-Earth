@@ -7,14 +7,17 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.DialogPane;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Created by Jonas on 27/09/18.
  */
 public class ConfirmationDialog {
 
-    public static boolean showDialog = true;
+    private static Set<String> ignoreDialogs = new HashSet<>();
 
-    public static Alert createAlertWithOptOut(Alert.AlertType type, String title, String headerText,
+    public static Alert createAlertWithOptOut(Alert.AlertType type, String dialogKey, String title, String headerText,
                                               String message, String optOutMessage, /*Callback<Boolean, Void> optOutAction,*/
                                               ButtonType... buttonTypes) {
         Alert alert = new Alert(type);
@@ -29,7 +32,11 @@ public class ConfirmationDialog {
             protected Node createDetailsButton() {
                 CheckBox optOut = new CheckBox();
                 optOut.setText(optOutMessage);
-                optOut.setOnAction(event -> showDialog = !optOut.isSelected());
+                optOut.setOnAction(event -> {
+                    if (optOut.isSelected()) {
+                        ignoreDialogs.add(dialogKey);
+                    }
+                });
                 return optOut;
             }
         });
@@ -46,5 +53,8 @@ public class ConfirmationDialog {
         return alert;
     }
 
+    public static boolean showDialog(String dialogKey) {
+        return !ignoreDialogs.contains(dialogKey);
+    }
 
 }

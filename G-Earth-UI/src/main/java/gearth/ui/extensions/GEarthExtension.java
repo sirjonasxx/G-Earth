@@ -6,6 +6,7 @@ import gearth.protocol.HPacket;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import gearth.ui.extensions.authentication.Authenticator;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +27,7 @@ public class GEarthExtension {
 
     private boolean isInstalledExtension; // <- extension is in the extensions directory
     private String fileName;
+    private String cookie;
 
     private Socket connection;
 
@@ -60,7 +62,14 @@ public class GEarthExtension {
                                 connection,
                                 onDisconnectedCallback
                         );
-                        callback.act(gEarthExtension);
+
+                        if (Authenticator.evaluate(gEarthExtension)) {
+                            callback.act(gEarthExtension);
+                        }
+                        else {
+                            gEarthExtension.closeConnection(); //you shall not pass...
+                        }
+
                         break;
                     }
                 }
@@ -79,6 +88,7 @@ public class GEarthExtension {
 
         this.isInstalledExtension = extensionInfo.readBoolean();
         this.fileName = extensionInfo.readString();
+        this.cookie = extensionInfo.readString();
 
         this.leaveButtonVisible = extensionInfo.readBoolean();
         this.deleteButtonVisible = extensionInfo.readBoolean();
@@ -150,6 +160,9 @@ public class GEarthExtension {
     }
     public String getFileName() {
         return fileName;
+    }
+    public String getCookie() {
+        return cookie;
     }
     public boolean isDeleteButtonVisible() {
         return deleteButtonVisible;

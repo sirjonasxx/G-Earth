@@ -30,6 +30,7 @@ public abstract class Extension {
     private boolean isCorrupted = false;
     private static final String[] PORT_FLAG = {"--port", "-p"};
     private static final String[] FILE_FLAG = {"--filename", "-f"};
+    private static final String[] COOKIE_FLAG = {"--auth-token", "-c"}; // don't add a cookie or filename when debugging
 
     private OutputStream out = null;
     private final Map<Integer, List<MessageListener>> incomingMessageListeners = new HashMap<>();
@@ -81,6 +82,7 @@ public abstract class Extension {
 
         int port = Integer.parseInt(getArgument(args, PORT_FLAG));
         String file = getArgument(args, FILE_FLAG);
+        String cookie = getArgument(args, COOKIE_FLAG);
 
         Socket gEarthExtensionServer = null;
         try {
@@ -123,6 +125,7 @@ public abstract class Extension {
                             .appendBoolean(isOnClickMethodUsed())
                             .appendBoolean(file != null)
                             .appendString(file == null ? "": file)
+                            .appendString(cookie == null ? "" : cookie)
                             .appendBoolean(CANLEAVE)
                             .appendBoolean(CANDELETE);
                     writeToStream(response.toBytes());
