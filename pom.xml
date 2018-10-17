@@ -14,12 +14,12 @@
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
 
-    <name>G-Earth</name>
+    <name>G-Earth-Parent</name>
     <url>https://github.com/sirjonasxx/G-Earth</url>
     <description>Cross Platform Habbo packetlogger/manipulator</description>
 
     <modules>
-        <module>G-Earth-UI</module>
+        <module>G-Earth</module>
 
         <!-- Compile our extensions too please! -->
         <module>Extensions/AdminOnConnect</module>

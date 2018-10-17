@@ -72,7 +72,7 @@
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
-                    <finalName>${project.artifactId}-Full</finalName>
+                    <finalName>${project.artifactId}</finalName>
                     <appendAssemblyId>false</appendAssemblyId>
                 </configuration>
             </plugin>
@@ -82,7 +82,7 @@
     <dependencies>
         <dependency>
             <groupId>G-Earth</groupId>
-            <artifactId>G-Earth-UI</artifactId>
+            <artifactId>G-Earth</artifactId>
             <version>0.1.2-beta</version>
             <!--<scope>provided</scope>-->
         </dependency>
