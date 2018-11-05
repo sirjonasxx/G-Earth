@@ -26,6 +26,7 @@ public class UiLoggerController implements Initializable {
     public CheckMenuItem chkDisplayStructure;
     public Label lblAutoScrolll;
     public CheckMenuItem chkAutoscroll;
+    public CheckMenuItem chkSkipBigPackets;
 
     private StyleClassedTextArea area;
 
@@ -33,6 +34,8 @@ public class UiLoggerController implements Initializable {
     private boolean viewOutgoing = true;
     private boolean displayStructure = true;
     private boolean autoScroll = true;
+    private boolean skiphugepackets = true;
+
 
     private volatile boolean initialized = false;
     private final List<Element> appendLater = new ArrayList<>();
@@ -78,16 +81,27 @@ public class UiLoggerController implements Initializable {
             elements.add(new Element("]", "incoming"));
 
             elements.add(new Element(" <- ", ""));
-            elements.add(new Element(packet.toString(), "incoming"));
+            if (skiphugepackets && packet.length() > 8000) {
+                elements.add(new Element("<packet skipped>", "skipped"));
+            }
+            else {
+                elements.add(new Element(packet.toString(), "incoming"));
+            }
         } else {
             elements.add(new Element("Outgoing[", "outgoing"));
             elements.add(new Element(String.valueOf(packet.headerId()), ""));
             elements.add(new Element("]", "outgoing"));
 
             elements.add(new Element(" -> ", ""));
-            elements.add(new Element(packet.toString(), "outgoing"));
+
+            if (skiphugepackets && packet.length() > 8000) {
+                elements.add(new Element("<packet skipped>", "skipped"));
+            }
+            else {
+                elements.add(new Element(packet.toString(), "outgoing"));
+            }
         }
-        if (!expr.equals("") && displayStructure)
+        if (!expr.equals("") && displayStructure && (!skiphugepackets || packet.length() <= 8000))
             elements.add(new Element("\n" + expr, "structure"));
 
         elements.add(new Element("\n--------------------\n", ""));
@@ -145,6 +159,10 @@ public class UiLoggerController implements Initializable {
     public void toggleAutoscroll(ActionEvent actionEvent) {
         autoScroll = !autoScroll;
         lblAutoScrolll.setText("Autoscroll: " + (autoScroll ? "True" : "False"));
+    }
+
+    public void toggleSkipPackets(ActionEvent actionEvent) {
+        skiphugepackets = !skiphugepackets;
     }
 }
 

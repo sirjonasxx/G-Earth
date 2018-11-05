@@ -15,7 +15,7 @@
     -fx-fill: #0066cc;
 }
 
-.structure {
+.structure, .skipped {
     -fx-fill: cyan;
 }
 

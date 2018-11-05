@@ -30,6 +30,7 @@
                <accelerator>
                   <KeyCodeCombination alt="UP" code="L" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
                </accelerator></CheckMenuItem>
+            <CheckMenuItem fx:id="chkSkipBigPackets" mnemonicParsing="false" onAction="#toggleSkipPackets" selected="true" text="Skip big packets" />
             </Menu>
         </MenuBar>
     </top>
