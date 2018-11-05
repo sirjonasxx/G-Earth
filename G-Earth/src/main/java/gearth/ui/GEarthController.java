@@ -18,6 +18,7 @@ import gearth.ui.tools.Tools;
 public class GEarthController {
 
     public Tab tab_Settings;
+    public Tab tab_Logger;
     public TabPane tabBar;
     private Stage stage = null;
     private volatile HConnection hConnection;
@@ -50,7 +51,7 @@ public class GEarthController {
         tabBar.getTabs().remove(tab_Settings);
 
         if (PacketLoggerFactory.usesUIlogger()) {
-            tabBar.getTabs().remove(loggerController);
+            tabBar.getTabs().remove(tab_Logger);
         }
 
 

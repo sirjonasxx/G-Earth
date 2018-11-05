@@ -15,7 +15,7 @@
         <Tab text="Connection">
             <fx:include fx:id="connection" source="connection/Connection.fxml"/>
         </Tab>
-        <Tab text="Logger">
+        <Tab fx:id="tab_Logger" text="Logger">
             <fx:include fx:id="logger" source="logger/Logger.fxml"/>
         </Tab>
         <Tab text="Injection">
