@@ -1,10 +1,14 @@
 package gearth;
 
+import gearth.misc.AdminValidator;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.layout.Region;
 import javafx.stage.Stage;
 import gearth.ui.GEarthController;
 
@@ -35,6 +39,11 @@ public class Main extends Application {
             System.exit(0);
         });
 
+        if (!AdminValidator.isAdmin()) {
+            Alert alert = new Alert(Alert.AlertType.ERROR, "G-Earth needs admin privileges in order to work properly, please restart G-Earth unless you know what you're doing", ButtonType.OK);
+            alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+            alert.show();
+        }
     }
 
     public static String[] args;
