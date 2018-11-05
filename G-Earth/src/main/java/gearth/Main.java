@@ -39,11 +39,17 @@ public class Main extends Application {
             System.exit(0);
         });
 
-        if (!AdminValidator.isAdmin()) {
-            Alert alert = new Alert(Alert.AlertType.ERROR, "G-Earth needs admin privileges in order to work properly, please restart G-Earth unless you know what you're doing", ButtonType.OK);
-            alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
-            alert.show();
-        }
+        new Thread(() -> {
+            if (!AdminValidator.isAdmin()) {
+                Platform.runLater(() -> {
+                    Alert alert = new Alert(Alert.AlertType.ERROR, "G-Earth needs admin privileges in order to work properly, please restart G-Earth with admin permissions unless you know what you're doing", ButtonType.OK);
+                    alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+                    alert.show();
+                });
+
+            }
+        }).start();
+
     }
 
     public static String[] args;
