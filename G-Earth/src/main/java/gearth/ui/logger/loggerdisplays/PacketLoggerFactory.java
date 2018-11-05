@@ -8,12 +8,19 @@ import gearth.misc.OSValidator;
  */
 public class PacketLoggerFactory {
 
+    public static boolean usesUIlogger() {
+        return (!Main.hasFlag("-t"));
+    }
+
     public static PacketLogger get() {
-        if (OSValidator.isUnix() && Main.hasFlag("-t")) {
-            return new LinuxTerminalLogger();
+        if (usesUIlogger()) {
+            return new UiLogger();
         }
 
-        return new UiLogger();
+        if (OSValidator.isUnix()) {
+            return new LinuxTerminalLogger();
+        }
+        return new SimpleTerminalLogger();
     }
 
 }
