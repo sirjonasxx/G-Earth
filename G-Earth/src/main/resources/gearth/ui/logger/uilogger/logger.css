@@ -15,6 +15,10 @@
     -fx-fill: #0066cc;
 }
 
+.structure {
+    -fx-fill: cyan;
+}
+
 .dark {
     -fx-background-color: #000000;
 }
@@ -30,4 +34,10 @@
 .menu-bar .text, .menu .text {
     -fx-text-fill: #000000 !important;
     -fx-fill: #000000 !important;
+    -fx-padding: -2 0 -2 0 !important;
+}
+
+.scroll-bar:vertical {
+    -fx-pref-width: 16.5;
+    -fx-padding: 1;
 }

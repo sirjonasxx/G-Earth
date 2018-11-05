@@ -3,9 +3,11 @@ package gearth.ui;
 import gearth.protocol.HPacket;
 import gearth.ui.logger.loggerdisplays.PacketLogger;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.Label;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import org.fxmisc.flowless.VirtualizedScrollPane;
@@ -26,12 +28,15 @@ public class UiLoggerController implements Initializable {
     public CheckMenuItem chkViewIncoming;
     public CheckMenuItem chkViewOutgoing;
     public CheckMenuItem chkDisplayStructure;
+    public Label lblAutoScrolll;
+    public CheckMenuItem chkAutoscroll;
 
     private StyleClassedTextArea area;
 
     private boolean viewIncoming = true;
     private boolean viewOutgoing = true;
     private boolean displayStructure = true;
+    private boolean autoScroll = true;
 
     @Override
     public void initialize(URL arg0, ResourceBundle arg1) {
@@ -66,9 +71,6 @@ public class UiLoggerController implements Initializable {
 
             elements.add(new Element(" <- ", ""));
             elements.add(new Element(packet.toString(), "incoming"));
-
-            if (!expr.equals("") && displayStructure)
-                elements.add(new Element("\n" + expr, "incoming"));
         } else {
             elements.add(new Element("Outgoing[", "outgoing"));
             elements.add(new Element(String.valueOf(packet.headerId()), ""));
@@ -76,10 +78,9 @@ public class UiLoggerController implements Initializable {
 
             elements.add(new Element(" -> ", ""));
             elements.add(new Element(packet.toString(), "outgoing"));
-
-            if (!expr.equals("") && displayStructure)
-                elements.add(new Element("\n" + expr, "outgoing"));
         }
+        if (!expr.equals("") && displayStructure)
+            elements.add(new Element("\n" + expr, "structure"));
 
         elements.add(new Element("\n--------------------\n", ""));
         AppendLog(elements);
@@ -98,25 +99,33 @@ public class UiLoggerController implements Initializable {
         area.appendText(sb.toString());
         area.setStyleSpans(oldLen, styleSpansBuilder.create());
 
-        area.moveTo(area.getLength());
-        area.requestFollowCaret();
+        if (autoScroll) {
+            area.moveTo(area.getLength());
+            area.requestFollowCaret();
+        }
+
     }
 
     public void toggleViewIncoming() {
         viewIncoming = !viewIncoming;
         lblViewIncoming.setText("View Incoming: " + (viewIncoming ? "True" : "False"));
-        chkViewIncoming.setSelected(viewIncoming);
+//        chkViewIncoming.setSelected(viewIncoming);
     }
 
     public void toggleViewOutgoing() {
         viewOutgoing = !viewOutgoing;
         lblViewOutgoing.setText("View Outgoing: " + (viewOutgoing ? "True" : "False"));
-        chkViewOutgoing.setSelected(viewOutgoing);
+//        chkViewOutgoing.setSelected(viewOutgoing);
     }
 
     public void toggleDisplayStructure() {
         displayStructure = !displayStructure;
-        chkDisplayStructure.setSelected(displayStructure);
+//        chkDisplayStructure.setSelected(displayStructure);
+    }
+
+    public void toggleAutoscroll(ActionEvent actionEvent) {
+        autoScroll = !autoScroll;
+        lblAutoScrolll.setText("Autoscroll: " + (autoScroll ? "True" : "False"));
     }
 }
 

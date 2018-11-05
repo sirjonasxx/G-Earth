@@ -23,7 +23,7 @@ public class UiLogger implements PacketLogger {
 
     @Override
     public void start() {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/gearth/ui/UiLogger.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/gearth/ui/logger/uilogger/UiLogger.fxml"));
 
         try {
             Parent root = loader.load();
@@ -34,24 +34,24 @@ public class UiLogger implements PacketLogger {
 
             Scene scene = new Scene(root);
             scene.getStylesheets().add("/gearth/ui/bootstrap3.css");
-            scene.getStylesheets().add("/gearth/ui/logger.css");
+            scene.getStylesheets().add("/gearth/ui/logger/uilogger/logger.css");
 
-            scene.addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
-                final KeyCombination keyCombIncoming = new KeyCodeCombination(KeyCode.I,
-                        KeyCombination.CONTROL_DOWN);
-                final KeyCombination keyCombOutgoing = new KeyCodeCombination(KeyCode.O,
-                        KeyCombination.CONTROL_DOWN);
-
-                public void handle(KeyEvent ke) {
-                    if (keyCombIncoming.match(ke)) {
-                        controller.toggleViewIncoming();
-                        ke.consume();
-                    } else if (keyCombOutgoing.match(ke)) {
-                        controller.toggleViewOutgoing();
-                        ke.consume();
-                    }
-                }
-            });
+//            scene.addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
+//                final KeyCombination keyCombIncoming = new KeyCodeCombination(KeyCode.I,
+//                        KeyCombination.CONTROL_DOWN);
+//                final KeyCombination keyCombOutgoing = new KeyCodeCombination(KeyCode.O,
+//                        KeyCombination.CONTROL_DOWN);
+//
+//                public void handle(KeyEvent ke) {
+//                    if (keyCombIncoming.match(ke)) {
+//                        controller.toggleViewIncoming();
+//                        ke.consume();
+//                    } else if (keyCombOutgoing.match(ke)) {
+//                        controller.toggleViewOutgoing();
+//                        ke.consume();
+//                    }
+//                }
+//            });
 
             stage.setScene(scene);
 
