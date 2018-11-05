@@ -4,7 +4,7 @@ import java.io.PrintStream;
 import java.util.prefs.Preferences;
 
 /**
- * Created by Jeunez on 5/11/2018.
+ * Created by Jonas on 5/11/2018.
  */
 public class AdminValidator {
 

@@ -2,12 +2,11 @@ package gearth.ui;
 
 import gearth.protocol.HPacket;
 import gearth.ui.logger.loggerdisplays.PacketLogger;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.Label;
-import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import org.fxmisc.flowless.VirtualizedScrollPane;
@@ -15,10 +14,7 @@ import org.fxmisc.richtext.StyleClassedTextArea;
 import org.fxmisc.richtext.model.StyleSpansBuilder;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class UiLoggerController implements Initializable {
     public FlowPane flowPane;
@@ -38,6 +34,9 @@ public class UiLoggerController implements Initializable {
     private boolean displayStructure = true;
     private boolean autoScroll = true;
 
+    private volatile boolean initialized = false;
+    private final List<Element> appendLater = new ArrayList<>();
+
     @Override
     public void initialize(URL arg0, ResourceBundle arg1) {
         area = new StyleClassedTextArea();
@@ -46,6 +45,15 @@ public class UiLoggerController implements Initializable {
 
         VirtualizedScrollPane<StyleClassedTextArea> vsPane = new VirtualizedScrollPane<>(area);
         borderPane.setCenter(vsPane);
+
+        synchronized (appendLater) {
+            initialized = true;
+            if (!appendLater.isEmpty()) {
+                appendLog(appendLater);
+            }
+        }
+
+
     }
 
     public void appendMessage(HPacket packet, int types) {
@@ -83,27 +91,38 @@ public class UiLoggerController implements Initializable {
             elements.add(new Element("\n" + expr, "structure"));
 
         elements.add(new Element("\n--------------------\n", ""));
-        AppendLog(elements);
+
+        synchronized (appendLater) {
+            if (initialized) {
+                appendLog(elements);
+            }
+            else {
+                appendLater.addAll(elements);
+            }
+        }
+
     }
 
-    private void AppendLog(ArrayList<Element> elements) {
-        StringBuilder sb = new StringBuilder();
-        StyleSpansBuilder<Collection<String>> styleSpansBuilder = new StyleSpansBuilder<>(0);
+    private synchronized void appendLog(List<Element> elements) {
+        Platform.runLater(() -> {
+            StringBuilder sb = new StringBuilder();
+            StyleSpansBuilder<Collection<String>> styleSpansBuilder = new StyleSpansBuilder<>(0);
 
-        for (Element element : elements) {
-            sb.append(element.text);
-            styleSpansBuilder.add(Collections.singleton(element.className), element.text.length());
-        }
+            for (Element element : elements) {
+                sb.append(element.text);
+                styleSpansBuilder.add(Collections.singleton(element.className), element.text.length());
+            }
 
-        int oldLen = area.getLength();
-        area.appendText(sb.toString());
-        area.setStyleSpans(oldLen, styleSpansBuilder.create());
+            int oldLen = area.getLength();
+            area.appendText(sb.toString());
+//            System.out.println(sb.toString());
+            area.setStyleSpans(oldLen, styleSpansBuilder.create());
 
-        if (autoScroll) {
-            area.moveTo(area.getLength());
-            area.requestFollowCaret();
-        }
-
+            if (autoScroll) {
+                area.moveTo(area.getLength());
+                area.requestFollowCaret();
+            }
+        });
     }
 
     public void toggleViewIncoming() {

@@ -2,24 +2,20 @@ package gearth.ui.logger.loggerdisplays;
 
 import gearth.protocol.HPacket;
 import gearth.ui.UiLoggerController;
-import javafx.application.Platform;
 import javafx.event.Event;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyCodeCombination;
-import javafx.scene.input.KeyCombination;
-import javafx.scene.input.KeyEvent;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UiLogger implements PacketLogger {
     private Stage stage;
-    private UiLoggerController controller;
+    private UiLoggerController controller = null;
 
     @Override
     public void start() {
@@ -27,7 +23,13 @@ public class UiLogger implements PacketLogger {
 
         try {
             Parent root = loader.load();
-            controller = loader.getController();
+            synchronized (appendLater) {
+                controller = loader.getController();
+                for (Elem elem : appendLater) {
+                    controller.appendMessage(elem.packet, elem.types);
+                }
+            }
+
             stage = new Stage();
             stage.setTitle("G-Earth | Packet Logger");
             stage.initModality(Modality.NONE);
@@ -78,9 +80,27 @@ public class UiLogger implements PacketLogger {
         //Platform.runLater(() -> controller.appendSplitLine());
     }
 
+    private class Elem {
+        HPacket packet;
+        int types;
+        Elem(HPacket packet, int types) {
+            this.packet = packet;
+            this.types = types;
+        }
+    }
+
+    private final List<Elem> appendLater = new ArrayList<>();
+
     @Override
     public void appendMessage(HPacket packet, int types) {
-        Platform.runLater(() -> controller.appendMessage(packet, types));
+        synchronized (appendLater) {
+            if (controller == null) {
+                appendLater.add(new Elem(packet, types));
+            }
+            else  {
+                controller.appendMessage(packet, types);
+            }
+        }
     }
 
     @Override
