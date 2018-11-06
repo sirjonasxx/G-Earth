@@ -6,6 +6,8 @@ import javafx.stage.Stage;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 
+import java.util.concurrent.Semaphore;
+
 /**
  * Created by Jonas on 22/09/18.
  */
@@ -13,41 +15,36 @@ public abstract class ExtensionForm extends Application {
 
     private Extension extension = null;
     protected static String[] args;
-    private volatile Stage primaryStage = null;
+    protected volatile Stage primaryStage;
+
+    private ExtensionForm realForm = null;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Platform.setImplicitExit(false);
-        setStageData(primaryStage);
-        this.primaryStage = primaryStage;
-        primaryStage.setOnCloseRequest(event -> {
-            event.consume();
-            Platform.runLater(primaryStage::hide);
-        });
-        ExtensionForm thiss = this;
-
         ExtensionInfo extInfo = getClass().getAnnotation(ExtensionInfo.class);
-
+        Semaphore semaphore = new Semaphore(1);
+        semaphore.acquire();
+        realForm = launchForm(primaryStage);
         Thread t = new Thread(() -> {
-            extension = new Extension(args) {
+            realForm.extension = new Extension(args) {
                 @Override
                 protected void init() {
-                    thiss.initExtension();
+                    realForm.initExtension();
                 }
 
                 @Override
                 protected void onClick() {
-                    thiss.onClick();
+                    realForm.onClick();
                 }
 
                 @Override
                 protected void onStartConnection() {
-                    thiss.onStartConnection();
+                    realForm.onStartConnection();
                 }
 
                 @Override
                 protected void onEndConnection() {
-                    thiss.onEndConnection();
+                    realForm.onEndConnection();
                 }
 
                 @Override
@@ -55,16 +52,29 @@ public abstract class ExtensionForm extends Application {
                     return extInfo;
                 }
             };
-            extension.run();
+            semaphore.release();
+            realForm.extension.run();
 //            Platform.runLater(primaryStage::close);
             //when the extension has ended, close this process
             System.exit(0);
         });
         t.start();
+
+        semaphore.acquire();
+        Platform.setImplicitExit(false);
+        realForm = launchForm(primaryStage);
+        realForm.primaryStage = primaryStage;
+
+        primaryStage.setOnCloseRequest(event -> {
+            event.consume();
+            Platform.runLater(() -> {
+                primaryStage.hide();
+                realForm.onHide();
+            });
+        });
     }
 
-    public abstract void setStageData(Stage primaryStage) throws Exception;
-
+    public abstract ExtensionForm launchForm(Stage primaryStage) throws Exception;
 
     //wrap extension methods
     protected boolean requestFlags(Extension.FlagsCheckListener flagRequestCallback){
@@ -86,6 +96,8 @@ public abstract class ExtensionForm extends Application {
         return extension.sendToClient(packet);
     }
 
+    protected void onShow(){};
+    protected void onHide(){};
 
     /**
      * Gets called when a connection has been established with G-Earth.
@@ -99,7 +111,9 @@ public abstract class ExtensionForm extends Application {
     private void onClick(){
         Platform.runLater(() -> {
             primaryStage.show();
+            primaryStage.requestFocus();
             primaryStage.toFront();
+            onShow();
         });
     }
 
