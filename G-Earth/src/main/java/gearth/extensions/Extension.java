@@ -186,10 +186,10 @@ public abstract class Extension {
                     }
 
                     for(MessageListener listener : correctListeners) {
-                        habboMessage.getPacket().setReadIndex(6);
+                        habboMessage.getPacket().resetReadIndex();
                         listener.act(habboMessage);
                     }
-                    habboMessage.getPacket().setReadIndex(6);
+                    habboMessage.getPacket().resetReadIndex();
 
                     HPacket response = new HPacket(Extensions.INCOMING_MESSAGES_IDS.MANIPULATEDPACKET);
                     response.appendLongString(habboMessage.stringify());

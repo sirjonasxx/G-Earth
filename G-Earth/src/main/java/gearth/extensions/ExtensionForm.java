@@ -58,7 +58,7 @@ public abstract class ExtensionForm extends Application {
             extension.run();
 //            Platform.runLater(primaryStage::close);
             //when the extension has ended, close this process
-            Platform.exit();
+            System.exit(0);
         });
         t.start();
     }
@@ -99,6 +99,7 @@ public abstract class ExtensionForm extends Application {
     private void onClick(){
         Platform.runLater(() -> {
             primaryStage.show();
+            primaryStage.toFront();
         });
     }
 
