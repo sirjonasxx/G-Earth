@@ -13,46 +13,45 @@ import java.util.concurrent.Semaphore;
  */
 public abstract class ExtensionForm extends Application {
 
-    private Extension extension = null;
+    private volatile Extension extension;
     protected static String[] args;
     protected volatile Stage primaryStage;
 
-    private ExtensionForm realForm = null;
+    private volatile ExtensionForm realForm = null;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
         ExtensionInfo extInfo = getClass().getAnnotation(ExtensionInfo.class);
-        Semaphore semaphore = new Semaphore(1);
-        semaphore.acquire();
+
         realForm = launchForm(primaryStage);
+        realForm.extension = new Extension(args) {
+            @Override
+            protected void init() {
+                realForm.initExtension();
+            }
+
+            @Override
+            protected void onClick() {
+                realForm.onClick();
+            }
+
+            @Override
+            protected void onStartConnection() {
+                realForm.onStartConnection();
+            }
+
+            @Override
+            protected void onEndConnection() {
+                realForm.onEndConnection();
+            }
+
+            @Override
+            ExtensionInfo getInfoAnnotations() {
+                return extInfo;
+            }
+        };
+        realForm.primaryStage = primaryStage;
         Thread t = new Thread(() -> {
-            realForm.extension = new Extension(args) {
-                @Override
-                protected void init() {
-                    realForm.initExtension();
-                }
-
-                @Override
-                protected void onClick() {
-                    realForm.onClick();
-                }
-
-                @Override
-                protected void onStartConnection() {
-                    realForm.onStartConnection();
-                }
-
-                @Override
-                protected void onEndConnection() {
-                    realForm.onEndConnection();
-                }
-
-                @Override
-                ExtensionInfo getInfoAnnotations() {
-                    return extInfo;
-                }
-            };
-            semaphore.release();
             realForm.extension.run();
 //            Platform.runLater(primaryStage::close);
             //when the extension has ended, close this process
@@ -60,10 +59,7 @@ public abstract class ExtensionForm extends Application {
         });
         t.start();
 
-        semaphore.acquire();
         Platform.setImplicitExit(false);
-        realForm = launchForm(primaryStage);
-        realForm.primaryStage = primaryStage;
 
         primaryStage.setOnCloseRequest(event -> {
             event.consume();

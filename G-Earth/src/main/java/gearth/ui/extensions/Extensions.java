@@ -291,7 +291,9 @@ public class Extensions extends SubForm {
                             e.printStackTrace();
                         }
                     });
-                    extension.onClick(observable -> extension.sendMessage(new HPacket(OUTGOING_MESSAGES_IDS.ONDOUBLECLICK)));
+                    extension.onClick(observable -> {
+                        extension.sendMessage(new HPacket(OUTGOING_MESSAGES_IDS.ONDOUBLECLICK));
+                    });
 
                     Platform.runLater(() -> producer.extensionConnected(extension));
                 }

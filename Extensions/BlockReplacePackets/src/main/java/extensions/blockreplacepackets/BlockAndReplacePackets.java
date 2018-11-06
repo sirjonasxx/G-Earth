@@ -157,12 +157,7 @@ public class BlockAndReplacePackets extends ExtensionForm {
 
     @Override
     protected void initExtension() {
-        intercept(HMessage.Side.TOSERVER, new Extension.MessageListener() {
-            @Override
-            public void act(HMessage message) {
-                System.out.println("just testing");
-            }
-        });
+        intercept(HMessage.Side.TOSERVER, message -> System.out.println("just testing"));
     }
 
     @Override
