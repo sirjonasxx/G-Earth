@@ -11,64 +11,16 @@ import java.util.concurrent.Semaphore;
 /**
  * Created by Jonas on 22/09/18.
  */
-public abstract class ExtensionForm extends Application {
+public abstract class ExtensionForm {
 
-    private volatile Extension extension;
-    protected static String[] args;
-    protected volatile Stage primaryStage;
+    volatile Extension extension;
+    volatile Stage primaryStage;
 
-    private volatile ExtensionForm realForm = null;
-
-    @Override
-    public void start(Stage primaryStage) throws Exception {
-        ExtensionInfo extInfo = getClass().getAnnotation(ExtensionInfo.class);
-
-        realForm = launchForm(primaryStage);
-        realForm.extension = new Extension(args) {
-            @Override
-            protected void init() {
-                realForm.initExtension();
-            }
-
-            @Override
-            protected void onClick() {
-                realForm.onClick();
-            }
-
-            @Override
-            protected void onStartConnection() {
-                realForm.onStartConnection();
-            }
-
-            @Override
-            protected void onEndConnection() {
-                realForm.onEndConnection();
-            }
-
-            @Override
-            ExtensionInfo getInfoAnnotations() {
-                return extInfo;
-            }
-        };
-        realForm.primaryStage = primaryStage;
-        Thread t = new Thread(() -> {
-            realForm.extension.run();
-//            Platform.runLater(primaryStage::close);
-            //when the extension has ended, close this process
-            System.exit(0);
-        });
-        t.start();
-
-        Platform.setImplicitExit(false);
-
-        primaryStage.setOnCloseRequest(event -> {
-            event.consume();
-            Platform.runLater(() -> {
-                primaryStage.hide();
-                realForm.onHide();
-            });
-        });
+    protected static void runExtensionForm(String[] args, Class<? extends ExtensionForm> extension) {
+        ExtensionFormLauncher launcher = new ExtensionFormLauncher();
+        launcher.trigger(extension, args);
     }
+
 
     public abstract ExtensionForm launchForm(Stage primaryStage) throws Exception;
 
@@ -104,7 +56,7 @@ public abstract class ExtensionForm extends Application {
     /**
      * The application got doubleclicked from the G-Earth interface. Doing something here is optional
      */
-    private void onClick(){
+    protected void onClick(){
         Platform.runLater(() -> {
             primaryStage.show();
             primaryStage.requestFocus();

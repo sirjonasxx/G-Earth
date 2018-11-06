@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<GridPane prefHeight="324.0" prefWidth="588.0" style="-fx-background-color: #FFFFFF;" xmlns="http://javafx.com/javafx/8.0.131" xmlns:fx="http://javafx.com/fxml/1" fx:controller="extensions.blockreplacepackets.BlockAndReplacePackets">
+<GridPane prefHeight="324.0" prefWidth="588.0" style="-fx-background-color: #FFFFFF;" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="extensions.blockreplacepackets.BlockAndReplacePackets">
   <columnConstraints>
     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
   </columnConstraints>
@@ -107,16 +107,16 @@
       </GridPane>
       <ScrollPane fx:id="scrollpane" hbarPolicy="NEVER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-border-color: #888888; -fx-background: #FFFFFF; -fx-border-radius: 4px;" vbarPolicy="ALWAYS">
          <content>
-            <VBox fx:id="schedulecontainer" maxHeight="1.7976931348623157E308" prefWidth="559.0">
+            <VBox fx:id="schedulecontainer" maxHeight="1.7976931348623157E308" prefWidth="574.0">
                <children>
                   <GridPane fx:id="header" gridLinesVisible="true">
                      <columnConstraints>
                         <ColumnConstraints hgrow="SOMETIMES" maxWidth="163.0" minWidth="10.0" percentWidth="12.0" prefWidth="57.0" />
-                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="190.0" minWidth="10.0" percentWidth="14.0" prefWidth="189.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="190.0" minWidth="10.0" percentWidth="12.0" prefWidth="189.0" />
                         <ColumnConstraints hgrow="SOMETIMES" maxWidth="118.0" minWidth="10.0" percentWidth="18.0" prefWidth="66.0" />
                         <ColumnConstraints hgrow="SOMETIMES" maxWidth="100.0" minWidth="10.0" percentWidth="33.0" prefWidth="100.0" />
                         <ColumnConstraints hgrow="SOMETIMES" maxWidth="100.0" minWidth="10.0" percentWidth="15.0" prefWidth="100.0" />
-                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="100.0" minWidth="10.0" percentWidth="6.0" prefWidth="100.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="100.0" minWidth="10.0" percentWidth="8.0" prefWidth="100.0" />
                      </columnConstraints>
                      <rowConstraints>
                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -142,6 +142,6 @@
       </ScrollPane>
    </children>
    <padding>
-      <Insets left="17.0" right="17.0" top="17.0" />
+      <Insets left="10.0" right="10.0" top="8.0" />
    </padding>
 </GridPane>

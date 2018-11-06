@@ -1,14 +1,10 @@
 package extensions.blockreplacepackets;
 
-import gearth.extensions.Extension;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 import gearth.ui.GEarthController;
 import javafx.application.Platform;
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -18,7 +14,6 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import gearth.extensions.ExtensionForm;
 import gearth.extensions.ExtensionInfo;
-import javafx.stage.WindowEvent;
 
 /**
  * Created by Jonas on 22/09/18.
@@ -40,8 +35,7 @@ public class BlockAndReplacePackets extends ExtensionForm {
     public TextField txt_value;
 
     public static void main(String[] args) {
-        ExtensionForm.args = args;
-        launch(args);
+        runExtensionForm(args, BlockAndReplacePackets.class);
     }
 
     //initialize javaFX elements
