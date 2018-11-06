@@ -28,6 +28,7 @@ public class UiLogger implements PacketLogger {
                 for (Elem elem : appendLater) {
                     controller.appendMessage(elem.packet, elem.types);
                 }
+                appendLater.clear();
             }
 
             stage = new Stage();

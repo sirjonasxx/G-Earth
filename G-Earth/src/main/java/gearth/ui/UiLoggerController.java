@@ -53,6 +53,7 @@ public class UiLoggerController implements Initializable {
             initialized = true;
             if (!appendLater.isEmpty()) {
                 appendLog(appendLater);
+                appendLater.clear();
             }
         }
 

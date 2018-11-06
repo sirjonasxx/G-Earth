@@ -2,6 +2,7 @@ package extensions.blockreplacepackets;
 
 import extensions.blockreplacepackets.rules.BlockReplaceRule;
 import extensions.blockreplacepackets.rules.RuleFactory;
+import gearth.extensions.Extension;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 import gearth.ui.GEarthController;
@@ -173,7 +174,14 @@ public class BlockAndReplacePackets extends ExtensionForm {
 
     @Override
     protected void initExtension() {
-        intercept(HMessage.Side.TOSERVER, message -> System.out.println("just testing"));
+        Extension.MessageListener messageListener = message -> {
+            for (BlockReplaceRule rule : rules) {
+                rule.appendRuleToMessage(message);
+            }
+        };
+
+        intercept(HMessage.Side.TOSERVER, messageListener);
+        intercept(HMessage.Side.TOCLIENT, messageListener);
     }
 
     @Override
