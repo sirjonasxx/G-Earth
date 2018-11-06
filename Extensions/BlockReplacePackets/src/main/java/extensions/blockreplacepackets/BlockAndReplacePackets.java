@@ -211,4 +211,9 @@ public class BlockAndReplacePackets extends ExtensionForm {
 
         clearInput();
     }
+
+    @Override
+    protected boolean canDelete() {
+        return false;
+    }
 }

@@ -44,6 +44,16 @@ public class ExtensionFormLauncher extends Application{
             ExtensionInfo getInfoAnnotations() {
                 return extInfo;
             }
+
+            @Override
+            protected boolean canLeave() {
+                return extensionForm.canLeave();
+            }
+
+            @Override
+            protected boolean canDelete() {
+                return extensionForm.canDelete();
+            }
         };
         extensionForm.primaryStage = primaryStage;
         Thread t = new Thread(() -> {

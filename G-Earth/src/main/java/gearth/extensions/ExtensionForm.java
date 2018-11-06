@@ -74,4 +74,12 @@ public abstract class ExtensionForm {
      * A connection with Habbo has ended
      */
     protected void onEndConnection(){}
+
+    protected boolean canLeave() {
+        return true;
+    }
+
+    protected boolean canDelete() {
+        return true;
+    }
 }

@@ -23,8 +23,8 @@ public abstract class Extension {
         void act(String[] args);
     }
 
-    protected static final boolean CANLEAVE = true;     // can you disconnect the ext
-    protected static final boolean CANDELETE = true;    // can you delete the ext (will be false for some built-in extensions)
+    protected boolean canLeave;     // can you disconnect the ext
+    protected boolean canDelete;    // can you delete the ext (will be false for some built-in extensions)
 
     private String[] args;
     private boolean isCorrupted = false;
@@ -53,6 +53,9 @@ public abstract class Extension {
      * @param args arguments
      */
     public Extension(String[] args) {
+        canLeave = canLeave();
+        canDelete = canDelete();
+
         //obtain port
         this.args = args;
 
@@ -126,8 +129,8 @@ public abstract class Extension {
                             .appendBoolean(file != null)
                             .appendString(file == null ? "": file)
                             .appendString(cookie == null ? "" : cookie)
-                            .appendBoolean(CANLEAVE)
-                            .appendBoolean(CANDELETE);
+                            .appendBoolean(canLeave)
+                            .appendBoolean(canDelete);
                     writeToStream(response.toBytes());
                 }
                 else if (packet.headerId() == Extensions.OUTGOING_MESSAGES_IDS.CONNECTIONSTART) {
@@ -347,6 +350,14 @@ public abstract class Extension {
      * A connection with Habbo has ended
      */
     protected void onEndConnection(){}
+
+    protected boolean canLeave() {
+        return true;
+    }
+
+    protected boolean canDelete() {
+        return true;
+    }
 
 
     ExtensionInfo getInfoAnnotations() {
