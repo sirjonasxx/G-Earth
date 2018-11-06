@@ -111,6 +111,7 @@ public class HConnection {
     private volatile boolean autoDetectHost = false;
 
     private volatile String clientHostAndPort = "";
+    private volatile String hotelVersion = "";
 
 
     public State getState() {
@@ -249,33 +250,33 @@ public class HConnection {
         if (DEBUG) System.out.println(habbo_server.getLocalAddress().getHostAddress() + ": " + habbo_server.getLocalPort());
 
         final boolean[] aborted = new boolean[1];
-
         Rc4Obtainer rc4Obtainer = new Rc4Obtainer(this);
+
+        OutgoingHandler outgoingHandler = new OutgoingHandler(habbo_server_out, trafficListeners);
+        rc4Obtainer.setOutgoingHandler(outgoingHandler);
+
+        IncomingHandler incomingHandler = new IncomingHandler(client_out, trafficListeners);
+        rc4Obtainer.setIncomingHandler(incomingHandler);
+
+        outgoingHandler.addOnDatastreamConfirmedListener(hotelVersion -> {
+            this.hotelVersion = hotelVersion;
+            incomingHandler.setAsDataStream();
+            clientHostAndPort = client.getLocalAddress().getHostAddress() + ":" + client.getPort();
+            if (DEBUG) System.out.println(clientHostAndPort);
+            setState(State.CONNECTED);
+            onConnect();
+            outHandler = outgoingHandler;
+            inHandler = incomingHandler;
+        });
 
         // wachten op data van client
         new Thread(() -> {
             try {
-                OutgoingHandler handler = new OutgoingHandler(habbo_server_out, trafficListeners);
-                rc4Obtainer.setOutgoingHandler(handler);
-
                 while (!client.isClosed() && (state == State.WAITING_FOR_CLIENT || state == State.CONNECTED)) {
                     byte[] buffer;
                     while (client_in.available() > 0)	{
                         client_in.read(buffer = new byte[client_in.available()]);
-
-                        handler.act(buffer);
-                        if (!datastream[0] && handler.isDataStream())	{
-                            clientHostAndPort = client.getLocalAddress().getHostAddress() + ":" + client.getPort();
-                            if (DEBUG) System.out.println(clientHostAndPort);
-                            datastream[0] = true;
-                            setState(State.CONNECTED);
-                            onConnect();
-
-                            outHandler = handler;
-                            //client_outputStream = client_out;
-                            //server_outputStream = habbo_server_out;
-                        }
-
+                        outgoingHandler.act(buffer);
                     }
                     Thread.sleep(1);
 
@@ -307,18 +308,11 @@ public class HConnection {
         // wachten op data van server
         new Thread(() -> {
             try {
-                IncomingHandler handler = new IncomingHandler(client_out, trafficListeners);
-                rc4Obtainer.setIncomingHandler(handler);
-
                 while (!habbo_server.isClosed() && (state == State.CONNECTED || state == State.WAITING_FOR_CLIENT)) {
                     byte[] buffer;
                     while (habbo_server_in.available() > 0) {
                         habbo_server_in.read(buffer = new byte[habbo_server_in.available()]);
-                        if (!handler.isDataStream() && datastream[0]) {
-                            handler.setAsDataStream();
-                            inHandler = handler;
-                        }
-                        handler.act(buffer);
+                        incomingHandler.act(buffer);
                     }
                     Thread.sleep(1);
                 }
@@ -434,6 +428,7 @@ public class HConnection {
         if (state != this.state) {
             if (state != State.CONNECTED) {
                 clientHostAndPort = "";
+                hotelVersion = "";
             }
 
             State buffer = this.state;
