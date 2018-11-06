@@ -1,6 +1,10 @@
 package extensions.blockreplacepackets.rules;
 
 import gearth.protocol.HMessage;
+import javafx.beans.InvalidationListener;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Jonas on 6/11/2018.
@@ -34,5 +38,15 @@ public abstract class BlockReplaceRule {
 
     public abstract String value();
     public abstract String replacement();
+
+    private List<InvalidationListener> onDeleteListeners = new ArrayList<>();
+    public void onDelete(InvalidationListener listener) {
+        onDeleteListeners.add(listener);
+    }
+    public void delete() {
+        for (int i = onDeleteListeners.size() - 1; i >= 0; i--) {
+            onDeleteListeners.get(i).invalidated(null);
+        }
+    }
 
 }

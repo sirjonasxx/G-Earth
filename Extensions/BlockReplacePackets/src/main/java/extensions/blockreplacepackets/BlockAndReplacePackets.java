@@ -1,19 +1,29 @@
 package extensions.blockreplacepackets;
 
+import extensions.blockreplacepackets.rules.BlockReplaceRule;
+import extensions.blockreplacepackets.rules.RuleFactory;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 import gearth.ui.GEarthController;
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import gearth.extensions.ExtensionForm;
 import gearth.extensions.ExtensionInfo;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Jonas on 22/09/18.
@@ -21,7 +31,7 @@ import gearth.extensions.ExtensionInfo;
 
 
 @ExtensionInfo(
-        Title = "iManipulate",
+        Title = "G-Manipulate",
         Description = "Block &/ replace packets",
         Version = "0.1",
         Author = "sirjonasxx"
@@ -33,6 +43,11 @@ public class BlockAndReplacePackets extends ExtensionForm {
     public Button btn_add;
     public volatile ComboBox<String> cmb_side;
     public TextField txt_value;
+    public ScrollPane scrollpane;
+    public VBox vbox;
+    public GridPane header;
+
+    List<BlockReplaceRule> rules = new ArrayList<>();
 
     public static void main(String[] args) {
         runExtensionForm(args, BlockAndReplacePackets.class);
@@ -149,6 +164,13 @@ public class BlockAndReplacePackets extends ExtensionForm {
         }
     }
 
+    private void clearInput() {
+        txt_value.clear();
+        txt_replacement.clear();
+        refreshOptions();
+        cmb_type.requestFocus();
+    }
+
     @Override
     protected void initExtension() {
         intercept(HMessage.Side.TOSERVER, message -> System.out.println("just testing"));
@@ -173,6 +195,12 @@ public class BlockAndReplacePackets extends ExtensionForm {
     }
 
     public void click_btnAddRule(ActionEvent actionEvent) {
+        BlockReplaceRule rule = RuleFactory.getRule(cmb_type.getSelectionModel().getSelectedItem(), cmb_side.getSelectionModel().getSelectedItem(), txt_value.getText(), txt_replacement.getText());
+        rules.add(rule);
+        rule.onDelete(observable -> rules.remove(rule));
+        new RuleContainer(rule, vbox);
 
+
+        clearInput();
     }
 }

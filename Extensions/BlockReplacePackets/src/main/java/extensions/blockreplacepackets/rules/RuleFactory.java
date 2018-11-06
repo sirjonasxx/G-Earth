@@ -10,7 +10,7 @@ public class RuleFactory {
     public static BlockReplaceRule getRule(String type, String side, String value, String replacement) {
         BlockReplaceRule.Option rOption = BlockReplaceRule.Option.valueOf(type.split(" ")[0].toUpperCase());
         BlockReplaceRule.Type rType = BlockReplaceRule.Type.valueOf(type.split(" ")[1].toUpperCase());
-        BlockReplaceRule.Side rSide = BlockReplaceRule.Side.valueOf(type.toUpperCase());
+        BlockReplaceRule.Side rSide = BlockReplaceRule.Side.valueOf(side.toUpperCase());
 
         if (rOption == BlockReplaceRule.Option.BLOCK) {
             return new BlockPacketRule(rSide, Integer.parseInt(value));

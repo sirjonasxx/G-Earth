@@ -36,10 +36,10 @@
                <children>
                   <GridPane prefHeight="41.0" prefWidth="580.0">
                     <columnConstraints>
-                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="191.0" minWidth="10.0" prefWidth="127.0" />
-                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="346.0" minWidth="10.0" prefWidth="52.0" />
-                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="314.0" minWidth="10.0" prefWidth="136.0" />
-                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="314.0" minWidth="10.0" prefWidth="123.0" />
+                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="191.0" minWidth="10.0" prefWidth="139.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="346.0" minWidth="10.0" prefWidth="50.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="314.0" minWidth="10.0" prefWidth="148.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="314.0" minWidth="10.0" prefWidth="110.0" />
                     </columnConstraints>
                     <rowConstraints>
                       <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" vgrow="SOMETIMES" />
@@ -107,16 +107,16 @@
       </GridPane>
       <ScrollPane fx:id="scrollpane" hbarPolicy="NEVER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-border-color: #888888; -fx-background: #FFFFFF; -fx-border-radius: 4px;" vbarPolicy="ALWAYS">
          <content>
-            <VBox fx:id="schedulecontainer" maxHeight="1.7976931348623157E308" prefWidth="574.0">
+            <VBox fx:id="vbox" maxHeight="1.7976931348623157E308" prefWidth="574.0">
                <children>
                   <GridPane fx:id="header" gridLinesVisible="true">
                      <columnConstraints>
                         <ColumnConstraints hgrow="SOMETIMES" maxWidth="163.0" minWidth="10.0" percentWidth="12.0" prefWidth="57.0" />
-                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="190.0" minWidth="10.0" percentWidth="12.0" prefWidth="189.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="190.0" minWidth="10.0" percentWidth="14.0" prefWidth="189.0" />
                         <ColumnConstraints hgrow="SOMETIMES" maxWidth="118.0" minWidth="10.0" percentWidth="18.0" prefWidth="66.0" />
                         <ColumnConstraints hgrow="SOMETIMES" maxWidth="100.0" minWidth="10.0" percentWidth="33.0" prefWidth="100.0" />
                         <ColumnConstraints hgrow="SOMETIMES" maxWidth="100.0" minWidth="10.0" percentWidth="15.0" prefWidth="100.0" />
-                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="100.0" minWidth="10.0" percentWidth="8.0" prefWidth="100.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="100.0" minWidth="10.0" percentWidth="6.0" prefWidth="100.0" />
                      </columnConstraints>
                      <rowConstraints>
                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />

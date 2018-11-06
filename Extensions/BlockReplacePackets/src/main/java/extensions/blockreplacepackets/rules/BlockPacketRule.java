@@ -49,6 +49,6 @@ public class BlockPacketRule extends BlockReplaceRule{
 
     @Override
     public String replacement() {
-        return "";
+        return "/";
     }
 }
