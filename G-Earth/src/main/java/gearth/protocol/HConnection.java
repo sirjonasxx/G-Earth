@@ -505,4 +505,7 @@ public class HConnection {
         return clientHostAndPort;
     }
 
+    public String getHotelVersion() {
+        return hotelVersion;
+    }
 }

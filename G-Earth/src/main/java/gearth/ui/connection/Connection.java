@@ -21,6 +21,7 @@ public class Connection extends SubForm {
     public TextField outHost;
     public TextField outPort;
     public CheckBox cbx_autodetect;
+    public TextField txtfield_hotelversion;
 
     private boolean isBusy = false;
 
@@ -75,6 +76,7 @@ public class Connection extends SubForm {
 
     public void onParentSet(){
         getHConnection().addStateChangeListener((oldState, newState) -> Platform.runLater(() -> {
+            txtfield_hotelversion.setText(getHConnection().getHotelVersion());
             if (newState == HConnection.State.NOT_CONNECTED) {
                 updateInputUI();
                 lblState.setText("Not connected");
