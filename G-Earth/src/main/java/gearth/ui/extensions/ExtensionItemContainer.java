@@ -79,10 +79,8 @@ public class ExtensionItemContainer extends GridPane {
         Tooltip delete = new Tooltip("Close connection with this extension");
         Tooltip.install(exitButton,delete);
         exitButton.show();
-        exitButton.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> item.isRemoveClickTrigger());
         clickButton = new SimpleClickButton();
         clickButton.show();
-        clickButton.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> item.isClickTrigger());
 
         buttonsBox = new HBox(clickButton, exitButton);
 
