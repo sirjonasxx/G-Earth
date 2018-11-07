@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+
+<GridPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="262.0" prefWidth="565.0"
+          xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1"
+          fx:controller="gearth.ui.scheduler.Scheduler">
+    <columnConstraints>
+        <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="277.0"/>
+    </columnConstraints>
+    <rowConstraints>
+        <RowConstraints maxHeight="220.0" minHeight="10.0" prefHeight="183.0" vgrow="SOMETIMES"/>
+        <RowConstraints maxHeight="185.0" minHeight="10.0" prefHeight="79.0" vgrow="SOMETIMES"/>
+    </rowConstraints>
+    <ScrollPane fx:id="scrollpane" hbarPolicy="NEVER" maxHeight="1.7976931348623157E308"
+                maxWidth="1.7976931348623157E308"
+                style="-fx-border-color: #888888; -fx-background: #FFFFFF; -fx-border-radius: 4px;"
+                vbarPolicy="ALWAYS">
+        <GridPane.margin>
+            <Insets bottom="8.0" left="17.0" right="17.0" top="17.0"/>
+        </GridPane.margin>
+        <VBox fx:id="schedulecontainer" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+            <GridPane fx:id="header" gridLinesVisible="true">
+                <columnConstraints>
+                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="163.0" minWidth="10.0"
+                                       percentWidth="10.0" prefWidth="57.0"/>
+                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="190.0" minWidth="10.0"
+                                       percentWidth="39.0" prefWidth="189.0"/>
+                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="118.0" minWidth="10.0"
+                                       percentWidth="16.0" prefWidth="66.0"/>
+                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="100.0" minWidth="10.0"
+                                       percentWidth="18.0" prefWidth="100.0"/>
+                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="100.0" minWidth="10.0"
+                                       percentWidth="15.0" prefWidth="100.0"/>
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                </rowConstraints>
+                <VBox.margin>
+                    <Insets bottom="-2.0" left="-2.0" right="-2.0" top="-2.0"/>
+                </VBox.margin>
+                <Label alignment="CENTER" maxHeight="1.7976931348623157E308"
+                       maxWidth="1.7976931348623157E308"
+                       style="-fx-text-fill: #666666; -fx-background-color: #F7F7F7;" text="Index"/>
+                <Label alignment="CENTER" maxHeight="1.7976931348623157E308"
+                       maxWidth="1.7976931348623157E308"
+                       style="-fx-text-fill: #666666; -fx-background-color: #F7F7F7;" text="Packet"
+                       GridPane.columnIndex="1"/>
+                <Label alignment="CENTER" maxHeight="1.7976931348623157E308"
+                       maxWidth="1.7976931348623157E308"
+                       style="-fx-text-fill: #666666; -fx-background-color: #F7F7F7;" text="Interval"
+                       GridPane.columnIndex="2"/>
+                <Label alignment="CENTER" maxHeight="1.7976931348623157E308"
+                       maxWidth="1.7976931348623157E308"
+                       style="-fx-text-fill: #666666; -fx-background-color: #F7F7F7;" text="Destination"
+                       GridPane.columnIndex="3"/>
+                <Label alignment="CENTER" maxHeight="1.7976931348623157E308"
+                       maxWidth="1.7976931348623157E308"
+                       style="-fx-text-fill: #666666; -fx-background-color: #F7F7F7;" text="Edit"
+                       GridPane.columnIndex="4"/>
+            </GridPane>
+        </VBox>
+    </ScrollPane>
+    <GridPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" vgap="3.0" GridPane.rowIndex="1">
+        <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0"
+                               prefWidth="349.0"/>
+        </columnConstraints>
+        <rowConstraints>
+            <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" prefHeight="30.0"
+                            vgrow="SOMETIMES"/>
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+        </rowConstraints>
+        <GridPane.margin>
+            <Insets bottom="10.0" left="17.0" right="17.0"/>
+        </GridPane.margin>
+        <GridPane hgap="7.0">
+            <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="63.0" minWidth="63.0" prefWidth="63.0"/>
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0"
+                                   prefWidth="468.0"/>
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="70.0"
+                                   prefWidth="70.0"/>
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="35.0"
+                                   prefWidth="35.0"/>
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="35.0"
+                                   prefWidth="35.0"/>
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+            </rowConstraints>
+            <TextField fx:id="txt_packet" text="[0][0][0][2][0][0]" GridPane.columnIndex="1">
+                <GridPane.margin>
+                    <Insets left="-7.0"/>
+                </GridPane.margin>
+            </TextField>
+            <Label maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Packet:"
+                   textFill="#000000bb">
+                <GridPane.margin>
+                    <Insets left="3.0"/>
+                </GridPane.margin>
+            </Label>
+            <Button fx:id="btn_clear" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308"
+                    mnemonicParsing="false" onAction="#clearBtnClicked" text="Clear"
+                    GridPane.columnIndex="2"/>
+            <Button fx:id="btn_save" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308"
+                    mnemonicParsing="false" onAction="#saveBtnClicked" text="S" GridPane.columnIndex="3"/>
+            <Button fx:id="btn_load" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308"
+                    mnemonicParsing="false" onAction="#loadBtnClicked" text="L" GridPane.columnIndex="4"/>
+        </GridPane>
+        <GridPane prefHeight="33.0" prefWidth="502.0" GridPane.rowIndex="1">
+            <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="63.0" minWidth="0.0" prefWidth="63.0"/>
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="488.0" minWidth="10.0" prefWidth="80.0"/>
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="102.0" minWidth="10.0" prefWidth="102.0"/>
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="107.0" minWidth="10.0" prefWidth="107.0"/>
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="488.0" minWidth="10.0" prefWidth="181.0"/>
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+            </rowConstraints>
+            <GridPane.margin>
+                <Insets/>
+            </GridPane.margin>
+            <TextField fx:id="txt_delay" text="500+0" GridPane.columnIndex="1">
+                <GridPane.margin>
+                    <Insets right="5.0"/>
+                </GridPane.margin>
+            </TextField>
+            <Label maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Interval:"
+                   textFill="#000000bb">
+                <GridPane.margin>
+                    <Insets left="3.0"/>
+                </GridPane.margin>
+            </Label>
+            <Button fx:id="btn_addoredit" maxHeight="1.7976931348623157E308"
+                    maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#scheduleBtnClicked"
+                    text="Add to scheduler" GridPane.columnIndex="4">
+                <GridPane.margin>
+                    <Insets bottom="2.0" left="5.0" top="2.0"/>
+                </GridPane.margin>
+            </Button>
+            <RadioButton fx:id="rb_incoming" maxHeight="1.7976931348623157E308"
+                         maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Incoming"
+                         GridPane.columnIndex="2">
+                <GridPane.margin>
+                    <Insets left="10.0"/>
+                </GridPane.margin>
+                <toggleGroup>
+                    <ToggleGroup fx:id="scheduler_dest"/>
+                </toggleGroup>
+            </RadioButton>
+            <RadioButton fx:id="rb_outgoing" maxHeight="1.7976931348623157E308"
+                         maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Outgoing"
+                         toggleGroup="$scheduler_dest" GridPane.columnIndex="3">
+                <GridPane.margin>
+                    <Insets left="10.0"/>
+                </GridPane.margin>
+            </RadioButton>
+        </GridPane>
+    </GridPane>
+</GridPane>

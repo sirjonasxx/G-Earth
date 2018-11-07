@@ -1,3 +1,5 @@
 .idea/
-G-Earth2.iml
-Extensions/
+out/
+bin/
+**/target/
+*.iml

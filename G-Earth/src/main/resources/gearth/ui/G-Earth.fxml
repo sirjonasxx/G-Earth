@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+
+<!--maxHeight="19.0" minHeight="19.0"-->
+
+<VBox xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="gearth.ui.GEarthController">
+    <Pane fx:id="mover" maxHeight="0.0" minHeight="0.0" prefWidth="200.0"/>
+    <TabPane fx:id="tabBar" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity"
+             minWidth="-Infinity" prefHeight="295.0" prefWidth="565.0" tabClosingPolicy="UNAVAILABLE">
+        <Tab text="Connection">
+            <fx:include fx:id="connection" source="connection/Connection.fxml"/>
+        </Tab>
+        <Tab fx:id="tab_Logger" text="Logger">
+            <fx:include fx:id="logger" source="logger/Logger.fxml"/>
+        </Tab>
+        <Tab text="Injection">
+            <fx:include fx:id="injection" source="injection/Injection.fxml"/>
+        </Tab>
+        <Tab text="Tools">
+            <fx:include fx:id="tools" source="tools/Tools.fxml"/>
+        </Tab>
+        <Tab text="Scheduler">
+            <fx:include fx:id="scheduler" source="scheduler/Scheduler.fxml"/>
+        </Tab>
+        <Tab fx:id="tab_Settings" text="Settings">
+            <fx:include fx:id="settings" source="settings/Settings.fxml"/>
+        </Tab>
+        <Tab text="Extensions">
+            <fx:include fx:id="extensions" source="extensions/Extensions.fxml"/>
+        </Tab>
+        <Tab text="Info">
+            <fx:include fx:id="info" source="info/Info.fxml"/>
+        </Tab>
+    </TabPane>
+
+</VBox>

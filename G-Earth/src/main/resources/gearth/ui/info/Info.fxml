@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.text.Font?>
+
+<GridPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="262.0" prefWidth="565.0" xmlns="http://javafx.com/javafx/8.0.131" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gearth.ui.info.Info">
+    <columnConstraints>
+        <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="332.0" />
+    </columnConstraints>
+    <rowConstraints>
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+    </rowConstraints>
+   <AnchorPane prefHeight="200.0" prefWidth="200.0">
+      <children>
+         <ImageView fx:id="img_logo" fitHeight="228.0" fitWidth="217.0" layoutX="23.0" layoutY="23.0" pickOnBounds="true" preserveRatio="true" />
+         <Label fx:id="version" layoutX="260.0" layoutY="23.0" text="G-Earth $version" textFill="#000000b2">
+            <font>
+               <Font size="18.0" />
+            </font>
+         </Label>
+         <Label layoutX="260.0" layoutY="50.0" text="Habbo packet manipulator for Linux &amp; Windows" textFill="#000000b2">
+            <font>
+               <Font size="14.0" />
+            </font>
+         </Label>
+         <Label layoutX="260.0" layoutY="86.0" text="Made by:" textFill="#000000b2">
+            <font>
+               <Font name="System Bold" size="14.0" />
+            </font>
+         </Label>
+         <Label layoutX="260.0" layoutY="106.0" text="sirjonasxx" textFill="#000000b2">
+            <font>
+               <Font size="14.0" />
+            </font>
+         </Label>
+         <Label layoutX="260.0" layoutY="142.0" text="Contributors:" textFill="#000000b2">
+            <font>
+               <Font name="System Bold" size="14.0" />
+            </font>
+         </Label>
+         <Label layoutX="260.0" layoutY="162.0" text="XePeleato" textFill="#000000b2">
+            <font>
+               <Font size="14.0" />
+            </font>
+         </Label>
+         <Label layoutX="260.0" layoutY="182.0" text="Scott Stamp" textFill="#000000b2">
+            <font>
+               <Font size="14.0" />
+            </font>
+         </Label>
+         <Label layoutX="260.0" layoutY="202.0" text="LittleJ" textFill="#000000b2">
+            <font>
+               <Font size="14.0" />
+            </font>
+         </Label>
+         <Label layoutX="260.0" layoutY="222.0" text="ArachisH" textFill="#000000b2">
+            <font>
+               <Font size="14.0" />
+            </font>
+         </Label>
+         <Label layoutX="400.0" layoutY="101.0" text="Links:" textFill="#000000b2">
+            <font>
+               <Font name="System Bold" size="14.0" />
+            </font>
+         </Label>
+         <Hyperlink fx:id="link_sng" layoutX="400.0" layoutY="121.0" text="SNG Forum" />
+         <Hyperlink fx:id="link_darkbox" layoutX="400.0" layoutY="141.0" text="Darkbox" />
+         <Hyperlink fx:id="link_d_harble" layoutX="400.0" layoutY="201.0" text="Discord - Harble" />
+         <Hyperlink fx:id="link_g_gearth" layoutX="400.0" layoutY="161.0" text="Github - G-Earth" />
+         <Hyperlink fx:id="link_g_tanji" layoutX="400.0" layoutY="181.0" text="Github - Tanji" />
+         <Hyperlink fx:id="link_d_bonnie" layoutX="400.0" layoutY="221.0" text="Discord - BonnieScripting (pt/br)" />
+      </children>
+   </AnchorPane>
+</GridPane>
