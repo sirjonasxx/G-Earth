@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.CheckMenuItem?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.input.KeyCodeCombination?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.FlowPane?>
+
+<BorderPane fx:id="borderPane" prefHeight="560.0" prefWidth="820.0" xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gearth.ui.UiLoggerController">
+    <top>
+        <MenuBar BorderPane.alignment="CENTER">
+            <Menu mnemonicParsing="false" text="View">
+            <Menu mnemonicParsing="false" text="Display Details">
+              <items>
+                  <CheckMenuItem fx:id="chkDisplayStructure" mnemonicParsing="false" onAction="#toggleDisplayStructure" selected="true" text="Structure" />
+              </items>
+            </Menu>
+            <CheckMenuItem fx:id="chkViewIncoming" mnemonicParsing="false" onAction="#toggleViewIncoming" selected="true" text="View Incoming">
+               <accelerator>
+                  <KeyCodeCombination alt="UP" code="I" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+               </accelerator></CheckMenuItem>
+            <CheckMenuItem fx:id="chkViewOutgoing" mnemonicParsing="false" onAction="#toggleViewOutgoing" selected="true" text="View Outgoing">
+               <accelerator>
+                  <KeyCodeCombination alt="UP" code="O" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+               </accelerator></CheckMenuItem>
+            <CheckMenuItem fx:id="chkAutoscroll" mnemonicParsing="false" onAction="#toggleAutoscroll" selected="true" text="Autoscroll">
+               <accelerator>
+                  <KeyCodeCombination alt="UP" code="L" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+               </accelerator></CheckMenuItem>
+            <CheckMenuItem fx:id="chkSkipBigPackets" mnemonicParsing="false" onAction="#toggleSkipPackets" selected="true" text="Skip big packets" />
+            </Menu>
+        </MenuBar>
+    </top>
+   <bottom>
+       <FlowPane fx:id="flowPane" prefHeight="20.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+           <padding>
+               <Insets left="10.0" top="1.0" />
+           </padding>
+           <Label fx:id="lblViewIncoming" style="-fx-text-fill: black !important" text="View Incoming: True">
+              <FlowPane.margin>
+                  <Insets right="10.0" />
+              </FlowPane.margin>
+           </Label>
+           <Label text="|">
+               <FlowPane.margin>
+                   <Insets right="10.0" />
+               </FlowPane.margin>
+           </Label>
+           <Label fx:id="lblViewOutgoing" style="-fx-text-fill: black !important" text="View Outgoing: True">
+              <FlowPane.margin>
+                  <Insets right="10.0" />
+              </FlowPane.margin>
+           </Label>
+         <Label layoutX="138.0" layoutY="11.0" text="|">
+            <FlowPane.margin>
+               <Insets right="10.0" />
+            </FlowPane.margin>
+         </Label>
+         <Label fx:id="lblAutoScrolll" layoutX="151.0" layoutY="11.0" style="-fx-text-fill: black !important" text="Autoscroll: True" />
+       </FlowPane>
+   </bottom>
+</BorderPane>

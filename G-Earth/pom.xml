@@ -4,11 +4,11 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>AdminOnConnect</artifactId>
+    <artifactId>G-Earth</artifactId>
 
     <packaging>jar</packaging>
 
-    <version>0.0.1-beta</version>
+    <version>0.2</version>
 
     <parent>
         <groupId>G-Earth</groupId>
@@ -17,19 +17,10 @@
     </parent>
 
     <build>
-        <resources>
-            <!-- Embedded FXML and CSS resources -->
-            <resource>
-                <filtering>false</filtering>
-                <directory>src/main/java</directory>
-                <includes>
-                    <include>**/*.fxml</include>
-                    <include>**/*.css</include>
-                </includes>
-            </resource>
-        </resources>
-
         <plugins>
+
+
+            <!-- this builds a non-standalone JAR file -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -40,16 +31,13 @@
                         <manifest>
                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                             <addClasspath>true</addClasspath>
-                            <mainClass>extensions.adminonconnect.AdminOnConnect</mainClass>
-                            <useUniqueVersions>false</useUniqueVersions>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                            <mainClass>gearth.Main</mainClass>
+                            <useUniqueVersions>false</useUniqueVersions>
                         </manifest>
                     </archive>
-                    <finalName>${project.artifactId}</finalName>
                 </configuration>
             </plugin>
-
 
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -66,13 +54,13 @@
                     <outputDirectory>${project.build.directory}/bin</outputDirectory>
                     <archive>
                         <manifest>
-                            <mainClass>extensions.adminonconnect.AdminOnConnect</mainClass>
+                            <mainClass>gearth.Main</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
-                    <finalName>${project.artifactId}</finalName>
+                    <finalName>G-Earth-${project.version}</finalName>
                     <appendAssemblyId>false</appendAssemblyId>
                 </configuration>
             </plugin>
@@ -81,10 +69,19 @@
 
     <dependencies>
         <dependency>
-            <groupId>G-Earth</groupId>
-            <artifactId>G-Earth</artifactId>
-            <version>0.2</version>
-            <!--<scope>provided</scope>-->
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20180813</version>
+        </dependency>
+        <dependency>
+            <groupId>org.fxmisc.richtext</groupId>
+            <artifactId>richtextfx</artifactId>
+            <version>0.9.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>1.11.2</version>
         </dependency>
     </dependencies>
 </project>

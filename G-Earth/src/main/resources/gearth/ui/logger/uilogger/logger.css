@@ -1,0 +1,43 @@
+/* packet logger css */
+.text {
+    -fx-fill: #a9a9a9;
+}
+
+.blocked, .replaced {
+    -fx-fill: #ffff00;
+}
+
+.incoming {
+    -fx-fill: #b22222;
+}
+
+.outgoing {
+    -fx-fill: #0066cc;
+}
+
+.structure, .skipped {
+    -fx-fill: cyan;
+}
+
+.dark {
+    -fx-background-color: #000000;
+}
+
+.caret {
+    -fx-stroke: #ffffff;
+}
+
+.label {
+    -fx-text-fill: #000000 !important;
+}
+
+.menu-bar .text, .menu .text {
+    -fx-text-fill: #000000 !important;
+    -fx-fill: #000000 !important;
+    -fx-padding: -2 0 -2 0 !important;
+}
+
+.scroll-bar:vertical {
+    -fx-pref-width: 16.5;
+    -fx-padding: 1;
+}

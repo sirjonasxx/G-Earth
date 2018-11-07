@@ -12,8 +12,7 @@ import java.util.Random;
  */
 
 /**
- *  - getTitle(), getDescription(), getVersion() and getAuthor() must be implemented
- *
+ * This is an example extension and is not included in a G-Earth release
  */
 
 @ExtensionInfo(

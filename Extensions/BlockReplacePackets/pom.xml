@@ -13,7 +13,7 @@
     <parent>
         <groupId>G-Earth</groupId>
         <artifactId>G-Earth-Parent</artifactId>
-        <version>0.0.1-beta</version>
+        <version>0.2</version>
     </parent>
 
     <build>
@@ -32,53 +32,6 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.7.0</version>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>2.6</version>
-                <executions>
-                    <execution>
-                        <id>copy-resources</id>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>src/main/resources</directory>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>copy-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/bin/lib</outputDirectory>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>2.5</version>
                 <configuration>
@@ -93,12 +46,13 @@
                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                         </manifest>
                     </archive>
-                    <finalName>${artifactId}</finalName>
+                    <finalName>${project.artifactId}</finalName>
                 </configuration>
             </plugin>
 
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.5</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -108,7 +62,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <outputDirectory>${project.parent.basedir}/bin</outputDirectory>
+                    <outputDirectory>${project.build.directory}/bin</outputDirectory>
                     <archive>
                         <manifest>
                             <mainClass>extensions.blockreplacepackets.BlockAndReplacePackets</mainClass>
@@ -117,7 +71,7 @@
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
-                    <finalName>BlockAndReplacePackets</finalName>
+                    <finalName>${project.artifactId}</finalName>
                     <appendAssemblyId>false</appendAssemblyId>
                 </configuration>
             </plugin>
@@ -127,8 +81,8 @@
     <dependencies>
         <dependency>
             <groupId>G-Earth</groupId>
-            <artifactId>G-Earth-UI</artifactId>
-            <version>0.0.1-beta</version>
+            <artifactId>G-Earth</artifactId>
+            <version>0.2</version>
             <!--<scope>provided</scope>-->
         </dependency>
     </dependencies>
