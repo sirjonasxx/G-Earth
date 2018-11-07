@@ -5,6 +5,7 @@ import gearth.ui.extensions.authentication.Authenticator;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.*;
 import java.util.Arrays;
 import java.util.Random;
@@ -14,7 +15,18 @@ import java.util.Random;
  */
 public class NormalExtensionRunner implements ExtensionRunner {
 
-    public static final String JARPATH = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParent();
+    public static final String JARPATH;
+
+    static {
+        String value;
+        try {
+            value = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParent();
+        } catch (URISyntaxException e) {
+            value = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParent();
+            e.printStackTrace();
+        }
+        JARPATH = value;
+    }
 
     @Override
     public void runAllExtensions(int port) {
@@ -45,7 +57,6 @@ public class NormalExtensionRunner implements ExtensionRunner {
         String realname = String.join(".",Arrays.copyOf(split, split.length-1));
         String newname = realname + "-" + getRandomString() + ext.substring(1);
 
-
         Path originalPath = Paths.get(path);
         Path newPath = Paths.get(
                 JARPATH,
@@ -72,13 +83,12 @@ public class NormalExtensionRunner implements ExtensionRunner {
     public void tryRunExtension(String path, int port) {
         try {
             String filename = Paths.get(path).getFileName().toString();
-            Runtime.getRuntime().exec(
-                    ExecutionInfo.getExecutionCommand(getFileExtension(path))
+            String execCommand = ExecutionInfo.getExecutionCommand(getFileExtension(path))
                     .replace("{path}", path)
                     .replace("{port}", port+"")
                     .replace("{filename}", filename)
-                    .replace("{cookie}", Authenticator.generateCookieForExtension(filename))
-            );
+                    .replace("{cookie}", Authenticator.generateCookieForExtension(filename));
+            Runtime.getRuntime().exec(execCommand);
         } catch (IOException e) {
             e.printStackTrace();
         }
