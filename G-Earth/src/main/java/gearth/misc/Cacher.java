@@ -7,6 +7,7 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.util.List;
 
@@ -18,7 +19,11 @@ public class Cacher {
     private static final String CACHE_FILENAME = "cache.json";
 
     private static String getCacheDir() {
-        return new File(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParent();
+        try {
+            return new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParent();
+        } catch (URISyntaxException e) {
+            return null;
+        }
     }
 
     private static boolean cacheFileExists() {

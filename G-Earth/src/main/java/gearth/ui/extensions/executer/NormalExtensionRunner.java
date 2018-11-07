@@ -20,7 +20,7 @@ public class NormalExtensionRunner implements ExtensionRunner {
     static {
         String value;
         try {
-            value = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParent();
+            value = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParent();
         } catch (URISyntaxException e) {
             value = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParent();
             e.printStackTrace();
