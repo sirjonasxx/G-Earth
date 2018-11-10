@@ -41,9 +41,11 @@ public class AdminOnConnect extends Extension {
                 }
             }
         });
+
+        intercept(HMessage.Side.TOSERVER, 4000, message -> done = false);
     }
 
-    protected void onStartConnection() {
-        done = false;
-    }
+//    protected void onStartConnection() {
+//        done = false;
+//    }
 }

@@ -16,25 +16,29 @@ import java.util.List;
  */
 public class Cacher {
 
-    private static final String CACHE_FILENAME = "cache.json";
+    private static final String DEFAULT_CACHE_FILENAME = "cache.json";
 
     private static String getCacheDir() {
         try {
-            return new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParent();
+            return new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParent()
+                    + File.separator
+                    + "Cache";
         } catch (URISyntaxException e) {
             return null;
         }
     }
 
-    private static boolean cacheFileExists() {
-        File f = new File(getCacheDir(), CACHE_FILENAME);
+
+
+    private static boolean cacheFileExists(String cache_filename) {
+        File f = new File(getCacheDir(), cache_filename);
         return (f.exists() && !f.isDirectory());
     }
 
-    private static JSONObject getCacheContents() {
-        if (cacheFileExists()) {
+    public static JSONObject getCacheContents(String cache_filename) {
+        if (cacheFileExists(cache_filename)) {
             try {
-                File f = new File(getCacheDir(), CACHE_FILENAME);
+                File f = new File(getCacheDir(), cache_filename);
                 String contents = String.join("\n", Files.readAllLines(f.toPath()));
 
                 return new JSONObject(contents);
@@ -44,8 +48,11 @@ public class Cacher {
         }
         return new JSONObject();
     }
-    private static void updateCache(JSONObject contents) {
-        try (FileWriter file = new FileWriter(new File(getCacheDir(), CACHE_FILENAME))) {
+    public static void updateCache(JSONObject contents, String cache_filename) {
+        File parent_dir = new File(getCacheDir());
+        parent_dir.mkdirs();
+
+        try (FileWriter file = new FileWriter(new File(getCacheDir(), cache_filename))) {
 
             file.write(contents.toString());
             file.flush();
@@ -54,28 +61,48 @@ public class Cacher {
             e.printStackTrace();
         }
     }
-
-    public static void put(String key, Object val) {
-        JSONObject object = getCacheContents();
+    public static void put(String key, Object val, String cache_filename) {
+        JSONObject object = getCacheContents(cache_filename);
         if (object.has(key)) object.remove(key);
 
         object.put(key, val);
-        updateCache(object);
+        updateCache(object, cache_filename);
     }
-
-    public static Object get(String key) {
-        JSONObject object = getCacheContents();
+    public static Object get(String key, String cache_filename) {
+        JSONObject object = getCacheContents(cache_filename);
         if (object.has(key)) return object.get(key);
         else return null;
     }
-
-    public static List<Object> getList(String key) {
-        JSONObject object = getCacheContents();
+    public static List<Object> getList(String key, String cache_filename) {
+        JSONObject object = getCacheContents(cache_filename);
         if (object.has(key)) return ((JSONArray)object.get(key)).toList();
         else return null;
     }
+    public static void clear(String cache_filename) {
+        updateCache(new JSONObject(), cache_filename);
+    }
 
+
+    private static boolean cacheFileExists() {
+        return cacheFileExists(DEFAULT_CACHE_FILENAME);
+    }
+
+    public static JSONObject getCacheContents() {
+        return getCacheContents(DEFAULT_CACHE_FILENAME);
+    }
+    public static void updateCache(JSONObject contents) {
+        updateCache(contents, DEFAULT_CACHE_FILENAME);
+    }
+    public static void put(String key, Object val) {
+        put(key, val, DEFAULT_CACHE_FILENAME);
+    }
+    public static Object get(String key) {
+        return get(key, DEFAULT_CACHE_FILENAME);
+    }
+    public static List<Object> getList(String key) {
+        return getList(key, DEFAULT_CACHE_FILENAME);
+    }
     public static void clear() {
-        updateCache(new JSONObject());
+         clear(DEFAULT_CACHE_FILENAME);
     }
 }

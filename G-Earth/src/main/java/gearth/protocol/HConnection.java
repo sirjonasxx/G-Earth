@@ -259,12 +259,13 @@ public class HConnection {
         rc4Obtainer.setIncomingHandler(incomingHandler);
 
         outgoingHandler.addOnDatastreamConfirmedListener(hotelVersion -> {
-            this.hotelVersion = hotelVersion;
             incomingHandler.setAsDataStream();
+            this.hotelVersion = hotelVersion;
             clientHostAndPort = client.getLocalAddress().getHostAddress() + ":" + client.getPort();
+            onConnect();
+
             if (DEBUG) System.out.println(clientHostAndPort);
             setState(State.CONNECTED);
-            onConnect();
             outHandler = outgoingHandler;
             inHandler = incomingHandler;
         });

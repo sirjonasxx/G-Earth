@@ -43,6 +43,9 @@ public abstract class ExtensionForm {
     protected boolean sendToClient(HPacket packet){
         return extension.sendToClient(packet);
     }
+    protected void onConnect(Extension.OnConnectionListener listener) {
+        extension.onConnect(listener);
+    }
 
     protected void onShow(){};
     protected void onHide(){};

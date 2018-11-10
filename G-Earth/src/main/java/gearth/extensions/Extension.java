@@ -134,6 +134,10 @@ public abstract class Extension {
                     writeToStream(response.toBytes());
                 }
                 else if (packet.headerId() == Extensions.OUTGOING_MESSAGES_IDS.CONNECTIONSTART) {
+                    String host = packet.readString();
+                    int connectionPort = packet.readInteger();
+                    String hotelVersion = packet.readString();
+                    notifyConnectionListeners(host, connectionPort, hotelVersion);
                     onStartConnection();
                 }
                 else if (packet.headerId() == Extensions.OUTGOING_MESSAGES_IDS.CONNECTIONEND) {
@@ -359,8 +363,22 @@ public abstract class Extension {
         return true;
     }
 
-
     ExtensionInfo getInfoAnnotations() {
         return getClass().getAnnotation(ExtensionInfo.class);
     }
+
+
+    protected interface OnConnectionListener {
+        void act(String host, int port, String hotelversion);
+    }
+    private List<OnConnectionListener> onConnectionListeners = new ArrayList<>();
+    protected void onConnect(OnConnectionListener listener){
+        onConnectionListeners.add(listener);
+    }
+    private void notifyConnectionListeners(String host, int port, String hotelversion) {
+        for (OnConnectionListener listener : onConnectionListeners) {
+            listener.act(host, port, hotelversion);
+        }
+    }
+
 }
