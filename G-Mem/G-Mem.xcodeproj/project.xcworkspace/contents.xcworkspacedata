@@ -2,6 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "self:/Users/Edu/Desktop/Code/G-Mem/G-Mem.xcodeproj">
+      location = "self:G-Mem.xcodeproj">
    </FileRef>
 </Workspace>

@@ -7,13 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		34E35C4F20F7AA7300144B03 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 34E35C4E20F7AA7300144B03 /* main.c */; };
-		34E35C5720F7AA9100144B03 /* process.c in Sources */ = {isa = PBXBuildFile; fileRef = 34E35C5520F7AA9100144B03 /* process.c */; };
-		34E35C5A20F7AC6100144B03 /* memory.c in Sources */ = {isa = PBXBuildFile; fileRef = 34E35C5820F7AC6100144B03 /* memory.c */; };
+		3492858F219A218700BF3522 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3492858E219A218700BF3522 /* main.cpp */; };
+		34928597219A21C200BF3522 /* Process.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 34928595219A21C200BF3522 /* Process.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		34E35C4920F7AA7300144B03 /* CopyFiles */ = {
+		34928589219A218700BF3522 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = /usr/share/man/man1/;
@@ -25,16 +24,15 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		34E35C4B20F7AA7300144B03 /* G-Mem */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "G-Mem"; sourceTree = BUILT_PRODUCTS_DIR; };
-		34E35C4E20F7AA7300144B03 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
-		34E35C5520F7AA9100144B03 /* process.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = process.c; sourceTree = "<group>"; };
-		34E35C5620F7AA9100144B03 /* process.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = process.h; sourceTree = "<group>"; };
-		34E35C5820F7AC6100144B03 /* memory.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = memory.c; sourceTree = "<group>"; };
-		34E35C5920F7AC6100144B03 /* memory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = memory.h; sourceTree = "<group>"; };
+		3431865F219C76AE00362B4B /* ctpl_stl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ctpl_stl.h; sourceTree = "<group>"; };
+		3492858B219A218700BF3522 /* G-Mem */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "G-Mem"; sourceTree = BUILT_PRODUCTS_DIR; };
+		3492858E219A218700BF3522 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		34928595219A21C200BF3522 /* Process.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Process.cpp; sourceTree = "<group>"; };
+		34928596219A21C200BF3522 /* Process.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Process.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		34E35C4820F7AA7300144B03 /* Frameworks */ = {
+		34928588219A218700BF3522 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -44,30 +42,29 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		34E35C4220F7AA7300144B03 = {
+		34928582219A218700BF3522 = {
 			isa = PBXGroup;
 			children = (
-				34E35C4D20F7AA7300144B03 /* G-Mem */,
-				34E35C4C20F7AA7300144B03 /* Products */,
+				3492858D219A218700BF3522 /* G-Mem */,
+				3492858C219A218700BF3522 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		34E35C4C20F7AA7300144B03 /* Products */ = {
+		3492858C219A218700BF3522 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				34E35C4B20F7AA7300144B03 /* G-Mem */,
+				3492858B219A218700BF3522 /* G-Mem */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		34E35C4D20F7AA7300144B03 /* G-Mem */ = {
+		3492858D219A218700BF3522 /* G-Mem */ = {
 			isa = PBXGroup;
 			children = (
-				34E35C4E20F7AA7300144B03 /* main.c */,
-				34E35C5520F7AA9100144B03 /* process.c */,
-				34E35C5620F7AA9100144B03 /* process.h */,
-				34E35C5820F7AC6100144B03 /* memory.c */,
-				34E35C5920F7AC6100144B03 /* memory.h */,
+				3492858E219A218700BF3522 /* main.cpp */,
+				34928595219A21C200BF3522 /* Process.cpp */,
+				34928596219A21C200BF3522 /* Process.hpp */,
+				3431865F219C76AE00362B4B /* ctpl_stl.h */,
 			);
 			path = "G-Mem";
 			sourceTree = "<group>";
@@ -75,69 +72,68 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		34E35C4A20F7AA7300144B03 /* G-Mem */ = {
+		3492858A219A218700BF3522 /* G-Mem */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 34E35C5220F7AA7300144B03 /* Build configuration list for PBXNativeTarget "G-Mem" */;
+			buildConfigurationList = 34928592219A218700BF3522 /* Build configuration list for PBXNativeTarget "G-Mem" */;
 			buildPhases = (
-				34E35C4720F7AA7300144B03 /* Sources */,
-				34E35C4820F7AA7300144B03 /* Frameworks */,
-				34E35C4920F7AA7300144B03 /* CopyFiles */,
+				34928587219A218700BF3522 /* Sources */,
+				34928588219A218700BF3522 /* Frameworks */,
+				34928589219A218700BF3522 /* CopyFiles */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			name = "G-Mem";
-			productName = G-Mem;
-			productReference = 34E35C4B20F7AA7300144B03 /* G-Mem */;
+			productName = "G-Mem";
+			productReference = 3492858B219A218700BF3522 /* G-Mem */;
 			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		34E35C4320F7AA7300144B03 /* Project object */ = {
+		34928583219A218700BF3522 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0940;
+				LastUpgradeCheck = 1010;
 				ORGANIZATIONNAME = "Eduardo Alonso";
 				TargetAttributes = {
-					34E35C4A20F7AA7300144B03 = {
-						CreatedOnToolsVersion = 9.4.1;
+					3492858A219A218700BF3522 = {
+						CreatedOnToolsVersion = 10.1;
 					};
 				};
 			};
-			buildConfigurationList = 34E35C4620F7AA7300144B03 /* Build configuration list for PBXProject "G-Mem" */;
+			buildConfigurationList = 34928586219A218700BF3522 /* Build configuration list for PBXProject "G-Mem" */;
 			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 			);
-			mainGroup = 34E35C4220F7AA7300144B03;
-			productRefGroup = 34E35C4C20F7AA7300144B03 /* Products */;
+			mainGroup = 34928582219A218700BF3522;
+			productRefGroup = 3492858C219A218700BF3522 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				34E35C4A20F7AA7300144B03 /* G-Mem */,
+				3492858A219A218700BF3522 /* G-Mem */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXSourcesBuildPhase section */
-		34E35C4720F7AA7300144B03 /* Sources */ = {
+		34928587219A218700BF3522 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				34E35C4F20F7AA7300144B03 /* main.c in Sources */,
-				34E35C5A20F7AC6100144B03 /* memory.c in Sources */,
-				34E35C5720F7AA9100144B03 /* process.c in Sources */,
+				3492858F219A218700BF3522 /* main.cpp in Sources */,
+				34928597219A21C200BF3522 /* Process.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		34E35C5020F7AA7300144B03 /* Debug */ = {
+		34928590219A218700BF3522 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -188,14 +184,15 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.13;
-				MTL_ENABLE_DEBUG_INFO = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
 			};
 			name = Debug;
 		};
-		34E35C5120F7AA7300144B03 /* Release */ = {
+		34928591219A218700BF3522 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -240,26 +237,25 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
 				SDKROOT = macosx;
 			};
 			name = Release;
 		};
-		34E35C5320F7AA7300144B03 /* Debug */ = {
+		34928593219A218700BF3522 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = Y64N4AUFJ4;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
 		};
-		34E35C5420F7AA7300144B03 /* Release */ = {
+		34928594219A218700BF3522 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = Y64N4AUFJ4;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -269,25 +265,25 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		34E35C4620F7AA7300144B03 /* Build configuration list for PBXProject "G-Mem" */ = {
+		34928586219A218700BF3522 /* Build configuration list for PBXProject "G-Mem" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				34E35C5020F7AA7300144B03 /* Debug */,
-				34E35C5120F7AA7300144B03 /* Release */,
+				34928590219A218700BF3522 /* Debug */,
+				34928591219A218700BF3522 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		34E35C5220F7AA7300144B03 /* Build configuration list for PBXNativeTarget "G-Mem" */ = {
+		34928592219A218700BF3522 /* Build configuration list for PBXNativeTarget "G-Mem" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				34E35C5320F7AA7300144B03 /* Debug */,
-				34E35C5420F7AA7300144B03 /* Release */,
+				34928593219A218700BF3522 /* Debug */,
+				34928594219A218700BF3522 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = 34E35C4320F7AA7300144B03 /* Project object */;
+	rootObject = 34928583219A218700BF3522 /* Project object */;
 }
