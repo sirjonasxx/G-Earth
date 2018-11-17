@@ -21,7 +21,7 @@ public class ExtensionFormLauncher extends Application{
 
         extensionForm.extension = new Extension(args) {
             @Override
-            protected void init() {
+            protected void initExtension() {
                 extensionForm.initExtension();
             }
 

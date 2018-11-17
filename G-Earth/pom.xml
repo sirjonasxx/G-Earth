@@ -60,7 +60,8 @@
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
-                    <finalName>G-Earth-${project.version}</finalName>
+                    <!--<finalName>G-Earth-${project.version}</finalName>-->
+                    <finalName>G-Earth</finalName>
                     <appendAssemblyId>false</appendAssemblyId>
                 </configuration>
             </plugin>

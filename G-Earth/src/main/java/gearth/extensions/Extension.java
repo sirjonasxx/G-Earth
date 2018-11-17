@@ -156,7 +156,7 @@ public abstract class Extension implements IExtension{
                     flagRequestCallback = null;
                 }
                 else if (packet.headerId() == Extensions.OUTGOING_MESSAGES_IDS.INIT) {
-                    init();
+                    initExtension();
                 }
                 else if (packet.headerId() == Extensions.OUTGOING_MESSAGES_IDS.FREEFLOW) {
                     // nothing to be done yet
@@ -338,7 +338,7 @@ public abstract class Extension implements IExtension{
      * Gets called when a connection has been established with G-Earth.
      * This does not imply a connection with Habbo is setup.
      */
-    protected void init(){}
+    protected void initExtension(){}
 
     /**
      * The application got doubleclicked from the G-Earth interface. Doing something here is optional

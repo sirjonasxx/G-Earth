@@ -1,5 +1,8 @@
-package gearth.ui;
+package gearth.ui.logger.loggerdisplays.uilogger;
 
+import gearth.misc.harble_api.HarbleAPI;
+import gearth.misc.harble_api.HarbleAPIFetcher;
+import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 import gearth.ui.logger.loggerdisplays.PacketLogger;
 import javafx.application.Platform;
@@ -27,6 +30,9 @@ public class UiLoggerController implements Initializable {
     public Label lblAutoScrolll;
     public CheckMenuItem chkAutoscroll;
     public CheckMenuItem chkSkipBigPackets;
+    public CheckMenuItem chkMessageName;
+    public CheckMenuItem chkMessageHash;
+    public Label lblHarbleAPI;
 
     private StyleClassedTextArea area;
 
@@ -35,7 +41,8 @@ public class UiLoggerController implements Initializable {
     private boolean displayStructure = true;
     private boolean autoScroll = true;
     private boolean skiphugepackets = true;
-
+    private boolean viewMessageName = true;
+    private boolean viewMessageHash = false;
 
     private volatile boolean initialized = false;
     private final List<Element> appendLater = new ArrayList<>();
@@ -85,6 +92,25 @@ public class UiLoggerController implements Initializable {
         ArrayList<Element> elements = new ArrayList<>();
 
         String expr = packet.toExpression();
+
+        lblHarbleAPI.setText("HarbleAPI: " + (HarbleAPIFetcher.HARBLEAPI == null ? "False" : "True"));
+        if ((viewMessageName || viewMessageHash) && HarbleAPIFetcher.HARBLEAPI != null) {
+            HarbleAPI api = HarbleAPIFetcher.HARBLEAPI;
+            HarbleAPI.HarbleMessage message = api.getHarbleMessageFromHeaderId(
+                    (isIncoming ? HMessage.Side.TOCLIENT : HMessage.Side.TOSERVER),
+                    packet.headerId()
+            );
+
+            if (!(viewMessageName && !viewMessageHash && message.getName() == null)) {
+                if (viewMessageName && message.getName() != null) {
+                    elements.add(new Element("["+message.getName()+"]", "messageinfo"));
+                }
+                if (viewMessageHash) {
+                    elements.add(new Element("["+message.getHash()+"]", "messageinfo"));
+                }
+                elements.add(new Element("\n", ""));
+            }
+        }
 
         if (isBlocked) elements.add(new Element("[Blocked]\n", "blocked"));
         else if (isReplaced) elements.add(new Element("[Replaced]\n", "replaced"));
@@ -180,14 +206,12 @@ public class UiLoggerController implements Initializable {
     public void toggleSkipPackets(ActionEvent actionEvent) {
         skiphugepackets = !skiphugepackets;
     }
-}
 
-class Element {
-    final String text;
-    final String className;
+    public void toggleMessageName(ActionEvent actionEvent) {
+        viewMessageName = !viewMessageName;
+    }
 
-    Element(String text, String className) {
-        this.text = text;
-        this.className = className;
+    public void toggleMessageHash(ActionEvent actionEvent) {
+        viewMessageHash = !viewMessageHash;
     }
 }

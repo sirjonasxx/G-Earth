@@ -1,7 +1,7 @@
-package gearth.ui.logger.loggerdisplays;
+package gearth.ui.logger.loggerdisplays.uilogger;
 
 import gearth.protocol.HPacket;
-import gearth.ui.UiLoggerController;
+import gearth.ui.logger.loggerdisplays.PacketLogger;
 import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;

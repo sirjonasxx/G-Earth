@@ -1,5 +1,6 @@
 package gearth.ui.extensions;
 
+import gearth.misc.harble_api.HarbleAPIFetcher;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
@@ -149,6 +150,7 @@ public class Extensions extends SubForm {
 
         getHConnection().addStateChangeListener((oldState, newState) -> {
             if (newState == HConnection.State.CONNECTED) {
+                HarbleAPIFetcher.fetch(getHConnection().getHotelVersion());
                 synchronized (gEarthExtensions) {
                     for (GEarthExtension extension : gEarthExtensions) {
                         extension.sendMessage(

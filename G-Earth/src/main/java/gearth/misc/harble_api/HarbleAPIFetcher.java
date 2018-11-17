@@ -1,6 +1,7 @@
 package gearth.misc.harble_api;
 
 import gearth.misc.Cacher;
+import gearth.protocol.HMessage;
 import org.json.JSONObject;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -16,11 +17,14 @@ public class HarbleAPIFetcher {
     public static final String CACHE_PREFIX = "HARBLE_API-";
     public static final String HARBLE_API_URL = "https://api.harble.net/revisions/$hotelversion$.json";
 
-    public static HarbleAPI fetch(String hotelversion) {
+    //latest fetched
+    public static HarbleAPI HARBLEAPI = null;
+
+    public static void fetch(String hotelversion) {
         String cacheName = CACHE_PREFIX + hotelversion;
 
         if (Cacher.cacheFileExists(cacheName)) {
-            return new HarbleAPI(hotelversion);
+            HARBLEAPI = new HarbleAPI(hotelversion);
         }
         else {
             Connection connection = Jsoup.connect(HARBLE_API_URL.replace("$hotelversion$", hotelversion)).ignoreContentType(true);
@@ -32,20 +36,23 @@ public class HarbleAPIFetcher {
                     s = s.substring(6, s.length() - 7);
                     JSONObject object = new JSONObject(s);
                     Cacher.updateCache(object, cacheName);
-
-                    return new HarbleAPI(hotelversion);
+                    HARBLEAPI = new HarbleAPI(hotelversion);
                 }
                 else {
-                    return null;
+                    HARBLEAPI = null;
                 }
             } catch (IOException e) {
-                return null;
+                HARBLEAPI = null;
             }
 
         }
     }
 
     public static void main(String[] args) {
-        HarbleAPI api = fetch("PRODUCTION-201810171204-70166177");
+        fetch("PRODUCTION-201810171204-70166177");
+
+        HarbleAPI api = HARBLEAPI;
+        HarbleAPI.HarbleMessage haMessage = api.getHarbleMessageFromHeaderId(HMessage.Side.TOSERVER, 525);
+        System.out.println(haMessage);
     }
 }

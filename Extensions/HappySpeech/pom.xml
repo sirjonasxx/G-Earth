@@ -40,7 +40,7 @@
                         <manifest>
                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                             <addClasspath>true</addClasspath>
-                            <mainClass>extensions.speechcolorizer.SpeechColorizer</mainClass>
+                            <mainClass>extensions.happyspeech.HappySpeech</mainClass>
                             <useUniqueVersions>false</useUniqueVersions>
                             <classpathPrefix>lib/</classpathPrefix>
                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
@@ -65,7 +65,7 @@
                     <outputDirectory>${project.build.directory}/bin</outputDirectory>
                     <archive>
                         <manifest>
-                            <mainClass>extensions.speechcolorizer.SpeechColorizer</mainClass>
+                            <mainClass>extensions.happyspeech.HappySpeech</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>

@@ -3,6 +3,10 @@
     -fx-fill: #a9a9a9;
 }
 
+.messageinfo {
+    -fx-fill: #D0D3D4;
+}
+
 .blocked, .replaced {
     -fx-fill: #ffff00;
 }

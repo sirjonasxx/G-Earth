@@ -2,6 +2,7 @@ package gearth.ui.logger.loggerdisplays;
 
 import gearth.Main;
 import gearth.misc.OSValidator;
+import gearth.ui.logger.loggerdisplays.uilogger.UiLogger;
 
 /**
  * Created by Jonas on 04/04/18.

@@ -27,7 +27,7 @@ public class HarbleAPI {
             this.destination = destination;
             this.headerId = headerId;
             this.hash = hash;
-            this.name = name;
+            this.name = (name == null || name.equals("null") ? null : name);
         }
         public String getName() {
             return name;
@@ -41,6 +41,11 @@ public class HarbleAPI {
         public String getHash() {
             return hash;
         }
+
+        public String toString() {
+            String s = (headerId+": " + "["+hash+"]" + "["+name+"]");
+            return s;
+        }
     }
 
     private Map<Integer, HarbleMessage> headerIdToMessage_incoming = new HashMap<>();
@@ -52,13 +57,25 @@ public class HarbleAPI {
     private Map<String, HarbleMessage> nameToMessage_incoming = new HashMap<>();
     private Map<String, HarbleMessage> nameToMessage_outgoing = new HashMap<>();
 
+    private boolean success = false;
+
     /**
      * cache file must be generated first within G-Earth, inb4 20 extensions requesting it at the same time
      * @param hotelversion
      */
+
+    public static HarbleAPI get(String hotelversion) {
+        HarbleAPI wannabe = new HarbleAPI(hotelversion);
+        if (!wannabe.success) {
+            return null;
+        }
+        return wannabe;
+    }
+
     public HarbleAPI (String hotelversion) {
         if (Cacher.cacheFileExists(HarbleAPIFetcher.CACHE_PREFIX + hotelversion)) {
             JSONObject object = Cacher.getCacheContents(HarbleAPIFetcher.CACHE_PREFIX + hotelversion);
+            success = true;
             parse(object);
         }
     }
@@ -87,29 +104,52 @@ public class HarbleAPI {
         }
     }
     private void parse(JSONObject object) {
-        JSONObject incoming = object.getJSONObject("IncomingMessages");
-        JSONObject outgoing = object.getJSONObject("OutgoingMessages");
+        try {
+            JSONObject incoming = object.getJSONObject("IncomingMessages");
+            JSONObject outgoing = object.getJSONObject("OutgoingMessages");
 
-        if (incoming != null && outgoing != null) {
-            for (String key : incoming.keySet()) {
-                JSONObject inMsg = incoming.getJSONObject(key);
-                String name = inMsg.getString("Name");
-                String hash = inMsg.getString("Hash");
-                Integer headerId = Integer.parseInt(key);
-                HarbleMessage message = new HarbleMessage(HMessage.Side.TOCLIENT, headerId, hash, name);
+            if (incoming != null && outgoing != null) {
+                for (String key : incoming.keySet()) {
+                    try {
+                        JSONObject inMsg = incoming.getJSONObject(key);
+                        String name;
+                        try {
+                            name = inMsg.getString("Name");
+                        }
+                        catch (Exception e) {
+                            name = null;
+                        }
+                        String hash = inMsg.getString("Hash");
+                        Integer headerId = Integer.parseInt(key);
+                        HarbleMessage message = new HarbleMessage(HMessage.Side.TOCLIENT, headerId, hash, name);
 
-                addMessage(message);
-            }
-            for (String key : outgoing.keySet()) {
-                JSONObject outMsg = incoming.getJSONObject(key);
-                String name = outMsg.getString("Name");
-                String hash = outMsg.getString("Hash");
-                Integer headerId = Integer.parseInt(key);
-                HarbleMessage message = new HarbleMessage(HMessage.Side.TOSERVER, headerId, hash, name);
+                        addMessage(message);
+                    }
+                    catch( Exception e) {}
+                }
+                for (String key : outgoing.keySet()) {
+                    try {
+                        JSONObject outMsg = outgoing.getJSONObject(key);
+                        String name;
+                        try {
+                            name = outMsg.getString("Name");
+                        } catch (Exception e) {
+                            name = null;
+                        }
+                        String hash = outMsg.getString("Hash");
+                        Integer headerId = Integer.parseInt(key);
+                        HarbleMessage message = new HarbleMessage(HMessage.Side.TOSERVER, headerId, hash, name);
 
-                addMessage(message);
+                        addMessage(message);
+                    }
+                    catch( Exception e) {}
+                }
             }
         }
+        catch (Exception e) {
+            success = false;
+        }
+
     }
 
     public HarbleMessage getHarbleMessageFromHeaderId(HMessage.Side side, int headerId) {

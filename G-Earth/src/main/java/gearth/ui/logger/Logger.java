@@ -1,6 +1,5 @@
 package gearth.ui.logger;
 
-import gearth.ui.logger.loggerdisplays.UiLogger;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;

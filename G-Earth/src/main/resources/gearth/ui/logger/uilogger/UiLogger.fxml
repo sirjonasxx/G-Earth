@@ -9,13 +9,15 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.FlowPane?>
 
-<BorderPane fx:id="borderPane" prefHeight="560.0" prefWidth="820.0" xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gearth.ui.UiLoggerController">
+<BorderPane fx:id="borderPane" prefHeight="560.0" prefWidth="820.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gearth.ui.logger.loggerdisplays.uilogger.UiLoggerController">
     <top>
         <MenuBar BorderPane.alignment="CENTER">
             <Menu mnemonicParsing="false" text="View">
             <Menu mnemonicParsing="false" text="Display Details">
               <items>
                   <CheckMenuItem fx:id="chkDisplayStructure" mnemonicParsing="false" onAction="#toggleDisplayStructure" selected="true" text="Structure" />
+                  <CheckMenuItem fx:id="chkMessageName" mnemonicParsing="false" onAction="#toggleMessageName" selected="true" text="Message Name" />
+                  <CheckMenuItem fx:id="chkMessageHash" mnemonicParsing="false" onAction="#toggleMessageHash" text="Message Hash" />
               </items>
             </Menu>
             <CheckMenuItem fx:id="chkViewIncoming" mnemonicParsing="false" onAction="#toggleViewIncoming" selected="true" text="View Incoming">
@@ -59,7 +61,20 @@
                <Insets right="10.0" />
             </FlowPane.margin>
          </Label>
-         <Label fx:id="lblAutoScrolll" layoutX="151.0" layoutY="11.0" style="-fx-text-fill: black !important" text="Autoscroll: True" />
+         <Label fx:id="lblAutoScrolll" layoutX="151.0" layoutY="11.0" style="-fx-text-fill: black !important" text="Autoscroll: True">
+            <FlowPane.margin>
+               <Insets right="10.0" />
+            </FlowPane.margin></Label>
+         <Label layoutX="270.0" layoutY="11.0" text="|">
+            <FlowPane.margin>
+               <Insets right="10.0" />
+            </FlowPane.margin>
+         </Label>
+         <Label fx:id="lblHarbleAPI" layoutX="283.0" layoutY="11.0" style="-fx-text-fill: black !important" text="HarbleAPI: False">
+            <FlowPane.margin>
+               <Insets right="10.0" />
+            </FlowPane.margin>
+         </Label>
        </FlowPane>
    </bottom>
 </BorderPane>

@@ -26,7 +26,7 @@ public class AdminOnConnect extends Extension {
 
     private boolean done = true;
 
-    protected void init() {
+    protected void initExtension() {
         intercept(HMessage.Side.TOCLIENT, message -> {
             if (!done) {
                 HPacket packet = message.getPacket();
