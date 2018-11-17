@@ -52,6 +52,7 @@ public class HappySpeech extends Extension {
         packet.replaceString(6, "@" + COLORS[r.nextInt(COLORS.length)] + "@" + speechtext + " :)");
     }
 
+    @Override
     protected void onClick() {
         //{l}{u:1047}{i:0}{s:text}{i:0}{i:0}{i:0}{i:0}
         hashSupport.sendToClient("RoomUserTalk", 0, "You clicked on this extension!", 0, 0, 0, 0);
