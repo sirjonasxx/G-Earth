@@ -19,13 +19,20 @@ public class Cacher {
     private static final String DEFAULT_CACHE_FILENAME = "cache.json";
 
     private static String getCacheDir() {
+        File GEarthDir = null;
         try {
-            return new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParent()
-                    + File.separator
-                    + "Cache";
+            GEarthDir = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParentFile();
+            if (GEarthDir.getName().equals("Extensions")) {
+                GEarthDir = GEarthDir.getParentFile();
+            }
+
         } catch (URISyntaxException e) {
-            return null;
+//            e.printStackTrace();
         }
+
+        return GEarthDir
+                + File.separator
+                + "Cache";
     }
 
 
