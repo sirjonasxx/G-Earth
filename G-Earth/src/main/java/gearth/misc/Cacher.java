@@ -30,7 +30,7 @@ public class Cacher {
 
 
 
-    private static boolean cacheFileExists(String cache_filename) {
+    public static boolean cacheFileExists(String cache_filename) {
         File f = new File(getCacheDir(), cache_filename);
         return (f.exists() && !f.isDirectory());
     }
@@ -83,7 +83,7 @@ public class Cacher {
     }
 
 
-    private static boolean cacheFileExists() {
+    public static boolean cacheFileExists() {
         return cacheFileExists(DEFAULT_CACHE_FILENAME);
     }
 

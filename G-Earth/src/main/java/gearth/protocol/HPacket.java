@@ -1,10 +1,12 @@
 package gearth.protocol;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import gearth.misc.StringifyAble;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -32,6 +34,35 @@ public class HPacket implements StringifyAble {
     public HPacket(int header, byte[] bytes) {
         this(header);
         appendBytes(bytes);
+        isEdited = false;
+    }
+
+    /**
+     *
+     * @param header headerId
+     * @param objects can be a byte, integer, boolean, string, no short values allowed (use 2 bytes instead)
+     */
+    public HPacket(int header, Object... objects) throws InvalidParameterException {
+        this(header);
+        for (int i = 0; i < objects.length; i++) {
+            Object o = objects[i];
+            if (o instanceof Byte) {
+                appendByte((Byte)o);
+            }
+            else if (o instanceof Integer) {
+                appendInt((Integer)o);
+            }
+            else if (o instanceof String) {
+                appendString((String)o);
+            }
+            else if (o instanceof Boolean) {
+                appendBoolean((Boolean) o);
+            }
+            else {
+                throw new InvalidParameterException();
+            }
+        }
+
         isEdited = false;
     }
 

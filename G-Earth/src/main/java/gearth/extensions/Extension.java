@@ -368,7 +368,7 @@ public abstract class Extension {
     }
 
 
-    protected interface OnConnectionListener {
+    public interface OnConnectionListener {
         void act(String host, int port, String hotelversion);
     }
     private List<OnConnectionListener> onConnectionListeners = new ArrayList<>();

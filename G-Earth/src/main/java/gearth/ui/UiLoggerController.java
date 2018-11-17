@@ -60,6 +60,20 @@ public class UiLoggerController implements Initializable {
 
     }
 
+    private static String cleanTextContent(String text)
+    {
+//        // strips off all non-ASCII characters
+//        text = text.replaceAll("[^\\x00-\\x7F]", "");
+//
+//        // erases all the ASCII control characters
+        text = text.replaceAll("[\\p{Cntrl}&&[^\n\t]]", "");
+
+        // removes non-printable characters from Unicode
+//        text = text.replaceAll("\\p{C}", "");
+
+        return text.trim();
+    }
+
     public void appendMessage(HPacket packet, int types) {
         boolean isBlocked = (types & PacketLogger.MESSAGE_TYPE.BLOCKED.getValue()) != 0;
         boolean isReplaced = (types & PacketLogger.MESSAGE_TYPE.REPLACED.getValue()) != 0;
@@ -103,7 +117,7 @@ public class UiLoggerController implements Initializable {
             }
         }
         if (!expr.equals("") && displayStructure && (!skiphugepackets || packet.length() <= 8000))
-            elements.add(new Element("\n" + expr, "structure"));
+            elements.add(new Element("\n" + cleanTextContent(expr), "structure"));
 
         elements.add(new Element("\n--------------------\n", ""));
 
@@ -125,6 +139,7 @@ public class UiLoggerController implements Initializable {
 
             for (Element element : elements) {
                 sb.append(element.text);
+
                 styleSpansBuilder.add(Collections.singleton(element.className), element.text.length());
             }
 
