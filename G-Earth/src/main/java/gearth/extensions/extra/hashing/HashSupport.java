@@ -1,6 +1,7 @@
 package gearth.extensions.extra.hashing;
 
 import gearth.extensions.Extension;
+import gearth.extensions.IExtension;
 import gearth.misc.harble_api.HarbleAPI;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
@@ -21,37 +22,31 @@ public class HashSupport {
     private HarbleAPI harbleAPI = new HarbleAPI(""); //empty
     private Map<String, List<Extension.MessageListener>> incomingMessageListeners = new HashMap<>();
     private Map<String, List<Extension.MessageListener>> outgoingMessageListeners = new HashMap<>();
-    private PacketSender toClientSender;
-    private PacketSender toServerSender;
 
+    private IExtension extension;
 
-    public interface OnConnectRegistration {
-        void onConnect(Extension.OnConnectionListener listener);
-    }
-    public interface InterceptRegistration {
-        void intercept(HMessage.Side side, Extension.MessageListener messageListener);
-    }
-    public interface PacketSender {
-        boolean send(HPacket packet);
-    }
-
-    public HashSupport(OnConnectRegistration onConnectRegistration, InterceptRegistration interceptRegistration, PacketSender sendToClient, PacketSender sendToServer) {
-        toClientSender = sendToClient;
-        toServerSender = sendToServer;
-        onConnectRegistration.onConnect((host, port, hotelversion) -> {
+    public HashSupport(IExtension extension) {
+        this.extension = extension;
+        extension.onConnect((host, port, hotelversion) -> {
 //            synchronized (lock) {
                 harbleAPI = new HarbleAPI(hotelversion);
 //            }
         });
 
-        interceptRegistration.intercept(HMessage.Side.TOSERVER, message -> {
+        extension.intercept(HMessage.Side.TOSERVER, message -> {
 //            synchronized (lock) {
                 HarbleAPI.HarbleMessage haMessage = harbleAPI.getHarbleMessageFromHeaderId(HMessage.Side.TOSERVER, message.getPacket().headerId());
                 if (haMessage != null) {
-                    String hash = haMessage.getHash();
-                    List<Extension.MessageListener> listeners = outgoingMessageListeners.get(hash);
-                    if (listeners != null) {
-                        for (Extension.MessageListener listener : listeners) {
+                    List<Extension.MessageListener> listeners_hash = outgoingMessageListeners.get(haMessage.getHash());
+                    List<Extension.MessageListener> listeners_name = outgoingMessageListeners.get(haMessage.getName());
+                    if (listeners_hash != null) {
+                        for (Extension.MessageListener listener : listeners_hash) {
+                            listener.act(message);
+                            message.getPacket().resetReadIndex();
+                        }
+                    }
+                    if (listeners_name != null) {
+                        for (Extension.MessageListener listener : listeners_name) {
                             listener.act(message);
                             message.getPacket().resetReadIndex();
                         }
@@ -59,14 +54,21 @@ public class HashSupport {
                 }
 //            }
         });
-        interceptRegistration.intercept(HMessage.Side.TOCLIENT, message -> {
+        extension.intercept(HMessage.Side.TOCLIENT, message -> {
 //            synchronized (lock) {
                 HarbleAPI.HarbleMessage haMessage = harbleAPI.getHarbleMessageFromHeaderId(HMessage.Side.TOCLIENT, message.getPacket().headerId());
                 if (haMessage != null) {
                     String hash = haMessage.getHash();
-                    List<Extension.MessageListener> listeners = incomingMessageListeners.get(hash);
-                    if (listeners != null) {
-                        for (Extension.MessageListener listener : listeners) {
+                    List<Extension.MessageListener> listeners_hash = incomingMessageListeners.get(haMessage.getHash());
+                    List<Extension.MessageListener> listeners_name = incomingMessageListeners.get(haMessage.getName());
+                    if (listeners_hash != null) {
+                        for (Extension.MessageListener listener : listeners_hash) {
+                            listener.act(message);
+                            message.getPacket().resetReadIndex();
+                        }
+                    }
+                    if (listeners_name != null) {
+                        for (Extension.MessageListener listener : listeners_name) {
                             listener.act(message);
                             message.getPacket().resetReadIndex();
                         }
@@ -76,29 +78,34 @@ public class HashSupport {
         });
     }
 
-    public void intercept(HMessage.Side side, String hash, Extension.MessageListener messageListener) {
+    public void intercept(HMessage.Side side, String hashOrName, Extension.MessageListener messageListener) {
         Map<String, List<Extension.MessageListener>> messageListeners =
                 (side == HMessage.Side.TOSERVER
                         ? outgoingMessageListeners
                         : incomingMessageListeners);
 
-        messageListeners.computeIfAbsent(hash, k -> new ArrayList<>());
-        messageListeners.get(hash).add(messageListener);
+        messageListeners.computeIfAbsent(hashOrName, k -> new ArrayList<>());
+        messageListeners.get(hashOrName).add(messageListener);
     }
 
-    /**
-     *
-     * @return if no errors occurred (invalid hash/invalid parameters/connection error)
-     */
-    public boolean sendToClient(String hash, Object... objects) {
-        List<HarbleAPI.HarbleMessage> possibilities = harbleAPI.getHarbleMessagesFromHash(HMessage.Side.TOCLIENT, hash);
-        if (possibilities.size() == 0) return false;
-        int headerId = possibilities.get(0).getHeaderId();
+    private boolean send(HMessage.Side side, String hashOrName, Object... objects) {
+        int headerId;
+        HarbleAPI.HarbleMessage fromname = harbleAPI.getHarbleMessageFromName(side, hashOrName);
+        if (fromname != null) {
+            headerId = fromname.getHeaderId();
+        }
+        else {
+            List<HarbleAPI.HarbleMessage> possibilities = harbleAPI.getHarbleMessagesFromHash(side, hashOrName);
+            if (possibilities.size() == 0) return false;
+            headerId = possibilities.get(0).getHeaderId();
+        }
 
         try {
             HPacket packetToSend = new HPacket(headerId, objects);
 
-            return toClientSender.send(packetToSend);
+            return (side == HMessage.Side.TOCLIENT
+                    ? extension.sendToClient(packetToSend)
+                    : extension.sendToServer(packetToSend));
         }
         catch (InvalidParameterException e) {
             return false;
@@ -109,19 +116,16 @@ public class HashSupport {
      *
      * @return if no errors occurred (invalid hash/invalid parameters/connection error)
      */
-    public boolean sendToServer(String hash, Object... objects) {
-        List<HarbleAPI.HarbleMessage> possibilities = harbleAPI.getHarbleMessagesFromHash(HMessage.Side.TOSERVER, hash);
-        if (possibilities.size() == 0) return false;
-        int headerId = possibilities.get(0).getHeaderId();
+    public boolean sendToClient(String hashOrName, Object... objects) {
+        return send(HMessage.Side.TOCLIENT, hashOrName, objects);
+    }
 
-        try {
-            HPacket packetToSend = new HPacket(headerId, objects);
-
-            return toServerSender.send(packetToSend);
-        }
-        catch (InvalidParameterException e) {
-            return false;
-        }
+    /**
+     *
+     * @return if no errors occurred (invalid hash/invalid parameters/connection error)
+     */
+    public boolean sendToServer(String hashOrName, Object... objects) {
+        return send(HMessage.Side.TOSERVER, hashOrName, objects);
     }
 
 }

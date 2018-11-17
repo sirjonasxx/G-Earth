@@ -11,7 +11,7 @@ import java.util.concurrent.Semaphore;
 /**
  * Created by Jonas on 22/09/18.
  */
-public abstract class ExtensionForm {
+public abstract class ExtensionForm implements IExtension{
 
     volatile Extension extension;
     volatile Stage primaryStage;
@@ -25,25 +25,25 @@ public abstract class ExtensionForm {
     public abstract ExtensionForm launchForm(Stage primaryStage) throws Exception;
 
     //wrap extension methods
-    protected boolean requestFlags(Extension.FlagsCheckListener flagRequestCallback){
+    public boolean requestFlags(Extension.FlagsCheckListener flagRequestCallback){
         return extension.requestFlags(flagRequestCallback);
     }
-    protected void writeToConsole(String s) {
+    public void writeToConsole(String s) {
         extension.writeToConsole(s);
     }
-    protected void intercept(HMessage.Side side, Extension.MessageListener messageListener) {
+    public void intercept(HMessage.Side side, Extension.MessageListener messageListener) {
         extension.intercept(side, messageListener);
     }
-    protected void intercept(HMessage.Side side, int headerId, Extension.MessageListener messageListener){
+    public void intercept(HMessage.Side side, int headerId, Extension.MessageListener messageListener){
         extension.intercept(side, headerId, messageListener);
     }
-    protected boolean sendToServer(HPacket packet){
+    public boolean sendToServer(HPacket packet){
         return extension.sendToServer(packet);
     }
-    protected boolean sendToClient(HPacket packet){
+    public boolean sendToClient(HPacket packet){
         return extension.sendToClient(packet);
     }
-    protected void onConnect(Extension.OnConnectionListener listener) {
+    public void onConnect(Extension.OnConnectionListener listener) {
         extension.onConnect(listener);
     }
 
