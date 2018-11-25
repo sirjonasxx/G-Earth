@@ -2,6 +2,8 @@ package gearth.protocol;
 
 import com.sun.org.apache.xpath.internal.operations.Bool;
 import gearth.misc.StringifyAble;
+import gearth.misc.harble_api.HarbleAPI;
+import gearth.misc.harble_api.HarbleAPIFetcher;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
@@ -9,6 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class HPacket implements StringifyAble {
     // te komen: toExpressions (+impl. expressies)
@@ -649,6 +652,54 @@ public class HPacket implements StringifyAble {
 
     public void overrideEditedField(boolean edited) {
         isEdited = edited;
+    }
+
+    private String toExpressionFromGivenStructure(List<String> structure) {
+        int oldReadIndex = readIndex;
+        resetReadIndex();
+
+        try {
+            StringBuilder builder = new StringBuilder();
+            builder.append("{l}{u:").append(headerId()).append("}");
+            for(String str : structure) {
+                builder.append("{");
+                builder.append(str.toLowerCase().charAt(0)).append(':');
+                switch (str) {
+                    case "int":
+                        builder.append(readInteger());
+                        break;
+                    case "String":
+                        builder.append(readString());
+                        break;
+                    case "Byte":
+                        builder.append(readByte());
+                        break;
+                    case "Boolean":
+                        builder.append(readBoolean());
+                        break;
+                }
+                builder.append("}");
+            }
+            readIndex = oldReadIndex;
+            return builder.toString();
+        }
+        catch (Exception e) {
+            readIndex = oldReadIndex;
+            return toExpression();
+        }
+    }
+
+    public String toExpression(HMessage.Side side) {
+        if (isCorrupted()) return "";
+
+        HarbleAPI.HarbleMessage msg;
+        if (HarbleAPIFetcher.HARBLEAPI != null &&
+                ((msg = HarbleAPIFetcher.HARBLEAPI.getHarbleMessageFromHeaderId(side, headerId())) != null)) {
+            if (msg.getStructure() != null) {
+                return toExpressionFromGivenStructure(msg.getStructure());
+            }
+        }
+        return toExpression();
     }
 
     /**
