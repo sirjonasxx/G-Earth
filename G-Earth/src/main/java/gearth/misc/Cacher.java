@@ -30,7 +30,6 @@ public class Cacher {
 //            e.printStackTrace();
         }
 
-        System.out.println(GEarthDir);
         return GEarthDir
                 + File.separator
                 + "Cache";
