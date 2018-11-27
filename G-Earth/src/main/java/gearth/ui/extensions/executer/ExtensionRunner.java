@@ -5,6 +5,8 @@ package gearth.ui.extensions.executer;
  */
 public interface ExtensionRunner {
 
+    String SHOW_EXTENSIONS_LOG = "--log-extensions";
+
     void runAllExtensions(int port);
 
     void installAndRunExtension(String path, int port);

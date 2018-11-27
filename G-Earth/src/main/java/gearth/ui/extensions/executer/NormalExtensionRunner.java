@@ -2,9 +2,12 @@ package gearth.ui.extensions.executer;
 
 import gearth.Main;
 import gearth.ui.extensions.authentication.Authenticator;
+import org.omg.CORBA.Environment;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.nio.file.*;
 import java.util.Arrays;
@@ -88,7 +91,50 @@ public class NormalExtensionRunner implements ExtensionRunner {
                     .replace("{port}", port+"")
                     .replace("{filename}", filename)
                     .replace("{cookie}", Authenticator.generateCookieForExtension(filename));
-            Runtime.getRuntime().exec(execCommand);
+            Process proc = Runtime.getRuntime().exec(execCommand);
+
+
+
+
+            if (Main.hasFlag(ExtensionRunner.SHOW_EXTENSIONS_LOG)) {
+                String sep = "" + System.lineSeparator();
+                synchronized (System.out) {
+                    System.out.println(path + sep + "Launching" + sep + "----------" + sep);
+                }
+
+                BufferedReader stdInput = new BufferedReader(new
+                        InputStreamReader(proc.getInputStream()));
+
+                new Thread(() -> {
+                    try {
+                        String line;
+                        while((line = stdInput.readLine()) != null) {
+                            synchronized (System.out) {
+                                System.out.println(path + sep + "Output" + sep + line + sep + "----------" + sep);
+                            }
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }).start();
+
+                BufferedReader stdError = new BufferedReader(new
+                        InputStreamReader(proc.getErrorStream()));
+
+                new Thread(() -> {
+                    try {
+                        String line;
+                        while((line = stdError.readLine()) != null) {
+                            synchronized (System.out) {
+                                System.out.println(path + sep + "Error" + sep + line + sep + "----------" + sep);
+                            }
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }).start();
+
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
