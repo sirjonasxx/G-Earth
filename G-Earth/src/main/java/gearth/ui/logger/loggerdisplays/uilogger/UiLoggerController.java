@@ -101,7 +101,7 @@ public class UiLoggerController implements Initializable {
                     packet.headerId()
             );
 
-            if (!(viewMessageName && !viewMessageHash && message.getName() == null)) {
+            if ( message != null && !(viewMessageName && !viewMessageHash && message.getName() == null)) {
                 if (viewMessageName && message.getName() != null) {
                     elements.add(new Element("["+message.getName()+"]", "messageinfo"));
                 }
