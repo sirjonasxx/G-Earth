@@ -86,15 +86,19 @@ public class NormalExtensionRunner implements ExtensionRunner {
     public void tryRunExtension(String path, int port) {
         try {
             String filename = Paths.get(path).getFileName().toString();
-            String execCommand = ExecutionInfo.getExecutionCommand(getFileExtension(path))
-                    .replace("{path}", path)
-                    .replace("{port}", port+"")
-                    .replace("{filename}", filename)
-                    .replace("{cookie}", Authenticator.generateCookieForExtension(filename));
-            Process proc = Runtime.getRuntime().exec(execCommand);
-
-
-
+            String[] execCommand = ExecutionInfo.getExecutionCommand(getFileExtension(path));
+            execCommand = Arrays.copyOf(execCommand, execCommand.length);
+            String cookie = Authenticator.generateCookieForExtension(filename);
+            for (int i = 0; i < execCommand.length; i++) {
+                execCommand[i] = execCommand[i]
+                        .replace("{path}", path)
+                        .replace("{port}", port+"")
+                        .replace("{filename}", filename)
+                        .replace("{cookie}", cookie);
+            }
+            ProcessBuilder pb = new ProcessBuilder(execCommand);
+//            Process proc = Runtime.getRuntime().exec(execCommand);
+            Process proc = pb.start();
 
             if (Main.hasFlag(ExtensionRunner.SHOW_EXTENSIONS_LOG)) {
                 String sep = "" + System.lineSeparator();
