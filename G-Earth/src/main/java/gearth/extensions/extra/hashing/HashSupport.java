@@ -1,11 +1,15 @@
 package gearth.extensions.extra.hashing;
 
+import gearth.Main;
 import gearth.extensions.Extension;
 import gearth.extensions.IExtension;
 import gearth.misc.harble_api.HarbleAPI;
+import gearth.misc.harble_api.HarbleAPIFetcher;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 
+import java.io.File;
+import java.net.URISyntaxException;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,9 +31,25 @@ public class HashSupport {
 
     public HashSupport(IExtension extension) {
         this.extension = extension;
+
+        boolean[] isDebug = {false};
+        File GEarthDir = null;
+        try {
+            GEarthDir = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParentFile();
+            if (!GEarthDir.getName().equals("Extensions")) {    //we're probably in debugging mode / not an installed extension
+                                                                //this means; no harble api is provided in our Cache
+                isDebug[0] = true;
+            }
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+
         extension.onConnect((host, port, hotelversion) -> {
 //            synchronized (lock) {
                 harbleAPI = new HarbleAPI(hotelversion);
+                if (isDebug[0]) {
+                    HarbleAPIFetcher.fetch(hotelversion);
+                }
 //            }
         });
 
@@ -58,7 +78,6 @@ public class HashSupport {
 //            synchronized (lock) {
                 HarbleAPI.HarbleMessage haMessage = harbleAPI.getHarbleMessageFromHeaderId(HMessage.Side.TOCLIENT, message.getPacket().headerId());
                 if (haMessage != null) {
-                    String hash = haMessage.getHash();
                     List<Extension.MessageListener> listeners_hash = incomingMessageListeners.get(haMessage.getHash());
                     List<Extension.MessageListener> listeners_name = incomingMessageListeners.get(haMessage.getName());
                     if (listeners_hash != null) {
