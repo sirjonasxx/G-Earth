@@ -46,10 +46,10 @@ public class HashSupport {
 
         extension.onConnect((host, port, hotelversion) -> {
 //            synchronized (lock) {
-                harbleAPI = new HarbleAPI(hotelversion);
-                if (isDebug[0]) {
-                    HarbleAPIFetcher.fetch(hotelversion);
-                }
+            if (isDebug[0]) {
+                HarbleAPIFetcher.fetch(hotelversion);
+            }
+            harbleAPI = new HarbleAPI(hotelversion);
 //            }
         });
 
