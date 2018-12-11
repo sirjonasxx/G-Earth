@@ -2,7 +2,7 @@ package extensions.happyspeech;
 
 import gearth.extensions.Extension;
 import gearth.extensions.ExtensionInfo;
-import gearth.extensions.extra.hashing.HashSupport;
+import gearth.extensions.extra.harble.HashSupport;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 

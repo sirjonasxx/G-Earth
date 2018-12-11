@@ -1,4 +1,4 @@
-package gearth.extensions.extra.hashing;
+package gearth.extensions.extra.harble;
 
 import gearth.Main;
 import gearth.extensions.Extension;
