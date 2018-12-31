@@ -25,19 +25,32 @@ public class Injection extends SubForm {
     }
 
     private void updateUI() {
-        HPacket packet = new HPacket(inputPacket.getText());
-        if (!packet.isCorrupted()) {
-            lbl_corrruption.setText("isCorrupted: False");
-            lbl_corrruption.setFill(Paint.valueOf("Green"));
-            lbl_pcktInfo.setText("header (id:"+packet.headerId()+", length:"+packet.length()+")");
+        boolean dirty = false;
+        String[] rawPackets = inputPacket.getText().split("\n");
+        HPacket[] packets = new HPacket[rawPackets.length];
 
+        lbl_corrruption.setText("isCorrupted: False");
+        lbl_corrruption.setFill(Paint.valueOf("Green"));
+
+        for (int i = 0; i < packets.length; i++) {
+            packets[i] = new HPacket(rawPackets[i]);
+            if (packets[i].isCorrupted()) {
+                if (!dirty) {
+                    lbl_corrruption.setText("isCorrupted: True -> " + i);
+                    lbl_corrruption.setFill(Paint.valueOf("#ee0404b2"));
+                    dirty = true;
+                } else
+                    lbl_corrruption.setText(lbl_corrruption.getText() + ", " + i);
+            }
+        }
+
+        if (!dirty) {
             btn_sendToClient.setDisable(getHConnection().getState() != HConnection.State.CONNECTED);
             btn_sendToServer.setDisable(getHConnection().getState() != HConnection.State.CONNECTED);
-        }
-        else {
-            lbl_corrruption.setText("isCorrupted: True");
-            lbl_corrruption.setFill(Paint.valueOf("#ee0404b2"));
-            lbl_pcktInfo.setText("header (id:NULL, length:"+packet.getBytesLength()+")");
+            lbl_pcktInfo.setText("header (id:" + packets[packets.length - 1].headerId() + ", length:" +
+                    packets[packets.length - 1].length() + ")");
+        } else {
+           lbl_pcktInfo.setText("header (id:NULL, length:" + packets[packets.length - 1].getBytesLength()+")");
 
             btn_sendToClient.setDisable(true);
             btn_sendToServer.setDisable(true);
@@ -46,14 +59,20 @@ public class Injection extends SubForm {
     }
 
     public void sendToServer_clicked(ActionEvent actionEvent) {
-        HPacket packet = new HPacket(inputPacket.getText());
-        getHConnection().sendToServerAsync(packet);
-        writeToLog(Color.BLUE, "SS -> packet with id: " + packet.headerId());
+        String[] rawPackets = inputPacket.getText().split("\n");
+        for (String rawPacket : rawPackets) {
+            HPacket packet = new HPacket(rawPacket);
+            getHConnection().sendToServerAsync(packet);
+            writeToLog(Color.BLUE, "SS -> packet with id: " + packet.headerId());
+        }
     }
 
     public void sendToClient_clicked(ActionEvent actionEvent) {
-        HPacket packet = new HPacket(inputPacket.getText());
-        getHConnection().sendToClientAsync(packet);
-        writeToLog(Color.RED, "CS -> packet with id: " + packet.headerId());
+        String[] rawPackets = inputPacket.getText().split("\n");
+        for (String rawPacket : rawPackets) {
+            HPacket packet = new HPacket(rawPacket);
+            getHConnection().sendToClientAsync(packet);
+            writeToLog(Color.RED, "CS -> packet with id: " + packet.headerId());
+        }
     }
 }
