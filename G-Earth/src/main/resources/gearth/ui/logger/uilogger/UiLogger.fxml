@@ -34,6 +34,10 @@
                </accelerator></CheckMenuItem>
             <CheckMenuItem fx:id="chkSkipBigPackets" mnemonicParsing="false" onAction="#toggleSkipPackets" selected="true" text="Skip big packets" />
             <CheckMenuItem fx:id="chkAlwaysOnTop" mnemonicParsing="false" onAction="#toggleAlwaysOnTop" text="Always on top" />
+            <CheckMenuItem fx:id="chkClearText" mnemonicParsing="false" onAction="#clearText" text="Clear text">
+               <accelerator>
+                  <KeyCodeCombination alt="UP" code="E" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+               </accelerator></CheckMenuItem>
             </Menu>
         </MenuBar>
     </top>

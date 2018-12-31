@@ -227,4 +227,8 @@ public class UiLoggerController implements Initializable {
         stage.setAlwaysOnTop(!alwaysOnTop);
         alwaysOnTop = !alwaysOnTop;
     }
+
+    public void clearText(ActionEvent actionEvent) {
+        area.clear();
+    }
 }
