@@ -12,6 +12,7 @@ import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
+import javafx.stage.Stage;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.StyleClassedTextArea;
 import org.fxmisc.richtext.model.StyleSpansBuilder;
@@ -36,6 +37,8 @@ public class UiLoggerController implements Initializable {
 
     private StyleClassedTextArea area;
 
+    private Stage stage;
+
     private boolean viewIncoming = true;
     private boolean viewOutgoing = true;
     private boolean displayStructure = true;
@@ -43,6 +46,7 @@ public class UiLoggerController implements Initializable {
     private boolean skiphugepackets = true;
     private boolean viewMessageName = true;
     private boolean viewMessageHash = false;
+    private boolean alwaysOnTop = false;
 
     private volatile boolean initialized = false;
     private final List<Element> appendLater = new ArrayList<>();
@@ -181,6 +185,10 @@ public class UiLoggerController implements Initializable {
         });
     }
 
+    public void setStage(Stage stage) {
+        this.stage = stage;
+    }
+
     public void toggleViewIncoming() {
         viewIncoming = !viewIncoming;
         lblViewIncoming.setText("View Incoming: " + (viewIncoming ? "True" : "False"));
@@ -213,5 +221,14 @@ public class UiLoggerController implements Initializable {
 
     public void toggleMessageHash(ActionEvent actionEvent) {
         viewMessageHash = !viewMessageHash;
+    }
+
+    public void toggleAlwaysOnTop(ActionEvent actionEvent) {
+        stage.setAlwaysOnTop(!alwaysOnTop);
+        alwaysOnTop = !alwaysOnTop;
+    }
+
+    public void clearText(ActionEvent actionEvent) {
+        area.clear();
     }
 }

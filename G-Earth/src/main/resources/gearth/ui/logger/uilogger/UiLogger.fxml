@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.FlowPane?>
 
-<BorderPane fx:id="borderPane" prefHeight="560.0" prefWidth="820.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gearth.ui.logger.loggerdisplays.uilogger.UiLoggerController">
+<BorderPane fx:id="borderPane" prefHeight="560.0" prefWidth="820.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gearth.ui.logger.loggerdisplays.uilogger.UiLoggerController">
     <top>
         <MenuBar BorderPane.alignment="CENTER">
             <Menu mnemonicParsing="false" text="View">
@@ -33,6 +33,11 @@
                   <KeyCodeCombination alt="UP" code="L" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
                </accelerator></CheckMenuItem>
             <CheckMenuItem fx:id="chkSkipBigPackets" mnemonicParsing="false" onAction="#toggleSkipPackets" selected="true" text="Skip big packets" />
+            <CheckMenuItem fx:id="chkAlwaysOnTop" mnemonicParsing="false" onAction="#toggleAlwaysOnTop" text="Always on top" />
+            <CheckMenuItem fx:id="chkClearText" mnemonicParsing="false" onAction="#clearText" text="Clear text">
+               <accelerator>
+                  <KeyCodeCombination alt="UP" code="E" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+               </accelerator></CheckMenuItem>
             </Menu>
         </MenuBar>
     </top>
