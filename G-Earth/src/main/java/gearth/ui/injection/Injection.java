@@ -59,6 +59,12 @@ public class Injection extends SubForm {
 
         HPacket[] packets = parsePackets(inputPacket.getText());
 
+        if (packets.length == 0) {
+            dirty = true;
+            lbl_corrruption.setFill(Paint.valueOf("#ee0404b2"));
+            lbl_corrruption.setText("isCorrupted: True");
+        }
+
         for (int i = 0; i < packets.length; i++) {
             if (packets[i].isCorrupted()) {
                 if (!dirty) {
@@ -70,13 +76,27 @@ public class Injection extends SubForm {
             }
         }
 
+        if (dirty && packets.length == 1) {
+            lbl_corrruption.setText("isCorrupted: True"); // no index needed
+        }
+
         if (!dirty) {
             btn_sendToClient.setDisable(getHConnection().getState() != HConnection.State.CONNECTED);
             btn_sendToServer.setDisable(getHConnection().getState() != HConnection.State.CONNECTED);
-            lbl_pcktInfo.setText("header (id:" + packets[packets.length - 1].headerId() + ", length:" +
-                    packets[packets.length - 1].length() + ")");
+            if (packets.length == 1) {
+                lbl_pcktInfo.setText("header (id:" + packets[0].headerId() + ", length:" +
+                        packets[0].length() + ")");
+            }
+            else {
+                lbl_pcktInfo.setText("");
+            }
         } else {
-           lbl_pcktInfo.setText("header (id:NULL, length:" + packets[packets.length - 1].getBytesLength()+")");
+            if (packets.length == 1) {
+                lbl_pcktInfo.setText("header (id:NULL, length:" + packets[0].getBytesLength()+")");
+            }
+            else {
+                lbl_pcktInfo.setText("");
+            }
 
             btn_sendToClient.setDisable(true);
             btn_sendToServer.setDisable(true);

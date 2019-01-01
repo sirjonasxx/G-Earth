@@ -73,9 +73,9 @@ public class HEntity {
     }
 
     public boolean tryUpdate(HEntityUpdate update) {
-        if (index != update.index) return false;
+        if (index != update.getIndex()) return false;
 
-        tile = update.tile;
+        tile = update.getTile();
         lastUpdate = update;
         return true;
     }
