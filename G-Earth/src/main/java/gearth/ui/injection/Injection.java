@@ -11,6 +11,8 @@ import gearth.protocol.HConnection;
 import gearth.protocol.HPacket;
 import gearth.ui.SubForm;
 
+import java.util.LinkedList;
+
 public class Injection extends SubForm {
     public TextArea inputPacket;
     public Text lbl_corrruption;
@@ -24,16 +26,40 @@ public class Injection extends SubForm {
         inputPacket.textProperty().addListener(event -> Platform.runLater(this::updateUI));
     }
 
+    private boolean isPacketIncomplete(String line) {
+        int unmatchedBraces = 0;
+        for (int i = 0; i < line.length(); i++)
+            if (line.charAt(i) == '{')
+                unmatchedBraces++;
+            else if (line.charAt(i) == '}')
+                unmatchedBraces--;
+
+            return unmatchedBraces != 0;
+    }
+
+    private HPacket[] parsePackets(String fullText) {
+        LinkedList<HPacket> packets = new LinkedList<>();
+        String[] lines = fullText.split("\n");
+
+        for (int i = 0; i < lines.length; i++) {
+            String line = lines[i];
+            while (isPacketIncomplete(line) && i < lines.length - 1)
+                line += lines[++i];
+
+            packets.add(new HPacket(line));
+        }
+        return packets.toArray(new HPacket[0]);
+    }
+
     private void updateUI() {
         boolean dirty = false;
-        String[] rawPackets = inputPacket.getText().split("\n");
-        HPacket[] packets = new HPacket[rawPackets.length];
 
         lbl_corrruption.setText("isCorrupted: False");
         lbl_corrruption.setFill(Paint.valueOf("Green"));
 
+        HPacket[] packets = parsePackets(inputPacket.getText());
+
         for (int i = 0; i < packets.length; i++) {
-            packets[i] = new HPacket(rawPackets[i]);
             if (packets[i].isCorrupted()) {
                 if (!dirty) {
                     lbl_corrruption.setText("isCorrupted: True -> " + i);
@@ -59,18 +85,16 @@ public class Injection extends SubForm {
     }
 
     public void sendToServer_clicked(ActionEvent actionEvent) {
-        String[] rawPackets = inputPacket.getText().split("\n");
-        for (String rawPacket : rawPackets) {
-            HPacket packet = new HPacket(rawPacket);
+        HPacket[] packets = parsePackets(inputPacket.getText());
+        for (HPacket packet : packets) {
             getHConnection().sendToServerAsync(packet);
             writeToLog(Color.BLUE, "SS -> packet with id: " + packet.headerId());
         }
     }
 
     public void sendToClient_clicked(ActionEvent actionEvent) {
-        String[] rawPackets = inputPacket.getText().split("\n");
-        for (String rawPacket : rawPackets) {
-            HPacket packet = new HPacket(rawPacket);
+        HPacket[] packets = parsePackets(inputPacket.getText());
+        for (HPacket packet : packets) {
             getHConnection().sendToClientAsync(packet);
             writeToLog(Color.RED, "CS -> packet with id: " + packet.headerId());
         }
