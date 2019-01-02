@@ -208,7 +208,35 @@ It will show the welcome message after typing _:info_ <br/>
 
 If used correctly it can be pretty powerful.
 
+## GUI extensions
+
+We'll build a simple GUI based extension using the concepts we learnt on the console extension part.
+
+The main difference is that instead of extending from _Extension_ we'll extend from _ExtensionForm_. This introduces some changes, for example, in order to call to our extension in _main_, we'll call _runExtensionForm_ instead of the constructor.
+
+```java
+public class SampleExtension extends ExtensionForm {
+    public static void main(String[] args) {
+        runExtensionForm(args, SampleExtension.class);
+    }
+}
+```
+
+Since _ExtensionForm_ is an abstract class, we'll have to implement _launchForm_ in order to setup the javafx components
+```java
+public ExtensionForm launchForm(Stage primaryStage) throws Exception {
+    FXMLLoader loader = new FXMLLoader(getClass().getResource("sampleextension.fxml"));
+    Parent root = loader.load();
+
+    primaryStage.setTitle("Sample extension");
+    primaryStage.setScene(new Scene(root));
+    primaryStage.setResizable(false);
+
+    return loader.getController();
+}
+```
+
+Assuming you've created the .fxml file, this code would be enough for G-Earth to load your extension.
 
 
-
-
+From there, you can design your own UI and use the API to create a fully functional extension.
