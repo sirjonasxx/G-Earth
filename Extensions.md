@@ -148,6 +148,10 @@ protected void onStartConnection() {
 }
 ```
 
+### Minimalistic interaction; onClick
+
+If the _onClick_ method is overridden by your extension, G-Earth will display a green "Start" button next to your extension and the function will get called on-click. For form extensions, this option is automatically used to open the GUI. For non-gui extensions, this is an additional feature you could use.
+
 ### HashSupport
 
 _HashSupport_ allows us to use hashes/names in order to intercept and send packets, using the aforementioned methods.
