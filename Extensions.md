@@ -166,7 +166,8 @@ protected void initExtension() {
 ```
 
 ### ChatConsole
-_ChatConsole_ is a new G-Earth feature that allows us to use the in-game chat in order to communicate with the extension, it can read your input and write messages, you can also set a welcome message, we'll add it to our example.
+_ChatConsole_ is a new G-Earth feature that allows us to use the in-game chat in order to easily communicate with the extension, it can read your input and write messages, you can also set a welcome message, we'll add it to our example.
+(side note: the implementation of ChatConsole hides the whole thing from the Habbo servers, so all interaction stays local)
 
 ```java
 private HashSupport mHashSupport;
