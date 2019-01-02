@@ -2,7 +2,7 @@ package gearth.extensions.parsers;
 
 import gearth.protocol.HPacket;
 
-public class UserProfile {
+public class HUserProfile {
     private int id;
     private String username;
     private String motto;
@@ -20,7 +20,7 @@ public class UserProfile {
     private int lastAccessSince;
     private boolean openProfile;
 
-    public UserProfile(HPacket packet) {
+    public HUserProfile(HPacket packet) {
         id = packet.readInteger();
         username = packet.readString();
         motto = packet.readString();

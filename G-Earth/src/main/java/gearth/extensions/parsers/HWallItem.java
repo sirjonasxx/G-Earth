@@ -28,7 +28,7 @@ public class HWallItem implements IFurni {
         ownerId = packet.readInteger();
     }
 
-    static HWallItem[] parse(HPacket packet) {
+    public static HWallItem[] parse(HPacket packet) {
         int ownersCount = packet.readInteger();
         HashMap<Integer, String> owners = new HashMap<>(ownersCount);
 
