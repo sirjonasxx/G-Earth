@@ -119,8 +119,13 @@ That would be a bare minimum to get it loaded into G-Earth, now let's have a loo
 
 In this section we'll build upon the previous example with the functionality provided by G-Earth's API
 
+### Initializing our extension
+
+_initExtension_  is called whenever G-Earth loads the extension, it's specially useful to init the _HashSupport_ and other features, we'll use it in the following examples
+
+
 ### Intercepting packets
-The _intercept_ method lets us intercept a packet from its id and modify it if we want to.
+The _intercept_ method lets us intercept a packet from its id and modify it if we want to. Typically, we use this function call inside _initExtension_.
 ```java
 intercept(HMessage.Side.TOCLIENT, 4000, hMessage -> {
     // oops we got disconnected
@@ -135,9 +140,6 @@ sendToClient(new HPacket("{l}{u:1234}"));
 // or
 sendToClient(new HPacket(1234));
 ```
-### Initializing our extension
-
-_initExtension_  is called whenever G-Earth loads the extension, it's specially useful to init the _HashSupport_ and other features, we'll use it in the following examples
 
 ### Doing stuff upon client connection
 
