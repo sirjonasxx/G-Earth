@@ -23,15 +23,15 @@ public class HarbleAPI {
         private int headerId;
         private String hash;
         private String name;
-        private List<String> structure;
+        private String structure;
 
         //name can be NULL
-        public HarbleMessage(HMessage.Side destination, int headerId, String hash, String name, List<String> structure) {
+        public HarbleMessage(HMessage.Side destination, int headerId, String hash, String name, String structure) {
             this.destination = destination;
             this.headerId = headerId;
             this.hash = hash;
             this.name = (name == null || name.equals("null") ? null : name);
-            this.structure = structure;
+            this.structure = (structure == null || structure.equals("null") ? null : structure);
         }
         public String getName() {
             return name;
@@ -45,7 +45,7 @@ public class HarbleAPI {
         public String getHash() {
             return hash;
         }
-        public List<String> getStructure() {
+        public String getStructure() {
             return structure;
         }
 
@@ -97,16 +97,12 @@ public class HarbleAPI {
         }
         String hash = object.getString("Hash");
         Integer headerId = Integer.parseInt(id);
-        List<String> structure;
+        String structure;
 
         try {
-            structure = new ArrayList<>();
-            JSONArray array = object.getJSONArray("Structure");
-            for (Object o : array) {
-                structure.add((String)o);
-            }
+            structure = object.getString("Structure");
         }
-        catch (Exception e){
+        catch (Exception e) {
             structure = null;
         }
 
