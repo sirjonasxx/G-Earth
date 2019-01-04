@@ -14,7 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class HPacket implements StringifyAble {
-    // te komen: toExpressions (+impl. expressies)
+
     private boolean isEdited = false;
     private byte[] packetInBytes;
     private int readIndex = 6;
@@ -326,6 +326,15 @@ public class HPacket implements StringifyAble {
         return java.nio.ByteBuffer.wrap(btarray).getInt();
     }
 
+    public double readDouble(){
+        double result = readDouble(readIndex);
+        readIndex += 8;
+        return result;
+    }
+    public double readDouble(int index)	{
+        return java.nio.ByteBuffer.wrap(packetInBytes).getDouble(index);
+    }
+
     public int length()	{
         return readInteger(0);
     }
@@ -409,6 +418,14 @@ public class HPacket implements StringifyAble {
         isEdited = true;
         ByteBuffer b = ByteBuffer.allocate(4).putInt(i);
         for (int j = 0; j < 4; j++) {
+            packetInBytes[index + j] = b.array()[j];
+        }
+        return this;
+    }
+    public HPacket replaceDouble(int index, double d) {
+        isEdited = true;
+        ByteBuffer b = ByteBuffer.allocate(8).putDouble(d);
+        for (int j = 0; j < 8; j++) {
             packetInBytes[index + j] = b.array()[j];
         }
         return this;
@@ -569,6 +586,16 @@ public class HPacket implements StringifyAble {
         ByteBuffer byteBuffer = ByteBuffer.allocate(4).putInt(i);
         for (int j = 0; j < 4; j++) {
             packetInBytes[packetInBytes.length - 4 + j] = byteBuffer.array()[j];
+        }
+        fixLength();
+        return this;
+    }
+    public HPacket appendDouble(double d) {
+        isEdited = true;
+        packetInBytes = Arrays.copyOf(packetInBytes, packetInBytes.length + 8);
+        ByteBuffer byteBuffer = ByteBuffer.allocate(8).putDouble(d);
+        for (int j = 0; j < 8; j++) {
+            packetInBytes[packetInBytes.length - 8 + j] = byteBuffer.array()[j];
         }
         fixLength();
         return this;
