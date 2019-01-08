@@ -85,7 +85,7 @@ public class Scheduler extends SubForm {
                                     getHConnection().sendToServerAsync(item.getPacketProperty().get());
                                 }
                                 else {
-                                    getHConnection().sendToClient(item.getPacketProperty().get());
+                                    getHConnection().sendToClientAsync(item.getPacketProperty().get());
                                 }
                             }
                         }

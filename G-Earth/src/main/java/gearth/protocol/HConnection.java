@@ -39,7 +39,6 @@ public class HConnection {
                 }
             }
         }).start();
-
         new Thread(() -> {
             while (true) {
                 HPacket packet;
@@ -98,19 +97,72 @@ public class HConnection {
     private volatile List<StateChangeListener> stateChangeListeners = new ArrayList<>();
     private volatile State state = State.NOT_CONNECTED;
 
-    private volatile List<String> input_domain = new ArrayList<>();        // given string representation
-    private volatile List<String> actual_domain = new ArrayList<>();              // actual ip representation
-    private volatile List<Integer> port = new ArrayList<>();
+    private class Proxy {
+        private volatile String input_domain;           //string representation of the domain to intercept
+        private volatile String actual_domain;          //dns resolved domain (ignoring hosts file)
+        private volatile int actual_port;               //port of the server
 
-    private volatile List<ServerSocket> proxy = new ArrayList<>();
-    private volatile int realProxyIndex = -1;
+        private volatile int intercept_port;            //port used to intercept connection (with the current implementation, must equal actual_port)
+        private volatile String intercept_host;         //local ip used to intercept host, example 127.0.0.1
 
-    private volatile Handler inHandler = null;
-    private volatile Handler outHandler = null;
+        private volatile ServerSocket proxy_server = null;     //listener for the client
 
-    private volatile boolean autoDetectHost = false;
+        private volatile IncomingHandler inHandler = null;     //connection with client (only initialized when verified habbo connection)
+        private volatile OutgoingHandler outHandler = null;    //connection with server (only initialized when verified habbo connection)
 
-    private volatile String clientHostAndPort = "";
+
+        public Proxy(String input_domain, String actual_domain, int actual_port, int intercept_port, String intercept_host) {
+            this.input_domain = input_domain;
+            this.actual_domain = actual_domain;
+            this.actual_port = actual_port;
+            this.intercept_host = intercept_host;
+            this.intercept_port = intercept_port;
+        }
+
+        public void initProxy(ServerSocket socket) {
+            this.proxy_server = socket;
+        }
+
+        public void verifyProxy(IncomingHandler incomingHandler, OutgoingHandler outgoingHandler) {
+            this.inHandler = incomingHandler;
+            this.outHandler = outgoingHandler;
+        }
+
+        public int getActual_port() {
+            return actual_port;
+        }
+
+        public int getIntercept_port() {
+            return intercept_port;
+        }
+
+        public ServerSocket getProxy_server() {
+            return proxy_server;
+        }
+
+        public String getActual_domain() {
+            return actual_domain;
+        }
+
+        public String getInput_domain() {
+            return input_domain;
+        }
+
+        public String getIntercept_host() {
+            return intercept_host;
+        }
+
+        public IncomingHandler getInHandler() {
+            return inHandler;
+        }
+
+        public OutgoingHandler getOutHandler() {
+            return outHandler;
+        }
+    }
+
+    private volatile List<Proxy> potentialProxies = new ArrayList<>();
+    private volatile Proxy actual_proxy = null;
     private volatile String hotelVersion = "";
 
 
@@ -137,40 +189,44 @@ public class HConnection {
         List<String> potentialHost = new ArrayList<>();
         potentialHost.add(domain+":"+port);
         prepare(potentialHost);
-        realProxyIndex = 0;
+        actual_proxy = null;
     }
 
     private void prepare(List<String> allPotentialHosts) {
         setState(State.PREPARING);
-        input_domain.clear();
-        actual_domain.clear();
-        port.clear();
         clearAllProxies();
-        realProxyIndex = -1;
-
-        for (String host : allPotentialHosts) {
-            String[] split = host.split(":");
-            input_domain.add(split[0]);
-            port.add(Integer.parseInt(split[1]));
-        }
+        actual_proxy = null;
 
         if (hostRedirected)	{
             removeFromHosts();
         }
 
-
         List<String> willremove = new ArrayList<>();
+
+        int c = 0;
+
         for (String host : allPotentialHosts) {
+            String[] split = host.split(":");
+            String input_dom = split[0];
+            int port = Integer.parseInt(split[1]);
+            String actual_dom;
+
             InetAddress address = null;
             try {
-                address = InetAddress.getByName(host.split(":")[0]);
-                actual_domain.add(address.getHostAddress());
-            } catch (UnknownHostException e) {
-//                e.printStackTrace();
-                actual_domain.add(null);
-                willremove.add(host);
+                address = InetAddress.getByName(input_dom);
+                actual_dom = address.getHostAddress();
             }
+            catch (UnknownHostException e) {
+                willremove.add(host);
+                continue;
+            }
+
+            int intercept_port = port;
+            String intercept_host = "127.0." + (c / 254) + "." + (1 + c % 254);
+            potentialProxies.add(new Proxy(input_dom, actual_dom, port, intercept_port, intercept_host));
+            c++;
         }
+
 
         List<Object> additionalCachedHotels = Cacher.getList(HOTELS_CACHE_KEY);
         if (additionalCachedHotels != null) {
@@ -192,29 +248,25 @@ public class HConnection {
             }
 
 
-            for (int i = 0; i < actual_domain.size(); i++) {
-                if (actual_domain.get(i) == null) continue;
+            for (int c = 0; c < potentialProxies.size(); c++) {
+                Proxy potentialProxy = potentialProxies.get(c);
 
-                ServerSocket proxy = new ServerSocket(port.get(i), 10, InetAddress.getByName("127.0.0." + (i+1)));
-                this.proxy.add(proxy);
-                String dom = actual_domain.get(i);
-                Integer port2 = port.get(i);
-
-                int[] i2 = {i};
+                ServerSocket proxy_server = new ServerSocket(potentialProxy.getIntercept_port(), 10, InetAddress.getByName(potentialProxy.getIntercept_host()));
+                potentialProxy.initProxy(proxy_server);
 
                 new Thread(() -> {
                     try  {
                         Thread.sleep(100);
-                        while ((state == State.WAITING_FOR_CLIENT) && !proxy.isClosed())	{
+                        while ((state == State.WAITING_FOR_CLIENT) && !proxy_server.isClosed())	{
                             try {
-                                Socket client = proxy.accept();
-                                realProxyIndex = i2[0];
-                                closeAllProxies(i2[0]);
+                                Socket client = proxy_server.accept();
+                                actual_proxy = potentialProxy;
+                                closeAllProxies(actual_proxy);
                                 if (DEBUG) System.out.println("accepted a proxy");
 
                                 new Thread(() -> {
                                     try {
-                                        startProxyThread(client, dom, port2);
+                                        startProxyThread(client, potentialProxy);
                                     } catch (InterruptedException | IOException e) {
                                         // TODO Auto-generated catch block
                                         e.printStackTrace();
@@ -237,10 +289,10 @@ public class HConnection {
             if (DEBUG) System.out.println("done waiting for clients with: " + this.state );
         }
     }
-    private void startProxyThread(Socket client, String ip, int port) throws InterruptedException, UnknownHostException, IOException	{
+    private void startProxyThread(Socket client, Proxy proxy) throws InterruptedException, UnknownHostException, IOException	{
         final boolean[] datastream = new boolean[1];
 
-        Socket habbo_server = new Socket(ip, port);
+        Socket habbo_server = new Socket(proxy.actual_domain, proxy.actual_port);
 
         OutputStream client_out = client.getOutputStream();
         InputStream client_in = client.getInputStream();
@@ -261,13 +313,10 @@ public class HConnection {
         outgoingHandler.addOnDatastreamConfirmedListener(hotelVersion -> {
             incomingHandler.setAsDataStream();
             this.hotelVersion = hotelVersion;
-            clientHostAndPort = client.getLocalAddress().getHostAddress() + ":" + client.getPort();
             onConnect();
 
-            if (DEBUG) System.out.println(clientHostAndPort);
             setState(State.CONNECTED);
-            outHandler = outgoingHandler;
-            inHandler = incomingHandler;
+            proxy.verifyProxy(incomingHandler, outgoingHandler);
         });
 
         // wachten op data van client
@@ -301,8 +350,8 @@ public class HConnection {
                 }
                 if (datastream[0]) {
                     setState(State.NOT_CONNECTED);
-                    outHandler = null;
-                    inHandler = null;
+                    proxy.verifyProxy(null, null);
+                    actual_proxy = null;
                 };
             }
         }).start();
@@ -360,26 +409,22 @@ public class HConnection {
             removeFromHosts();
         }
 
-        port.clear();
-        input_domain.clear();
-        actual_domain.clear();
-        realProxyIndex = -1;
+        actual_proxy = null;
 
         setState(State.NOT_CONNECTED);
         clearAllProxies();
     }
 
     private void clearAllProxies() {
-        closeAllProxies(-1);
-        proxy.clear();
+        closeAllProxies(null);
+        potentialProxies = new ArrayList<>();
     }
-    private void closeAllProxies(int except) {
-        for (int i = 0; i < proxy.size(); i++) {
-            if (i != except) {
-                ServerSocket prox = proxy.get(i);
-                if (prox != null && !prox.isClosed())	{
+    private void closeAllProxies(Proxy except) {
+        for (Proxy proxy : potentialProxies) {
+            if (except != proxy) {
+                if (proxy.proxy_server != null && !proxy.proxy_server.isClosed())	{
                     try {
-                        prox.close();
+                        proxy.proxy_server.close();
                     } catch (IOException e) {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
@@ -392,10 +437,8 @@ public class HConnection {
 
     private void addToHosts() {
         List<String> linesTemp = new ArrayList<>();
-        for (int i = 0; i < input_domain.size(); i++) {
-            if (actual_domain.get(i) != null) {
-                linesTemp.add(("127.0.0." + (i+1)) + " " + input_domain.get(i));
-            }
+        for (Proxy proxy : potentialProxies) {
+            linesTemp.add(proxy.getIntercept_host() + " " + proxy.getInput_domain());
         }
 
         String[] lines = new String[linesTemp.size()];
@@ -407,10 +450,8 @@ public class HConnection {
     }
     private void removeFromHosts(){
         List<String> linesTemp = new ArrayList<>();
-        for (int i = 0; i < input_domain.size(); i++) {
-            if (actual_domain.get(i) != null) {
-                linesTemp.add(("127.0.0." + (i+1)) + " " + input_domain.get(i));
-            }
+        for (Proxy proxy : potentialProxies) {
+            linesTemp.add(proxy.getIntercept_host() + " " + proxy.getInput_domain());
         }
 
         String[] lines = new String[linesTemp.size()];
@@ -428,7 +469,6 @@ public class HConnection {
         }
         if (state != this.state) {
             if (state != State.CONNECTED) {
-                clientHostAndPort = "";
                 hotelVersion = "";
             }
 
@@ -466,27 +506,27 @@ public class HConnection {
     }
 
     public int getPort() {
-        if (realProxyIndex == -1) return -1;
-        return port.get(realProxyIndex);
+        if (actual_proxy == null) return -1;
+        return actual_proxy.getIntercept_port();
     }
     public String getHost() {
-        if (realProxyIndex == -1) return "<auto-detect>";
-        return actual_domain.get(realProxyIndex);
+        if (actual_proxy == null) return "<auto-detect>";
+        return actual_proxy.getActual_domain();
     }
     public String getDomain() {
-        if (realProxyIndex == -1) return "<auto-detect>";
-        return input_domain.get(realProxyIndex);
+        if (actual_proxy == null) return "<auto-detect>";
+        return actual_proxy.getInput_domain();
     }
 
 
-    public boolean sendToClient(HPacket message) {
-        if (inHandler == null) return false;
-        inHandler.sendToStream(message.toBytes());
+    private boolean sendToClient(HPacket message) {
+        if (actual_proxy == null || actual_proxy.getInHandler() == null) return false;
+        actual_proxy.getInHandler().sendToStream(message.toBytes());
         return true;
     }
-    public boolean sendToServer(HPacket message) {
-        if (outHandler == null) return false;
-        outHandler.sendToStream(message.toBytes());
+    private boolean sendToServer(HPacket message) {
+        if (actual_proxy == null || actual_proxy.getOutHandler() == null)  return false;
+        actual_proxy.getOutHandler().sendToStream(message.toBytes());
         return true;
     }
 
@@ -503,7 +543,10 @@ public class HConnection {
     }
 
     public String getClientHostAndPort() {
-        return clientHostAndPort;
+        if (actual_proxy == null || actual_proxy.getIntercept_host() == null || actual_proxy.getIntercept_port() == -1) {
+            return "";
+        }
+        return actual_proxy.getIntercept_host() + ":" + actual_proxy.getIntercept_port();
     }
 
     public String getHotelVersion() {
