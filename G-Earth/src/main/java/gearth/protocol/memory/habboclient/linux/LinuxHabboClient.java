@@ -12,8 +12,15 @@ public class LinuxHabboClient extends HabboClient {
 
     private static final String[] potentialProcessNames = {"--ppapi-flash-args", "plugin-container"};
 
-    private int PID;
-    private List<long[]> maps;
+    List<PotentialHabboProcess> potentialProcesses = new ArrayList<>();
+
+    private class PotentialHabboProcess {
+        public int PID;
+        public List<long[]> maps;
+    }
+
+    private volatile int PID;
+    private volatile List<long[]> maps;
 
     private static final boolean DEBUG = false;
 
@@ -33,19 +40,20 @@ public class LinuxHabboClient extends HabboClient {
                     for (String s : potentialProcessNames) {
                         if (fileContainsString(path, s)) {
                             isHabboProcess = true;
-                            break;
                         }
                     }
                     if (isHabboProcess) {
-                        this.PID = Integer.parseInt(file.getName());
-                        this.maps = new ArrayList<>();
+                        PotentialHabboProcess process = new PotentialHabboProcess();
+                        process.PID = Integer.parseInt(file.getName());
+                        process.maps = new ArrayList<>();
+                        potentialProcesses.add(process);
                         found = true;
                     }
                 }
             }
         } while (!found);
 
-        if (DEBUG) System.out.println("* Found flashclient process: " + PID);
+        if (DEBUG) System.out.println("* Found flashclient " + potentialProcesses.size() + " potential processes");
     }
 
     @Override
@@ -141,31 +149,36 @@ public class LinuxHabboClient extends HabboClient {
     }
 
     public List<byte[]> getRC4possibilities() {
+
         int offset = 4;
-
-        List<LinuxMemorySnippet> possibilities = createMemorySnippetListForRC4();
-        fetchMemory(possibilities);
-
         List<byte[]> resultSet = new ArrayList<>();
 
-        for (LinuxMemorySnippet snippet : possibilities) {
-            if (snippet.getData().length >= 1024 && snippet.getData().length <= 1024+2*offset) {
-                for (int i = 0; i < (snippet.getData().length - ((256 - 1) * offset)); i+=offset) {
-                    byte[] wannabeRC4data = Arrays.copyOfRange(snippet.getData(), i, 1024 + i);
-                    byte[] data = new byte[256]; // dis is the friggin key
+        for (PotentialHabboProcess process : potentialProcesses) {
+            PID = process.PID;
+            maps = process.maps;
 
-                    boolean isvalid = true;
-                    for (int j = 0; j < 1024; j++) {
-                        if (j % 4 != 0 && wannabeRC4data[j] != 0) {
-                            isvalid = false;
-                            break;
+            List<LinuxMemorySnippet> possibilities = createMemorySnippetListForRC4();
+            fetchMemory(possibilities);
+
+            for (LinuxMemorySnippet snippet : possibilities) {
+                if (snippet.getData().length >= 1024 && snippet.getData().length <= 1024+2*offset) {
+                    for (int i = 0; i < (snippet.getData().length - ((256 - 1) * offset)); i+=offset) {
+                        byte[] wannabeRC4data = Arrays.copyOfRange(snippet.getData(), i, 1024 + i);
+                        byte[] data = new byte[256]; // dis is the friggin key
+
+                        boolean isvalid = true;
+                        for (int j = 0; j < 1024; j++) {
+                            if (j % 4 != 0 && wannabeRC4data[j] != 0) {
+                                isvalid = false;
+                                break;
+                            }
+                            if (j % 4 == 0) {
+                                data[j/4] = wannabeRC4data[j];
+                            }
                         }
-                        if (j % 4 == 0) {
-                            data[j/4] = wannabeRC4data[j];
+                        if (isvalid) {
+                            resultSet.add(data);
                         }
-                    }
-                    if (isvalid) {
-                        resultSet.add(data);
                     }
                 }
             }
