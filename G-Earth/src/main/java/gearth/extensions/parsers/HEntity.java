@@ -8,11 +8,11 @@ public class HEntity {
     private HPoint tile;
     private String name;
     private String motto;
-    private HGender gender;
-    private int entityType;
+    private HGender gender = null;
+    private HEntityType entityType;
     private String figureId;
-    private String favoriteGroup;
-    private HEntityUpdate lastUpdate;
+    private String favoriteGroup = null;
+    private HEntityUpdate lastUpdate = null;
 
     public HEntity(HPacket packet) {
         id = packet.readInteger();
@@ -24,9 +24,10 @@ public class HEntity {
                 Double.parseDouble(packet.readString()));
 
         packet.readInteger();
-        entityType = packet.readInteger();
+        int entityTypeId = packet.readInteger();
+        entityType = HEntityType.valueOf(entityTypeId);
 
-        switch (entityType) {
+        switch (entityTypeId) {
             case 1:
                 gender = HGender.valueOf(packet.readString());
                 packet.readInteger();
@@ -104,7 +105,7 @@ public class HEntity {
         return gender;
     }
 
-    public int getEntityType() {
+    public HEntityType getEntityType() {
         return entityType;
     }
 
