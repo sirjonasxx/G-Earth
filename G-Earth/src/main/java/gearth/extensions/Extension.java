@@ -90,6 +90,7 @@ public abstract class Extension implements IExtension{
         Socket gEarthExtensionServer = null;
         try {
             gEarthExtensionServer = new Socket("127.0.0.1", port);
+            gEarthExtensionServer.setTcpNoDelay(true);
             InputStream in = gEarthExtensionServer.getInputStream();
             DataInputStream dIn = new DataInputStream(in);
             out = gEarthExtensionServer.getOutputStream();

@@ -29,7 +29,7 @@ import java.io.IOException;
 public class Main extends Application {
 
     public static Application main;
-    public static String version = "0.2";
+    public static String version = "0.2.1";
     private static String gitApi = "https://api.github.com/repos/sirjonasxx/G-Earth/releases/latest";
 
     @Override
