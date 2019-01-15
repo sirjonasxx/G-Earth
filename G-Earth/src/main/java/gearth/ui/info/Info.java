@@ -43,31 +43,11 @@ public class Info extends SubForm {
         link_g_gearth.setTooltip(new Tooltip("https://github.com/sirjonasxx/G-Earth"));
         link_g_tanji.setTooltip(new Tooltip("https://github.com/ArachisH/Tanji"));
         link_d_harble.setTooltip(new Tooltip("https://discord.gg/Vyc2gFC"));
-        link_d_bonnie.setTooltip(new Tooltip("https://discord.gg/KZa3rXD"));
 
-        activateHyperlink(link_d_harble);
-        activateHyperlink(link_d_bonnie);
+//        activateHyperlink(link_d_harble);
         activateHyperlink(link_g_gearth);
         activateHyperlink(link_g_tanji);
         activateHyperlink(link_sng);
         activateHyperlink(link_darkbox);
-
-//        String[] lines = {
-//                "G-Earth 0.1.1",
-//                "Linux Habbo Packet Manipulator",
-//                "",
-//                "Made by:",
-//                "sirjonasxx",
-//                "",
-//                "Contributors:",
-//                "XePeleato (Windows & Mac support)",
-//                "Scott Stamp",
-//                "LittleJ",
-//                "ArachisH",
-//                "",
-//                "Check out:",
-//                "sngforum.info",
-//                "darkbox.nl"
-//        };
     }
 }

@@ -74,7 +74,7 @@
          <Hyperlink fx:id="link_d_harble" layoutX="400.0" layoutY="201.0" text="Discord - Harble" />
          <Hyperlink fx:id="link_g_gearth" layoutX="400.0" layoutY="161.0" text="Github - G-Earth" />
          <Hyperlink fx:id="link_g_tanji" layoutX="400.0" layoutY="181.0" text="Github - Tanji" />
-         <Hyperlink fx:id="link_d_bonnie" layoutX="400.0" layoutY="221.0" text="Discord - BonnieScripting (pt/br)" />
+         <!--<Hyperlink fx:id="link_d_bonnie" layoutX="400.0" layoutY="221.0" text="Discord - BonnieScripting (pt/br)" />-->
       </children>
    </AnchorPane>
 </GridPane>
