@@ -260,6 +260,7 @@ public class HConnection {
                         while ((state == State.WAITING_FOR_CLIENT) && !proxy_server.isClosed())	{
                             try {
                                 Socket client = proxy_server.accept();
+                                client.setTcpNoDelay(true);
                                 actual_proxy = potentialProxy;
                                 closeAllProxies(actual_proxy);
                                 if (DEBUG) System.out.println("accepted a proxy");
@@ -293,6 +294,7 @@ public class HConnection {
         final boolean[] datastream = new boolean[1];
 
         Socket habbo_server = new Socket(proxy.actual_domain, proxy.actual_port);
+        habbo_server.setTcpNoDelay(true);
 
         OutputStream client_out = client.getOutputStream();
         InputStream client_in = client.getInputStream();
