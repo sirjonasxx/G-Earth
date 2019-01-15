@@ -1,5 +1,5 @@
 # G-Earth
-Habbo packet logger & manipulator for Windows and Linux devices.
+Habbo packet logger & manipulator for Windows, Linux and Mac.
 
 - Requires Java 8
 
@@ -17,6 +17,9 @@ Execute this command if you get the following error:
 
 > $ xhost +local:
 
+# Mac execution
+This is more complex, will be documented later
+
 # Features
 * Log outgoing and incoming packets
 * Injection, both sides
@@ -27,7 +30,4 @@ Execute this command if you get the following error:
 * Retro support - enter game host & port manually (only the first time)
 * Advanced scheduler
 * Advanced extension support
-* Block/replace packets, replace Strings & ints & .. in all packets, included extension
-* Always admin, included extension
-* Packetlogger
-
+* 2 included extensions on-release
