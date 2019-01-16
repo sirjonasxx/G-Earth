@@ -1,3 +1,5 @@
+**NOTE: Currently supported browsers: ONLY Firefox and Chromium**
+
 In order to run G-Earth on macOs, you'll need to sign G-Mem (our memory searcher). This wiki page will cover that process.
 
 First we'll create a certificate in order to sign it:
