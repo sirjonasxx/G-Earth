@@ -44,7 +44,7 @@ public class Injection extends SubForm {
         for (int i = 0; i < lines.length; i++) {
             String line = lines[i];
             while (isPacketIncomplete(line) && i < lines.length - 1)
-                line += lines[++i];
+                line += '\n' + lines[++i];
 
             packets.add(new HPacket(line));
         }
