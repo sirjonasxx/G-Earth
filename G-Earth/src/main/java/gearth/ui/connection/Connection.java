@@ -117,13 +117,11 @@ public class Connection extends SubForm {
 
                 if (HConnection.DEBUG) System.out.println("connecting");
 
-                new Thread(() -> {
-                    try {
-                        getHConnection().start();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }).start();
+                try {
+                    getHConnection().start();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }).start();
 
         }
