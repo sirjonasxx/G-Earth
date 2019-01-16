@@ -23,8 +23,6 @@ public class Connection extends SubForm {
     public CheckBox cbx_autodetect;
     public TextField txtfield_hotelversion;
 
-    private boolean isBusy = false;
-
     public void initialize() {
         inpPort.getEditor().textProperty().addListener(observable -> {
             updateInputUI();
@@ -77,53 +75,60 @@ public class Connection extends SubForm {
     public void onParentSet(){
         getHConnection().addStateChangeListener((oldState, newState) -> Platform.runLater(() -> {
             txtfield_hotelversion.setText(getHConnection().getHotelVersion());
-            if (newState == HConnection.State.NOT_CONNECTED) {
-                updateInputUI();
-                lblState.setText("Not connected");
-                btnConnect.setText("Connect");
-                outHost.setText("");
-                outPort.setText("");
-            }
-            else if (oldState == HConnection.State.NOT_CONNECTED) {
-                updateInputUI();
-                btnConnect.setText("Abort");
-            }
+            Platform.runLater(() -> {
+                if (newState == HConnection.State.NOT_CONNECTED) {
+                    updateInputUI();
+                    lblState.setText("Not connected");
+                    btnConnect.setText("Connect");
+                    outHost.setText("");
+                    outPort.setText("");
+                }
+                else if (oldState == HConnection.State.NOT_CONNECTED) {
+                    updateInputUI();
+                    btnConnect.setText("Abort");
+                }
 
-            if (newState == HConnection.State.CONNECTED) {
-                lblState.setText("Connected");
-                outHost.setText(getHConnection().getDomain());
-                outPort.setText(getHConnection().getPort()+"");
-            }
-            if (newState == HConnection.State.WAITING_FOR_CLIENT) {
-                lblState.setText("Waiting for connection");
-            }
+                if (newState == HConnection.State.CONNECTED) {
+                    lblState.setText("Connected");
+                    outHost.setText(getHConnection().getDomain());
+                    outPort.setText(getHConnection().getPort()+"");
+                }
+                if (newState == HConnection.State.WAITING_FOR_CLIENT) {
+                    lblState.setText("Waiting for connection");
+                }
+            });
+
 
         }));
     }
 
     public void btnConnect_clicked(ActionEvent actionEvent) {
-        if (!isBusy) {
-            isBusy = true;
-            if (cbx_autodetect.isSelected()) {
-                getHConnection().prepare();
-            }
-            else {
-                getHConnection().prepare(inpHost.getEditor().getText(), Integer.parseInt(inpPort.getEditor().getText()));
-            }
+        if (getHConnection().getState() == HConnection.State.NOT_CONNECTED) {
 
-            if (HConnection.DEBUG) System.out.println("connecting");
-
+            btnConnect.setDisable(true);
             new Thread(() -> {
-                try {
-                    getHConnection().start();
-                } catch (IOException e) {
-                    e.printStackTrace();
+                if (cbx_autodetect.isSelected()) {
+                    getHConnection().prepare();
                 }
+                else {
+                    getHConnection().prepare(inpHost.getEditor().getText(), Integer.parseInt(inpPort.getEditor().getText()));
+                }
+                Platform.runLater(() -> btnConnect.setDisable(false));
+
+                if (HConnection.DEBUG) System.out.println("connecting");
+
+                new Thread(() -> {
+                    try {
+                        getHConnection().start();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }).start();
             }).start();
+
         }
         else {
             getHConnection().abort();
-            isBusy = false;
         }
     }
     
