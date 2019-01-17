@@ -1,6 +1,7 @@
 package gearth.protocol;
 
 import gearth.misc.Cacher;
+import gearth.misc.OSValidator;
 import gearth.protocol.hostreplacer.HostReplacer;
 import gearth.protocol.hostreplacer.HostReplacerFactory;
 import gearth.protocol.memory.Rc4Obtainer;
@@ -83,6 +84,17 @@ public class HConnection {
             for (Object additionalHotel : additionalCachedHotels) {
                 if (!autoDetectHosts.contains(additionalHotel)) {
                     autoDetectHosts.add((String)additionalHotel);
+                }
+            }
+        }
+
+        if (OSValidator.isMac()) {
+            for (int i = 2; i <= autoDetectHosts.size(); i++) {
+                ProcessBuilder allowLocalHost = new ProcessBuilder("ifconfig", "lo0", "alias", ("127.0.0." + i), "up");
+                try {
+                    allowLocalHost.start();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
         }
