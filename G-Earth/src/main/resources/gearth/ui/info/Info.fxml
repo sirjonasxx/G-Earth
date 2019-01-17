@@ -24,7 +24,7 @@
                <Font size="18.0" />
             </font>
          </Label>
-         <Label layoutX="260.0" layoutY="50.0" text="Habbo packet manipulator for Linux &amp; Windows" textFill="#000000b2">
+         <Label layoutX="260.0" layoutY="50.0" text="Habbo packet manipulator for Linux, Windows &amp; Mac" textFill="#000000b2">
             <font>
                <Font size="14.0" />
             </font>
