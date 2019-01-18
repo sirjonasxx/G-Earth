@@ -18,7 +18,7 @@ public class Cacher {
 
     private static final String DEFAULT_CACHE_FILENAME = "cache.json";
 
-    private static String getCacheDir() {
+    public static String getCacheDir() {
         File GEarthDir = null;
         try {
             GEarthDir = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParentFile();

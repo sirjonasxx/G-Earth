@@ -2,16 +2,13 @@ package gearth.misc.harble_api;
 
 import gearth.misc.Cacher;
 import gearth.protocol.HMessage;
-import org.json.JSONArray;
 import org.json.JSONObject;
-import sun.misc.Cache;
 
-import javax.print.attribute.standard.Destination;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 
 /**
  * Created by Jonas on 10/11/2018.
@@ -33,24 +30,29 @@ public class HarbleAPI {
             this.name = (name == null || name.equals("null") ? null : name);
             this.structure = (structure == null || structure.equals("null") ? null : structure);
         }
+
         public String getName() {
             return name;
         }
+
         public int getHeaderId() {
             return headerId;
         }
+
         public HMessage.Side getDestination() {
             return destination;
         }
+
         public String getHash() {
             return hash;
         }
+
         public String getStructure() {
             return structure;
         }
 
         public String toString() {
-            String s = (headerId+": " + "["+hash+"]["+name+"]["+ structure+"]");
+            String s = (headerId + ": " + "[" + hash + "][" + name + "][" + structure + "]");
             return s;
         }
     }
@@ -65,9 +67,11 @@ public class HarbleAPI {
     private Map<String, HarbleMessage> nameToMessage_outgoing = new HashMap<>();
 
     private boolean success = false;
+    private String cachedMessagesPath;
 
     /**
      * cache file must be generated first within G-Earth, inb4 20 extensions requesting it at the same time
+     *
      * @param hotelversion
      */
 
@@ -79,10 +83,12 @@ public class HarbleAPI {
         return wannabe;
     }
 
-    public HarbleAPI (String hotelversion) {
-        if (Cacher.cacheFileExists(HarbleAPIFetcher.CACHE_PREFIX + hotelversion)) {
-            JSONObject object = Cacher.getCacheContents(HarbleAPIFetcher.CACHE_PREFIX + hotelversion);
+    public HarbleAPI(String hotelversion) {
+        String possibleCachedMessagesPath = HarbleAPIFetcher.CACHE_PREFIX + hotelversion;
+        if (Cacher.cacheFileExists(possibleCachedMessagesPath)) {
+            JSONObject object = Cacher.getCacheContents(possibleCachedMessagesPath);
             success = true;
+            cachedMessagesPath = possibleCachedMessagesPath;
             parse(object);
         }
     }
@@ -91,8 +97,7 @@ public class HarbleAPI {
         String name;
         try {
             name = object.getString("Name");
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             name = null;
         }
         String hash = object.getString("Hash");
@@ -101,8 +106,7 @@ public class HarbleAPI {
 
         try {
             structure = object.getString("Structure");
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             structure = null;
         }
 
@@ -132,6 +136,7 @@ public class HarbleAPI {
             nameToMessag.put(message.getName(), message);
         }
     }
+
     private void parse(JSONObject object) {
         try {
             JSONObject incoming = object.getJSONObject("Incoming");
@@ -142,8 +147,7 @@ public class HarbleAPI {
                     try {
                         JSONObject inMsg = incoming.getJSONObject(key);
                         addMessage(HMessage.Side.TOCLIENT, inMsg, key);
-                    }
-                    catch( Exception e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
@@ -151,12 +155,11 @@ public class HarbleAPI {
                     try {
                         JSONObject outMsg = outgoing.getJSONObject(key);
                         addMessage(HMessage.Side.TOSERVER, outMsg, key);
+                    } catch (Exception e) {
                     }
-                    catch( Exception e) {}
                 }
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             success = false;
         }
 
@@ -170,6 +173,7 @@ public class HarbleAPI {
 
         return headerIdToMessage.get(headerId);
     }
+
     public List<HarbleMessage> getHarbleMessagesFromHash(HMessage.Side side, String hash) {
         Map<String, List<HarbleMessage>> hashToMessage =
                 (side == HMessage.Side.TOSERVER
@@ -179,6 +183,7 @@ public class HarbleAPI {
         List<HarbleMessage> result = hashToMessage.get(hash);
         return result == null ? new ArrayList<>() : result;
     }
+
     public HarbleMessage getHarbleMessageFromName(HMessage.Side side, String name) {
         Map<String, HarbleMessage> nameToMessage =
                 (side == HMessage.Side.TOSERVER
@@ -188,5 +193,11 @@ public class HarbleAPI {
         return nameToMessage.get(name);
     }
 
-
+    @Override
+    public String toString() {
+        if (Cacher.cacheFileExists(cachedMessagesPath)) {
+            return Cacher.getCacheDir() + File.separator + cachedMessagesPath;
+        }
+        return super.toString();
+    }
 }
