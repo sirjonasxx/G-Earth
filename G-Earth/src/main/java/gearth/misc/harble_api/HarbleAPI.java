@@ -198,6 +198,6 @@ public class HarbleAPI {
         if (Cacher.cacheFileExists(cachedMessagesPath)) {
             return Cacher.getCacheDir() + File.separator + cachedMessagesPath;
         }
-        return super.toString();
+        return "null";
     }
 }
