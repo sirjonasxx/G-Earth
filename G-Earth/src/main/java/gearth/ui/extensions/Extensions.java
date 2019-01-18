@@ -158,6 +158,7 @@ public class Extensions extends SubForm {
                                         .appendString(getHConnection().getDomain())
                                         .appendInt(getHConnection().getPort())
                                         .appendString(getHConnection().getHotelVersion())
+                                        .appendString(HarbleAPIFetcher.HARBLEAPI.toString())
                         );
                     }
                 }
@@ -294,6 +295,7 @@ public class Extensions extends SubForm {
                                         .appendString(getHConnection().getDomain())
                                         .appendInt(getHConnection().getPort())
                                         .appendString(getHConnection().getHotelVersion())
+                                        .appendString(HarbleAPIFetcher.HARBLEAPI.toString())
                         );
                     }
 
