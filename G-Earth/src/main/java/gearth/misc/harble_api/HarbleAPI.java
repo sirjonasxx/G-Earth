@@ -2,6 +2,7 @@ package gearth.misc.harble_api;
 
 import gearth.misc.Cacher;
 import gearth.protocol.HMessage;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -93,7 +94,7 @@ public class HarbleAPI {
         }
     }
 
-    private void addMessage(HMessage.Side side, JSONObject object, String id) {
+    private void addMessage(HMessage.Side side, JSONObject object) {
         String name;
         try {
             name = object.getString("Name");
@@ -101,7 +102,7 @@ public class HarbleAPI {
             name = null;
         }
         String hash = object.getString("Hash");
-        Integer headerId = Integer.parseInt(id);
+        Integer headerId = object.getInt("Id");
         String structure;
 
         try {
@@ -139,30 +140,32 @@ public class HarbleAPI {
 
     private void parse(JSONObject object) {
         try {
-            JSONObject incoming = object.getJSONObject("Incoming");
-            JSONObject outgoing = object.getJSONObject("Outgoing");
+            JSONArray incoming = object.getJSONArray("Incoming");
+            JSONArray outgoing = object.getJSONArray("Outgoing");
 
             if (incoming != null && outgoing != null) {
-                for (String key : incoming.keySet()) {
+                for (int i = 0; i < incoming.length(); i++) {
                     try {
-                        JSONObject inMsg = incoming.getJSONObject(key);
-                        addMessage(HMessage.Side.TOCLIENT, inMsg, key);
-                    } catch (Exception e) {
+                        JSONObject message = incoming.getJSONObject(i);
+                        addMessage(HMessage.Side.TOCLIENT, message);
+                    }
+                    catch (Exception e){
                         e.printStackTrace();
                     }
                 }
-                for (String key : outgoing.keySet()) {
-                    try {
-                        JSONObject outMsg = outgoing.getJSONObject(key);
-                        addMessage(HMessage.Side.TOSERVER, outMsg, key);
-                    } catch (Exception e) {
+                for (int i = 0; i < outgoing.length(); i++) {
+                    try{
+                        JSONObject message = outgoing.getJSONObject(i);
+                        addMessage(HMessage.Side.TOSERVER, message);
+                    }
+                    catch (Exception e){
+                        e.printStackTrace();
                     }
                 }
             }
         } catch (Exception e) {
             success = false;
         }
-
     }
 
     public HarbleMessage getHarbleMessageFromHeaderId(HMessage.Side side, int headerId) {

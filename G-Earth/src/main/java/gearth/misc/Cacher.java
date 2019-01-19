@@ -56,12 +56,15 @@ public class Cacher {
         return new JSONObject();
     }
     public static void updateCache(JSONObject contents, String cache_filename) {
+        updateCache(contents.toString(), cache_filename);
+    }
+    public static  void updateCache(String content, String cache_filename){
         File parent_dir = new File(getCacheDir());
         parent_dir.mkdirs();
 
         try (FileWriter file = new FileWriter(new File(getCacheDir(), cache_filename))) {
 
-            file.write(contents.toString());
+            file.write(content);
             file.flush();
 
         } catch (IOException e) {
