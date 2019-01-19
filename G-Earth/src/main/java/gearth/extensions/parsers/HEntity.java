@@ -29,7 +29,7 @@ public class HEntity {
 
         switch (entityTypeId) {
             case 1:
-                gender = HGender.valueOf(packet.readString());
+                gender = HGender.fromString(packet.readString());
                 packet.readInteger();
                 packet.readInteger();
                 favoriteGroup = packet.readString();

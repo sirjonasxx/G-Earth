@@ -14,4 +14,12 @@ public enum HGender {
     public String toString() {
         return id;
     }
+
+    public static HGender fromString(String text) {
+        for (HGender g : HGender.values()) {
+            if (g.toString().toLowerCase().equals(text.toLowerCase()))
+                return g;
+        }
+        return null;
+    }
 }
