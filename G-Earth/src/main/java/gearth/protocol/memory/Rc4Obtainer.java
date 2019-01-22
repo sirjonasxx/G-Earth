@@ -57,17 +57,18 @@ public class Rc4Obtainer {
 
             if (DEBUG) System.out.println("[+] send encrypted");
 
-            List<byte[]> cached = client.getRC4cached();
-            boolean worked = onSendFirstEncryptedMessage(handler, cached);
-
-            if (!worked) {
-                worked = onSendFirstEncryptedMessage(handler, client.getRC4possibilities());
-                if (!worked) {
-                    System.err.println("COULD NOT FIND RC4 TABLE");
-                }
+            boolean worked = false;
+            int i = 0;
+            while (!worked && i < 4) {
+                worked = (i % 2 == 0) ?
+                        onSendFirstEncryptedMessage(handler, client.getRC4cached()) :
+                        onSendFirstEncryptedMessage(handler, client.getRC4possibilities());
+                i++;
             }
 
-
+            if (!worked) {
+                System.err.println("COULD NOT FIND RC4 TABLE");
+            }
 
             incomingHandler.unblock();
             outgoingHandler.unblock();
