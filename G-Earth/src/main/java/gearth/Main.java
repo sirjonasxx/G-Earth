@@ -8,10 +8,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Hyperlink;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Region;
@@ -77,7 +74,10 @@ public class Main extends Application {
                 String gitv = (String)object.get("tag_name");
                 if (!gitv.equals(version)) {
                     Platform.runLater(() -> {
-                        Alert alert = new Alert(Alert.AlertType.INFORMATION, "G-Earth is outdated!", ButtonType.OK);
+                        String body = (String)object.get("body");
+                        boolean isForcedUpdate = body.contains("<F>");
+
+                        Alert alert = new Alert(isForcedUpdate ? Alert.AlertType.ERROR : Alert.AlertType.INFORMATION, "G-Earth is outdated!", ButtonType.OK);
 
                         FlowPane fp = new FlowPane();
                         Label lbl = new Label("A new version of G-Earth has been found ("+gitv+")" + System.lineSeparator()+ System.lineSeparator() + "Update to the latest version:");
@@ -95,7 +95,11 @@ public class Main extends Application {
                         webView.setPrefSize(500, 200);
                         alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
                         alert.getDialogPane().setContent(fp);
+                        if (isForcedUpdate) {
+                            alert.setOnCloseRequest(event -> System.exit(0));
+                        }
                         alert.show();
+
                     });
                 }
 
