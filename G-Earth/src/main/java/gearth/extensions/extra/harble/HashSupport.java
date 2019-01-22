@@ -32,24 +32,9 @@ public class HashSupport {
     public HashSupport(IExtension extension) {
         this.extension = extension;
 
-        boolean[] isDebug = {false};
-        File GEarthDir = null;
-        try {
-            GEarthDir = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParentFile();
-            if (!GEarthDir.getName().equals("Extensions")) {    //we're probably in debugging mode / not an installed extension
-                                                                //this means; no harble api is provided in our Cache
-                isDebug[0] = true;
-            }
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
-
-        extension.onConnect((host, port, hotelversion) -> {
+        extension.onConnect((host, port, hotelversion, cachePath) -> {
 //            synchronized (lock) {
-            if (isDebug[0]) {
-                HarbleAPIFetcher.fetch(hotelversion);
-            }
-            harbleAPI = new HarbleAPI(hotelversion);
+            harbleAPI = new HarbleAPI(hotelversion, cachePath);
 //            }
         });
 

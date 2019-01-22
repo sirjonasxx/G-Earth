@@ -138,7 +138,8 @@ public abstract class Extension implements IExtension{
                     String host = packet.readString();
                     int connectionPort = packet.readInteger();
                     String hotelVersion = packet.readString();
-                    notifyConnectionListeners(host, connectionPort, hotelVersion);
+                    String harbleMessagesPath = packet.readString();
+                    notifyConnectionListeners(host, connectionPort, hotelVersion, harbleMessagesPath);
                     onStartConnection();
                 }
                 else if (packet.headerId() == Extensions.OUTGOING_MESSAGES_IDS.CONNECTIONEND) {
@@ -370,15 +371,15 @@ public abstract class Extension implements IExtension{
 
 
     public interface OnConnectionListener {
-        void act(String host, int port, String hotelversion);
+        void act(String host, int port, String hotelversion, String harbleMessagesPath);
     }
     private List<OnConnectionListener> onConnectionListeners = new ArrayList<>();
     public void onConnect(OnConnectionListener listener){
         onConnectionListeners.add(listener);
     }
-    private void notifyConnectionListeners(String host, int port, String hotelversion) {
+    private void notifyConnectionListeners(String host, int port, String hotelversion, String harbleMessagesPath) {
         for (OnConnectionListener listener : onConnectionListeners) {
-            listener.act(host, port, hotelversion);
+            listener.act(host, port, hotelversion, harbleMessagesPath);
         }
     }
 

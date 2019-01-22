@@ -43,7 +43,7 @@ public class ChatConsole {
 
         final boolean[] doOncePerConnection = {false};
 
-        extension.onConnect((s, i, s1) -> doOncePerConnection[0] = true);
+        extension.onConnect((s, i, s1, h1) -> doOncePerConnection[0] = true);
 
         extension.intercept(HMessage.Side.TOSERVER, hMessage -> {
             // if the first packet on init is not 4000, the extension was already running, so we open the chat instantly
