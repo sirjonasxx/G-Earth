@@ -6,6 +6,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -68,7 +70,8 @@ public class HarbleAPI {
     private Map<String, HarbleMessage> nameToMessage_outgoing = new HashMap<>();
 
     private boolean success = false;
-    private String cachedMessagesPath;
+    private String fullPath = null;
+    private String revision = null;
 
     /**
      * cache file must be generated first within G-Earth, inb4 20 extensions requesting it at the same time
@@ -89,8 +92,27 @@ public class HarbleAPI {
         if (Cacher.cacheFileExists(possibleCachedMessagesPath)) {
             JSONObject object = Cacher.getCacheContents(possibleCachedMessagesPath);
             success = true;
-            cachedMessagesPath = possibleCachedMessagesPath;
+            revision = hotelversion;
+            fullPath = Cacher.getCacheDir() + File.separator + possibleCachedMessagesPath;
             parse(object);
+        }
+    }
+
+    public HarbleAPI(String hotelversion, String path_to_file) {
+
+        File f = new File(path_to_file);
+        if (f.exists() && !f.isDirectory()) {
+            try {
+                String contents = String.join("\n", Files.readAllLines(f.toPath()));
+                JSONObject object = new JSONObject(contents);
+                success = true;
+                revision = hotelversion;
+                fullPath = path_to_file;
+                parse(object);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -196,10 +218,14 @@ public class HarbleAPI {
         return nameToMessage.get(name);
     }
 
+    public String getRevision() {
+        return revision;
+    }
+
     @Override
     public String toString() {
-        if (Cacher.cacheFileExists(cachedMessagesPath)) {
-            return Cacher.getCacheDir() + File.separator + cachedMessagesPath;
+        if (success) {
+            return fullPath;
         }
         return "null";
     }
