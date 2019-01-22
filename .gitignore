@@ -1,8 +1,13 @@
+# intelliJ
 .idea/
+*.iml
 out/
+
+# maven
 bin/
 **/target/
-*.iml
+
+# vsCode
 Extensions/BlockReplacePackets/.classpath
 .project
 .settings/org.eclipse.m2e.core.prefs
