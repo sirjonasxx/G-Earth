@@ -14,7 +14,7 @@ If you're using a mac; make sure you have completed the mac-installation wiki pa
 * MAKE SURE your downloaded the right .rar file, for Windows, check if you're running on a 32bit or 64bit device first.
 
 ## Problem 3: Habbo loads, but G-Earth isn't connected
-* Your hosts file might have some permissions issues. Delete it and place a new one: https://github.com/sirjonasxx/G-Earth/issues/16
+* Your hosts file might have some permissions issues. Delete it and place a new one: https://github.com/sirjonasxx/G-Earth/issues/17
 
 ## Creating an Issue
 If the solutions did NOT help you, navigate to https://github.com/sirjonasxx/G-Earth/issues and, if it hasn't been solved before, create a new issue.
