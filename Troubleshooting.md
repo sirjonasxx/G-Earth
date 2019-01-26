@@ -11,8 +11,10 @@ If you're using a mac; make sure you have completed the mac-installation wiki pa
 ## Problem 2: Stuck at 76%
 * On windows; navigate to https://visualstudio.microsoft.com/downloads/ and download the c++ redistributable 2017 ( https://imgur.com/a/bgvL8fN ), make sure to select the right version.
 * Try another browser. (on Mac, use Firefox. On Windows, use Chrome, Firefox or Opera, others might work as well, but IE and Edge do not)
-* Your hosts file might have some permissions issues. Delete it and place a new one: https://github.com/sirjonasxx/G-Earth/issues/16
 * MAKE SURE your downloaded the right .rar file, for Windows, check if you're running on a 32bit or 64bit device first.
+
+## Problem 3: Habbo loads, but G-Earth isn't connected
+* Your hosts file might have some permissions issues. Delete it and place a new one: https://github.com/sirjonasxx/G-Earth/issues/16
 
 ## Creating an Issue
 If the solutions did NOT help you, navigate to https://github.com/sirjonasxx/G-Earth/issues and, if it hasn't been solved before, create a new issue.
