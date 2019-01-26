@@ -23,4 +23,4 @@ Include the following things in your issue:
 * Your hosts file might have some permissions issues. Delete it and place a new one: https://github.com/sirjonasxx/G-Earth/issues/16
 * MAKE SURE your downloaded the right .rar file, for Windows, check if you're running on a 32bit or 64bit device first.
 
-If you had an issue and solved with a different solution and feel like it belongs on this page, feel free to create an issue.
+If you had an issue and you solved it with a different solution and feel like it belongs on this page, feel free to create an issue.
