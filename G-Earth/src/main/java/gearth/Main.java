@@ -35,9 +35,9 @@ public class Main extends Application {
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/gearth/ui/G-Earth.fxml"));
         Parent root = loader.load();
-
         GEarthController companion = loader.getController();
         companion.setStage(primaryStage);
+
         primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/gearth/G-EarthLogoSmaller.png")));
 
         primaryStage.setResizable(false);

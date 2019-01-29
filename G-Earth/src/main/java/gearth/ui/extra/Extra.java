@@ -3,6 +3,8 @@ package gearth.ui.extra;
 import gearth.Main;
 import gearth.ui.SubForm;
 import gearth.ui.info.Info;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.event.ActionEvent;
 import javafx.scene.control.*;
 
@@ -32,4 +34,9 @@ public class Extra extends SubForm {
         Info.activateHyperlink(url_troubleshooting);
     }
 
+    @Override
+    protected void onParentSet() {
+        parentController.getStage().setAlwaysOnTop(cbx_alwaysOnTop.isSelected());
+        cbx_alwaysOnTop.selectedProperty().addListener(observable -> parentController.getStage().setAlwaysOnTop(cbx_alwaysOnTop.isSelected()));
+    }
 }

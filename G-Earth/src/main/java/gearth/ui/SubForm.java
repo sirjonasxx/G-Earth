@@ -7,6 +7,7 @@ public class SubForm {
 
     protected GEarthController parentController;
 
+    //gets called when all UI elements are initialized, set parentController available & stage field is initialized
     public void setParentController(GEarthController controller) {
         parentController = controller;
         onParentSet();

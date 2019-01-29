@@ -22,6 +22,8 @@ public class GEarthController {
     private Stage stage = null;
     private volatile HConnection hConnection;
 
+    private volatile int initcount = 0;
+
     public Connection connectionController;
     public Injection injectionController;
     public Logger loggerController;
@@ -38,19 +40,13 @@ public class GEarthController {
     }
 
     public void initialize() {
-        connectionController.setParentController(this);
-        injectionController.setParentController(this);
-        loggerController.setParentController(this);
-        toolsController.setParentController(this);
-        schedulerController.setParentController(this);
-        extraController.setParentController(this);
-        infoController.setParentController(this);
-        extensionsController.setParentController(this);
+        synchronized (this) {
+            trySetController();
+        }
 
         if (PacketLoggerFactory.usesUIlogger()) {
             tabBar.getTabs().remove(tab_Logger);
         }
-
 
         //custom header bar
 //        final Point[] startpos = {null};
@@ -85,7 +81,24 @@ public class GEarthController {
 
     public void setStage(Stage stage) {
         this.stage = stage;
+        synchronized (this) {
+            trySetController();
+        }
     }
+
+    private void trySetController() {
+        if (++initcount == 2) {
+            connectionController.setParentController(this);
+            injectionController.setParentController(this);
+            loggerController.setParentController(this);
+            toolsController.setParentController(this);
+            schedulerController.setParentController(this);
+            extraController.setParentController(this);
+            infoController.setParentController(this);
+            extensionsController.setParentController(this);
+        }
+    }
+
     public Stage getStage() {
         return stage;
     }
