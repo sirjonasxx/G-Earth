@@ -24,7 +24,7 @@ public class Info extends SubForm {
 
     // this is a TEMPORARY info tab
 
-    private void activateHyperlink(Hyperlink link) {
+    public static void activateHyperlink(Hyperlink link) {
         link.setOnAction((ActionEvent event) -> {
             Hyperlink h = (Hyperlink) event.getTarget();
             String s = h.getTooltip().getText();
