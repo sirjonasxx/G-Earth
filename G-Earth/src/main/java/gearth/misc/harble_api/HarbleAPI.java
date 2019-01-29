@@ -222,11 +222,11 @@ public class HarbleAPI {
         return revision;
     }
 
-    @Override
-    public String toString() {
+    public String getPath() {
         if (success) {
             return fullPath;
         }
         return "null";
     }
+
 }

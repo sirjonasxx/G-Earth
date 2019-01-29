@@ -158,7 +158,7 @@ public class Extensions extends SubForm {
                                         .appendString(getHConnection().getDomain())
                                         .appendInt(getHConnection().getPort())
                                         .appendString(getHConnection().getHotelVersion())
-                                        .appendString(HarbleAPIFetcher.HARBLEAPI + "") // automatic .toString() and no additional nullpointerexception
+                                        .appendString(HarbleAPIFetcher.HARBLEAPI == null ? "null" : HarbleAPIFetcher.HARBLEAPI.getPath())
                         );
                     }
                 }
@@ -295,7 +295,7 @@ public class Extensions extends SubForm {
                                         .appendString(getHConnection().getDomain())
                                         .appendInt(getHConnection().getPort())
                                         .appendString(getHConnection().getHotelVersion())
-                                        .appendString(HarbleAPIFetcher.HARBLEAPI + "")
+                                        .appendString(HarbleAPIFetcher.HARBLEAPI == null ? "null" : HarbleAPIFetcher.HARBLEAPI.getPath())
                         );
                     }
 
