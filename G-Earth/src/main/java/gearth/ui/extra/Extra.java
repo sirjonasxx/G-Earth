@@ -1,12 +1,11 @@
 package gearth.ui.extra;
 
-import gearth.Main;
 import gearth.misc.Cacher;
+import gearth.protocol.HConnection;
 import gearth.ui.SubForm;
 import gearth.ui.info.Info;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
-import javafx.event.ActionEvent;
 import javafx.scene.control.*;
 
 /**
@@ -30,7 +29,7 @@ public class Extra extends SubForm {
     public TextField txt_mitmPort;
 
     public CheckBox cbx_disableDecryption;
-    public CheckBox txt_debug;
+    public CheckBox cbx_debug;
 
     public void initialize() {
         url_troubleshooting.setTooltip(new Tooltip("https://github.com/sirjonasxx/G-Earth/wiki/Troubleshooting"));
@@ -40,16 +39,29 @@ public class Extra extends SubForm {
         if (notepadInitValue != null) {
             txtarea_notepad.setText(notepadInitValue);
         }
+
+        cbx_debug.selectedProperty().addListener(observable -> HConnection.DEBUG = cbx_debug.isSelected());
     }
 
     @Override
     protected void onParentSet() {
         parentController.getStage().setAlwaysOnTop(cbx_alwaysOnTop.isSelected());
         cbx_alwaysOnTop.selectedProperty().addListener(observable -> parentController.getStage().setAlwaysOnTop(cbx_alwaysOnTop.isSelected()));
+
+        cbx_advanced.selectedProperty().addListener(observable -> updateAdvancedUI());
+        getHConnection().addStateChangeListener((oldState, newState) -> {
+            if (oldState == HConnection.State.NOT_CONNECTED || newState == HConnection.State.NOT_CONNECTED) {
+                updateAdvancedUI();
+            }
+        });
     }
 
     @Override
     protected void onExit() {
         Cacher.put(NOTEPAD_CACHE_KEY, txtarea_notepad.getText());
+    }
+
+    private void updateAdvancedUI() {
+
     }
 }

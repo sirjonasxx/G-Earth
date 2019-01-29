@@ -109,7 +109,7 @@
                      </padding>
                   </GridPane>
                   <CheckBox fx:id="cbx_disableDecryption" mnemonicParsing="false" text="Disable decryption" GridPane.rowIndex="2" />
-                  <CheckBox fx:id="txt_debug" mnemonicParsing="false" text="Debug to stdout" GridPane.rowIndex="3" />
+                  <CheckBox fx:id="cbx_debug" mnemonicParsing="false" text="Debug to stdout" GridPane.rowIndex="3" />
                </children>
             </GridPane>
             <CheckBox fx:id="cbx_advanced" mnemonicParsing="false" text="Advanced" textFill="#000000ba">

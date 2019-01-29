@@ -101,7 +101,7 @@ public class HConnection {
     }
 
 
-    public final static boolean DEBUG = false;
+    public static boolean DEBUG = false;
     private static final HostReplacer hostsReplacer = HostReplacerFactory.get();
 
     private volatile boolean hostRedirected = false;
