@@ -7,6 +7,7 @@ import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -35,6 +36,7 @@ public class UiLogger implements PacketLogger {
             stage = new Stage();
             stage.setTitle("G-Earth | Packet Logger");
             stage.initModality(Modality.NONE);
+            stage.getIcons().add(new Image(getClass().getResourceAsStream("/gearth/G-EarthLogoSmaller.png")));
 
             Scene scene = new Scene(root);
             scene.getStylesheets().add("/gearth/ui/bootstrap3.css");
