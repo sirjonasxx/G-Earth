@@ -55,7 +55,7 @@ public class Cacher {
         }
         return new JSONObject();
     }
-    public static void updateCache(JSONObject contents, String cache_filename) {
+    private static void updateCache(JSONObject contents, String cache_filename) {
         updateCache(contents.toString(), cache_filename);
     }
     public static  void updateCache(String content, String cache_filename){
@@ -100,7 +100,7 @@ public class Cacher {
     public static JSONObject getCacheContents() {
         return getCacheContents(DEFAULT_CACHE_FILENAME);
     }
-    public static void updateCache(JSONObject contents) {
+    private static void updateCache(JSONObject contents) {
         updateCache(contents, DEFAULT_CACHE_FILENAME);
     }
     public static void put(String key, Object val) {

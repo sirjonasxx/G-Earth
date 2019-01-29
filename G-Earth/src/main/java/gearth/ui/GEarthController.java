@@ -111,7 +111,16 @@ public class GEarthController {
     }
 
 
-    public void abort() {
+    public void exit() {
+        connectionController.exit();
+        injectionController.exit();
+        loggerController.exit();
+        toolsController.exit();
+        schedulerController.exit();
+        extraController.exit();
+        infoController.exit();
+        extensionsController.exit();
+
         hConnection.abort();
     }
 

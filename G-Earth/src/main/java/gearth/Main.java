@@ -3,8 +3,6 @@ package gearth;
 import gearth.misc.AdminValidator;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -17,7 +15,6 @@ import javafx.stage.Stage;
 import gearth.ui.GEarthController;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
-import org.omg.CORBA.Environment;
 
 import java.io.IOException;
 
@@ -48,7 +45,7 @@ public class Main extends Application {
         primaryStage.getScene().getStylesheets().add(getClass().getResource("/gearth/ui/bootstrap3.css").toExternalForm());
 
         primaryStage.setOnCloseRequest( event -> {
-            companion.abort();
+            companion.exit();
             Platform.exit();
 
             // Platform.exit doesn't seem to be enough on Windows?

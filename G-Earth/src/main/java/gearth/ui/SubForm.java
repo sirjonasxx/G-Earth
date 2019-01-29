@@ -14,8 +14,17 @@ public class SubForm {
     }
 
 
-    //abstract
+    //abstract but non required
     protected void onParentSet() {
+
+    }
+
+    public void exit() {
+        onExit();
+    }
+
+    //abstract but non required
+    protected void onExit() {
 
     }
 
