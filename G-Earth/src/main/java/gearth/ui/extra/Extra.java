@@ -7,6 +7,7 @@ import gearth.ui.info.Info;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.scene.control.*;
+import javafx.scene.layout.GridPane;
 
 /**
  * Created by Jonas on 06/04/18.
@@ -21,8 +22,11 @@ public class Extra extends SubForm {
     public Hyperlink url_troubleshooting;
 
     public CheckBox cbx_advanced;
+    public GridPane grd_advanced;
 
     public CheckBox cbx_ovcinfo;
+    public GridPane grd_ovcinfo;
+
     public TextField txt_realPort;
     public TextField txt_mitmIP;
     public TextField txt_realIp;
@@ -41,6 +45,9 @@ public class Extra extends SubForm {
         }
 
         cbx_debug.selectedProperty().addListener(observable -> HConnection.DEBUG = cbx_debug.isSelected());
+        cbx_disableDecryption.selectedProperty().addListener(observable -> HConnection.DECRYPTPACKETS = !cbx_disableDecryption.isSelected());
+
+        cbx_ovcinfo.selectedProperty().addListener(observable -> grd_ovcinfo.setDisable(!cbx_ovcinfo.isSelected()));
     }
 
     @Override
@@ -54,6 +61,8 @@ public class Extra extends SubForm {
                 updateAdvancedUI();
             }
         });
+
+        updateAdvancedUI();
     }
 
     @Override
@@ -62,6 +71,15 @@ public class Extra extends SubForm {
     }
 
     private void updateAdvancedUI() {
+        if (!cbx_advanced.isSelected()) {
+            cbx_debug.setSelected(false);
+            cbx_ovcinfo.setSelected(false);
+            if (getHConnection().getState() == HConnection.State.NOT_CONNECTED) {
+                cbx_disableDecryption.setSelected(false);
+            }
+        }
+        grd_advanced.setDisable(!cbx_advanced.isSelected());
 
+        cbx_disableDecryption.setDisable(getHConnection().getState() != HConnection.State.NOT_CONNECTED);
     }
 }

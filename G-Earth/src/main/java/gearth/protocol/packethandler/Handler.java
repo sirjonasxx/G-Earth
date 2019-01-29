@@ -1,5 +1,6 @@
 package gearth.protocol.packethandler;
 
+import gearth.protocol.HConnection;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 import gearth.protocol.TrafficListener;
@@ -50,6 +51,11 @@ public abstract class Handler {
 
         if (!isEncryptedStream) {
             payloadBuffer.push(buffer);
+        }
+        else if (!HConnection.DECRYPTPACKETS) {
+            synchronized (lock) {
+                out.write(buffer);
+            }
         }
         else if (decryptcipher == null) {
             for (int i = 0; i < buffer.length; i++) {

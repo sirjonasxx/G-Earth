@@ -50,6 +50,8 @@ public class Rc4Obtainer {
 
 
     private void onSendFirstEncryptedMessage(Handler handler) {
+        if (!HConnection.DECRYPTPACKETS) return;
+
         outgoingHandler.block();
         incomingHandler.block();
 

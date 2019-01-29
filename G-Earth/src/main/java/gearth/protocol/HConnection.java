@@ -101,6 +101,7 @@ public class HConnection {
     }
 
 
+    public static boolean DECRYPTPACKETS = true;
     public static boolean DEBUG = false;
     private static final HostReplacer hostsReplacer = HostReplacerFactory.get();
 
