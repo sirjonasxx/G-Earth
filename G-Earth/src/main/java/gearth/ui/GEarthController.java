@@ -15,13 +15,16 @@ import gearth.ui.scheduler.Scheduler;
 import gearth.ui.extra.Extra;
 import gearth.ui.tools.Tools;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
+
 public class GEarthController {
 
     public Tab tab_Logger;
     public TabPane tabBar;
     private Stage stage = null;
     private volatile HConnection hConnection;
-
     private volatile int initcount = 0;
 
     public Connection connectionController;
@@ -33,13 +36,24 @@ public class GEarthController {
     public Info infoController;
     public Extensions extensionsController;
 
-    public Pane mover;
+    private List<SubForm> tabs = null;
 
+    public Pane mover;
     public GEarthController() {
         hConnection = new HConnection();
     }
 
     public void initialize() {
+        tabs = new ArrayList<>();
+        tabs.add(connectionController);
+        tabs.add(injectionController);
+        tabs.add(loggerController);
+        tabs.add(toolsController);
+        tabs.add(schedulerController);
+        tabs.add(extraController);
+        tabs.add(infoController);
+        tabs.add(extensionsController);
+
         synchronized (this) {
             trySetController();
         }
@@ -88,14 +102,8 @@ public class GEarthController {
 
     private void trySetController() {
         if (++initcount == 2) {
-            connectionController.setParentController(this);
-            injectionController.setParentController(this);
-            loggerController.setParentController(this);
-            toolsController.setParentController(this);
-            schedulerController.setParentController(this);
-            extraController.setParentController(this);
-            infoController.setParentController(this);
-            extensionsController.setParentController(this);
+            GEarthController self = this;
+            tabs.forEach(subForm -> subForm.setParentController(self));
         }
     }
 
@@ -112,15 +120,7 @@ public class GEarthController {
 
 
     public void exit() {
-        connectionController.exit();
-        injectionController.exit();
-        loggerController.exit();
-        toolsController.exit();
-        schedulerController.exit();
-        extraController.exit();
-        infoController.exit();
-        extensionsController.exit();
-
+        tabs.forEach(SubForm::exit);
         hConnection.abort();
     }
 
