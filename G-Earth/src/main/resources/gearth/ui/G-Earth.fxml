@@ -27,11 +27,11 @@
         <Tab text="Scheduler">
             <fx:include fx:id="scheduler" source="scheduler/Scheduler.fxml"/>
         </Tab>
-        <Tab fx:id="tab_Settings" text="Settings">
-            <fx:include fx:id="settings" source="settings/Settings.fxml"/>
-        </Tab>
         <Tab text="Extensions">
             <fx:include fx:id="extensions" source="extensions/Extensions.fxml"/>
+        </Tab>
+        <Tab text="Extra">
+            <fx:include fx:id="extra" source="extra/Extra.fxml"/>
         </Tab>
         <Tab text="Info">
             <fx:include fx:id="info" source="info/Info.fxml"/>

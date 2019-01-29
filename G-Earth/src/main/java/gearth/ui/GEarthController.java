@@ -12,12 +12,11 @@ import gearth.ui.info.Info;
 import gearth.ui.injection.Injection;
 import gearth.ui.logger.Logger;
 import gearth.ui.scheduler.Scheduler;
-import gearth.ui.settings.Settings;
+import gearth.ui.extra.Extra;
 import gearth.ui.tools.Tools;
 
 public class GEarthController {
 
-    public Tab tab_Settings;
     public Tab tab_Logger;
     public TabPane tabBar;
     private Stage stage = null;
@@ -28,7 +27,7 @@ public class GEarthController {
     public Logger loggerController;
     public Tools toolsController;
     public Scheduler schedulerController;
-    public Settings settingsController;
+    public Extra extraController;
     public Info infoController;
     public Extensions extensionsController;
 
@@ -44,11 +43,9 @@ public class GEarthController {
         loggerController.setParentController(this);
         toolsController.setParentController(this);
         schedulerController.setParentController(this);
-        settingsController.setParentController(this);
+        extraController.setParentController(this);
         infoController.setParentController(this);
         extensionsController.setParentController(this);
-
-        tabBar.getTabs().remove(tab_Settings);
 
         if (PacketLoggerFactory.usesUIlogger()) {
             tabBar.getTabs().remove(tab_Logger);
