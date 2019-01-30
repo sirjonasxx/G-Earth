@@ -2,6 +2,7 @@ package gearth.ui.extra;
 
 import gearth.misc.Cacher;
 import gearth.protocol.HConnection;
+import gearth.protocol.misc.ConnectionInfoOverrider;
 import gearth.ui.SubForm;
 import gearth.ui.info.Info;
 import javafx.beans.InvalidationListener;
@@ -12,7 +13,7 @@ import javafx.scene.layout.GridPane;
 /**
  * Created by Jonas on 06/04/18.
  */
-public class Extra extends SubForm {
+public class Extra extends SubForm implements ConnectionInfoOverrider {
 
     public static final String NOTEPAD_CACHE_KEY = "notepad_text";
 
@@ -36,6 +37,8 @@ public class Extra extends SubForm {
     public CheckBox cbx_debug;
 
     public void initialize() {
+        HConnection.setConnectionInfoOverrider(this);
+
         url_troubleshooting.setTooltip(new Tooltip("https://github.com/sirjonasxx/G-Earth/wiki/Troubleshooting"));
         Info.activateHyperlink(url_troubleshooting);
 
@@ -81,5 +84,21 @@ public class Extra extends SubForm {
         grd_advanced.setDisable(!cbx_advanced.isSelected());
 
         cbx_disableDecryption.setDisable(getHConnection().getState() != HConnection.State.NOT_CONNECTED);
+    }
+
+    @Override
+    public boolean mustOverrideConnection() {
+        return cbx_ovcinfo.isSelected();
+    }
+
+    @Override
+    public HConnection.Proxy getOverrideProxy() {
+        return new HConnection.Proxy(
+                txt_realIp.getText(),
+                txt_realIp.getText(),
+                Integer.parseInt(txt_realPort.getText()),
+                Integer.parseInt(txt_mitmPort.getText()),
+                txt_mitmIP.getText()
+        );
     }
 }

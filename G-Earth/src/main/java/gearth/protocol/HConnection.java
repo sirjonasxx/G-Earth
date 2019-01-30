@@ -5,6 +5,7 @@ import gearth.misc.OSValidator;
 import gearth.protocol.hostreplacer.HostReplacer;
 import gearth.protocol.hostreplacer.HostReplacerFactory;
 import gearth.protocol.memory.Rc4Obtainer;
+import gearth.protocol.misc.ConnectionInfoOverrider;
 import gearth.protocol.packethandler.Handler;
 import gearth.protocol.packethandler.IncomingHandler;
 import gearth.protocol.packethandler.OutgoingHandler;
@@ -101,8 +102,9 @@ public class HConnection {
     }
 
 
-    public static boolean DECRYPTPACKETS = true;
-    public static boolean DEBUG = false;
+    private static volatile ConnectionInfoOverrider connectionInfoOverrider;
+    public static volatile boolean DECRYPTPACKETS = true;
+    public static volatile boolean DEBUG = false;
     private static final HostReplacer hostsReplacer = HostReplacerFactory.get();
 
     private volatile boolean hostRedirected = false;
@@ -110,7 +112,7 @@ public class HConnection {
     private volatile List<StateChangeListener> stateChangeListeners = new ArrayList<>();
     private volatile State state = State.NOT_CONNECTED;
 
-    private class Proxy {
+    public static class Proxy {
         private volatile String input_domain;           //string representation of the domain to intercept
         private volatile String actual_domain;          //dns resolved domain (ignoring hosts file)
         private volatile int actual_port;               //port of the server
@@ -178,7 +180,6 @@ public class HConnection {
     private volatile Proxy actual_proxy = null;
     private volatile String hotelVersion = "";
 
-
     public State getState() {
         return state;
     }
@@ -214,40 +215,43 @@ public class HConnection {
             removeFromHosts();
         }
 
-        List<String> willremove = new ArrayList<>();
+        if (connectionInfoOverrider.mustOverrideConnection()) {
+            potentialProxies.add(connectionInfoOverrider.getOverrideProxy());
+        }
+        else {
+            List<String> willremove = new ArrayList<>();
+            int c = 0;
+            for (String host : allPotentialHosts) {
+                String[] split = host.split(":");
+                String input_dom = split[0];
+                int port = Integer.parseInt(split[1]);
+                String actual_dom;
 
-        int c = 0;
+                InetAddress address = null;
+                try {
+                    address = InetAddress.getByName(input_dom);
+                    actual_dom = address.getHostAddress();
+                }
+                catch (UnknownHostException e) {
+                    willremove.add(host);
+                    continue;
+                }
 
-        for (String host : allPotentialHosts) {
-            String[] split = host.split(":");
-            String input_dom = split[0];
-            int port = Integer.parseInt(split[1]);
-            String actual_dom;
-
-            InetAddress address = null;
-            try {
-                address = InetAddress.getByName(input_dom);
-                actual_dom = address.getHostAddress();
+                int intercept_port = port;
+                String intercept_host = "127.0." + (c / 254) + "." + (1 + c % 254);
+                potentialProxies.add(new Proxy(input_dom, actual_dom, port, intercept_port, intercept_host));
+                c++;
             }
-            catch (UnknownHostException e) {
-                willremove.add(host);
-                continue;
-            }
 
-            int intercept_port = port;
-            String intercept_host = "127.0." + (c / 254) + "." + (1 + c % 254);
-            potentialProxies.add(new Proxy(input_dom, actual_dom, port, intercept_port, intercept_host));
-            c++;
+            List<Object> additionalCachedHotels = Cacher.getList(HOTELS_CACHE_KEY);
+            if (additionalCachedHotels != null) {
+                for (String host : willremove) {
+                    additionalCachedHotels.remove(host);
+                }
+                Cacher.put(HOTELS_CACHE_KEY, additionalCachedHotels);
+            }
         }
 
-
-        List<Object> additionalCachedHotels = Cacher.getList(HOTELS_CACHE_KEY);
-        if (additionalCachedHotels != null) {
-            for (String host : willremove) {
-                additionalCachedHotels.remove(host);
-            }
-            Cacher.put(HOTELS_CACHE_KEY, additionalCachedHotels);
-        }
 
         setState(State.PREPARED);
     }
@@ -566,5 +570,9 @@ public class HConnection {
 
     public String getHotelVersion() {
         return hotelVersion;
+    }
+
+    public static void setConnectionInfoOverrider(ConnectionInfoOverrider connectionInfoOverrider) {
+        HConnection.connectionInfoOverrider = connectionInfoOverrider;
     }
 }

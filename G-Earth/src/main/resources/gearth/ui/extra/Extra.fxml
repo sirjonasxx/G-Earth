@@ -71,7 +71,7 @@
                         <Label text="MITM IP:" GridPane.rowIndex="1" />
                         <Label text="Real port:" GridPane.rowIndex="2" />
                         <Label text="MITM port:" GridPane.rowIndex="3" />
-                        <TextField fx:id="txt_realPort" editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                        <TextField fx:id="txt_realPort" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="2">
                            <opaqueInsets>
                               <Insets />
                            </opaqueInsets>
@@ -79,7 +79,7 @@
                               <Insets bottom="3.0" right="7.0" top="3.0" />
                            </GridPane.margin>
                         </TextField>
-                        <TextField fx:id="txt_mitmIP" editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                        <TextField fx:id="txt_mitmIP" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="1">
                            <opaqueInsets>
                               <Insets />
                            </opaqueInsets>
@@ -87,7 +87,7 @@
                               <Insets bottom="3.0" right="7.0" top="3.0" />
                            </GridPane.margin>
                         </TextField>
-                        <TextField fx:id="txt_realIp" editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1">
+                        <TextField fx:id="txt_realIp" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1">
                            <opaqueInsets>
                               <Insets />
                            </opaqueInsets>
@@ -95,7 +95,7 @@
                               <Insets bottom="3.0" right="7.0" top="3.0" />
                            </GridPane.margin>
                         </TextField>
-                        <TextField fx:id="txt_mitmPort" editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                        <TextField fx:id="txt_mitmPort" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="3">
                            <opaqueInsets>
                               <Insets />
                            </opaqueInsets>
