@@ -40,6 +40,8 @@ public class Scheduler extends SubForm {
     public Button btn_save;
     public Button btn_load;
 
+    public CheckBox cbx_hotkeys;
+
     private ScheduleItem isBeingEdited = null;
 
     private List<ScheduleItem> scheduleItemList = new ArrayList<>();
