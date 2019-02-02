@@ -1,5 +1,6 @@
 package gearth.protocol.memory;
 
+import gearth.Main;
 import gearth.protocol.HConnection;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
@@ -10,6 +11,14 @@ import gearth.protocol.packethandler.Handler;
 import gearth.protocol.packethandler.IncomingHandler;
 import gearth.protocol.packethandler.OutgoingHandler;
 import gearth.protocol.packethandler.PayloadBuffer;
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Hyperlink;
+import javafx.scene.control.Label;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.Region;
+import javafx.scene.web.WebView;
 
 import java.util.Arrays;
 import java.util.List;
@@ -70,6 +79,32 @@ public class Rc4Obtainer {
 
             if (!worked) {
                 System.err.println("COULD NOT FIND RC4 TABLE");
+
+
+                Platform.runLater(() -> {
+                    Alert alert = new Alert(Alert.AlertType.WARNING, "Something went wrong!", ButtonType.OK);
+
+                    FlowPane fp = new FlowPane();
+                    Label lbl = new Label("G-Earth has experienced an issue" + System.lineSeparator()+ System.lineSeparator() + "Head over to our Troubleshooting page to solve the problem:");
+                    Hyperlink link = new Hyperlink("https://github.com/sirjonasxx/G-Earth/wiki/Troubleshooting");
+                    fp.getChildren().addAll( lbl, link);
+                    link.setOnAction(event -> {
+                        Main.main.getHostServices().showDocument(link.getText());
+                        event.consume();
+                    });
+
+                    WebView webView = new WebView();
+                    webView.getEngine().loadContent("<html>G-Earth has experienced an issue<br><br>Head over to our Troubleshooting page to solve the problem:<br><a href=\"https://github.com/sirjonasxx/G-Earth/wiki/Troubleshooting\">https://github.com/sirjonasxx/G-Earth/wiki/Troubleshooting</a></html>");
+                    webView.setPrefSize(500, 200);
+                    alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+                    alert.getDialogPane().setContent(fp);
+                    alert.setOnCloseRequest(event -> {
+                        Main.main.getHostServices().showDocument(link.getText());
+                    });
+                    alert.show();
+
+                });
+
             }
 
             incomingHandler.unblock();
