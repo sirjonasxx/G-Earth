@@ -84,5 +84,22 @@
             <artifactId>jsoup</artifactId>
             <version>1.11.2</version>
         </dependency>
+        <dependency>
+            <groupId>com.github.tulskiy</groupId>
+            <artifactId>jkeymaster</artifactId>
+            <version>1.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-jdk14</artifactId>
+            <version>1.7.13</version>
+        </dependency>
     </dependencies>
+
+    <repositories>
+        <repository>
+            <id>snapshots-repo</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </repository>
+    </repositories>
 </project>

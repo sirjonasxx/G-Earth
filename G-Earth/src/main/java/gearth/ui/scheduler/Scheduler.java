@@ -1,5 +1,6 @@
 package gearth.ui.scheduler;
 
+import com.tulskiy.keymaster.common.Provider;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.scene.control.*;
@@ -10,6 +11,7 @@ import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 import gearth.ui.SubForm;
 
+import javax.swing.*;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -101,6 +103,28 @@ public class Scheduler extends SubForm {
             }
         }).start();
 
+
+
+        //register hotkeys
+        //disable some output things
+        PrintStream err = System.err;
+        System.setErr(new PrintStream(new OutputStream() {
+            public void write(int b) {
+            }
+        }));
+
+        Provider provider = Provider.getCurrentProvider(false);
+        for (int i = 0; i < 10; i++) {
+            int[] ii = {i};
+            provider.register(KeyStroke.getKeyStroke("control shift " + ii[0]), hotKey -> switchPauseHotkey(ii[0]));
+        }
+        System.setErr(err);
+    }
+
+    private void switchPauseHotkey(int index) {
+        if (cbx_hotkeys.isSelected() && index < scheduleItemList.size()) {
+            scheduleItemList.get(index).getPausedProperty().set(!scheduleItemList.get(index).getPausedProperty().get());
+        }
     }
 
     public static boolean stringIsNumber(String str) {

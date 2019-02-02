@@ -1,5 +1,7 @@
 package gearth.ui.scheduler;
 
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
@@ -69,11 +71,12 @@ public class ScheduleItemContainer extends GridPane {
         EditButton editButton = new EditButton();
         DeleteButton deleteButton = new DeleteButton();
         PauseResumeButton pauseResumeButton = new PauseResumeButton(item.getPausedProperty().get());
+        item.getPausedProperty().addListener(observable -> pauseResumeButton.setPaused(item.getPausedProperty().get()));
         editButton.show();
         deleteButton.show();
         editButton.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> item.edit());
         deleteButton.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> item.delete());
-        pauseResumeButton.onClick(observable -> item.getPausedProperty().set(pauseResumeButton.isPaused()));
+        pauseResumeButton.onClick(observable -> item.getPausedProperty().set(!pauseResumeButton.isPaused()));
         HBox buttonsBox = new HBox(pauseResumeButton, editButton, deleteButton);
         buttonsBox.setSpacing(10);
         buttonsBox.setAlignment(Pos.CENTER);

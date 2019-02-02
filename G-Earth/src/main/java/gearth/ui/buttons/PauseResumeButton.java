@@ -26,6 +26,8 @@ public class PauseResumeButton extends StackPane{
     private Image imageResume;
     private Image imageResumeOnHover;
 
+    private volatile boolean isHovering = false;
+
     private List<InvalidationListener> clickListeners = new ArrayList<>();
 
     public PauseResumeButton(boolean isPaused) {
@@ -44,15 +46,7 @@ public class PauseResumeButton extends StackPane{
 
         imageView.setImage(isPaused() ? imageResume : imagePause);
 
-        PauseResumeButton thiss = this;
-        setEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
-            thiss.isPaused[0] = !thiss.isPaused[0];
-            imageView.setImage(isPaused() ? imageResumeOnHover : imagePauseOnHover);
-
-            for (int i = clickListeners.size() - 1; i >= 0; i--) {
-                clickListeners.get(i).invalidated(null);
-            }
-        });
+        setEventHandler(MouseEvent.MOUSE_CLICKED, event -> click());
     }
 
     public boolean isPaused() {
@@ -65,11 +59,33 @@ public class PauseResumeButton extends StackPane{
 
 
     private EventHandler<MouseEvent> onMouseHover =
-            t -> imageView.setImage(isPaused() ? imageResumeOnHover : imagePauseOnHover);
+            t -> {
+        imageView.setImage(isPaused() ? imageResumeOnHover : imagePauseOnHover);
+        isHovering = true;
+            };
 
     private EventHandler<MouseEvent> onMouseHoverDone =
-            t -> imageView.setImage(isPaused() ? imageResume : imagePause);
+            t -> {
+        imageView.setImage(isPaused() ? imageResume : imagePause);
+        isHovering = false;
+            };
 
+
+    public void setPaused(boolean paused) {
+        isPaused[0] = paused;
+
+
+        imageView.setImage(isPaused() ?
+                (isHovering ? imageResumeOnHover : imageResume) :
+                (isHovering ? imagePauseOnHover : imagePause)
+        );
+    }
+
+    private void click() {
+        for (int i = clickListeners.size() - 1; i >= 0; i--) {
+            clickListeners.get(i).invalidated(null);
+        }
+    }
 
 //    private ImageView imageView;
 //    private Image image;
