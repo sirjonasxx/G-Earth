@@ -34,4 +34,9 @@ public class HPoint {
         HPoint p = (HPoint) o;
         return this.x == p.getX() && this.y == p.getY() && this.z == p.getZ();
     }
+    
+    @Override
+    public String toString() {
+        return "(" + this.getX() + "," + this.getY() + "," + this.getZ() + ")";
+    }
 }
