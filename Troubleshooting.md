@@ -6,6 +6,7 @@ If you're using a mac; make sure you have completed the mac-installation wiki pa
 ## Problem 1: G-Earth doesn't open
 * It's recommended to use Java 8, some problems have occurred with people using Java 11 or other versions. It shouldn't be hard to fix this with a simple google search.
 * On Linux, if you get a "Invalid MIT-MAGIC-COOKIE-1" exception, execute "xhost +local:" in a terminal
+* On Linux, if you get a "could not find or load main class gearth.Main", javafx might not be installed. Execute "apt install openjfx" to install javafx
 * It will almost always be an issue with Java, so try reinstalling
 
 ## Problem 2: Stuck at 76%
