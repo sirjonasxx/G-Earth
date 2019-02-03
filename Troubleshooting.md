@@ -1,6 +1,6 @@
-There are some known issues while using G-Earth, please read this through carefully.
+There are some known issues with the execution G-Earth, please read this through carefully.
 
-First of all, make sure you have extracted the .rar file to its own folder.
+First of all, make sure you have extracted the .rar file into its own folder.
 If you're using a mac; make sure you have completed the mac-installation wiki page.
 
 ## Problem 1: G-Earth doesn't open
