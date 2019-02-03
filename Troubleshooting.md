@@ -18,6 +18,7 @@ If you're using a mac; make sure you have completed the mac-installation wiki pa
 * Your hosts file might have some permissions issues. Delete it and place a new one: https://github.com/sirjonasxx/G-Earth/issues/17
 * The port of the hotel you're trying to connect with (30000 or 38101 on most hotels) must not be in use by any other process than G-Earth. There are platform-specific ways to find out what ports are in-use by googling.
 * Make sure you don't have a VPN(/browser extension) enabled
+* Your antivirus might be the problem
 
 ## Creating an Issue
 If the solutions did NOT help you, navigate to https://github.com/sirjonasxx/G-Earth/issues and, if it hasn't been solved before, create a new issue.
