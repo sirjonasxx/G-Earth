@@ -36,7 +36,7 @@ import java.util.*;
  * Why? Because Habbo relies on the TCP protocol, which ENSURES that packets get received in the right order, so we will not be fucking that up.
  * That means that all packets following the packet you're manipulating in your extension will be blocked from being sent untill you're done.
  * TIP: If you're trying to replace a packet in your extension but you know it will take time, just block the packet, end the method, and let something asynchronous send
- * the editted packet when you're done.
+ * the edited packet when you're done.
  *
  *
  * You may ignore everything beneath this line if you're extending the abstract Extension class we provide in Java.
@@ -44,13 +44,13 @@ import java.util.*;
  *
  * (0. We recommend to use a cross-platform language for your extension)
  *
- * 1.   An extension will run as a seperate process on your device and has to be called with the flag "-p <PORT>",
+ * 1.   An extension will run as a separate process on your device and has to be called with the flag "-p <PORT>",
  *      where <PORT> is a random port where the G-Earth local extension server will run on. Your extension has to connect with this server.
  *
- * 2.   G-Earth will open your program only ONCE, that is on the boot of G-Earth or when you install the exension.
+ * 2.   G-Earth will open your program only ONCE, that is on the boot of G-Earth or when you install the extension.
  *      Same story goes for closing the connection between the program and G-Earth, only once (on uninstall or close of G-Earth).
  *
- *      You may also run your extension completely seperate from G-Earth for debugging purpose for example, then it won't be installed in G-Earth
+ *      You may also run your extension completely separate from G-Earth for debugging purpose for example, then it won't be installed in G-Earth
  *      (but you have to configure the port yourself, which will be displayed in the extension page)
  *
  * 3.   Once a connection is made, your extension will have to deal with the following incoming & outgoing messages as described (follows the same protocol structure as Habbo communication does):
@@ -209,7 +209,6 @@ public class Extensions extends SubForm {
                                     }
                                 }
                             }
-
                         }
                     };
                     extension.addOnReceiveMessageListener(respondCallback);
@@ -250,83 +249,80 @@ public class Extensions extends SubForm {
 
 
         HashMap<GEarthExtension, GEarthExtension.ReceiveMessageListener> messageListeners = new HashMap<>();
-        try {
-            extensionsRegistrer = new GEarthExtensionsRegistrer(new GEarthExtensionsRegistrer.ExtensionRegisterObserver() {
-                @Override
-                public void onConnect(GEarthExtension extension) {
-                    synchronized (gEarthExtensions) {
-                        gEarthExtensions.add(extension);
-                    }
-
-                    GEarthExtension.ReceiveMessageListener receiveMessageListener = message -> {
-                        if (message.headerId() == INCOMING_MESSAGES_IDS.REQUESTFLAGS) { // no body
-                            HPacket packet = new HPacket(OUTGOING_MESSAGES_IDS.FLAGSCHECK);
-                            packet.appendInt(Main.args.length);
-                            for (String arg : Main.args) {
-                                packet.appendString(arg);
-                            }
-                            extension.sendMessage(packet);
-                        }
-                        else if (message.headerId() == INCOMING_MESSAGES_IDS.SENDMESSAGE) {
-                            Byte side = message.readByte();
-                            int byteLength = message.readInteger();
-                            byte[] packetAsByteArray = message.readBytes(byteLength);
-
-                            HPacket packet = new HPacket(packetAsByteArray);
-                            if (!packet.isCorrupted()) {
-                                if (side == 0) {        // toclient
-                                    getHConnection().sendToClientAsync(packet);
-                                }
-                                else if (side == 1) {   // toserver
-                                    getHConnection().sendToServerAsync(packet);
-                                }
-                            }
-                        }
-                    };
-                    synchronized (messageListeners) {
-                        messageListeners.put(extension, receiveMessageListener);
-                    }
-                    extension.addOnReceiveMessageListener(receiveMessageListener);
-
-                    extension.sendMessage(new HPacket(OUTGOING_MESSAGES_IDS.INIT));
-                    if (getHConnection().getState() == HConnection.State.CONNECTED) {
-                        extension.sendMessage(
-                                new HPacket(OUTGOING_MESSAGES_IDS.CONNECTIONSTART)
-                                        .appendString(getHConnection().getDomain())
-                                        .appendInt(getHConnection().getPort())
-                                        .appendString(getHConnection().getHotelVersion())
-                                        .appendString(HarbleAPIFetcher.HARBLEAPI == null ? "null" : HarbleAPIFetcher.HARBLEAPI.getPath())
-                        );
-                    }
-
-                    extension.onRemoveClick(observable -> {
-                        try {
-                            extension.getConnection().close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    });
-                    extension.onClick(observable -> extension.sendMessage(new HPacket(OUTGOING_MESSAGES_IDS.ONDOUBLECLICK)));
-
-                    Platform.runLater(() -> producer.extensionConnected(extension));
+        extensionsRegistrer = new GEarthExtensionsRegistrer(new GEarthExtensionsRegistrer.ExtensionRegisterObserver() {
+            @Override
+            public void onConnect(GEarthExtension extension) {
+                synchronized (gEarthExtensions) {
+                    gEarthExtensions.add(extension);
                 }
 
-                @Override
-                public void onDisconnect(GEarthExtension extension) {
-                    synchronized (gEarthExtensions) {
-                        gEarthExtensions.remove(extension);
+                GEarthExtension.ReceiveMessageListener receiveMessageListener = message -> {
+                    if (message.headerId() == INCOMING_MESSAGES_IDS.REQUESTFLAGS) { // no body
+                        HPacket packet = new HPacket(OUTGOING_MESSAGES_IDS.FLAGSCHECK);
+                        packet.appendInt(Main.args.length);
+                        for (String arg : Main.args) {
+                            packet.appendString(arg);
+                        }
+                        extension.sendMessage(packet);
                     }
+                    else if (message.headerId() == INCOMING_MESSAGES_IDS.SENDMESSAGE) {
+                        Byte side = message.readByte();
+                        int byteLength = message.readInteger();
+                        byte[] packetAsByteArray = message.readBytes(byteLength);
 
-                    synchronized (messageListeners) {
-                    extension.removeOnReceiveMessageListener(messageListeners.get(extension));
-                        messageListeners.remove(extension);
+                        HPacket packet = new HPacket(packetAsByteArray);
+                        if (!packet.isCorrupted()) {
+                            if (side == 0) {        // toclient
+                                getHConnection().sendToClientAsync(packet);
+                            }
+                            else if (side == 1) {   // toserver
+                                getHConnection().sendToServerAsync(packet);
+                            }
+                        }
                     }
-                    Platform.runLater(extension::delete);
+                };
+                synchronized (messageListeners) {
+                    messageListeners.put(extension, receiveMessageListener);
                 }
-            });
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+                extension.addOnReceiveMessageListener(receiveMessageListener);
+
+                extension.sendMessage(new HPacket(OUTGOING_MESSAGES_IDS.INIT));
+                if (getHConnection().getState() == HConnection.State.CONNECTED) {
+                    extension.sendMessage(
+                            new HPacket(OUTGOING_MESSAGES_IDS.CONNECTIONSTART)
+                                    .appendString(getHConnection().getDomain())
+                                    .appendInt(getHConnection().getPort())
+                                    .appendString(getHConnection().getHotelVersion())
+                                    .appendString(HarbleAPIFetcher.HARBLEAPI == null ? "null" : HarbleAPIFetcher.HARBLEAPI.getPath())
+                    );
+                }
+
+                extension.onRemoveClick(observable -> {
+                    try {
+                        extension.getConnection().close();
+                        extension.disconnect();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                });
+                extension.onClick(observable -> extension.sendMessage(new HPacket(OUTGOING_MESSAGES_IDS.ONDOUBLECLICK)));
+
+                Platform.runLater(() -> producer.extensionConnected(extension));
+            }
+
+            @Override
+            public void onDisconnect(GEarthExtension extension) {
+                synchronized (gEarthExtensions) {
+                    gEarthExtensions.remove(extension);
+                }
+
+                synchronized (messageListeners) {
+                extension.removeOnReceiveMessageListener(messageListeners.get(extension));
+                    messageListeners.remove(extension);
+                }
+                Platform.runLater(extension::delete);
+            }
+        });
 
         producer.setPort(extensionsRegistrer.getPort());
         ext_port.setText(extensionsRegistrer.getPort()+"");

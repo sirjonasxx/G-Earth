@@ -5,7 +5,9 @@ import gearth.protocol.HPacket;
 import gearth.ui.extensions.Extensions;
 
 import java.io.*;
-import java.net.Socket;
+import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
+import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,8 +25,8 @@ public abstract class Extension implements IExtension{
         void act(String[] args);
     }
 
-    protected boolean canLeave;     // can you disconnect the ext
-    protected boolean canDelete;    // can you delete the ext (will be false for some built-in extensions)
+    private boolean canLeave;     // can you disconnect the ext
+    private boolean canDelete;    // can you delete the ext (will be false for some built-in extensions)
 
     private String[] args;
     private boolean isCorrupted = false;
@@ -32,7 +34,8 @@ public abstract class Extension implements IExtension{
     private static final String[] FILE_FLAG = {"--filename", "-f"};
     private static final String[] COOKIE_FLAG = {"--auth-token", "-c"}; // don't add a cookie or filename when debugging
 
-    private OutputStream out = null;
+    private SocketChannel gEarthExtensionServer = null;
+
     private final Map<Integer, List<MessageListener>> incomingMessageListeners = new HashMap<>();
     private final Map<Integer, List<MessageListener>> outgoingMessageListeners = new HashMap<>();
     private FlagsCheckListener flagRequestCallback = null;
@@ -87,36 +90,28 @@ public abstract class Extension implements IExtension{
         String file = getArgument(args, FILE_FLAG);
         String cookie = getArgument(args, COOKIE_FLAG);
 
-        Socket gEarthExtensionServer = null;
         try {
-            gEarthExtensionServer = new Socket("127.0.0.1", port);
-            gEarthExtensionServer.setTcpNoDelay(true);
-            InputStream in = gEarthExtensionServer.getInputStream();
-            DataInputStream dIn = new DataInputStream(in);
-            out = gEarthExtensionServer.getOutputStream();
+            gEarthExtensionServer = SocketChannel.open();
+            gEarthExtensionServer.connect(new InetSocketAddress("127.0.0.1", port));
+            gEarthExtensionServer.socket().setTcpNoDelay(true);
 
-            while (!gEarthExtensionServer.isClosed()) {
+            ByteBuffer bbLength = ByteBuffer.allocateDirect(4);
 
+            while (gEarthExtensionServer.isOpen()) {
                 int length;
-                try {
-                    length = dIn.readInt();
-                }
-                catch(EOFException exception) {
-                    //g-earth closed the extension
+
+                if (gEarthExtensionServer.read(bbLength) == -1)
                     break;
-                }
 
-                byte[] headerandbody = new byte[length + 4];
+                length = bbLength.getInt(0);
+                bbLength.flip();
 
-                int amountRead = 0;
+                ByteBuffer headerAndBody = ByteBuffer.allocateDirect(4 + length);
+                headerAndBody.putInt(0); // this will be the length
+                gEarthExtensionServer.read(headerAndBody);
 
-                while (amountRead < length) {
-                    amountRead += dIn.read(headerandbody, 4 + amountRead, Math.min(dIn.available(), length - amountRead));
-                }
-
-                HPacket packet = new HPacket(headerandbody);
+                HPacket packet = new HPacket(headerAndBody);
                 packet.fixLength();
-
 
                 if (packet.headerId() == Extensions.OUTGOING_MESSAGES_IDS.INFOREQUEST) {
                     ExtensionInfo info = getInfoAnnotations();
@@ -132,7 +127,9 @@ public abstract class Extension implements IExtension{
                             .appendString(cookie == null ? "" : cookie)
                             .appendBoolean(canLeave)
                             .appendBoolean(canDelete);
-                    writeToStream(response.toBytes());
+
+                    ByteBuffer extInfo = ByteBuffer.wrap(response.toBytes());
+                    gEarthExtensionServer.write(extInfo);
                 }
                 else if (packet.headerId() == Extensions.OUTGOING_MESSAGES_IDS.CONNECTIONSTART) {
                     String host = packet.readString();
@@ -204,7 +201,6 @@ public abstract class Extension implements IExtension{
                     response.appendLongString(habboMessage.stringify());
 
                     writeToStream(response.toBytes());
-
                 }
             }
 
@@ -213,7 +209,7 @@ public abstract class Extension implements IExtension{
 //            e.printStackTrace();
         }
         finally {
-            if (gEarthExtensionServer != null && !gEarthExtensionServer.isClosed()) {
+            if (gEarthExtensionServer != null && gEarthExtensionServer.isOpen()) {
                 try {
                     gEarthExtensionServer.close();
                 } catch (IOException e) {
@@ -225,7 +221,7 @@ public abstract class Extension implements IExtension{
 
     private void writeToStream(byte[] bytes) throws IOException {
         synchronized (this) {
-            out.write(bytes);
+            gEarthExtensionServer.write(ByteBuffer.wrap(bytes));
         }
     }
 
