@@ -5,6 +5,9 @@ Habbo packet logger & manipulator for Windows, Linux and Mac.
 
 FOR TROUBLESHOOTING, GO TO https://github.com/sirjonasxx/G-Earth/wiki/Troubleshooting
 
+NOTE: Development for this project has stopped a while ago. Feel free to maintain your own fork.
+One day a part of the project (memorysearcher + traffic manipulation) might be maintained and expanded in another repository for non-habbospecific and more general use.
+
 # Windows execution
 Double click G-Earth.exe, which will be delivered in the release. Note that executing G-Earth requires admin privileges.
 
