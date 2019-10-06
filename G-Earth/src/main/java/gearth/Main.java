@@ -37,10 +37,13 @@ public class Main extends Application {
 
         primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/gearth/G-EarthLogoSmaller.png")));
 
-        primaryStage.setResizable(false);
+        primaryStage.setResizable(true);
+        primaryStage.onShownProperty().addListener(e -> {
+            Platform.runLater(() -> primaryStage.setResizable(false));
+        });
         //primaryStage.initStyle(StageStyle.UNDECORATED);
         primaryStage.setTitle("G-Earth " + version);
-        primaryStage.setScene(new Scene(root, 620, 295));
+        primaryStage.setScene(new Scene(root, 650, 295));
         primaryStage.show();
         primaryStage.getScene().getStylesheets().add(getClass().getResource("/gearth/ui/bootstrap3.css").toExternalForm());
 
@@ -57,6 +60,10 @@ public class Main extends Application {
                 Platform.runLater(() -> {
                     Alert alert = new Alert(Alert.AlertType.ERROR, "G-Earth needs admin privileges in order to work properly, please restart G-Earth with admin permissions unless you know what you're doing", ButtonType.OK);
                     alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+                    alert.setResizable(true);
+                    alert.onShownProperty().addListener(e -> {
+                        Platform.runLater(() -> alert.setResizable(false));
+                    });
                     alert.show();
                 });
 
@@ -90,6 +97,12 @@ public class Main extends Application {
                         WebView webView = new WebView();
                         webView.getEngine().loadContent("<html>A new version of G-Earth has been found ("+gitv+")<br><br>Update to the latest version:<br><a href=\"https://github.com/sirjonasxx/G-Earth/releases\">https://github.com/sirjonasxx/G-Earth/releases</a></html>");
                         webView.setPrefSize(500, 200);
+
+                        alert.setResizable(true);
+                        alert.onShownProperty().addListener(e -> {
+                            Platform.runLater(() -> alert.setResizable(false));
+                        });
+
                         alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
                         alert.getDialogPane().setContent(fp);
                         if (isForcedUpdate) {
