@@ -2,7 +2,6 @@ package gearth.ui.extensions.executer;
 
 import gearth.Main;
 import gearth.ui.extensions.authentication.Authenticator;
-import org.omg.CORBA.Environment;
 
 import java.io.BufferedReader;
 import java.io.File;
