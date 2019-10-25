@@ -4,6 +4,7 @@ import gearth.protocol.HConnection;
 import gearth.protocol.memory.habboclient.HabboClient;
 
 import java.io.*;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.util.*;
 
@@ -149,44 +150,38 @@ public class LinuxHabboClient extends HabboClient {
     }
 
     public List<byte[]> getRC4possibilities() {
+        ArrayList<String> possibleData = new ArrayList<>();
 
-        int offset = 4;
-        List<byte[]> resultSet = new ArrayList<>();
+        try {
+            String g_mem = new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI()).getParent() + "/G-Mem";
+            ProcessBuilder pb = new ProcessBuilder(g_mem, hConnection.getClientHostAndPort().substring(0, hConnection.getClientHostAndPort().indexOf(':')) , Integer.toString(hConnection.getPort()));
 
-        for (PotentialHabboProcess process : potentialProcesses) {
-            PID = process.PID;
-            maps = process.maps;
 
-            List<LinuxMemorySnippet> possibilities = createMemorySnippetListForRC4();
-            fetchMemory(possibilities);
+            Process p = pb.start();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
 
-            for (LinuxMemorySnippet snippet : possibilities) {
-                if (snippet.getData().length >= 1024 && snippet.getData().length <= 1024+2*offset) {
-                    for (int i = 0; i < (snippet.getData().length - ((256 - 1) * offset)); i+=offset) {
-                        byte[] wannabeRC4data = Arrays.copyOfRange(snippet.getData(), i, 1024 + i);
-                        byte[] data = new byte[256]; // dis is the friggin key
+            String line;
 
-                        boolean isvalid = true;
-                        for (int j = 0; j < 1024; j++) {
-                            if (j % 4 != 0 && wannabeRC4data[j] != 0) {
-                                isvalid = false;
-                                break;
-                            }
-                            if (j % 4 == 0) {
-                                data[j/4] = wannabeRC4data[j];
-                            }
-                        }
-                        if (isvalid) {
-                            resultSet.add(data);
-                        }
-                    }
+            while((line = reader.readLine()) !=  null) {
+                if (line.length() > 1) {
+                    System.out.println("[+] " + line);
+                    possibleData.add(line);
                 }
             }
-        }
-        return resultSet;
+
+        } catch (URISyntaxException | IOException e) {
+            e.printStackTrace();
+       }
+
+        List<byte[]> ret = new ArrayList<>();
+
+        for (String possibleHexStr : possibleData)
+            ret.add(hexStringToByteArray(possibleHexStr));
+
+        return ret;
     }
 
-    private List<LinuxMemorySnippet> createMemorySnippetListForRC4() {
+        private List<LinuxMemorySnippet> createMemorySnippetListForRC4() {
 
         Object lock = new Object();
 
@@ -282,5 +277,15 @@ public class LinuxHabboClient extends HabboClient {
         }
 
         return result;
+    }
+
+    private static byte[] hexStringToByteArray(String s) {
+        int len = s.length();
+        byte[] data = new byte[len / 2];
+        for (int i = 0; i < len; i += 2) {
+            data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
+                    + Character.digit(s.charAt(i+1), 16));
+        }
+        return data;
     }
 }
