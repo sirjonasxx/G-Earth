@@ -11,7 +11,7 @@
     <version>1.0</version>
 
     <properties>
-        <javafx.version>12</javafx.version>
+        <javafx.version>11</javafx.version>
     </properties>
 
     <parent>
@@ -36,7 +36,7 @@
                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>gearth.J12Main</mainClass>
+                            <mainClass>gearth.J11Main</mainClass>
                             <useUniqueVersions>false</useUniqueVersions>
                         </manifest>
                     </archive>
@@ -58,7 +58,7 @@
                     <outputDirectory>${project.build.directory}/bin</outputDirectory>
                     <archive>
                         <manifest>
-                            <mainClass>gearth.J12Main</mainClass>
+                            <mainClass>gearth.J11Main</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
