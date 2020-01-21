@@ -1,15 +1,32 @@
 [package]
 name = "G-Mem"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["G-Earth contributors"]
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+kernel32-sys = "0.2.2"
 netstat = "0.7.0"
 read-process-memory = "0.1.2"
-procfs = "0.6.0"
+
+[target.'cfg(unix)'.dependencies]
+procfs = "0.7.7"
+
+[target.'cfg(windows)'.dependencies]
+winapi = {version = "0.3.8", features = ["winnt", "minwindef", "memoryapi", "sysinfoapi", "processthreadsapi"]}
 
 [profile.dev]
 opt-level = 3
+
+[profile.release]
+opt-level = 3
+debug = false
+rpath = false
+lto = false
+debug-assertions = false
+codegen-units = 16
+panic = 'unwind'
+incremental = false
+overflow-checks = false

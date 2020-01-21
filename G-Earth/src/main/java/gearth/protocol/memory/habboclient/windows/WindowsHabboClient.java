@@ -79,7 +79,7 @@ public class WindowsHabboClient extends HabboClient {
             }
         }
 
-        String g_winmem = new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI()).getParent() + "\\G-WinMem.exe";
+        String g_winmem = new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI()).getParent() + "\\G-Mem.exe";
         if (!useCache)
             pb = new ProcessBuilder(g_winmem, hConnection.getClientHostAndPort().substring(0, hConnection.getClientHostAndPort().indexOf(':')) , Integer.toString(hConnection.getPort()));
         else
