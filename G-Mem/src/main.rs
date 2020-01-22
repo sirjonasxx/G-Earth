@@ -5,7 +5,7 @@ use std::sync::mpsc;
 use std::convert::TryInto;
 
 #[cfg(unix)]
-use procfs::MemoryMap;
+use procfs::process::MemoryMap;
 
 use netstat::*;
 use read_process_memory::*;
@@ -228,7 +228,7 @@ fn get_mem_maps(pid: Pid) -> Vec<MemoryMap> {
 #[cfg(unix)]
 fn get_mem_maps(pid: Pid) -> Vec<MemoryMap>{
     let mut ret: Vec<MemoryMap> = Vec::new();
-    let habbo_proc = procfs::Process::new(pid as i32).unwrap();
+    let habbo_proc = procfs::process::Process::new(pid as i32).unwrap();
 
     let maps = habbo_proc.maps().unwrap();
 
