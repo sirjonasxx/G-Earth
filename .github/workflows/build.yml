@@ -1,0 +1,46 @@
+name: Java CI
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        name: [linux, windows]
+        include:
+          - name: linux
+            os: ubuntu-latest
+            artifact_name: G-Mem
+          - name: windows
+            os: windows-latest
+            artifact_name: G-Mem.exe
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: Set up JDK 11
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+
+      - name: Build with Maven
+        run: mvn -B package --file pom.xml
+
+
+      - name: rust-cargo
+        uses: actions-rs/cargo@v1.0.1
+        with:
+          command: build
+          args: --release --manifest-path=G-Mem/Cargo.toml
+
+      - name: Release java part
+        uses: actions/upload-artifact@v1
+        with:
+          name: G-Earth-${{ matrix.os }}
+          path: G-Earth/target/bin
+
+      - name: Release rust part
+        uses: actions/upload-artifact@v1
+        with:
+          name: G-Earth-${{ matrix.os }}
+          path: G-Mem/target/release/${{ matrix.artifact_name }}
