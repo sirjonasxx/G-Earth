@@ -19,7 +19,6 @@
         <!-- Compile our extensions too please! -->
         <module>Extensions/AdminOnConnect</module>
         <module>Extensions/BlockReplacePackets</module>
-        <module>Extensions/HappySpeech</module>
     </modules>
 
     <build>
