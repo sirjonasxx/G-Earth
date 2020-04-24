@@ -8,7 +8,7 @@ bin/
 **/target/
 
 # our self-made build folder
-Build/
+/Build/
 
 # vsCode
 Extensions/BlockReplacePackets/.classpath
