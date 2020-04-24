@@ -32,3 +32,5 @@ https://github.com/sirjonasxx/G-Earth/wiki/macOs-Installation-guide
 Interested in creating an extension?
 * If you're not experienced with Java but have written extensions before in C#, you could have a look at https://github.com/ArachisH/Geode
 * If you are experienced with Java, read this wiki page carefully: https://github.com/sirjonasxx/G-Earth/wiki/Extensions
+
+For the memorysearcher that extracts the RC4 table, go to https://github.com/sirjonasxx/G-Mem
