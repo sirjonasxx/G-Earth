@@ -4,13 +4,13 @@ import gearth.misc.StringifyAble;
 
 public class HMessage implements StringifyAble {
 
-    public enum Side {
+    public enum Direction {
         TOSERVER,
         TOCLIENT
     }
 
     private HPacket hPacket;
-    private Side side;
+    private Direction direction;
     private int index;
 
     private boolean isBlocked;
@@ -23,8 +23,8 @@ public class HMessage implements StringifyAble {
         constructFromHMessage(message);
     }
 
-    public HMessage(HPacket packet, Side side, int index) {
-        this.side = side;
+    public HMessage(HPacket packet, Direction direction, int index) {
+        this.direction = direction;
         this.hPacket = packet;
         this.index = index;
         isBlocked = false;
@@ -44,8 +44,8 @@ public class HMessage implements StringifyAble {
     public HPacket getPacket() {
         return hPacket;
     }
-    public Side getDestination() {
-        return side;
+    public Direction getDestination() {
+        return direction;
     }
 
     public boolean isCorrupted() {
@@ -55,7 +55,7 @@ public class HMessage implements StringifyAble {
 
     @Override
     public String stringify() {
-        String s = (isBlocked ? "1" : "0") + "\t" + index + "\t" + side.name() + "\t" + hPacket.stringify();
+        String s = (isBlocked ? "1" : "0") + "\t" + index + "\t" + direction.name() + "\t" + hPacket.stringify();
         return s;
     }
 
@@ -64,7 +64,7 @@ public class HMessage implements StringifyAble {
         String[] parts = str.split("\t", 4);
         this.isBlocked = parts[0].equals("1");
         this.index = Integer.parseInt(parts[1]);
-        this.side = parts[2].equals("TOCLIENT") ? Side.TOCLIENT : Side.TOSERVER;
+        this.direction = parts[2].equals("TOCLIENT") ? Direction.TOCLIENT : Direction.TOSERVER;
         HPacket p = new HPacket(new byte[0]);
         p.constructFromString(parts[3]);
         this.hPacket = p;
@@ -73,7 +73,7 @@ public class HMessage implements StringifyAble {
     public void constructFromHMessage(HMessage message) {
         this.isBlocked = message.isBlocked();
         this.index = message.getIndex();
-        this.side = message.getDestination();
+        this.direction = message.getDestination();
         this.hPacket = new HPacket(message.getPacket());
     }
 
@@ -83,7 +83,7 @@ public class HMessage implements StringifyAble {
 
         HMessage message = (HMessage) obj;
 
-        return message.hPacket.equals(hPacket) && (side == message.side) && (index == message.index);
+        return message.hPacket.equals(hPacket) && (direction == message.direction) && (index == message.index);
     }
 
 //    public static void gearth(String[] args) {

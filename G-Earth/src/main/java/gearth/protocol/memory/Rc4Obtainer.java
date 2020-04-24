@@ -19,7 +19,6 @@ import javafx.scene.web.WebView;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Consumer;
 
 public class Rc4Obtainer {
 
@@ -119,7 +118,7 @@ public class Rc4Obtainer {
                     byte[] keycpy = Arrays.copyOf(possible, possible.length);
                     RC4 rc4Tryout = new RC4(keycpy, i, j);
 
-                    if (packetHandler.getMessageSide() == HMessage.Side.TOSERVER) rc4Tryout.undoRc4(encBuffer);
+                    if (packetHandler.getMessageSide() == HMessage.Direction.TOSERVER) rc4Tryout.undoRc4(encBuffer);
                     if (rc4Tryout.couldBeFresh()) {
                         byte[] encDataCopy = Arrays.copyOf(encBuffer, encBuffer.length);
                         RC4 rc4TryCopy = rc4Tryout.deepCopy();

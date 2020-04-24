@@ -37,10 +37,10 @@ public class Logger extends SubForm {
     public void onParentSet(){
         getHConnection().addStateChangeListener((oldState, newState) -> Platform.runLater(() -> {
             if (newState == HConnection.State.PREPARING) {
-                miniLogText(Color.ORANGE, "Connecting to "+getHConnection().getDomain() + ":" + getHConnection().getPort());
+                miniLogText(Color.ORANGE, "Connecting to "+getHConnection().getDomain() + ":" + getHConnection().getServerPort());
             }
             if (newState == HConnection.State.CONNECTED) {
-                miniLogText(Color.GREEN, "Connected to "+getHConnection().getDomain() + ":" + getHConnection().getPort());
+                miniLogText(Color.GREEN, "Connected to "+getHConnection().getDomain() + ":" + getHConnection().getServerPort());
                 packetLogger.start();
             }
             if (newState == HConnection.State.NOT_CONNECTED) {
@@ -50,16 +50,16 @@ public class Logger extends SubForm {
         }));
 
         getHConnection().addTrafficListener(2, message -> { Platform.runLater(() -> {
-            if (message.getDestination() == HMessage.Side.TOCLIENT && cbx_blockIn.isSelected() ||
-                    message.getDestination() == HMessage.Side.TOSERVER && cbx_blockOut.isSelected()) return;
+            if (message.getDestination() == HMessage.Direction.TOCLIENT && cbx_blockIn.isSelected() ||
+                    message.getDestination() == HMessage.Direction.TOSERVER && cbx_blockOut.isSelected()) return;
 
             if (cbx_splitPackets.isSelected()) {
                 packetLogger.appendSplitLine();
             }
 
             int types = 0;
-            if (message.getDestination() == HMessage.Side.TOCLIENT) types |= PacketLogger.MESSAGE_TYPE.INCOMING.getValue();
-            else if (message.getDestination() == HMessage.Side.TOSERVER) types |= PacketLogger.MESSAGE_TYPE.OUTGOING.getValue();
+            if (message.getDestination() == HMessage.Direction.TOCLIENT) types |= PacketLogger.MESSAGE_TYPE.INCOMING.getValue();
+            else if (message.getDestination() == HMessage.Direction.TOSERVER) types |= PacketLogger.MESSAGE_TYPE.OUTGOING.getValue();
             if (message.getPacket().length() >= packetLimit) types |= PacketLogger.MESSAGE_TYPE.SKIPPED.getValue();
             if (message.isBlocked()) types |= PacketLogger.MESSAGE_TYPE.BLOCKED.getValue();
             if (message.getPacket().isReplaced()) types |= PacketLogger.MESSAGE_TYPE.REPLACED.getValue();

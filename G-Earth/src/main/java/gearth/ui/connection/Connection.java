@@ -91,7 +91,7 @@ public class Connection extends SubForm {
                 if (newState == HConnection.State.CONNECTED) {
                     lblState.setText("Connected");
                     outHost.setText(getHConnection().getDomain());
-                    outPort.setText(getHConnection().getPort()+"");
+                    outPort.setText(getHConnection().getServerPort()+"");
                 }
                 if (newState == HConnection.State.WAITING_FOR_CLIENT) {
                     lblState.setText("Waiting for connection");

@@ -7,8 +7,6 @@ import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 import gearth.ui.GEarthController;
 import javafx.application.Platform;
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -180,8 +178,8 @@ public class BlockAndReplacePackets extends ExtensionForm {
             }
         };
 
-        intercept(HMessage.Side.TOSERVER, messageListener);
-        intercept(HMessage.Side.TOCLIENT, messageListener);
+        intercept(HMessage.Direction.TOSERVER, messageListener);
+        intercept(HMessage.Direction.TOCLIENT, messageListener);
     }
 
     @Override

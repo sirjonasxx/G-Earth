@@ -1,7 +1,6 @@
 package gearth.ui.scheduler;
 
 import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -21,13 +20,13 @@ public class ScheduleItem implements StringifyAble {
     private SimpleBooleanProperty pausedProperty = null;
     private SimpleObjectProperty<Interval> delayProperty = null;
     private SimpleObjectProperty<HPacket> packetProperty = null;
-    private SimpleObjectProperty<HMessage.Side> destinationProperty = null;
+    private SimpleObjectProperty<HMessage.Direction> destinationProperty = null;
 
-    ScheduleItem (int index, boolean paused, Interval delay, HPacket packet, HMessage.Side destination) {
+    ScheduleItem (int index, boolean paused, Interval delay, HPacket packet, HMessage.Direction destination) {
         construct(index, paused, delay, packet, destination);
     }
 
-    private void construct(int index, boolean paused, Interval delay, HPacket packet, HMessage.Side destination) {
+    private void construct(int index, boolean paused, Interval delay, HPacket packet, HMessage.Direction destination) {
         this.indexProperty = new SimpleIntegerProperty(index);
         this.pausedProperty = new SimpleBooleanProperty(paused);
         this.delayProperty = new SimpleObjectProperty<>(delay);
@@ -55,7 +54,7 @@ public class ScheduleItem implements StringifyAble {
         return packetProperty;
     }
 
-    public SimpleObjectProperty<HMessage.Side> getDestinationProperty() {
+    public SimpleObjectProperty<HMessage.Direction> getDestinationProperty() {
         return destinationProperty;
     }
 
@@ -123,9 +122,9 @@ public class ScheduleItem implements StringifyAble {
             boolean paused = parts[1].equals("true");
             Interval delay = new Interval(parts[2]);
             HPacket packet = new HPacket(parts[3]);
-            HMessage.Side side = parts[4].equals(HMessage.Side.TOSERVER.name()) ? HMessage.Side.TOSERVER : HMessage.Side.TOCLIENT;
+            HMessage.Direction direction = parts[4].equals(HMessage.Direction.TOSERVER.name()) ? HMessage.Direction.TOSERVER : HMessage.Direction.TOCLIENT;
 
-            construct(index, paused, delay, packet, side);
+            construct(index, paused, delay, packet, direction);
 
         }
     }

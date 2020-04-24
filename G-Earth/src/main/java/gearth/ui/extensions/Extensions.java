@@ -156,7 +156,7 @@ public class Extensions extends SubForm {
                         extension.sendMessage(
                                 new HPacket(OUTGOING_MESSAGES_IDS.CONNECTIONSTART)
                                         .appendString(getHConnection().getDomain())
-                                        .appendInt(getHConnection().getPort())
+                                        .appendInt(getHConnection().getServerPort())
                                         .appendString(getHConnection().getHotelVersion())
                                         .appendString(HarbleAPIFetcher.HARBLEAPI == null ? "null" : HarbleAPIFetcher.HARBLEAPI.getPath())
                         );
@@ -293,7 +293,7 @@ public class Extensions extends SubForm {
                         extension.sendMessage(
                                 new HPacket(OUTGOING_MESSAGES_IDS.CONNECTIONSTART)
                                         .appendString(getHConnection().getDomain())
-                                        .appendInt(getHConnection().getPort())
+                                        .appendInt(getHConnection().getServerPort())
                                         .appendString(getHConnection().getHotelVersion())
                                         .appendString(HarbleAPIFetcher.HARBLEAPI == null ? "null" : HarbleAPIFetcher.HARBLEAPI.getPath())
                         );

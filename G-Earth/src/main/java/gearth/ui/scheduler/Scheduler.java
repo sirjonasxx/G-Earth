@@ -12,7 +12,6 @@ import gearth.protocol.HPacket;
 import gearth.ui.SubForm;
 
 import javax.swing.*;
-import java.awt.event.KeyEvent;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -86,7 +85,7 @@ public class Scheduler extends SubForm {
                         Interval cur = item.getDelayProperty().get();
                         for (int i = 0; i < changed; i++) {
                             if ((t - i) % cur.getDelay() == cur.getOffset()) {
-                                if (item.getDestinationProperty().get() == HMessage.Side.TOSERVER) {
+                                if (item.getDestinationProperty().get() == HMessage.Direction.TOSERVER) {
                                     getHConnection().sendToServerAsync(item.getPacketProperty().get());
                                 }
                                 else {
@@ -153,7 +152,7 @@ public class Scheduler extends SubForm {
                     false,
                     new Interval(txt_delay.getText()),
                     new HPacket(txt_packet.getText()),
-                    rb_incoming.isSelected() ? HMessage.Side.TOCLIENT : HMessage.Side.TOSERVER);
+                    rb_incoming.isSelected() ? HMessage.Direction.TOCLIENT : HMessage.Direction.TOSERVER);
 
             addItem(newItem);
         }
@@ -161,7 +160,7 @@ public class Scheduler extends SubForm {
 
             isBeingEdited.getPacketProperty().set(new HPacket(txt_packet.getText()));
             isBeingEdited.getDelayProperty().set(new Interval(txt_delay.getText()));
-            isBeingEdited.getDestinationProperty().set(rb_incoming.isSelected() ? HMessage.Side.TOCLIENT : HMessage.Side.TOSERVER);
+            isBeingEdited.getDestinationProperty().set(rb_incoming.isSelected() ? HMessage.Direction.TOCLIENT : HMessage.Direction.TOSERVER);
             isBeingEdited.isUpdatedTrigger();
 
             isBeingEdited = null;
@@ -193,8 +192,8 @@ public class Scheduler extends SubForm {
             if (isBeingEdited != newItem) {
                 txt_packet.setText(newItem.getPacketProperty().get().toString());
                 txt_delay.setText(newItem.getDelayProperty().get().toString());
-                rb_incoming.setSelected(newItem.getDestinationProperty().get() == HMessage.Side.TOCLIENT);
-                rb_outgoing.setSelected(newItem.getDestinationProperty().get() == HMessage.Side.TOSERVER);
+                rb_incoming.setSelected(newItem.getDestinationProperty().get() == HMessage.Direction.TOCLIENT);
+                rb_outgoing.setSelected(newItem.getDestinationProperty().get() == HMessage.Direction.TOSERVER);
 
                 isBeingEdited = newItem;
                 btn_addoredit.setText("Edit schedule item"); //Add to scheduler

@@ -23,7 +23,7 @@ public class MacOsHabboClient extends HabboClient {
         super(connection);
 
         connection.addTrafficListener(0, message -> {
-            if (message.getDestination() == HMessage.Side.TOSERVER && message.getPacket().headerId() == PRODUCTION_ID) {
+            if (message.getDestination() == HMessage.Direction.TOSERVER && message.getPacket().headerId() == PRODUCTION_ID) {
                 production = message.getPacket().readString();
             }
         });
@@ -81,9 +81,9 @@ public class MacOsHabboClient extends HabboClient {
 
         String g_mem = new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI()).getParent() + "/G-Mem";
         if (!useCache)
-            pb = new ProcessBuilder(g_mem, hConnection.getClientHostAndPort().substring(0, hConnection.getClientHostAndPort().indexOf(':')) , Integer.toString(hConnection.getPort()));
+            pb = new ProcessBuilder(g_mem, hConnection.getClientHost() , Integer.toString(hConnection.getClientPort()));
         else
-            pb = new ProcessBuilder(g_mem, hConnection.getClientHostAndPort().substring(0, hConnection.getClientHostAndPort().indexOf(':')) , Integer.toString(hConnection.getPort()), "-c" + joiner.toString());
+            pb = new ProcessBuilder(g_mem, hConnection.getClientHost() , Integer.toString(hConnection.getClientPort()), "-c" + joiner.toString());
 
 
         Process p = pb.start();

@@ -1,7 +1,6 @@
 package extensions.blockreplacepackets.rules;
 
 import gearth.protocol.HMessage;
-import gearth.protocol.HPacket;
 
 /**
  * Created by Jonas on 6/11/2018.
@@ -19,8 +18,8 @@ public class BlockPacketRule extends BlockReplaceRule{
     @Override
     public void appendRuleToMessage(HMessage message) {
         if (side == Side.ALL
-                || (message.getDestination() == HMessage.Side.TOSERVER && side == Side.OUTGOING)
-                || (message.getDestination() == HMessage.Side.TOCLIENT && side ==Side.INCOMING)) {
+                || (message.getDestination() == HMessage.Direction.TOSERVER && side == Side.OUTGOING)
+                || (message.getDestination() == HMessage.Direction.TOCLIENT && side ==Side.INCOMING)) {
             if (message.getPacket().headerId() == headerId) {
                 message.setBlocked(true);
             }

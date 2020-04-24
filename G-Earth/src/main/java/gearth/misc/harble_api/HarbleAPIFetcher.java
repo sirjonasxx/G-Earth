@@ -2,10 +2,8 @@ package gearth.misc.harble_api;
 
 import gearth.misc.Cacher;
 import gearth.protocol.HMessage;
-import org.json.JSONObject;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 
 import java.io.IOException;
 
@@ -66,7 +64,7 @@ public class HarbleAPIFetcher {
         fetch("PRODUCTION-201901141210-114421986");
 
         HarbleAPI api = HARBLEAPI;
-        HarbleAPI.HarbleMessage haMessage = api.getHarbleMessageFromHeaderId(HMessage.Side.TOSERVER, 525);
+        HarbleAPI.HarbleMessage haMessage = api.getHarbleMessageFromHeaderId(HMessage.Direction.TOSERVER, 525);
         System.out.println(haMessage);
     }
 }

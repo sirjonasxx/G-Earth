@@ -45,7 +45,7 @@ public class ChatConsole {
 
         extension.onConnect((s, i, s1, h1) -> doOncePerConnection[0] = true);
 
-        extension.intercept(HMessage.Side.TOSERVER, hMessage -> {
+        extension.intercept(HMessage.Direction.TOSERVER, hMessage -> {
             // if the first packet on init is not 4000, the extension was already running, so we open the chat instantly
             if (firstTime) {
                 firstTime = false;
@@ -56,7 +56,7 @@ public class ChatConsole {
             }
         });
 
-        hashSupport.intercept(HMessage.Side.TOCLIENT, "Friends", hMessage -> {
+        hashSupport.intercept(HMessage.Direction.TOCLIENT, "Friends", hMessage -> {
             if (doOncePerConnection[0]) {
                 doOncePerConnection[0] = false;
 
@@ -72,7 +72,7 @@ public class ChatConsole {
             }
         });
 
-        hashSupport.intercept(HMessage.Side.TOSERVER, "FriendPrivateMessage", hMessage -> {
+        hashSupport.intercept(HMessage.Direction.TOSERVER, "FriendPrivateMessage", hMessage -> {
             HPacket packet = hMessage.getPacket();
             if (packet.readInteger() == chatid) {
                 hMessage.setBlocked(true);

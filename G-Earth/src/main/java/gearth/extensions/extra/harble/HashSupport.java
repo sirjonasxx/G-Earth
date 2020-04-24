@@ -1,15 +1,11 @@
 package gearth.extensions.extra.harble;
 
-import gearth.Main;
 import gearth.extensions.Extension;
 import gearth.extensions.IExtension;
 import gearth.misc.harble_api.HarbleAPI;
-import gearth.misc.harble_api.HarbleAPIFetcher;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 
-import java.io.File;
-import java.net.URISyntaxException;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,9 +34,9 @@ public class HashSupport {
 //            }
         });
 
-        extension.intercept(HMessage.Side.TOSERVER, message -> {
+        extension.intercept(HMessage.Direction.TOSERVER, message -> {
 //            synchronized (lock) {
-                HarbleAPI.HarbleMessage haMessage = harbleAPI.getHarbleMessageFromHeaderId(HMessage.Side.TOSERVER, message.getPacket().headerId());
+                HarbleAPI.HarbleMessage haMessage = harbleAPI.getHarbleMessageFromHeaderId(HMessage.Direction.TOSERVER, message.getPacket().headerId());
                 if (haMessage != null) {
                     List<Extension.MessageListener> listeners_hash = outgoingMessageListeners.get(haMessage.getHash());
                     List<Extension.MessageListener> listeners_name = outgoingMessageListeners.get(haMessage.getName());
@@ -59,9 +55,9 @@ public class HashSupport {
                 }
 //            }
         });
-        extension.intercept(HMessage.Side.TOCLIENT, message -> {
+        extension.intercept(HMessage.Direction.TOCLIENT, message -> {
 //            synchronized (lock) {
-                HarbleAPI.HarbleMessage haMessage = harbleAPI.getHarbleMessageFromHeaderId(HMessage.Side.TOCLIENT, message.getPacket().headerId());
+                HarbleAPI.HarbleMessage haMessage = harbleAPI.getHarbleMessageFromHeaderId(HMessage.Direction.TOCLIENT, message.getPacket().headerId());
                 if (haMessage != null) {
                     List<Extension.MessageListener> listeners_hash = incomingMessageListeners.get(haMessage.getHash());
                     List<Extension.MessageListener> listeners_name = incomingMessageListeners.get(haMessage.getName());
@@ -82,9 +78,9 @@ public class HashSupport {
         });
     }
 
-    public void intercept(HMessage.Side side, String hashOrName, Extension.MessageListener messageListener) {
+    public void intercept(HMessage.Direction direction, String hashOrName, Extension.MessageListener messageListener) {
         Map<String, List<Extension.MessageListener>> messageListeners =
-                (side == HMessage.Side.TOSERVER
+                (direction == HMessage.Direction.TOSERVER
                         ? outgoingMessageListeners
                         : incomingMessageListeners);
 
@@ -92,14 +88,14 @@ public class HashSupport {
         messageListeners.get(hashOrName).add(messageListener);
     }
 
-    private boolean send(HMessage.Side side, String hashOrName, Object... objects) {
+    private boolean send(HMessage.Direction direction, String hashOrName, Object... objects) {
         int headerId;
-        HarbleAPI.HarbleMessage fromname = harbleAPI.getHarbleMessageFromName(side, hashOrName);
+        HarbleAPI.HarbleMessage fromname = harbleAPI.getHarbleMessageFromName(direction, hashOrName);
         if (fromname != null) {
             headerId = fromname.getHeaderId();
         }
         else {
-            List<HarbleAPI.HarbleMessage> possibilities = harbleAPI.getHarbleMessagesFromHash(side, hashOrName);
+            List<HarbleAPI.HarbleMessage> possibilities = harbleAPI.getHarbleMessagesFromHash(direction, hashOrName);
             if (possibilities.size() == 0) return false;
             headerId = possibilities.get(0).getHeaderId();
         }
@@ -107,7 +103,7 @@ public class HashSupport {
         try {
             HPacket packetToSend = new HPacket(headerId, objects);
 
-            return (side == HMessage.Side.TOCLIENT
+            return (direction == HMessage.Direction.TOCLIENT
                     ? extension.sendToClient(packetToSend)
                     : extension.sendToServer(packetToSend));
         }
@@ -121,7 +117,7 @@ public class HashSupport {
      * @return if no errors occurred (invalid hash/invalid parameters/connection error)
      */
     public boolean sendToClient(String hashOrName, Object... objects) {
-        return send(HMessage.Side.TOCLIENT, hashOrName, objects);
+        return send(HMessage.Direction.TOCLIENT, hashOrName, objects);
     }
 
     /**
@@ -129,7 +125,7 @@ public class HashSupport {
      * @return if no errors occurred (invalid hash/invalid parameters/connection error)
      */
     public boolean sendToServer(String hashOrName, Object... objects) {
-        return send(HMessage.Side.TOSERVER, hashOrName, objects);
+        return send(HMessage.Direction.TOSERVER, hashOrName, objects);
     }
 
 }

@@ -23,7 +23,7 @@ public class WindowsHabboClient extends HabboClient {
         super(connection);
 
         connection.addTrafficListener(0, message -> {
-            if (message.getDestination() == HMessage.Side.TOSERVER && message.getPacket().headerId() == PRODUCTION_ID) {
+            if (message.getDestination() == HMessage.Direction.TOSERVER && message.getPacket().headerId() == PRODUCTION_ID) {
                 production = message.getPacket().readString();
             }
         });
@@ -81,9 +81,9 @@ public class WindowsHabboClient extends HabboClient {
 
         String g_winmem = new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI()).getParent() + "\\G-Mem.exe";
         if (!useCache)
-            pb = new ProcessBuilder(g_winmem, hConnection.getClientHostAndPort().substring(0, hConnection.getClientHostAndPort().indexOf(':')) , Integer.toString(hConnection.getPort()));
+            pb = new ProcessBuilder(g_winmem, hConnection.getClientHost() , Integer.toString(hConnection.getClientPort()));
         else
-            pb = new ProcessBuilder(g_winmem, hConnection.getClientHostAndPort().substring(0, hConnection.getClientHostAndPort().indexOf(':')) , Integer.toString(hConnection.getPort()), "-c" + joiner.toString());
+            pb = new ProcessBuilder(g_winmem, hConnection.getClientHost() , Integer.toString(hConnection.getClientPort()), "-c" + joiner.toString());
 
 
         Process p = pb.start();

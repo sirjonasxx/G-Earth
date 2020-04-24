@@ -719,12 +719,12 @@ public class HPacket implements StringifyAble {
         }
     }
 
-    public String toExpression(HMessage.Side side) {
+    public String toExpression(HMessage.Direction direction) {
         if (isCorrupted()) return "";
 
         HarbleAPI.HarbleMessage msg;
         if (HarbleAPIFetcher.HARBLEAPI != null &&
-                ((msg = HarbleAPIFetcher.HARBLEAPI.getHarbleMessageFromHeaderId(side, headerId())) != null)) {
+                ((msg = HarbleAPIFetcher.HARBLEAPI.getHarbleMessageFromHeaderId(direction, headerId())) != null)) {
             if (msg.getStructure() != null) {
                 return toExpressionFromGivenStructure(msg.getStructure());
             }

@@ -95,13 +95,13 @@ public class UiLoggerController implements Initializable {
 
         ArrayList<Element> elements = new ArrayList<>();
 
-        String expr = packet.toExpression(isIncoming ? HMessage.Side.TOCLIENT : HMessage.Side.TOSERVER);
+        String expr = packet.toExpression(isIncoming ? HMessage.Direction.TOCLIENT : HMessage.Direction.TOSERVER);
 
         lblHarbleAPI.setText("HarbleAPI: " + (HarbleAPIFetcher.HARBLEAPI == null ? "False" : "True"));
         if ((viewMessageName || viewMessageHash) && HarbleAPIFetcher.HARBLEAPI != null) {
             HarbleAPI api = HarbleAPIFetcher.HARBLEAPI;
             HarbleAPI.HarbleMessage message = api.getHarbleMessageFromHeaderId(
-                    (isIncoming ? HMessage.Side.TOCLIENT : HMessage.Side.TOSERVER),
+                    (isIncoming ? HMessage.Direction.TOCLIENT : HMessage.Direction.TOSERVER),
                     packet.headerId()
             );
 

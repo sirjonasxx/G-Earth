@@ -258,7 +258,7 @@ public class HConnection {
         if (state == State.PREPARED)	{
 
             setState(State.WAITING_FOR_CLIENT);
-            if (!hostRedirected)	{
+            if (!hostRedirected && !connectionInfoOverrider.mustOverrideConnection())	{
                 addToHosts();
             }
 
@@ -271,7 +271,7 @@ public class HConnection {
 
                 new Thread(() -> {
                     try  {
-                        Thread.sleep(100);
+                        Thread.sleep(30);
                         while ((state == State.WAITING_FOR_CLIENT) && !proxy_server.isClosed())	{
                             try {
                                 Socket client = proxy_server.accept();
@@ -413,14 +413,14 @@ public class HConnection {
         }
     }
     private void onConnect()	{
-        if (hostRedirected)	{
+        if (hostRedirected && !connectionInfoOverrider.mustOverrideConnection())	{
             removeFromHosts();
         }
 
         clearAllProxies();
     }
     public void abort()	{
-        if (hostRedirected)	{
+        if (hostRedirected && !connectionInfoOverrider.mustOverrideConnection())	{
             removeFromHosts();
         }
 
@@ -520,11 +520,11 @@ public class HConnection {
         stateChangeListeners.remove(listener);
     }
 
-    public int getPort() {
+    public int getServerPort() {
         if (actual_proxy == null) return -1;
         return actual_proxy.getIntercept_port();
     }
-    public String getHost() {
+    public String getServerHost() {
         if (actual_proxy == null) return "<auto-detect>";
         return actual_proxy.getActual_domain();
     }
@@ -557,11 +557,18 @@ public class HConnection {
         }
     }
 
-    public String getClientHostAndPort() {
-        if (actual_proxy == null || actual_proxy.getIntercept_host() == null || actual_proxy.getIntercept_port() == -1) {
+    public String getClientHost() {
+        if (actual_proxy == null) {
             return "";
         }
-        return actual_proxy.getIntercept_host() + ":" + actual_proxy.getIntercept_port();
+        return actual_proxy.getIntercept_host();
+    }
+
+    public int getClientPort() {
+        if (actual_proxy == null) {
+            return -1;
+        }
+        return actual_proxy.getIntercept_port();
     }
 
     public String getHotelVersion() {

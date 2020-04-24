@@ -19,14 +19,14 @@ import java.util.Map;
 public class HarbleAPI {
 
     public class HarbleMessage {
-        private HMessage.Side destination;
+        private HMessage.Direction destination;
         private int headerId;
         private String hash;
         private String name;
         private String structure;
 
         //name can be NULL
-        public HarbleMessage(HMessage.Side destination, int headerId, String hash, String name, String structure) {
+        public HarbleMessage(HMessage.Direction destination, int headerId, String hash, String name, String structure) {
             this.destination = destination;
             this.headerId = headerId;
             this.hash = hash;
@@ -42,7 +42,7 @@ public class HarbleAPI {
             return headerId;
         }
 
-        public HMessage.Side getDestination() {
+        public HMessage.Direction getDestination() {
             return destination;
         }
 
@@ -116,7 +116,7 @@ public class HarbleAPI {
         }
     }
 
-    private void addMessage(HMessage.Side side, JSONObject object) {
+    private void addMessage(HMessage.Direction direction, JSONObject object) {
         String name;
         try {
             name = object.getString("Name");
@@ -134,21 +134,21 @@ public class HarbleAPI {
         }
 
 
-        HarbleMessage message = new HarbleMessage(side, headerId, hash, name, structure);
+        HarbleMessage message = new HarbleMessage(direction, headerId, hash, name, structure);
 
 
         Map<Integer, HarbleMessage> headerIdToMessage =
-                message.getDestination() == HMessage.Side.TOCLIENT
+                message.getDestination() == HMessage.Direction.TOCLIENT
                         ? headerIdToMessage_incoming :
                         headerIdToMessage_outgoing;
 
         Map<String, List<HarbleMessage>> hashToMessage =
-                message.getDestination() == HMessage.Side.TOCLIENT
+                message.getDestination() == HMessage.Direction.TOCLIENT
                         ? hashToMessage_incoming
                         : hashToMessage_outgoing;
 
         Map<String, HarbleMessage> nameToMessag =
-                message.getDestination() == HMessage.Side.TOCLIENT
+                message.getDestination() == HMessage.Direction.TOCLIENT
                         ? nameToMessage_incoming
                         : nameToMessage_outgoing;
 
@@ -169,7 +169,7 @@ public class HarbleAPI {
                 for (int i = 0; i < incoming.length(); i++) {
                     try {
                         JSONObject message = incoming.getJSONObject(i);
-                        addMessage(HMessage.Side.TOCLIENT, message);
+                        addMessage(HMessage.Direction.TOCLIENT, message);
                     }
                     catch (Exception e){
                         e.printStackTrace();
@@ -178,7 +178,7 @@ public class HarbleAPI {
                 for (int i = 0; i < outgoing.length(); i++) {
                     try{
                         JSONObject message = outgoing.getJSONObject(i);
-                        addMessage(HMessage.Side.TOSERVER, message);
+                        addMessage(HMessage.Direction.TOSERVER, message);
                     }
                     catch (Exception e){
                         e.printStackTrace();
@@ -190,18 +190,18 @@ public class HarbleAPI {
         }
     }
 
-    public HarbleMessage getHarbleMessageFromHeaderId(HMessage.Side side, int headerId) {
+    public HarbleMessage getHarbleMessageFromHeaderId(HMessage.Direction direction, int headerId) {
         Map<Integer, HarbleMessage> headerIdToMessage =
-                (side == HMessage.Side.TOSERVER
+                (direction == HMessage.Direction.TOSERVER
                         ? headerIdToMessage_outgoing
                         : headerIdToMessage_incoming);
 
         return headerIdToMessage.get(headerId);
     }
 
-    public List<HarbleMessage> getHarbleMessagesFromHash(HMessage.Side side, String hash) {
+    public List<HarbleMessage> getHarbleMessagesFromHash(HMessage.Direction direction, String hash) {
         Map<String, List<HarbleMessage>> hashToMessage =
-                (side == HMessage.Side.TOSERVER
+                (direction == HMessage.Direction.TOSERVER
                         ? hashToMessage_outgoing
                         : hashToMessage_incoming);
 
@@ -209,9 +209,9 @@ public class HarbleAPI {
         return result == null ? new ArrayList<>() : result;
     }
 
-    public HarbleMessage getHarbleMessageFromName(HMessage.Side side, String name) {
+    public HarbleMessage getHarbleMessageFromName(HMessage.Direction direction, String name) {
         Map<String, HarbleMessage> nameToMessage =
-                (side == HMessage.Side.TOSERVER
+                (direction == HMessage.Direction.TOSERVER
                         ? nameToMessage_outgoing
                         : nameToMessage_incoming);
 

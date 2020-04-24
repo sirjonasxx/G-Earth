@@ -156,7 +156,7 @@ public abstract class PacketHandler {
         }
     }
 
-    public abstract HMessage.Side getMessageSide();
+    public abstract HMessage.Direction getMessageSide();
 
     public List<Byte> getEncryptedBuffer() {
         return tempEncryptedBuffer;

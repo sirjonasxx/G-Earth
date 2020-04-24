@@ -20,8 +20,8 @@ public class ReplaceIntegerRule extends BlockReplaceRule {
     @Override
     public void appendRuleToMessage(HMessage message) {
         if (side == Side.ALL
-                || (message.getDestination() == HMessage.Side.TOSERVER && side == Side.OUTGOING)
-                || (message.getDestination() == HMessage.Side.TOCLIENT && side ==Side.INCOMING)) {
+                || (message.getDestination() == HMessage.Direction.TOSERVER && side == Side.OUTGOING)
+                || (message.getDestination() == HMessage.Direction.TOCLIENT && side ==Side.INCOMING)) {
             message.getPacket().replaceAllIntegers(value, replacement);
         }
     }

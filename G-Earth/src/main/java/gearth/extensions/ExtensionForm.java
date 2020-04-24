@@ -1,12 +1,9 @@
 package gearth.extensions;
 
-import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.stage.Stage;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
-
-import java.util.concurrent.Semaphore;
 
 /**
  * Created by Jonas on 22/09/18.
@@ -31,11 +28,11 @@ public abstract class ExtensionForm implements IExtension{
     public void writeToConsole(String s) {
         extension.writeToConsole(s);
     }
-    public void intercept(HMessage.Side side, Extension.MessageListener messageListener) {
-        extension.intercept(side, messageListener);
+    public void intercept(HMessage.Direction direction, Extension.MessageListener messageListener) {
+        extension.intercept(direction, messageListener);
     }
-    public void intercept(HMessage.Side side, int headerId, Extension.MessageListener messageListener){
-        extension.intercept(side, headerId, messageListener);
+    public void intercept(HMessage.Direction direction, int headerId, Extension.MessageListener messageListener){
+        extension.intercept(direction, headerId, messageListener);
     }
     public boolean sendToServer(HPacket packet){
         return extension.sendToServer(packet);

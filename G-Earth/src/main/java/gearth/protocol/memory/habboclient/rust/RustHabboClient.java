@@ -26,7 +26,7 @@ public class RustHabboClient extends HabboClient {
 
         try {
             String g_mem = new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI()).getParent() + "/G-Mem";
-            ProcessBuilder pb = new ProcessBuilder(g_mem, hConnection.getClientHostAndPort().substring(0, hConnection.getClientHostAndPort().indexOf(':')) , Integer.toString(hConnection.getPort()));
+            ProcessBuilder pb = new ProcessBuilder(g_mem, hConnection.getClientHost() , Integer.toString(hConnection.getClientPort()));
 
 
             Process p = pb.start();

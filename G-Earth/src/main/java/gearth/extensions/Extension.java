@@ -172,7 +172,7 @@ public abstract class Extension implements IExtension{
                     HPacket habboPacket = habboMessage.getPacket();
 
                     Map<Integer, List<MessageListener>> listeners =
-                            habboMessage.getDestination() == HMessage.Side.TOCLIENT ?
+                            habboMessage.getDestination() == HMessage.Direction.TOCLIENT ?
                                     incomingMessageListeners :
                                     outgoingMessageListeners;
 
@@ -235,7 +235,7 @@ public abstract class Extension implements IExtension{
      * @return success or failure
      */
     public boolean sendToClient(HPacket packet) {
-        return send(packet, HMessage.Side.TOCLIENT);
+        return send(packet, HMessage.Direction.TOCLIENT);
     }
 
     /**
@@ -244,11 +244,11 @@ public abstract class Extension implements IExtension{
      * @return success or failure
      */
     public boolean sendToServer(HPacket packet) {
-        return send(packet, HMessage.Side.TOSERVER);
+        return send(packet, HMessage.Direction.TOSERVER);
     }
-    private boolean send(HPacket packet, HMessage.Side side) {
+    private boolean send(HPacket packet, HMessage.Direction direction) {
         HPacket packet1 = new HPacket(Extensions.INCOMING_MESSAGES_IDS.SENDMESSAGE);
-        packet1.appendByte(side == HMessage.Side.TOCLIENT ? (byte)0 : (byte)1);
+        packet1.appendByte(direction == HMessage.Direction.TOCLIENT ? (byte)0 : (byte)1);
         packet1.appendInt(packet.getBytesLength());
         packet1.appendBytes(packet.toBytes());
         try {
@@ -261,13 +261,13 @@ public abstract class Extension implements IExtension{
 
     /**
      * Register a listener on a specific packet Type
-     * @param side ToClient or ToServer
+     * @param direction ToClient or ToServer
      * @param headerId the packet header ID
      * @param messageListener the callback
      */
-    public void intercept(HMessage.Side side, int headerId, MessageListener messageListener) {
+    public void intercept(HMessage.Direction direction, int headerId, MessageListener messageListener) {
         Map<Integer, List<MessageListener>> listeners =
-                side == HMessage.Side.TOCLIENT ?
+                direction == HMessage.Direction.TOCLIENT ?
                         incomingMessageListeners :
                         outgoingMessageListeners;
 
@@ -283,11 +283,11 @@ public abstract class Extension implements IExtension{
 
     /**
      * Register a listener on all packets
-     * @param side ToClient or ToServer
+     * @param direction ToClient or ToServer
      * @param messageListener the callback
      */
-    public void intercept(HMessage.Side side, MessageListener messageListener) {
-        intercept(side, -1, messageListener);
+    public void intercept(HMessage.Direction direction, MessageListener messageListener) {
+        intercept(direction, -1, messageListener);
     }
 
     /**

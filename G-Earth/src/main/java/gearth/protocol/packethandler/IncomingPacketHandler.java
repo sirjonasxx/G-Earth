@@ -42,8 +42,8 @@ public class IncomingPacketHandler extends PacketHandler {
     }
 
     @Override
-    public HMessage.Side getMessageSide() {
-        return HMessage.Side.TOCLIENT;
+    public HMessage.Direction getMessageSide() {
+        return HMessage.Direction.TOCLIENT;
     }
 
     @Override

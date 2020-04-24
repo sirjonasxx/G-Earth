@@ -21,8 +21,8 @@ public class ReplacePacketRule extends BlockReplaceRule {
     @Override
     public void appendRuleToMessage(HMessage message) {
         if (side == Side.ALL
-                || (message.getDestination() == HMessage.Side.TOSERVER && side == Side.OUTGOING)
-                || (message.getDestination() == HMessage.Side.TOCLIENT && side ==Side.INCOMING)) {
+                || (message.getDestination() == HMessage.Direction.TOSERVER && side == Side.OUTGOING)
+                || (message.getDestination() == HMessage.Direction.TOCLIENT && side ==Side.INCOMING)) {
             if (message.getPacket().headerId() == headerId) {
                 message.getPacket().constructFromString(replacement.stringify());
                 message.getPacket().overrideEditedField(true);
