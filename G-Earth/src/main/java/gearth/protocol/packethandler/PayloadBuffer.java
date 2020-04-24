@@ -18,24 +18,15 @@ public class PayloadBuffer {
     }
     public HPacket[] receive() {
         if (buffer.length < 6) return new HPacket[0];
-
         HPacket total = new HPacket(buffer);
-        if (total.getBytesLength() - 4 == total.length())	{
-            buffer = new byte[0];
-            return new HPacket[]{total};
+
+        ArrayList<HPacket> all = new ArrayList<>();
+        while (total.getBytesLength() >= 4 && total.getBytesLength() - 4 >= total.length()){
+            all.add(new HPacket(Arrays.copyOfRange(buffer, 0, total.length() + 4)));
+            buffer = Arrays.copyOfRange(buffer, total.length() + 4, buffer.length);
+            total = new HPacket(buffer);
         }
-        else if (total.getBytesLength() - 4 > total.length())	{
-            ArrayList<HPacket> all = new ArrayList<>();
-            while (total.getBytesLength() >= 4 && total.getBytesLength() - 4 >= total.length()){
-                all.add(new HPacket(Arrays.copyOfRange(buffer, 0, total.length() + 4)));
-                buffer = Arrays.copyOfRange(buffer, total.length() + 4, buffer.length);
-                total = new HPacket(buffer);
-            }
-            return all.toArray(new HPacket[all.size()]);
-        }
-        else	{
-            return new HPacket[0];
-        }
+        return all.toArray(new HPacket[all.size()]);
     }
 
 
