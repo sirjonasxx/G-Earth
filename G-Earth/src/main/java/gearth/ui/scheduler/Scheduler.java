@@ -12,6 +12,7 @@ import gearth.protocol.HPacket;
 import gearth.ui.SubForm;
 
 import javax.swing.*;
+import java.awt.event.KeyEvent;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -116,7 +117,8 @@ public class Scheduler extends SubForm {
         Provider provider = Provider.getCurrentProvider(false);
         for (int i = 0; i < 10; i++) {
             int[] ii = {i};
-            provider.register(KeyStroke.getKeyStroke("control shift " + ii[0]), hotKey -> switchPauseHotkey(ii[0]));
+            // todo doesnt work on my pc for some reason
+            provider.register(KeyStroke.getKeyStroke("control alt " + ii[0]), hotKey -> switchPauseHotkey(ii[0]));
         }
         System.setErr(err);
     }
