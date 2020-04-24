@@ -3,11 +3,10 @@ package gearth.ui.extensions;
 import javafx.beans.InvalidationListener;
 import gearth.protocol.HPacket;
 
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import gearth.ui.extensions.authentication.Authenticator;
-import java.net.Socket;
+import java.io.*;
+
+import java.nio.ByteBuffer;
+import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,57 +28,12 @@ public class GEarthExtension {
     private String fileName;
     private String cookie;
 
-    private Socket connection;
+    private OnDisconnectedCallback disconnectedCallback;
 
-    //calls callback when the extension is creatd
-    static void create(Socket connection, OnCreatedCallback callback, OnDisconnectedCallback onDisconnectedCallback) {
+    private SocketChannel connection;
 
-        new Thread(() -> {
-            try {
-                synchronized (connection) {
-                    connection.getOutputStream().write((new HPacket(Extensions.OUTGOING_MESSAGES_IDS.INFOREQUEST)).toBytes());
-                }
-
-                InputStream inputStream = connection.getInputStream();
-                DataInputStream dIn = new DataInputStream(inputStream);
-
-                while (!connection.isClosed()) {
-
-                    int length = dIn.readInt();
-                    byte[] headerandbody = new byte[length + 4];
-
-                    int amountRead = 0;
-                    while (amountRead < length) {
-                        amountRead += dIn.read(headerandbody, 4 + amountRead, Math.min(dIn.available(), length - amountRead));
-                    }
-
-                    HPacket packet = new HPacket(headerandbody);
-                    packet.fixLength();
-
-                    if (packet.headerId() == Extensions.INCOMING_MESSAGES_IDS.EXTENSIONINFO) {
-                        GEarthExtension gEarthExtension = new GEarthExtension(
-                                packet,
-                                connection,
-                                onDisconnectedCallback
-                        );
-
-                        if (Authenticator.evaluate(gEarthExtension)) {
-                            callback.act(gEarthExtension);
-                        }
-                        else {
-                            gEarthExtension.closeConnection(); //you shall not pass...
-                        }
-
-                        break;
-                    }
-                }
-
-            } catch (IOException ignored) {}
-        }).start();
-
-    }
-
-    private GEarthExtension(HPacket extensionInfo, Socket connection, OnDisconnectedCallback onDisconnectedCallback) {
+    //calls callback when the extension is created
+    GEarthExtension(HPacket extensionInfo, SocketChannel connection, OnDisconnectedCallback onDisconnectedCallback) {
         this.title = extensionInfo.readString();
         this.author = extensionInfo.readString();
         this.version = extensionInfo.readString();
@@ -94,52 +48,23 @@ public class GEarthExtension {
         this.deleteButtonVisible = extensionInfo.readBoolean();
 
         this.connection = connection;
-
-        GEarthExtension selff = this;
-        new Thread(() -> {
-            try {
-                InputStream inputStream = connection.getInputStream();
-                DataInputStream dIn = new DataInputStream(inputStream);
-
-                while (!connection.isClosed()) {
-                    int length = dIn.readInt();
-                    byte[] headerandbody = new byte[length + 4];
-
-                    int amountRead = 0;
-                    while (amountRead < length) {
-                        amountRead += dIn.read(headerandbody, 4 + amountRead, Math.min(dIn.available(), length - amountRead));
-                    }
-
-                    HPacket packet = new HPacket(headerandbody);
-                    packet.fixLength();
-
-                    synchronized (receiveMessageListeners) {
-                        for (int i = receiveMessageListeners.size() - 1; i >= 0; i--) {
-                            receiveMessageListeners.get(i).act(packet);
-                            packet.setReadIndex(6);
-                        }
-                    }
-
-                }
-
-            } catch (IOException e) {
-                // An extension disconnected, which is OK
-            } finally {
-                onDisconnectedCallback.act(selff);
-                if (!connection.isClosed()) {
-                    try {
-                        connection.close();
-                    } catch (IOException e) {
-//                        e.printStackTrace();
-                    }
-                }
-            }
-        }).start();
-
-
+        this.disconnectedCallback = onDisconnectedCallback;
     }
 
-    public Socket getConnection() {
+    public void act(HPacket packet) {
+        synchronized (receiveMessageListeners) {
+            for (int i = receiveMessageListeners.size() - 1; i >= 0; i--) {
+                receiveMessageListeners.get(i).act(packet);
+                packet.setReadIndex(6);
+            }
+        }
+    }
+
+    void disconnect() {
+        disconnectedCallback.act(this);
+    }
+
+    public SocketChannel getConnection() {
         return connection;
     }
 
@@ -187,7 +112,7 @@ public class GEarthExtension {
     public boolean sendMessage(HPacket message) {
         try {
             synchronized (this) {
-                connection.getOutputStream().write(message.toBytes());
+                connection.write(ByteBuffer.wrap(message.toBytes()));
             }
             return true;
         } catch (IOException e) {

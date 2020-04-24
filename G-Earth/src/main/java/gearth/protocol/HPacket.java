@@ -20,6 +20,13 @@ public class HPacket implements StringifyAble {
     public HPacket(byte[] packet)	{
         packetInBytes = packet.clone();
     }
+
+    public HPacket(ByteBuffer packet)  {
+        packetInBytes = new byte[packet.capacity()];
+        for (int i = 0; i < packetInBytes.length; i++)
+            packetInBytes[i] = packet.get(i);
+    }
+
     public HPacket(HPacket packet) {
         packetInBytes = packet.packetInBytes.clone();
         isEdited = packet.isEdited;
