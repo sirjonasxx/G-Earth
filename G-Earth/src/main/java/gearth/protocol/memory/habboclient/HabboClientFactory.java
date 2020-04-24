@@ -17,6 +17,8 @@ public class HabboClientFactory {
         if (OSValidator.isWindows()) return new WindowsHabboClient(connection);
         if (OSValidator.isMac()) return new MacOsHabboClient(connection);
 
+        // todo use rust if beneficial
+
         return null;
     }
 
