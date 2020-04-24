@@ -8,9 +8,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
 
-public class IncomingHandler extends Handler {
+public class IncomingPacketHandler extends PacketHandler {
 
-    public IncomingHandler(OutputStream outputStream, Object[] listeners) {
+    public IncomingPacketHandler(OutputStream outputStream, Object[] listeners) {
         super(outputStream, listeners);
 
         TrafficListener listener = new TrafficListener() {

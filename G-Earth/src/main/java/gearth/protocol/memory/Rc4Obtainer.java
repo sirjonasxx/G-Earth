@@ -7,10 +7,7 @@ import gearth.protocol.HPacket;
 import gearth.protocol.crypto.RC4;
 import gearth.protocol.memory.habboclient.HabboClient;
 import gearth.protocol.memory.habboclient.HabboClientFactory;
-import gearth.protocol.packethandler.Handler;
-import gearth.protocol.packethandler.IncomingHandler;
-import gearth.protocol.packethandler.OutgoingHandler;
-import gearth.protocol.packethandler.PayloadBuffer;
+import gearth.protocol.packethandler.*;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -22,47 +19,45 @@ import javafx.scene.web.WebView;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class Rc4Obtainer {
 
     public static final boolean DEBUG = false;
 
-    HabboClient client = null;
-    OutgoingHandler outgoingHandler = null;
-    IncomingHandler incomingHandler = null;
+    private HabboClient client;
+    private List<PacketHandler> packetHandlers;
 
     public Rc4Obtainer(HConnection hConnection) {
         client = HabboClientFactory.get(hConnection);
     }
 
-    private boolean hashappened1 = false;
-    public void setOutgoingHandler(OutgoingHandler handler) {
-        outgoingHandler = handler;
-        handler.addBufferListener((int addedbytes) -> {
-            if (!hashappened1 && handler.isEncryptedStream()) {
-                hashappened1 = true;
-                onSendFirstEncryptedMessage(outgoingHandler);
-            }
-        });
+
+    public void setPacketHandlers(PacketHandler... packetHandlers) {
+        this.packetHandlers = Arrays.asList(packetHandlers);
+
+        for (PacketHandler handler : packetHandlers) {
+            BufferChangeListener bufferChangeListener = new BufferChangeListener() {
+                @Override
+                public void act() {
+                    if (handler.isEncryptedStream()) {
+                        onSendFirstEncryptedMessage(handler);
+                        handler.removeBufferChangeListener(this);
+                    }
+                }
+            };
+            handler.onBufferChanged(bufferChangeListener);
+        }
+
+
     }
 
-    private boolean hashappened2 = false;
-    public void setIncomingHandler(IncomingHandler handler) {
-        incomingHandler = handler;
-        handler.addBufferListener((int addedbytes) -> {
-            if (!hashappened2 && handler.isEncryptedStream()) {
-                hashappened2 = true;
-                onSendFirstEncryptedMessage(incomingHandler);
-            }
-        });
-    }
 
 
-    private void onSendFirstEncryptedMessage(Handler handler) {
+    private void onSendFirstEncryptedMessage(PacketHandler packetHandler) {
         if (!HConnection.DECRYPTPACKETS) return;
 
-        outgoingHandler.block();
-        incomingHandler.block();
+        packetHandlers.forEach(PacketHandler::block);
 
         new Thread(() -> {
 
@@ -72,8 +67,8 @@ public class Rc4Obtainer {
             int i = 0;
             while (!worked && i < 4) {
                 worked = (i % 2 == 0) ?
-                        onSendFirstEncryptedMessage(handler, client.getRC4cached()) :
-                        onSendFirstEncryptedMessage(handler, client.getRC4possibilities());
+                        onSendFirstEncryptedMessage(packetHandler, client.getRC4cached()) :
+                        onSendFirstEncryptedMessage(packetHandler, client.getRC4possibilities());
                 i++;
             }
 
@@ -107,17 +102,16 @@ public class Rc4Obtainer {
 
             }
 
-            incomingHandler.unblock();
-            outgoingHandler.unblock();
+            packetHandlers.forEach(PacketHandler::unblock);
         }).start();
     }
 
-    private boolean onSendFirstEncryptedMessage(Handler handler, List<byte[]> potentialRC4tables) {
+    private boolean onSendFirstEncryptedMessage(PacketHandler packetHandler, List<byte[]> potentialRC4tables) {
         for (byte[] possible : potentialRC4tables) {
 
-            byte[] encBuffer = new byte[handler.getEncryptedBuffer().size()];
+            byte[] encBuffer = new byte[packetHandler.getEncryptedBuffer().size()];
             for (int i = 0; i < encBuffer.length; i++) {
-                encBuffer[i] = handler.getEncryptedBuffer().get(i);
+                encBuffer[i] = packetHandler.getEncryptedBuffer().get(i);
             }
 
             for (int i = 0; i < 256; i++) {
@@ -125,7 +119,7 @@ public class Rc4Obtainer {
                     byte[] keycpy = Arrays.copyOf(possible, possible.length);
                     RC4 rc4Tryout = new RC4(keycpy, i, j);
 
-                    if (handler.getMessageSide() == HMessage.Side.TOSERVER) rc4Tryout.undoRc4(encBuffer);
+                    if (packetHandler.getMessageSide() == HMessage.Side.TOSERVER) rc4Tryout.undoRc4(encBuffer);
                     if (rc4Tryout.couldBeFresh()) {
                         byte[] encDataCopy = Arrays.copyOf(encBuffer, encBuffer.length);
                         RC4 rc4TryCopy = rc4Tryout.deepCopy();
@@ -136,7 +130,7 @@ public class Rc4Obtainer {
                             HPacket[] checker = payloadBuffer.pushAndReceive(decoded);
 
                             if (payloadBuffer.peak().length == 0) {
-                                handler.setRc4(rc4Tryout);
+                                packetHandler.setRc4(rc4Tryout);
                                 return true;
                             }
 

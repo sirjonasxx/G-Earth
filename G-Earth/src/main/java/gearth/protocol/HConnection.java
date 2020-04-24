@@ -6,10 +6,8 @@ import gearth.protocol.hostreplacer.HostReplacer;
 import gearth.protocol.hostreplacer.HostReplacerFactory;
 import gearth.protocol.memory.Rc4Obtainer;
 import gearth.protocol.misc.ConnectionInfoOverrider;
-import gearth.protocol.packethandler.Handler;
-import gearth.protocol.packethandler.IncomingHandler;
-import gearth.protocol.packethandler.OutgoingHandler;
-import org.json.JSONArray;
+import gearth.protocol.packethandler.IncomingPacketHandler;
+import gearth.protocol.packethandler.OutgoingPacketHandler;
 
 import java.io.*;
 import java.net.InetAddress;
@@ -122,8 +120,8 @@ public class HConnection {
 
         private volatile ServerSocket proxy_server = null;     //listener for the client
 
-        private volatile IncomingHandler inHandler = null;     //connection with client (only initialized when verified habbo connection)
-        private volatile OutgoingHandler outHandler = null;    //connection with server (only initialized when verified habbo connection)
+        private volatile IncomingPacketHandler inHandler = null;     //connection with client (only initialized when verified habbo connection)
+        private volatile OutgoingPacketHandler outHandler = null;    //connection with server (only initialized when verified habbo connection)
 
 
         public Proxy(String input_domain, String actual_domain, int actual_port, int intercept_port, String intercept_host) {
@@ -138,7 +136,7 @@ public class HConnection {
             this.proxy_server = socket;
         }
 
-        public void verifyProxy(IncomingHandler incomingHandler, OutgoingHandler outgoingHandler) {
+        public void verifyProxy(IncomingPacketHandler incomingHandler, OutgoingPacketHandler outgoingHandler) {
             this.inHandler = incomingHandler;
             this.outHandler = outgoingHandler;
         }
@@ -167,11 +165,11 @@ public class HConnection {
             return intercept_host;
         }
 
-        public IncomingHandler getInHandler() {
+        public IncomingPacketHandler getInHandler() {
             return inHandler;
         }
 
-        public OutgoingHandler getOutHandler() {
+        public OutgoingPacketHandler getOutHandler() {
             return outHandler;
         }
     }
@@ -323,11 +321,9 @@ public class HConnection {
         final boolean[] aborted = new boolean[1];
         Rc4Obtainer rc4Obtainer = new Rc4Obtainer(this);
 
-        OutgoingHandler outgoingHandler = new OutgoingHandler(habbo_server_out, trafficListeners);
-        rc4Obtainer.setOutgoingHandler(outgoingHandler);
-
-        IncomingHandler incomingHandler = new IncomingHandler(client_out, trafficListeners);
-        rc4Obtainer.setIncomingHandler(incomingHandler);
+        OutgoingPacketHandler outgoingHandler = new OutgoingPacketHandler(habbo_server_out, trafficListeners);
+        IncomingPacketHandler incomingHandler = new IncomingPacketHandler(client_out, trafficListeners);
+        rc4Obtainer.setPacketHandlers(outgoingHandler, incomingHandler);
 
         outgoingHandler.addOnDatastreamConfirmedListener(hotelVersion -> {
             incomingHandler.setAsDataStream();

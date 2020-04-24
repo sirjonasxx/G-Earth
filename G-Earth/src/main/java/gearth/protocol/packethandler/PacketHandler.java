@@ -11,7 +11,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Handler {
+public abstract class PacketHandler {
 
     protected static final boolean DEBUG = false;
 
@@ -31,7 +31,7 @@ public abstract class Handler {
     protected volatile boolean isEncryptedStream = false;
 
 
-    public Handler(OutputStream outputStream, Object[] listeners) {
+    public PacketHandler(OutputStream outputStream, Object[] listeners) {
         this.listeners = listeners;
         out = outputStream;
     }
@@ -47,7 +47,7 @@ public abstract class Handler {
 
     public abstract void act(byte[] buffer) throws IOException;
     protected void continuedAct(byte[] buffer) throws IOException {
-        notifyBufferListeners(buffer.length);
+        notifyBufferListeners();
 
         if (!isEncryptedStream) {
             payloadBuffer.push(buffer);
@@ -164,16 +164,16 @@ public abstract class Handler {
 
     protected abstract void printForDebugging(byte[] bytes);
 
-    private List<BufferListener> bufferListeners = new ArrayList<>();
-    public void addBufferListener(BufferListener listener) {
-        bufferListeners.add(listener);
+    private List<BufferChangeListener> bufferChangeListeners = new ArrayList<>();
+    public void onBufferChanged(BufferChangeListener listener) {
+        bufferChangeListeners.add(listener);
     }
-    public void removeBufferListener(BufferListener listener) {
-        bufferListeners.remove(listener);
+    public void removeBufferChangeListener(BufferChangeListener listener) {
+        bufferChangeListeners.remove(listener);
     }
-    void notifyBufferListeners(int addedbytes) {
-        for (int i = bufferListeners.size() - 1; i >= 0; i -= 1) {
-            bufferListeners.get(i).act(addedbytes);
+    void notifyBufferListeners() {
+        for (int i = bufferChangeListeners.size() - 1; i >= 0; i -= 1) {
+            bufferChangeListeners.get(i).act();
         }
     }
 

@@ -8,9 +8,9 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OutgoingHandler extends Handler {
+public class OutgoingPacketHandler extends PacketHandler {
 
-    public OutgoingHandler(OutputStream outputStream, Object[] listeners) {
+    public OutgoingPacketHandler(OutputStream outputStream, Object[] listeners) {
         super(outputStream, listeners);
     }
 
