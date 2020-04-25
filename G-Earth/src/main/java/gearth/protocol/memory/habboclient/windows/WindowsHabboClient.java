@@ -80,10 +80,13 @@ public class WindowsHabboClient extends HabboClient {
         }
 
         String g_winmem = new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI()).getParent() + "\\G-Mem.exe";
+        String clientHost = hConnection.isRawIpMode() ? "null" : hConnection.getClientHost();
+        String clientPort = hConnection.isRawIpMode() ? "null" : hConnection.getClientPort() + "";
+
         if (!useCache)
-            pb = new ProcessBuilder(g_winmem, hConnection.getClientHost() , Integer.toString(hConnection.getClientPort()));
+            pb = new ProcessBuilder(g_winmem, clientHost , clientPort);
         else
-            pb = new ProcessBuilder(g_winmem, hConnection.getClientHost() , Integer.toString(hConnection.getClientPort()), "-c" + joiner.toString());
+            pb = new ProcessBuilder(g_winmem, clientHost , clientPort, "-c" + joiner.toString());
 
 
         Process p = pb.start();
