@@ -116,7 +116,6 @@ public class Scheduler extends SubForm {
         Provider provider = Provider.getCurrentProvider(false);
         for (int i = 0; i < 10; i++) {
             int[] ii = {i};
-            // todo doesnt work on my pc for some reason
             provider.register(KeyStroke.getKeyStroke("control shift " + ii[0]), hotKey -> switchPauseHotkey(ii[0]));
         }
         System.setErr(err);
