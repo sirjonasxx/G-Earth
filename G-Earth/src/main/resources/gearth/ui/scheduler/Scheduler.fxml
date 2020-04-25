@@ -128,7 +128,7 @@
                     <Insets left="5.0" />
                 </GridPane.margin>
             </RadioButton>
-         <CheckBox fx:id="cbx_hotkeys" mnemonicParsing="false" text="Enable hotkeys (Ctrl+Alt+Index)" textFill="#4d4d4d" GridPane.columnIndex="5">
+         <CheckBox fx:id="cbx_hotkeys" mnemonicParsing="false" text="Enable hotkeys (Ctrl+Shift+Index)" textFill="#4d4d4d" GridPane.columnIndex="5">
             <GridPane.margin>
                <Insets left="32.0" />
             </GridPane.margin>
