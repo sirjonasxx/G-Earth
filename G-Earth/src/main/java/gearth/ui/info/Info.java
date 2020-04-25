@@ -42,9 +42,9 @@ public class Info extends SubForm {
         link_darkbox.setTooltip(new Tooltip("https://darkbox.nl"));
         link_g_gearth.setTooltip(new Tooltip("https://github.com/sirjonasxx/G-Earth"));
         link_g_tanji.setTooltip(new Tooltip("https://github.com/ArachisH/Tanji"));
-        link_d_harble.setTooltip(new Tooltip("https://discord.gg/Vyc2gFC"));
+        link_d_harble.setTooltip(new Tooltip("https://discord.gg/CzRuHvW"));
 
-//        activateHyperlink(link_d_harble);
+        activateHyperlink(link_d_harble);
         activateHyperlink(link_g_gearth);
         activateHyperlink(link_g_tanji);
         activateHyperlink(link_sng);
