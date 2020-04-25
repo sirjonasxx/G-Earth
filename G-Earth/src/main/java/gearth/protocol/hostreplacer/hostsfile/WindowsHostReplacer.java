@@ -1,4 +1,4 @@
-package gearth.protocol.hostreplacer;
+package gearth.protocol.hostreplacer.hostsfile;
 
 /**
  * Created by Jonas on 04/04/18.

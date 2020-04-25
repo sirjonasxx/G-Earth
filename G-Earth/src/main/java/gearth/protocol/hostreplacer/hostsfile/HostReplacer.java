@@ -1,4 +1,4 @@
-package gearth.protocol.hostreplacer;
+package gearth.protocol.hostreplacer.hostsfile;
 
 public interface HostReplacer {
 

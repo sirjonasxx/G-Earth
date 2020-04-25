@@ -1,11 +1,11 @@
-package gearth.protocol.hostreplacer;
+package gearth.protocol.hostreplacer.hostsfile;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Jeunez on 04/04/18.
+ * Created by Jonas on 04/04/18.
  */
 class UnixHostReplacer implements HostReplacer {
 
