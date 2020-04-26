@@ -1,9 +1,9 @@
-package gearth.services.extensionserver.extensions.network;
+package gearth.services.extensionhandler.extensions.network;
 
 import gearth.protocol.HPacket;
-import gearth.services.extensionserver.extensions.extensionproducers.ExtensionProducer;
-import gearth.services.extensionserver.extensions.extensionproducers.ExtensionProducerObserver;
-import gearth.services.extensionserver.extensions.network.authentication.Authenticator;
+import gearth.services.extensionhandler.extensions.extensionproducers.ExtensionProducer;
+import gearth.services.extensionhandler.extensions.extensionproducers.ExtensionProducerObserver;
+import gearth.services.extensionhandler.extensions.network.authentication.Authenticator;
 
 import java.io.DataInputStream;
 import java.io.IOException;

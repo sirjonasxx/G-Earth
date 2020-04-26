@@ -1,26 +1,26 @@
-package gearth.services.extensionserver;
+package gearth.services.extensionhandler;
 
 import gearth.Main;
 import gearth.misc.harble_api.HarbleAPIFetcher;
 import gearth.protocol.HConnection;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
-import gearth.services.extensionserver.extensions.ExtensionListener;
-import gearth.services.extensionserver.extensions.extensionproducers.ExtensionProducer;
-import gearth.services.extensionserver.extensions.extensionproducers.ExtensionProducerFactory;
-import gearth.services.extensionserver.extensions.extensionproducers.ExtensionProducerObserver;
-import gearth.services.extensionserver.extensions.GEarthExtension;
+import gearth.services.extensionhandler.extensions.ExtensionListener;
+import gearth.services.extensionhandler.extensions.extensionproducers.ExtensionProducer;
+import gearth.services.extensionhandler.extensions.extensionproducers.ExtensionProducerFactory;
+import gearth.services.extensionhandler.extensions.extensionproducers.ExtensionProducerObserver;
+import gearth.services.extensionhandler.extensions.GEarthExtension;
 
 import java.util.*;
 
-public class ExtensionServer {
+public class ExtensionHandler {
 
     private final List<GEarthExtension> gEarthExtensions = new ArrayList<>();
     private final HConnection hConnection;
     private List<ExtensionProducer> extensionProducers;
 
 
-    public ExtensionServer(HConnection hConnection) {
+    public ExtensionHandler(HConnection hConnection) {
         this.hConnection = hConnection;
         initialize();
     }

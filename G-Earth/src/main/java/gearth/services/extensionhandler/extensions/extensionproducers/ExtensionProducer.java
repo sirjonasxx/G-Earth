@@ -1,4 +1,4 @@
-package gearth.services.extensionserver.extensions.extensionproducers;
+package gearth.services.extensionhandler.extensions.extensionproducers;
 
 public interface ExtensionProducer {
 

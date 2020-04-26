@@ -1,10 +1,7 @@
-package gearth.services.extensionserver.extensions.simple;
+package gearth.services.extensionhandler.extensions.simple;
 
 import gearth.protocol.HMessage;
-import gearth.protocol.HPacket;
-import gearth.services.extensionserver.extensions.GEarthExtension;
-
-import java.util.Arrays;
+import gearth.services.extensionhandler.extensions.GEarthExtension;
 
 public class ExampleExtension extends GEarthExtension {
     @Override

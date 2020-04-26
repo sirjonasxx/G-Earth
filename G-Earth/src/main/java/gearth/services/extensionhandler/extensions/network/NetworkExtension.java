@@ -1,18 +1,13 @@
-package gearth.services.extensionserver.extensions.network;
+package gearth.services.extensionhandler.extensions.network;
 
-import gearth.Main;
 import gearth.protocol.HMessage;
-import gearth.services.extensionserver.extensions.GEarthExtension;
-import javafx.beans.InvalidationListener;
+import gearth.services.extensionhandler.extensions.GEarthExtension;
 import gearth.protocol.HPacket;
 
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import gearth.services.extensionserver.extensions.network.authentication.Authenticator;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Jonas on 21/06/18.

@@ -1,11 +1,10 @@
 package gearth.ui.extensions;
 
-import gearth.services.extensionserver.ExtensionServer;
-import gearth.services.extensionserver.extensions.extensionproducers.ExtensionProducer;
-import gearth.services.extensionserver.extensions.network.NetworkExtensionsProducer;
-import gearth.services.extensionserver.extensions.network.executer.ExecutionInfo;
-import gearth.services.extensionserver.extensions.network.executer.ExtensionRunner;
-import gearth.services.extensionserver.extensions.network.executer.ExtensionRunnerFactory;
+import gearth.services.extensionhandler.ExtensionHandler;
+import gearth.services.extensionhandler.extensions.network.NetworkExtensionsProducer;
+import gearth.services.extensionhandler.extensions.network.executer.ExecutionInfo;
+import gearth.services.extensionhandler.extensions.network.executer.ExtensionRunner;
+import gearth.services.extensionhandler.extensions.network.executer.ExtensionRunnerFactory;
 import gearth.ui.SubForm;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -17,7 +16,6 @@ import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 
 import java.io.File;
-import java.util.function.Predicate;
 
 /**
  * Created by Jonas on 06/04/18.
@@ -34,7 +32,7 @@ public class Extensions extends SubForm {
     public ScrollPane scroller;
 
     private ExtensionRunner extensionRunner = null;
-    private ExtensionServer extensionServer;
+    private ExtensionHandler extensionHandler;
     private NetworkExtensionsProducer networkExtensionsProducer; // needed for port
 
 
@@ -44,14 +42,14 @@ public class Extensions extends SubForm {
 
     protected void onParentSet() {
         ExtensionItemContainerProducer producer = new ExtensionItemContainerProducer(extensioncontainer, scroller);
-        extensionServer = new ExtensionServer(getHConnection());
-        extensionServer.onExtensionConnected((e -> {
+        extensionHandler = new ExtensionHandler(getHConnection());
+        extensionHandler.onExtensionConnected((e -> {
             Platform.runLater(() -> producer.extensionConnected(e));
         }));
 
         //noinspection OptionalGetWithoutIsPresent
         networkExtensionsProducer
-                = (NetworkExtensionsProducer) extensionServer.getExtensionProducers().stream()
+                = (NetworkExtensionsProducer) extensionHandler.getExtensionProducers().stream()
                 .filter(producer1 -> producer1 instanceof NetworkExtensionsProducer)
                 .findFirst().get();
 

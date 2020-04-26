@@ -1,4 +1,4 @@
-package gearth.services.extensionserver.extensions;
+package gearth.services.extensionhandler.extensions;
 
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;

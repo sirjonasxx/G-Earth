@@ -2,9 +2,7 @@ package gearth.extensions;
 
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
-import gearth.services.extensionserver.ExtensionServer;
-import gearth.services.extensionserver.extensions.network.NetworkExtensionInfo;
-import gearth.ui.extensions.Extensions;
+import gearth.services.extensionhandler.extensions.network.NetworkExtensionInfo;
 
 import java.io.*;
 import java.net.Socket;

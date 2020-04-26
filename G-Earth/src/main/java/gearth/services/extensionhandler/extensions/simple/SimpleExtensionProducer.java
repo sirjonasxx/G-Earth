@@ -1,7 +1,7 @@
-package gearth.services.extensionserver.extensions.simple;
+package gearth.services.extensionhandler.extensions.simple;
 
-import gearth.services.extensionserver.extensions.extensionproducers.ExtensionProducer;
-import gearth.services.extensionserver.extensions.extensionproducers.ExtensionProducerObserver;
+import gearth.services.extensionhandler.extensions.extensionproducers.ExtensionProducer;
+import gearth.services.extensionhandler.extensions.extensionproducers.ExtensionProducerObserver;
 
 public class SimpleExtensionProducer implements ExtensionProducer {
 
