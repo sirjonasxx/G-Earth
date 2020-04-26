@@ -1,4 +1,6 @@
-package gearth.ui.scheduler;
+package gearth.services.scheduler;
+
+import gearth.ui.scheduler.SchedulerController;
 
 /**
  * Created by Jonas on 11/04/18.
@@ -21,7 +23,7 @@ public class Interval {
             offset = -1;
             return;
         }
-        if (!Scheduler.stringIsNumber(split[0]) || (split.length == 2 && !Scheduler.stringIsNumber(split[1]))) {
+        if (!SchedulerController.stringIsNumber(split[0]) || (split.length == 2 && !SchedulerController.stringIsNumber(split[1]))) {
             delay = -1;
             offset = -1;
             return;

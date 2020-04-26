@@ -13,7 +13,7 @@ import gearth.ui.SubForm;
 
 import java.util.LinkedList;
 
-public class Injection extends SubForm {
+public class InjectionController extends SubForm {
     public TextArea inputPacket;
     public Text lbl_corrruption;
     public Text lbl_pcktInfo;

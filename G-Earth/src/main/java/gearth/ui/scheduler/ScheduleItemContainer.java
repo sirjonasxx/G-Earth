@@ -1,7 +1,6 @@
 package gearth.ui.scheduler;
 
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
+import gearth.services.scheduler.ScheduleItem;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
@@ -19,7 +18,7 @@ import gearth.ui.buttons.PauseResumeButton;
 public class ScheduleItemContainer extends GridPane {
 
     public static final int[] columnWidths = {10, 39, 16, 18, 15};
-    ScheduleItem item;
+    InteractableScheduleItem item;
 
     Label indexLabel;
     Label packetLabel;
@@ -28,7 +27,7 @@ public class ScheduleItemContainer extends GridPane {
 
     VBox parent;
 
-    ScheduleItemContainer(ScheduleItem item, VBox parent, ScrollPane scrollPane) {
+    ScheduleItemContainer(InteractableScheduleItem item, VBox parent, ScrollPane scrollPane) {
         super();
         setGridLinesVisible(true);
         VBox.setMargin(this, new Insets(2, -2, -2, -2));

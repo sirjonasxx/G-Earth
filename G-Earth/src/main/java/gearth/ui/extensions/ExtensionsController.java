@@ -21,7 +21,7 @@ import java.io.File;
  * Created by Jonas on 06/04/18.
  */
 
-public class Extensions extends SubForm {
+public class ExtensionsController extends SubForm {
 
 
     public Button btn_install;

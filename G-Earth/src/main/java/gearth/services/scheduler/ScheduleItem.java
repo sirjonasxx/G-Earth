@@ -1,20 +1,16 @@
-package gearth.ui.scheduler;
+package gearth.services.scheduler;
 
 import gearth.misc.listenerpattern.Observable;
-import gearth.ui.scheduler.listeners.OnBeingUpdatedListener;
-import gearth.ui.scheduler.listeners.OnDeleteListener;
-import gearth.ui.scheduler.listeners.OnEditListener;
-import gearth.ui.scheduler.listeners.OnUpdatedListener;
-import javafx.beans.InvalidationListener;
+import gearth.services.scheduler.listeners.OnBeingUpdatedListener;
+import gearth.services.scheduler.listeners.OnDeleteListener;
+import gearth.services.scheduler.listeners.OnEditListener;
+import gearth.services.scheduler.listeners.OnUpdatedListener;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import gearth.misc.StringifyAble;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Jonas on 07/04/18.
@@ -27,7 +23,7 @@ public class ScheduleItem implements StringifyAble {
     private SimpleObjectProperty<HPacket> packetProperty;
     private SimpleObjectProperty<HMessage.Direction> destinationProperty;
 
-    ScheduleItem (int index, boolean paused, Interval delay, HPacket packet, HMessage.Direction destination) {
+    public ScheduleItem (int index, boolean paused, Interval delay, HPacket packet, HMessage.Direction destination) {
         construct(index, paused, delay, packet, destination);
     }
 
@@ -39,7 +35,7 @@ public class ScheduleItem implements StringifyAble {
         this.destinationProperty = new SimpleObjectProperty<>(destination);
     }
 
-    ScheduleItem(String stringifyAbleRepresentation) {
+    public ScheduleItem(String stringifyAbleRepresentation) {
         constructFromString(stringifyAbleRepresentation);
     }
 
@@ -61,39 +57,6 @@ public class ScheduleItem implements StringifyAble {
 
     public SimpleObjectProperty<HMessage.Direction> getDestinationProperty() {
         return destinationProperty;
-    }
-
-
-    private Observable<OnDeleteListener> onDeleteObservable = new Observable<>(OnDeleteListener::onDelete);
-    public void onDelete(OnDeleteListener listener) {
-        onDeleteObservable.addListener(listener);
-    }
-    public void delete() {
-        onDeleteObservable.fireEvent();
-    }
-
-    private Observable<OnEditListener> onEditObservable = new Observable<>(OnEditListener::onEdit);
-    public void onEdit(OnEditListener listener) {
-        onEditObservable.addListener(listener);
-    }
-    public void edit() {
-        onEditObservable.fireEvent();
-    }
-
-    private Observable<OnUpdatedListener> onUpdatedObservable = new Observable<>(OnUpdatedListener::onUpdated);
-    public void onIsupdated(OnUpdatedListener listener) {
-        onUpdatedObservable.addListener(listener);
-    }
-    public void isUpdatedTrigger() {
-        onUpdatedObservable.fireEvent();
-    }
-
-    private Observable<OnBeingUpdatedListener> onBeingUpdatedObservable = new Observable<>(OnBeingUpdatedListener::onBeingUpdated);
-    public void onIsBeingUpdated(OnBeingUpdatedListener listener) {
-        onBeingUpdatedObservable.addListener(listener);
-    }
-    public void onIsBeingUpdatedTrigger() {
-        onBeingUpdatedObservable.fireEvent();
     }
 
     @Override

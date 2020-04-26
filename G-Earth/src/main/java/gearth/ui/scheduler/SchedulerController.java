@@ -1,6 +1,9 @@
 package gearth.ui.scheduler;
 
 import com.tulskiy.keymaster.common.Provider;
+import gearth.services.scheduler.Interval;
+import gearth.services.scheduler.ScheduleItem;
+import gearth.services.scheduler.Scheduler;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.scene.control.*;
@@ -21,7 +24,7 @@ import java.util.Set;
 /**
  * Created by Jonas on 06/04/18.
  */
-public class Scheduler extends SubForm {
+public class SchedulerController extends SubForm {
 
     private static final Interval defaultInterval = new Interval(0, 500);
     private static final HPacket defaultPacket = new HPacket(0);
@@ -44,9 +47,9 @@ public class Scheduler extends SubForm {
 
     public CheckBox cbx_hotkeys;
 
-    private ScheduleItem isBeingEdited = null;
+    private InteractableScheduleItem isBeingEdited = null;
 
-    private List<ScheduleItem> scheduleItemList = new ArrayList<>();
+    private Scheduler<InteractableScheduleItem> scheduler = null;
 
 
     public void initialize() {
@@ -61,49 +64,6 @@ public class Scheduler extends SubForm {
         btn_load.setTooltip(new Tooltip("Load from file"));
 
         updateUI();
-
-        new Thread(() -> {
-            long t = System.currentTimeMillis();
-            long changed = 1;
-
-            Set<ScheduleItem> set = new HashSet<>();
-
-            while (true) {
-                try {
-                    Thread.sleep(1);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
-                set.clear();
-                for (int i = scheduleItemList.size() - 1; i >= 0; i--) {
-                    set.add(scheduleItemList.get(i));
-                }
-
-                for (ScheduleItem item : set) {
-                    if (!item.getPausedProperty().get()) {
-                        Interval cur = item.getDelayProperty().get();
-                        for (int i = 0; i < changed; i++) {
-                            if ((t - i) % cur.getDelay() == cur.getOffset()) {
-                                if (item.getDestinationProperty().get() == HMessage.Direction.TOSERVER) {
-                                    getHConnection().sendToServerAsync(item.getPacketProperty().get());
-                                }
-                                else {
-                                    getHConnection().sendToClientAsync(item.getPacketProperty().get());
-                                }
-                            }
-                        }
-                    }
-
-                }
-
-                long newT = System.currentTimeMillis();
-                changed = newT - t;
-                t = newT;
-            }
-        }).start();
-
-
 
         //register hotkeys
         //disable some output things
@@ -121,9 +81,14 @@ public class Scheduler extends SubForm {
         System.setErr(err);
     }
 
+    @Override
+    protected void onParentSet() {
+        scheduler = new Scheduler<>(getHConnection());
+    }
+
     private void switchPauseHotkey(int index) {
-        if (cbx_hotkeys.isSelected() && index < scheduleItemList.size()) {
-            scheduleItemList.get(index).getPausedProperty().set(!scheduleItemList.get(index).getPausedProperty().get());
+        if (cbx_hotkeys.isSelected() && index < scheduler.size()) {
+            scheduler.get(index).getPausedProperty().set(!scheduler.get(index).getPausedProperty().get());
         }
     }
 
@@ -146,8 +111,8 @@ public class Scheduler extends SubForm {
             HPacket packet = new HPacket(txt_packet.getText());
             if (packet.isCorrupted()) return;
 
-            ScheduleItem newItem = new ScheduleItem(
-                    scheduleItemList.size(),
+            InteractableScheduleItem newItem = new InteractableScheduleItem(
+                    scheduler.size(),
                     false,
                     new Interval(txt_delay.getText()),
                     new HPacket(txt_packet.getText()),
@@ -168,9 +133,9 @@ public class Scheduler extends SubForm {
 
     }
 
-    private void addItem(ScheduleItem newItem) {
+    private void addItem(InteractableScheduleItem newItem) {
         new ScheduleItemContainer(newItem, schedulecontainer, scrollpane);
-        scheduleItemList.add(newItem);
+        scheduler.add(newItem);
 
 
         newItem.onDelete(() -> {
@@ -178,9 +143,9 @@ public class Scheduler extends SubForm {
                 setInputDefault();
                 isBeingEdited = null;
             }
-            scheduleItemList.remove(newItem);
-            for (int i = 0; i < scheduleItemList.size(); i++) {
-                scheduleItemList.get(i).getIndexProperty().set(i);
+            scheduler.remove(newItem);
+            for (int i = 0; i < scheduler.size(); i++) {
+                scheduler.get(i).getIndexProperty().set(i);
             }
         });
         newItem.onEdit(() -> {
@@ -219,14 +184,14 @@ public class Scheduler extends SubForm {
 
 
     private void clear() {
-        for (int i = scheduleItemList.size() - 1; i >= 0; i--) {
-            scheduleItemList.get(i).delete();
+        for (int i = scheduler.size() - 1; i >= 0; i--) {
+            scheduler.get(i).delete();
         }
     }
-    private void load(List<ScheduleItem> list) {
+    private void load(List<InteractableScheduleItem> list) {
         clear();
 
-        for (ScheduleItem item : list) {
+        for (InteractableScheduleItem item : list) {
             addItem(item);
         }
     }
@@ -254,9 +219,9 @@ public class Scheduler extends SubForm {
                 FileWriter fileWriter = new FileWriter(file);
                 BufferedWriter out = new BufferedWriter(fileWriter);
 
-                for (int i = 0; i < scheduleItemList.size(); i++) {
-                    out.write(scheduleItemList.get(i).stringify());
-                    if (i != scheduleItemList.size() - 1) out.write("\n");
+                for (int i = 0; i < scheduler.size(); i++) {
+                    out.write(scheduler.get(i).stringify());
+                    if (i != scheduler.size() - 1) out.write("\n");
                 }
 
                 out.flush();
@@ -270,7 +235,7 @@ public class Scheduler extends SubForm {
     }
 
     public void loadBtnClicked(ActionEvent actionEvent) {
-        List<ScheduleItem> list = new ArrayList<>();
+        List<InteractableScheduleItem> list = new ArrayList<>();
 
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Load Schedule File");
@@ -287,7 +252,7 @@ public class Scheduler extends SubForm {
 
                 while ((line = br.readLine()) != null)
                 {
-                    list.add(new ScheduleItem(line));
+                    list.add(new InteractableScheduleItem(line));
                 }
 
                 fr.close();

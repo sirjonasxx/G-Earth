@@ -14,7 +14,7 @@
 
 <GridPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="262.0" prefWidth="565.0"
           xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1"
-          fx:controller="gearth.ui.logger.Logger">
+          fx:controller="gearth.ui.logger.LoggerController">
     <columnConstraints>
         <ColumnConstraints hgrow="SOMETIMES" maxWidth="293.0" minWidth="10.0" prefWidth="242.0"/>
         <ColumnConstraints hgrow="SOMETIMES" maxWidth="390.0" minWidth="10.0" prefWidth="323.0"/>

@@ -4,16 +4,14 @@ import gearth.misc.Cacher;
 import gearth.protocol.HConnection;
 import gearth.protocol.misc.ConnectionInfoOverrider;
 import gearth.ui.SubForm;
-import gearth.ui.info.Info;
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
+import gearth.ui.info.InfoController;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 
 /**
  * Created by Jonas on 06/04/18.
  */
-public class Extra extends SubForm implements ConnectionInfoOverrider {
+public class ExtraController extends SubForm implements ConnectionInfoOverrider {
 
     public static final String NOTEPAD_CACHE_KEY = "notepad_text";
 
@@ -40,7 +38,7 @@ public class Extra extends SubForm implements ConnectionInfoOverrider {
         HConnection.setConnectionInfoOverrider(this);
 
         url_troubleshooting.setTooltip(new Tooltip("https://github.com/sirjonasxx/G-Earth/wiki/Troubleshooting"));
-        Info.activateHyperlink(url_troubleshooting);
+        InfoController.activateHyperlink(url_troubleshooting);
 
         String notepadInitValue = (String)Cacher.get(NOTEPAD_CACHE_KEY);
         if (notepadInitValue != null) {

@@ -17,7 +17,7 @@ import gearth.ui.logger.loggerdisplays.PacketLoggerFactory;
 
 import java.util.Calendar;
 
-public class Logger extends SubForm {
+public class LoggerController extends SubForm {
 
 
     public TextField txtPacketLimit;

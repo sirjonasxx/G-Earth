@@ -6,18 +6,17 @@ import javafx.scene.control.TabPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import gearth.protocol.HConnection;
-import gearth.ui.connection.Connection;
-import gearth.ui.extensions.Extensions;
-import gearth.ui.info.Info;
-import gearth.ui.injection.Injection;
-import gearth.ui.logger.Logger;
-import gearth.ui.scheduler.Scheduler;
-import gearth.ui.extra.Extra;
-import gearth.ui.tools.Tools;
+import gearth.ui.connection.ConnectionController;
+import gearth.ui.extensions.ExtensionsController;
+import gearth.ui.info.InfoController;
+import gearth.ui.injection.InjectionController;
+import gearth.ui.logger.LoggerController;
+import gearth.ui.scheduler.SchedulerController;
+import gearth.ui.extra.ExtraController;
+import gearth.ui.tools.ToolsController;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 
 public class GEarthController {
 
@@ -27,14 +26,14 @@ public class GEarthController {
     private volatile HConnection hConnection;
     private volatile int initcount = 0;
 
-    public Connection connectionController;
-    public Injection injectionController;
-    public Logger loggerController;
-    public Tools toolsController;
-    public Scheduler schedulerController;
-    public Extra extraController;
-    public Info infoController;
-    public Extensions extensionsController;
+    public ConnectionController connectionController;
+    public InjectionController injectionController;
+    public LoggerController loggerController;
+    public ToolsController toolsController;
+    public SchedulerController schedulerController;
+    public ExtraController extraController;
+    public InfoController infoController;
+    public ExtensionsController extensionsController;
 
     private List<SubForm> tabs = null;
 

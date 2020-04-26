@@ -12,7 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class Connection extends SubForm {
+public class ConnectionController extends SubForm {
 
     public ComboBox<String> inpPort;
     public ComboBox<String> inpHost;

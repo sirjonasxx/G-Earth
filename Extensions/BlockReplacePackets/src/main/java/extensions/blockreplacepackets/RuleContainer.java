@@ -2,10 +2,6 @@ package extensions.blockreplacepackets;
 
 import extensions.blockreplacepackets.rules.BlockReplaceRule;
 import gearth.ui.buttons.DeleteButton;
-import gearth.ui.scheduler.ScheduleItem;
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;

@@ -12,7 +12,7 @@ import javafx.scene.image.ImageView;
 /**
  * Created by Jonas on 06/04/18.
  */
-public class Info extends SubForm {
+public class InfoController extends SubForm {
     public ImageView img_logo;
     public Hyperlink link_sng;
     public Hyperlink link_darkbox;

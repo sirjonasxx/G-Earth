@@ -1,4 +1,4 @@
-package gearth.ui.scheduler.listeners;
+package gearth.services.scheduler.listeners;
 
 public interface OnDeleteListener {
     void onDelete();
