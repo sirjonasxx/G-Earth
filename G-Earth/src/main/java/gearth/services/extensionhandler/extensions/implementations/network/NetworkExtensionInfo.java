@@ -1,4 +1,4 @@
-package gearth.services.extensionhandler.extensions.network;
+package gearth.services.extensionhandler.extensions.implementations.network;
 
 public class NetworkExtensionInfo {
 

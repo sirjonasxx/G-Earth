@@ -21,7 +21,7 @@ public class Injection extends SubForm {
     public Button btn_sendToClient;
 
     protected void onParentSet() {
-        getHConnection().addStateChangeListener((oldState, newState) -> Platform.runLater(this::updateUI));
+        getHConnection().getStateObservable().addListener((oldState, newState) -> Platform.runLater(this::updateUI));
 
         inputPacket.textProperty().addListener(event -> Platform.runLater(this::updateUI));
     }

@@ -40,7 +40,7 @@ public abstract class ExtensionForm implements IExtension{
     public boolean sendToClient(HPacket packet){
         return extension.sendToClient(packet);
     }
-    public void onConnect(Extension.OnConnectionListener listener) {
+    public void onConnect(OnConnectionListener listener) {
         extension.onConnect(listener);
     }
 

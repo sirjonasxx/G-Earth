@@ -1,7 +1,7 @@
-package gearth.services.extensionhandler.extensions.network.authentication;
+package gearth.services.extensionhandler.extensions.implementations.network.authentication;
 
 import gearth.misc.ConfirmationDialog;
-import gearth.services.extensionhandler.extensions.network.NetworkExtension;
+import gearth.services.extensionhandler.extensions.implementations.network.NetworkExtension;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;

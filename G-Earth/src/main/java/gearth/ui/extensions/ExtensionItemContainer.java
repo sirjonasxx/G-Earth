@@ -12,10 +12,10 @@ import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import gearth.misc.ConfirmationDialog;
 import gearth.ui.buttons.*;
-import gearth.services.extensionhandler.extensions.network.executer.ExecutionInfo;
-import gearth.services.extensionhandler.extensions.network.executer.ExtensionRunner;
-import gearth.services.extensionhandler.extensions.network.executer.ExtensionRunnerFactory;
-import gearth.services.extensionhandler.extensions.network.executer.NormalExtensionRunner;
+import gearth.services.extensionhandler.extensions.implementations.network.executer.ExecutionInfo;
+import gearth.services.extensionhandler.extensions.implementations.network.executer.ExtensionRunner;
+import gearth.services.extensionhandler.extensions.implementations.network.executer.ExtensionRunnerFactory;
+import gearth.services.extensionhandler.extensions.implementations.network.executer.NormalExtensionRunner;
 
 import java.nio.file.Paths;
 
@@ -161,14 +161,14 @@ public class ExtensionItemContainer extends GridPane {
             exitButton.removeEventHandler(MouseEvent.MOUSE_CLICKED, onExit);
             clickButton.removeEventHandler(MouseEvent.MOUSE_CLICKED, onClick);
         }
-        onExit = event -> item.isRemoveClickTrigger();
-        onClick = event -> item.isClickTrigger();
+        onExit = event -> item.getRemoveClickObservable().fireEvent();
+        onClick = event -> item.getClickedObservable().fireEvent();
 
         exitButton.addEventHandler(MouseEvent.MOUSE_CLICKED, onExit);
         clickButton.addEventHandler(MouseEvent.MOUSE_CLICKED, onClick);
 
         ExtensionItemContainer this2 = this;
-        item.onDelete(observable -> Platform.runLater(() -> {
+        item.getDeletedObservable().addListener(() -> Platform.runLater(() -> {
             if (item.isInstalledExtension()) {
                 setBackground(new Background(new BackgroundFill(Paint.valueOf("#cccccc"),null, null)));
                 getChildren().remove(buttonsBox);

@@ -14,6 +14,6 @@ public interface IExtension {
     void intercept(HMessage.Direction direction, Extension.MessageListener messageListener);
     boolean requestFlags(Extension.FlagsCheckListener flagRequestCallback);
     void writeToConsole(String s); // not implemented in g-earth yet
-    void onConnect(Extension.OnConnectionListener listener);
+    void onConnect(OnConnectionListener listener);
 
 }

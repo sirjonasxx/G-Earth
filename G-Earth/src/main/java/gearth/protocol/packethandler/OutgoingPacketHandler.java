@@ -10,8 +10,8 @@ import java.util.List;
 
 public class OutgoingPacketHandler extends PacketHandler {
 
-    public OutgoingPacketHandler(OutputStream outputStream, Object[] listeners) {
-        super(outputStream, listeners);
+    public OutgoingPacketHandler(OutputStream outputStream, Object[] trafficObservables) {
+        super(outputStream, trafficObservables);
     }
 
     private List<OnDatastreamConfirmedListener> onDatastreamConfirmedListeners = new ArrayList<>();

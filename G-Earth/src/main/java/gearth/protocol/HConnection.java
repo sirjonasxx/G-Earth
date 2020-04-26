@@ -2,6 +2,7 @@ package gearth.protocol;
 
 import gearth.misc.Cacher;
 import gearth.misc.OSValidator;
+import gearth.misc.listenerpattern.Observable;
 import gearth.protocol.hostreplacer.hostsfile.HostReplacer;
 import gearth.protocol.hostreplacer.hostsfile.HostReplacerFactory;
 import gearth.protocol.hostreplacer.ipmapping.IpMapper;
@@ -17,9 +18,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.*;
-import java.util.function.IntFunction;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 public class HConnection {
 
@@ -122,8 +120,9 @@ public class HConnection {
     private static final HostReplacer hostsReplacer = HostReplacerFactory.get();
 
     private volatile boolean hostRedirected = false;
-    private volatile Object[] trafficListeners = {new ArrayList<TrafficListener>(), new ArrayList<TrafficListener>(), new ArrayList<TrafficListener>()};
-    private volatile List<StateChangeListener> stateChangeListeners = new ArrayList<>();
+    private volatile Object[] trafficObservables = {new Observable<TrafficListener>(), new Observable<TrafficListener>(), new Observable<TrafficListener>()};
+    private volatile Observable<StateChangeListener> stateObservable = new Observable<>();
+
     private volatile State state = State.NOT_CONNECTED;
 
     public static class Proxy {
@@ -416,8 +415,8 @@ public class HConnection {
         final boolean[] aborted = new boolean[1];
         Rc4Obtainer rc4Obtainer = new Rc4Obtainer(this);
 
-        OutgoingPacketHandler outgoingHandler = new OutgoingPacketHandler(habbo_server_out, trafficListeners);
-        IncomingPacketHandler incomingHandler = new IncomingPacketHandler(client_out, trafficListeners);
+        OutgoingPacketHandler outgoingHandler = new OutgoingPacketHandler(habbo_server_out, trafficObservables);
+        IncomingPacketHandler incomingHandler = new IncomingPacketHandler(client_out, trafficObservables);
         rc4Obtainer.setPacketHandlers(outgoingHandler, incomingHandler);
 
         outgoingHandler.addOnDatastreamConfirmedListener(hotelVersion -> {
@@ -593,11 +592,13 @@ public class HConnection {
 
             State buffer = this.state;
             this.state = state;
-            for (StateChangeListener listener : stateChangeListeners) {
-                listener.stateChanged(buffer, state);
-            }
+            stateObservable.fireEvent(l -> l.stateChanged(buffer, state));
         }
 
+    }
+
+    public Observable<StateChangeListener> getStateObservable() {
+        return stateObservable;
     }
 
     /**
@@ -609,19 +610,12 @@ public class HConnection {
      * ¹don't edit the packet (block, replace)
      */
     public void addTrafficListener(int order, TrafficListener listener) {
-        ((List<TrafficListener>)trafficListeners[order]).add(listener);
+        ((Observable<TrafficListener>) trafficObservables[order]).addListener(listener);
     }
     public void removeTrafficListener(TrafficListener listener) {
-        ((List<TrafficListener>)trafficListeners[0]).remove(listener);
-        ((List<TrafficListener>)trafficListeners[1]).remove(listener);
-        ((List<TrafficListener>)trafficListeners[2]).remove(listener);
-    }
-
-    public void addStateChangeListener(StateChangeListener listener) {
-        stateChangeListeners.add(listener);
-    }
-    public void removeStateChangeListener(StateChangeListener listener) {
-        stateChangeListeners.remove(listener);
+        ((Observable<TrafficListener>) trafficObservables[0]).removeListener(listener);
+        ((Observable<TrafficListener>) trafficObservables[1]).removeListener(listener);
+        ((Observable<TrafficListener>) trafficObservables[2]).removeListener(listener);
     }
 
     public int getServerPort() {

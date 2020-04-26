@@ -1,5 +1,10 @@
 package gearth.ui.scheduler;
 
+import gearth.misc.listenerpattern.Observable;
+import gearth.ui.scheduler.listeners.OnBeingUpdatedListener;
+import gearth.ui.scheduler.listeners.OnDeleteListener;
+import gearth.ui.scheduler.listeners.OnEditListener;
+import gearth.ui.scheduler.listeners.OnUpdatedListener;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -16,11 +21,11 @@ import java.util.List;
  */
 public class ScheduleItem implements StringifyAble {
 
-    private SimpleIntegerProperty indexProperty = null;
-    private SimpleBooleanProperty pausedProperty = null;
-    private SimpleObjectProperty<Interval> delayProperty = null;
-    private SimpleObjectProperty<HPacket> packetProperty = null;
-    private SimpleObjectProperty<HMessage.Direction> destinationProperty = null;
+    private SimpleIntegerProperty indexProperty;
+    private SimpleBooleanProperty pausedProperty;
+    private SimpleObjectProperty<Interval> delayProperty;
+    private SimpleObjectProperty<HPacket> packetProperty;
+    private SimpleObjectProperty<HMessage.Direction> destinationProperty;
 
     ScheduleItem (int index, boolean paused, Interval delay, HPacket packet, HMessage.Direction destination) {
         construct(index, paused, delay, packet, destination);
@@ -59,44 +64,36 @@ public class ScheduleItem implements StringifyAble {
     }
 
 
-    private List<InvalidationListener> onDeleteListeners = new ArrayList<>();
-    public void onDelete(InvalidationListener listener) {
-        onDeleteListeners.add(listener);
+    private Observable<OnDeleteListener> onDeleteObservable = new Observable<>(OnDeleteListener::onDelete);
+    public void onDelete(OnDeleteListener listener) {
+        onDeleteObservable.addListener(listener);
     }
     public void delete() {
-        for (int i = onDeleteListeners.size() - 1; i >= 0; i--) {
-            onDeleteListeners.get(i).invalidated(null);
-        }
+        onDeleteObservable.fireEvent();
     }
 
-    private List<InvalidationListener> onEditListeners = new ArrayList<>();
-    public void onEdit(InvalidationListener listener) {
-        onEditListeners.add(listener);
+    private Observable<OnEditListener> onEditObservable = new Observable<>(OnEditListener::onEdit);
+    public void onEdit(OnEditListener listener) {
+        onEditObservable.addListener(listener);
     }
     public void edit() {
-        for (int i = onEditListeners.size() - 1; i >= 0; i--) {
-            onEditListeners.get(i).invalidated(null);
-        }
+        onEditObservable.fireEvent();
     }
 
-    private List<InvalidationListener> onIsupdatedListeners = new ArrayList<>();
-    public void onIsupdated(InvalidationListener listener) {
-        onIsupdatedListeners.add(listener);
+    private Observable<OnUpdatedListener> onUpdatedObservable = new Observable<>(OnUpdatedListener::onUpdated);
+    public void onIsupdated(OnUpdatedListener listener) {
+        onUpdatedObservable.addListener(listener);
     }
     public void isUpdatedTrigger() {
-        for (int i = onIsupdatedListeners.size() - 1; i >= 0; i--) {
-            onIsupdatedListeners.get(i).invalidated(null);
-        }
+        onUpdatedObservable.fireEvent();
     }
 
-    private List<InvalidationListener> OnIsBeingUpdatedListeners = new ArrayList<>();
-    public void onIsBeingUpdated(InvalidationListener listener) {
-        OnIsBeingUpdatedListeners.add(listener);
+    private Observable<OnBeingUpdatedListener> onBeingUpdatedObservable = new Observable<>(OnBeingUpdatedListener::onBeingUpdated);
+    public void onIsBeingUpdated(OnBeingUpdatedListener listener) {
+        onBeingUpdatedObservable.addListener(listener);
     }
     public void onIsBeingUpdatedTrigger() {
-        for (int i = OnIsBeingUpdatedListeners.size() - 1; i >= 0; i--) {
-            OnIsBeingUpdatedListeners.get(i).invalidated(null);
-        }
+        onBeingUpdatedObservable.fireEvent();
     }
 
     @Override

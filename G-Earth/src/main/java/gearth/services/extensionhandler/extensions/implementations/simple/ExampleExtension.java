@@ -1,4 +1,4 @@
-package gearth.services.extensionhandler.extensions.simple;
+package gearth.services.extensionhandler.extensions.implementations.simple;
 
 import gearth.protocol.HMessage;
 import gearth.services.extensionhandler.extensions.GEarthExtension;

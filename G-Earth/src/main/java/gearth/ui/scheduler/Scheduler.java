@@ -173,7 +173,7 @@ public class Scheduler extends SubForm {
         scheduleItemList.add(newItem);
 
 
-        newItem.onDelete(observable -> {
+        newItem.onDelete(() -> {
             if (isBeingEdited == newItem) {
                 setInputDefault();
                 isBeingEdited = null;
@@ -183,7 +183,7 @@ public class Scheduler extends SubForm {
                 scheduleItemList.get(i).getIndexProperty().set(i);
             }
         });
-        newItem.onEdit(observable -> {
+        newItem.onEdit(() -> {
             if (isBeingEdited != null) {
                 isBeingEdited.isUpdatedTrigger();
             }
@@ -195,7 +195,7 @@ public class Scheduler extends SubForm {
                 rb_outgoing.setSelected(newItem.getDestinationProperty().get() == HMessage.Direction.TOSERVER);
 
                 isBeingEdited = newItem;
-                btn_addoredit.setText("Edit schedule item"); //Add to scheduler
+                btn_addoredit.setText("Edit");
                 updateUI();
                 newItem.onIsBeingUpdatedTrigger();
             }
@@ -213,7 +213,7 @@ public class Scheduler extends SubForm {
         rb_incoming.setSelected(true);
         rb_outgoing.setSelected(false);
 
-        btn_addoredit.setText("Add to scheduler");
+        btn_addoredit.setText("Add");
         updateUI();
     }
 

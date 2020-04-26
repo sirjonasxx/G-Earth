@@ -2,6 +2,7 @@ package gearth.services.extensionhandler;
 
 import gearth.Main;
 import gearth.misc.harble_api.HarbleAPIFetcher;
+import gearth.misc.listenerpattern.Observable;
 import gearth.protocol.HConnection;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
@@ -12,12 +13,22 @@ import gearth.services.extensionhandler.extensions.extensionproducers.ExtensionP
 import gearth.services.extensionhandler.extensions.GEarthExtension;
 
 import java.util.*;
+import java.util.function.Consumer;
 
 public class ExtensionHandler {
 
     private final List<GEarthExtension> gEarthExtensions = new ArrayList<>();
     private final HConnection hConnection;
     private List<ExtensionProducer> extensionProducers;
+    private Observable<ExtensionConnectedListener> observable = new Observable<>() {
+        @Override
+        public void addListener(ExtensionConnectedListener extensionConnectedListener) {
+            super.addListener(extensionConnectedListener);
+            for (GEarthExtension gEarthExtension : gEarthExtensions) {
+                extensionConnectedListener.onExtensionConnect(gEarthExtension);
+            }
+        }
+    };
 
 
     public ExtensionHandler(HConnection hConnection) {
@@ -27,7 +38,7 @@ public class ExtensionHandler {
 
     private void initialize() {
 
-        hConnection.addStateChangeListener((oldState, newState) -> {
+        hConnection.getStateObservable().addListener((oldState, newState) -> {
             if (newState == HConnection.State.CONNECTED) {
                 HarbleAPIFetcher.fetch(hConnection.getHotelVersion());
                 synchronized (gEarthExtensions) {
@@ -76,12 +87,12 @@ public class ExtensionHandler {
                                         collection.remove(extension);
                                     }
 
-                                    extension.removeExtensionListener(this);
+                                    extension.getExtensionObservable().removeListener(this);
                                 }
                             }
                         }
                     };
-                    extension.registerExtensionListener(respondCallback);
+                    extension.getExtensionObservable().addListener(respondCallback);
                 }
             }
 
@@ -134,7 +145,7 @@ public class ExtensionHandler {
     private void initializeExtensionProducer(ExtensionProducer producer) {
         producer.startProducing(new ExtensionProducerObserver() {
             @Override
-            public void onExtensionConnect(GEarthExtension extension) {
+            public void onExtensionProduced(GEarthExtension extension) {
                 synchronized (gEarthExtensions) {
                     gEarthExtensions.add(extension);
                 }
@@ -167,12 +178,12 @@ public class ExtensionHandler {
                         synchronized (gEarthExtensions) {
                             gEarthExtensions.remove(extension);
                         }
-                        extension.removeExtensionListener(this);
-                        extension.delete();
+                        extension.getExtensionObservable().removeListener(this);
+                        extension.getDeletedObservable().fireEvent();
                     }
                 };
 
-                extension.registerExtensionListener(listener);
+                extension.getExtensionObservable().addListener(listener);
                 extension.init();
 
                 if (hConnection.getState() == HConnection.State.CONNECTED) {
@@ -184,10 +195,10 @@ public class ExtensionHandler {
                     );
                 }
 
-                extension.onRemoveClick(observable -> extension.close());
-                extension.onClick(observable -> extension.doubleclick());
+                extension.getRemoveClickObservable().addListener(extension::close);
+                extension.getClickedObservable().addListener(extension::doubleclick);
 
-                notifyExtensionConnectListeners(extension);
+                observable.fireEvent(l -> l.onExtensionConnect(extension));
             }
         });
     }
@@ -197,24 +208,9 @@ public class ExtensionHandler {
         return extensionProducers;
     }
 
-    public interface ExtensionConnectListener {
-        void extensionConnected(GEarthExtension e);
+    public Observable<ExtensionConnectedListener> getObservable() {
+        return observable;
     }
-    private List<ExtensionConnectListener> listeners = new ArrayList<>();
-    public void onExtensionConnected(ExtensionConnectListener extensionConnectListener) {
-        synchronized (gEarthExtensions) {
-            for (GEarthExtension gEarthExtension : gEarthExtensions) {
-                extensionConnectListener.extensionConnected(gEarthExtension);
-            }
-        }
-        listeners.add(extensionConnectListener);
-    }
-    public void removeExtensionConnectListener(ExtensionConnectListener extensionConnectListener) {
-        listeners.remove(extensionConnectListener);
-    }
-    private void notifyExtensionConnectListeners(GEarthExtension extension) {
-        for (int i = listeners.size() - 1; i >= 0; i--) {
-            listeners.get(i).extensionConnected(extension);
-        }
-    }
+
+
 }

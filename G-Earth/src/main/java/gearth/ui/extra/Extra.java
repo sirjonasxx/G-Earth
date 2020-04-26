@@ -59,7 +59,7 @@ public class Extra extends SubForm implements ConnectionInfoOverrider {
         cbx_alwaysOnTop.selectedProperty().addListener(observable -> parentController.getStage().setAlwaysOnTop(cbx_alwaysOnTop.isSelected()));
 
         cbx_advanced.selectedProperty().addListener(observable -> updateAdvancedUI());
-        getHConnection().addStateChangeListener((oldState, newState) -> {
+        getHConnection().getStateObservable().addListener((oldState, newState) -> {
             if (oldState == HConnection.State.NOT_CONNECTED || newState == HConnection.State.NOT_CONNECTED) {
                 updateAdvancedUI();
             }

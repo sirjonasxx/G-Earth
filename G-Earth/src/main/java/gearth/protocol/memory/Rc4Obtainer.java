@@ -41,11 +41,11 @@ public class Rc4Obtainer {
                 public void act() {
                     if (handler.isEncryptedStream()) {
                         onSendFirstEncryptedMessage(handler);
-                        handler.removeBufferChangeListener(this);
+                        handler.getBufferChangeObservable().removeListener(this);
                     }
                 }
             };
-            handler.onBufferChanged(bufferChangeListener);
+            handler.getBufferChangeObservable().addListener(bufferChangeListener);
         }
 
 

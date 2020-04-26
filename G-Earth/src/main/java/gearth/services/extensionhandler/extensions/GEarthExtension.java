@@ -1,12 +1,12 @@
 package gearth.services.extensionhandler.extensions;
 
+import gearth.misc.listenerpattern.Observable;
+import gearth.misc.listenerpattern.SynchronizedObservable;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
-import javafx.beans.InvalidationListener;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Consumer;
+import gearth.services.extensionhandler.extensions.listeners.OmRemoveClickListener;
+import gearth.services.extensionhandler.extensions.listeners.OnClickListener;
+import gearth.services.extensionhandler.extensions.listeners.OnDeleteListener;
 
 public abstract class GEarthExtension {
 
@@ -47,45 +47,36 @@ public abstract class GEarthExtension {
 
 
     // ----------------- listen to the extension ---------------------
-    protected final List<ExtensionListener> extensionListeners = new ArrayList<>();
-    public void registerExtensionListener(ExtensionListener listener) {
-        this.extensionListeners.add(listener);
-    }
-    public void removeExtensionListener(ExtensionListener listener) {
-        this.extensionListeners.remove(listener);
-    }
-    private void notifyListeners(Consumer<ExtensionListener> consumer) {
-        for (int i = extensionListeners.size() - 1; i >= 0; i--) {
-            consumer.accept(extensionListeners.get(i));
-        }
 
-        extensionListeners.forEach(consumer);
+    protected final Observable<ExtensionListener> extensionObservable = new Observable<>();
+    public Observable<ExtensionListener> getExtensionObservable() {
+        return extensionObservable;
     }
 
     protected void sendManipulatedPacket(HMessage hMessage) {
         int orgIndex = hMessage.getPacket().getReadIndex();
-        notifyListeners(listener -> {
+        extensionObservable.fireEvent(listener -> {
             hMessage.getPacket().setReadIndex(6);
             listener.manipulatedPacket(hMessage);
         });
         hMessage.getPacket().setReadIndex(orgIndex);
     }
     protected void requestFlags() {
-        notifyListeners(ExtensionListener::flagsRequest);
+        extensionObservable.fireEvent(ExtensionListener::flagsRequest);
     }
     protected void sendMessage(HMessage.Direction direction, HPacket packet) {
         int orgIndex = packet.getReadIndex();
-        notifyListeners(listener -> {
+        extensionObservable.fireEvent(listener -> {
             packet.setReadIndex(6);
             listener.sendMessage(direction, packet);
         });
         packet.setReadIndex(orgIndex);
     }
     protected void log(String text) {
-        notifyListeners(listener -> listener.log(text));
+        extensionObservable.fireEvent(listener -> listener.log(text));
     }
     protected void hasClosed() {
-        notifyListeners(ExtensionListener::hasClosed);
+        extensionObservable.fireEvent(ExtensionListener::hasClosed);
     }
     // --------------------------------------------------------------------
 
@@ -97,46 +88,19 @@ public abstract class GEarthExtension {
 
     // ----------- methods for interaction with G-Earth UI, don't use/change them ----------------
 
-    private final List<InvalidationListener> onRemoveClickListener = new ArrayList<>();
-    public void onRemoveClick(InvalidationListener listener) {
-        synchronized (onRemoveClickListener) {
-            onRemoveClickListener.add(listener);
-        }
-    }
-    public void isRemoveClickTrigger() {
-        synchronized (onRemoveClickListener) {
-            for (int i = onRemoveClickListener.size() - 1; i >= 0; i--) {
-                onRemoveClickListener.get(i).invalidated(null);
-            }
-        }
+    private final Observable<OmRemoveClickListener> removeClickObservable = new SynchronizedObservable<>(OmRemoveClickListener::onRemove);
+    public Observable<OmRemoveClickListener> getRemoveClickObservable() {
+        return removeClickObservable;
     }
 
-    private final List<InvalidationListener> onClickListener = new ArrayList<>();
-    public void onClick(InvalidationListener listener) {
-        synchronized (onClickListener) {
-            onClickListener.add(listener);
-        }
-    }
-    public void isClickTrigger() {
-        synchronized (onClickListener) {
-            for (int i = onClickListener.size() - 1; i >= 0; i--) {
-                onClickListener.get(i).invalidated(null);
-            }
-        }
+    private final Observable<OnClickListener> clickedObservable = new SynchronizedObservable<>(OnClickListener::onClick);
+    public Observable<OnClickListener> getClickedObservable() {
+        return clickedObservable;
     }
 
-    private final List<InvalidationListener> onDeleteListeners = new ArrayList<>();
-    public void onDelete(InvalidationListener listener) {
-        synchronized (onDeleteListeners) {
-            onDeleteListeners.add(listener);
-        }
-    }
-    public void delete() {
-        synchronized (onDeleteListeners) {
-            for (int i = onDeleteListeners.size() - 1; i >= 0; i--) {
-                onDeleteListeners.get(i).invalidated(null);
-            }
-        }
+    private final Observable<OnDeleteListener> deletedObservable = new SynchronizedObservable<>(OnDeleteListener::onDelete);
+    public Observable<OnDeleteListener> getDeletedObservable() {
+        return deletedObservable;
     }
     // ----------------------------------------------------------------------------------------
 

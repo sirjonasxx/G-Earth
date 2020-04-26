@@ -1,5 +1,6 @@
 package gearth.protocol.packethandler;
 
+import gearth.misc.listenerpattern.Observable;
 import gearth.protocol.HConnection;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
@@ -17,7 +18,7 @@ public abstract class PacketHandler {
 
     volatile PayloadBuffer payloadBuffer = new PayloadBuffer();
     volatile OutputStream out;
-    volatile Object[] listeners = null; //get notified on packet send
+    volatile Object[] trafficObservables; //get notified on packet send
     volatile boolean isTempBlocked = false;
     volatile boolean isDataStream = false;
     volatile int currentIndex = 0;
@@ -31,8 +32,8 @@ public abstract class PacketHandler {
     protected volatile boolean isEncryptedStream = false;
 
 
-    public PacketHandler(OutputStream outputStream, Object[] listeners) {
-        this.listeners = listeners;
+    public PacketHandler(OutputStream outputStream, Object[] trafficObservables) {
+        this.trafficObservables = trafficObservables;
         out = outputStream;
     }
 
@@ -47,7 +48,7 @@ public abstract class PacketHandler {
 
     public abstract void act(byte[] buffer) throws IOException;
     protected void continuedAct(byte[] buffer) throws IOException {
-        notifyBufferListeners();
+        bufferChangeObservable.fireEvent();
 
         if (!isEncryptedStream) {
             payloadBuffer.push(buffer);
@@ -111,10 +112,10 @@ public abstract class PacketHandler {
      */
     void notifyListeners(HMessage message) {
         for (int x = 0; x < 3; x++) {
-            for (int i = ((List<TrafficListener>)listeners[x]).size() - 1; i >= 0; i--) {
+            ((Observable<TrafficListener>) trafficObservables[x]).fireEvent(trafficListener -> {
                 message.getPacket().resetReadIndex();
-                ((List<TrafficListener>)listeners[x]).get(i).onCapture(message);
-            }
+                trafficListener.onCapture(message);
+            });
         }
         message.getPacket().resetReadIndex();
     }
@@ -164,17 +165,9 @@ public abstract class PacketHandler {
 
     protected abstract void printForDebugging(byte[] bytes);
 
-    private List<BufferChangeListener> bufferChangeListeners = new ArrayList<>();
-    public void onBufferChanged(BufferChangeListener listener) {
-        bufferChangeListeners.add(listener);
-    }
-    public void removeBufferChangeListener(BufferChangeListener listener) {
-        bufferChangeListeners.remove(listener);
-    }
-    void notifyBufferListeners() {
-        for (int i = bufferChangeListeners.size() - 1; i >= 0; i -= 1) {
-            bufferChangeListeners.get(i).act();
-        }
+    private Observable<BufferChangeListener> bufferChangeObservable = new Observable<>(BufferChangeListener::act);
+    public Observable<BufferChangeListener> getBufferChangeObservable() {
+        return bufferChangeObservable;
     }
 
     public int getCurrentIndex() {

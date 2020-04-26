@@ -1,10 +1,10 @@
 package gearth.ui.extensions;
 
 import gearth.services.extensionhandler.ExtensionHandler;
-import gearth.services.extensionhandler.extensions.network.NetworkExtensionsProducer;
-import gearth.services.extensionhandler.extensions.network.executer.ExecutionInfo;
-import gearth.services.extensionhandler.extensions.network.executer.ExtensionRunner;
-import gearth.services.extensionhandler.extensions.network.executer.ExtensionRunnerFactory;
+import gearth.services.extensionhandler.extensions.implementations.network.NetworkExtensionsProducer;
+import gearth.services.extensionhandler.extensions.implementations.network.executer.ExecutionInfo;
+import gearth.services.extensionhandler.extensions.implementations.network.executer.ExtensionRunner;
+import gearth.services.extensionhandler.extensions.implementations.network.executer.ExtensionRunnerFactory;
 import gearth.ui.SubForm;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -43,7 +43,7 @@ public class Extensions extends SubForm {
     protected void onParentSet() {
         ExtensionItemContainerProducer producer = new ExtensionItemContainerProducer(extensioncontainer, scroller);
         extensionHandler = new ExtensionHandler(getHConnection());
-        extensionHandler.onExtensionConnected((e -> {
+        extensionHandler.getObservable().addListener((e -> {
             Platform.runLater(() -> producer.extensionConnected(e));
         }));
 

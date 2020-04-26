@@ -35,7 +35,7 @@ public class Logger extends SubForm {
     private PacketLogger packetLogger = PacketLoggerFactory.get();
 
     public void onParentSet(){
-        getHConnection().addStateChangeListener((oldState, newState) -> Platform.runLater(() -> {
+        getHConnection().getStateObservable().addListener((oldState, newState) -> Platform.runLater(() -> {
             if (newState == HConnection.State.PREPARING) {
                 miniLogText(Color.ORANGE, "Connecting to "+getHConnection().getDomain() + ":" + getHConnection().getServerPort());
             }

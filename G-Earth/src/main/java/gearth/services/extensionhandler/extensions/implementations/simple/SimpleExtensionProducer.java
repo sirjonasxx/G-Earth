@@ -1,4 +1,4 @@
-package gearth.services.extensionhandler.extensions.simple;
+package gearth.services.extensionhandler.extensions.implementations.simple;
 
 import gearth.services.extensionhandler.extensions.extensionproducers.ExtensionProducer;
 import gearth.services.extensionhandler.extensions.extensionproducers.ExtensionProducerObserver;

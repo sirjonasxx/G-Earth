@@ -2,11 +2,10 @@ package gearth.extensions.extra.harble;
 
 import gearth.extensions.ExtensionInfo;
 import gearth.extensions.IExtension;
+import gearth.extensions.OnConnectionListener;
+import gearth.misc.listenerpattern.Observable;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Jonas on 3/12/2018.
@@ -23,6 +22,7 @@ public class ChatConsole {
     private volatile String infoMessage;
 
     private volatile boolean firstTime = true;
+    private volatile Observable<ChatInputListener> chatInputObservable = new Observable<>();
 
 
     public ChatConsole(final HashSupport hashSupport, IExtension extension) {
@@ -42,7 +42,6 @@ public class ChatConsole {
         this.infoMessage = infoMessage;
 
         final boolean[] doOncePerConnection = {false};
-
         extension.onConnect((s, i, s1, h1) -> doOncePerConnection[0] = true);
 
         extension.intercept(HMessage.Direction.TOSERVER, hMessage -> {
@@ -81,7 +80,7 @@ public class ChatConsole {
                     writeOutput(infoMessage, false);
                 }
                 else {
-                    notifyChatInputListeners(str);
+                    chatInputObservable.fireEvent(l -> l.inputEntered(str));
                 }
             }
         });
@@ -106,17 +105,8 @@ public class ChatConsole {
         }
     }
 
-    public interface ChatInputListener {
-        void inputEntered(String input);
-    }
-    private List<ChatInputListener> chatInputListenerList = new ArrayList<ChatInputListener>();
     public void onInput(ChatInputListener listener) {
-        chatInputListenerList.add(listener);
-    }
-    private void notifyChatInputListeners (String s) {
-        for (ChatInputListener listener : chatInputListenerList) {
-            listener.inputEntered(s);
-        }
+        chatInputObservable.addListener(listener);
     }
 
 

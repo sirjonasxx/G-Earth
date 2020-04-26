@@ -1,9 +1,9 @@
-package gearth.services.extensionhandler.extensions.network;
+package gearth.services.extensionhandler.extensions.implementations.network;
 
 import gearth.protocol.HPacket;
 import gearth.services.extensionhandler.extensions.extensionproducers.ExtensionProducer;
 import gearth.services.extensionhandler.extensions.extensionproducers.ExtensionProducerObserver;
-import gearth.services.extensionhandler.extensions.network.authentication.Authenticator;
+import gearth.services.extensionhandler.extensions.implementations.network.authentication.Authenticator;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -63,7 +63,7 @@ public class NetworkExtensionsProducer implements ExtensionProducer {
                                     );
 
                                     if (Authenticator.evaluate(gEarthExtension)) {
-                                        observer.onExtensionConnect(gEarthExtension);
+                                        observer.onExtensionProduced(gEarthExtension);
                                     }
                                     else {
                                         gEarthExtension.close(); //you shall not pass...

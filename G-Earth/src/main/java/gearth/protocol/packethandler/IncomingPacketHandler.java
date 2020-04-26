@@ -1,5 +1,6 @@
 package gearth.protocol.packethandler;
 
+import gearth.misc.listenerpattern.Observable;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 import gearth.protocol.TrafficListener;
@@ -10,25 +11,25 @@ import java.util.List;
 
 public class IncomingPacketHandler extends PacketHandler {
 
-    public IncomingPacketHandler(OutputStream outputStream, Object[] listeners) {
-        super(outputStream, listeners);
+    public IncomingPacketHandler(OutputStream outputStream, Object[] trafficObservables) {
+        super(outputStream, trafficObservables);
 
         TrafficListener listener = new TrafficListener() {
             @Override
             public void onCapture(HMessage message) {
                 if (isDataStream && message.getPacket().structureEquals("s,b")) {
-                    ((List<TrafficListener>)listeners[0]).remove(this);
+                    ((Observable<TrafficListener>)trafficObservables[0]).removeListener(this);
                     HPacket packet = message.getPacket();
                     packet.readString();
                     isEncryptedStream = packet.readBoolean();
                 }
                 else if (message.getIndex() > 3) {
-                    ((List<TrafficListener>)listeners[0]).remove(this);
+                    ((Observable<TrafficListener>)trafficObservables[0]).removeListener(this);
                 }
             }
         };
 
-        ((List<TrafficListener>)listeners[0]).add(listener);
+        ((Observable<TrafficListener>)trafficObservables[0]).addListener(listener);
     }
 
     @Override

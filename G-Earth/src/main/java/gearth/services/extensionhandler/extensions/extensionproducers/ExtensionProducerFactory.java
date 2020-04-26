@@ -1,7 +1,7 @@
 package gearth.services.extensionhandler.extensions.extensionproducers;
 
-import gearth.services.extensionhandler.extensions.network.NetworkExtensionsProducer;
-import gearth.services.extensionhandler.extensions.simple.SimpleExtensionProducer;
+import gearth.services.extensionhandler.extensions.implementations.network.NetworkExtensionsProducer;
+import gearth.services.extensionhandler.extensions.implementations.simple.SimpleExtensionProducer;
 
 import java.util.Arrays;
 import java.util.List;

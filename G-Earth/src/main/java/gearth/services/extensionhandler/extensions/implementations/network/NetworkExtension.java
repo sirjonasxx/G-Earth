@@ -1,4 +1,4 @@
-package gearth.services.extensionhandler.extensions.network;
+package gearth.services.extensionhandler.extensions.implementations.network;
 
 import gearth.protocol.HMessage;
 import gearth.services.extensionhandler.extensions.GEarthExtension;
@@ -63,7 +63,7 @@ public class NetworkExtension extends GEarthExtension {
                     HPacket message = new HPacket(headerandbody);
                     message.fixLength();
 
-                    synchronized (selff.extensionListeners) {
+                    synchronized (selff.extensionObservable) {
                         if (message.headerId() == NetworkExtensionInfo.INCOMING_MESSAGES_IDS.REQUESTFLAGS) {
                             requestFlags();
                         }
@@ -96,7 +96,7 @@ public class NetworkExtension extends GEarthExtension {
             } catch (IOException e) {
                 // An extension disconnected, which is OK
             } finally {
-                synchronized (selff.extensionListeners) {
+                synchronized (selff.extensionObservable) {
                     hasClosed();
                 }
                 if (!connection.isClosed()) {

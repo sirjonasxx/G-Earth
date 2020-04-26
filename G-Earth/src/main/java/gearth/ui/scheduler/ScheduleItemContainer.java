@@ -87,9 +87,9 @@ public class ScheduleItemContainer extends GridPane {
 
 
         GridPane this2 = this;
-        item.onDelete(observable -> parent.getChildren().remove(this2));
-        item.onIsBeingUpdated(observable -> setStyle("-fx-background-color: #faebcc;"));
-        item.onIsupdated(observable -> setStyle("-fx-background-color: #ffffff;"));
+        item.onDelete(() -> parent.getChildren().remove(this2));
+        item.onIsBeingUpdated(() -> setStyle("-fx-background-color: #faebcc;"));
+        item.onIsupdated(() -> setStyle("-fx-background-color: #ffffff;"));
     }
 
     private Label initNewLabelColumn(String text) {

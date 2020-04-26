@@ -73,7 +73,7 @@ public class Connection extends SubForm {
     }
 
     public void onParentSet(){
-        getHConnection().addStateChangeListener((oldState, newState) -> Platform.runLater(() -> {
+        getHConnection().getStateObservable().addListener((oldState, newState) -> Platform.runLater(() -> {
             txtfield_hotelversion.setText(getHConnection().getHotelVersion());
             Platform.runLater(() -> {
                 if (newState == HConnection.State.NOT_CONNECTED) {

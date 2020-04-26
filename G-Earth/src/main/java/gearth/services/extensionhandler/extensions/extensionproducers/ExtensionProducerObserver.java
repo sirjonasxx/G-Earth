@@ -3,5 +3,5 @@ package gearth.services.extensionhandler.extensions.extensionproducers;
 import gearth.services.extensionhandler.extensions.GEarthExtension;
 
 public interface ExtensionProducerObserver {
-    void onExtensionConnect(GEarthExtension extension);
+    void onExtensionProduced(GEarthExtension extension);
 }

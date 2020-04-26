@@ -1,7 +1,7 @@
-package gearth.services.extensionhandler.extensions.network.executer;
+package gearth.services.extensionhandler.extensions.implementations.network.executer;
 
 import gearth.Main;
-import gearth.services.extensionhandler.extensions.network.authentication.Authenticator;
+import gearth.services.extensionhandler.extensions.implementations.network.authentication.Authenticator;
 
 import java.io.BufferedReader;
 import java.io.File;

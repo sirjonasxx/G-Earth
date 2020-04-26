@@ -1,8 +1,9 @@
 package gearth.extensions;
 
+import gearth.misc.listenerpattern.Observable;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
-import gearth.services.extensionhandler.extensions.network.NetworkExtensionInfo;
+import gearth.services.extensionhandler.extensions.implementations.network.NetworkExtensionInfo;
 
 import java.io.*;
 import java.net.Socket;
@@ -139,7 +140,7 @@ public abstract class Extension implements IExtension{
                     int connectionPort = packet.readInteger();
                     String hotelVersion = packet.readString();
                     String harbleMessagesPath = packet.readString();
-                    notifyConnectionListeners(host, connectionPort, hotelVersion, harbleMessagesPath);
+                    onConnectionObservable.fireEvent(l -> l.onConnection(host, connectionPort, hotelVersion, harbleMessagesPath));
                     onStartConnection();
                 }
                 else if (packet.headerId() == NetworkExtensionInfo.OUTGOING_MESSAGES_IDS.CONNECTIONEND) {
@@ -367,17 +368,9 @@ public abstract class Extension implements IExtension{
     }
 
 
-    public interface OnConnectionListener {
-        void act(String host, int port, String hotelversion, String harbleMessagesPath);
-    }
-    private List<OnConnectionListener> onConnectionListeners = new ArrayList<>();
+    private Observable<OnConnectionListener> onConnectionObservable = new Observable<>();
     public void onConnect(OnConnectionListener listener){
-        onConnectionListeners.add(listener);
-    }
-    private void notifyConnectionListeners(String host, int port, String hotelversion, String harbleMessagesPath) {
-        for (OnConnectionListener listener : onConnectionListeners) {
-            listener.act(host, port, hotelversion, harbleMessagesPath);
-        }
+        onConnectionObservable.addListener(listener);
     }
 
 }
