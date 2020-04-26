@@ -1,5 +1,7 @@
 package gearth.ui.extensions;
 
+import gearth.services.extensionserver.extensions.GEarthExtension;
+import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -10,10 +12,10 @@ import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import gearth.misc.ConfirmationDialog;
 import gearth.ui.buttons.*;
-import gearth.ui.extensions.executer.ExecutionInfo;
-import gearth.ui.extensions.executer.ExtensionRunner;
-import gearth.ui.extensions.executer.ExtensionRunnerFactory;
-import gearth.ui.extensions.executer.NormalExtensionRunner;
+import gearth.services.extensionserver.extensions.network.executer.ExecutionInfo;
+import gearth.services.extensionserver.extensions.network.executer.ExtensionRunner;
+import gearth.services.extensionserver.extensions.network.executer.ExtensionRunnerFactory;
+import gearth.services.extensionserver.extensions.network.executer.NormalExtensionRunner;
 
 import java.nio.file.Paths;
 
@@ -166,7 +168,7 @@ public class ExtensionItemContainer extends GridPane {
         clickButton.addEventHandler(MouseEvent.MOUSE_CLICKED, onClick);
 
         ExtensionItemContainer this2 = this;
-        item.onDelete(observable -> {
+        item.onDelete(observable -> Platform.runLater(() -> {
             if (item.isInstalledExtension()) {
                 setBackground(new Background(new BackgroundFill(Paint.valueOf("#cccccc"),null, null)));
                 getChildren().remove(buttonsBox);
@@ -176,7 +178,7 @@ public class ExtensionItemContainer extends GridPane {
             else {
                 parent.getChildren().remove(this2);
             }
-        });
+        }));
     }
 
     void hasReconnected(GEarthExtension extension) {

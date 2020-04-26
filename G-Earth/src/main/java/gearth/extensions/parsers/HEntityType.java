@@ -3,9 +3,6 @@ package gearth.extensions.parsers;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by Jeunez on 8/01/2019.
- */
 public enum HEntityType {
     HABBO(1),
     PET(2),

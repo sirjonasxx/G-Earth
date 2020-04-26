@@ -1,5 +1,7 @@
 package gearth.ui.extensions;
 
+import gearth.services.extensionserver.extensions.GEarthExtension;
+import gearth.services.extensionserver.extensions.network.NetworkExtension;
 import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;
@@ -26,7 +28,7 @@ public class ExtensionItemContainerProducer {
                 for (Node n : parent.getChildren()) {
                     if (n instanceof ExtensionItemContainer) {
                         ExtensionItemContainer container = (ExtensionItemContainer) n;
-                        if (container.getExtensionFileName().equals(extension.getFileName())) {
+                        if (container.getExtensionFileName() != null && container.getExtensionFileName().equals(extension.getFileName())) {
                             container.hasReconnected(extension);
                             return;
                         }

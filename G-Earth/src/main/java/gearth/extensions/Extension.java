@@ -2,6 +2,8 @@ package gearth.extensions;
 
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
+import gearth.services.extensionserver.ExtensionServer;
+import gearth.services.extensionserver.extensions.network.NetworkExtensionInfo;
 import gearth.ui.extensions.Extensions;
 
 import java.io.*;
@@ -118,10 +120,10 @@ public abstract class Extension implements IExtension{
                 packet.fixLength();
 
 
-                if (packet.headerId() == Extensions.OUTGOING_MESSAGES_IDS.INFOREQUEST) {
+                if (packet.headerId() == NetworkExtensionInfo.OUTGOING_MESSAGES_IDS.INFOREQUEST) {
                     ExtensionInfo info = getInfoAnnotations();
 
-                    HPacket response = new HPacket(Extensions.INCOMING_MESSAGES_IDS.EXTENSIONINFO);
+                    HPacket response = new HPacket(NetworkExtensionInfo.INCOMING_MESSAGES_IDS.EXTENSIONINFO);
                     response.appendString(info.Title())
                             .appendString(info.Author())
                             .appendString(info.Version())
@@ -134,7 +136,7 @@ public abstract class Extension implements IExtension{
                             .appendBoolean(canDelete);
                     writeToStream(response.toBytes());
                 }
-                else if (packet.headerId() == Extensions.OUTGOING_MESSAGES_IDS.CONNECTIONSTART) {
+                else if (packet.headerId() == NetworkExtensionInfo.OUTGOING_MESSAGES_IDS.CONNECTIONSTART) {
                     String host = packet.readString();
                     int connectionPort = packet.readInteger();
                     String hotelVersion = packet.readString();
@@ -142,10 +144,10 @@ public abstract class Extension implements IExtension{
                     notifyConnectionListeners(host, connectionPort, hotelVersion, harbleMessagesPath);
                     onStartConnection();
                 }
-                else if (packet.headerId() == Extensions.OUTGOING_MESSAGES_IDS.CONNECTIONEND) {
+                else if (packet.headerId() == NetworkExtensionInfo.OUTGOING_MESSAGES_IDS.CONNECTIONEND) {
                     onEndConnection();
                 }
-                else if (packet.headerId() == Extensions.OUTGOING_MESSAGES_IDS.FLAGSCHECK) {
+                else if (packet.headerId() == NetworkExtensionInfo.OUTGOING_MESSAGES_IDS.FLAGSCHECK) {
                     // body = an array of G-Earths gearth flags
                     if (flagRequestCallback != null) {
                         int arraysize = packet.readInteger();
@@ -157,16 +159,13 @@ public abstract class Extension implements IExtension{
                     }
                     flagRequestCallback = null;
                 }
-                else if (packet.headerId() == Extensions.OUTGOING_MESSAGES_IDS.INIT) {
+                else if (packet.headerId() == NetworkExtensionInfo.OUTGOING_MESSAGES_IDS.INIT) {
                     initExtension();
                 }
-                else if (packet.headerId() == Extensions.OUTGOING_MESSAGES_IDS.FREEFLOW) {
-                    // nothing to be done yet
-                }
-                else if (packet.headerId() == Extensions.OUTGOING_MESSAGES_IDS.ONDOUBLECLICK) {
+                else if (packet.headerId() == NetworkExtensionInfo.OUTGOING_MESSAGES_IDS.ONDOUBLECLICK) {
                     onClick();
                 }
-                else if (packet.headerId() == Extensions.OUTGOING_MESSAGES_IDS.PACKETINTERCEPT) {
+                else if (packet.headerId() == NetworkExtensionInfo.OUTGOING_MESSAGES_IDS.PACKETINTERCEPT) {
                     String stringifiedMessage = packet.readLongString();
                     HMessage habboMessage = new HMessage(stringifiedMessage);
                     HPacket habboPacket = habboMessage.getPacket();
@@ -200,7 +199,7 @@ public abstract class Extension implements IExtension{
                     }
                     habboMessage.getPacket().resetReadIndex();
 
-                    HPacket response = new HPacket(Extensions.INCOMING_MESSAGES_IDS.MANIPULATEDPACKET);
+                    HPacket response = new HPacket(NetworkExtensionInfo.INCOMING_MESSAGES_IDS.MANIPULATEDPACKET);
                     response.appendLongString(habboMessage.stringify());
 
                     writeToStream(response.toBytes());
@@ -247,7 +246,7 @@ public abstract class Extension implements IExtension{
         return send(packet, HMessage.Direction.TOSERVER);
     }
     private boolean send(HPacket packet, HMessage.Direction direction) {
-        HPacket packet1 = new HPacket(Extensions.INCOMING_MESSAGES_IDS.SENDMESSAGE);
+        HPacket packet1 = new HPacket(NetworkExtensionInfo.INCOMING_MESSAGES_IDS.SENDMESSAGE);
         packet1.appendByte(direction == HMessage.Direction.TOCLIENT ? (byte)0 : (byte)1);
         packet1.appendInt(packet.getBytesLength());
         packet1.appendBytes(packet.toBytes());
@@ -307,7 +306,7 @@ public abstract class Extension implements IExtension{
      * @param s the text to be written
      */
     public void writeToConsole(String s) {
-        HPacket packet = new HPacket(Extensions.INCOMING_MESSAGES_IDS.EXTENSIONCONSOLELOG);
+        HPacket packet = new HPacket(NetworkExtensionInfo.INCOMING_MESSAGES_IDS.EXTENSIONCONSOLELOG);
         packet.appendString(s);
         try {
             writeToStream(packet.toBytes());

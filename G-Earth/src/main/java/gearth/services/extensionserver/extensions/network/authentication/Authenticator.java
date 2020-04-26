@@ -1,10 +1,7 @@
-package gearth.ui.extensions.authentication;
+package gearth.services.extensionserver.extensions.network.authentication;
 
-import gearth.extensions.Extension;
 import gearth.misc.ConfirmationDialog;
-import gearth.ui.extensions.GEarthExtension;
-import gearth.ui.extensions.executer.ExtensionRunner;
-import gearth.ui.extensions.executer.ExtensionRunnerFactory;
+import gearth.services.extensionserver.extensions.network.NetworkExtension;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -27,7 +24,7 @@ public class Authenticator {
         return cookie;
     }
 
-    public static boolean evaluate(GEarthExtension extension) {
+    public static boolean evaluate(NetworkExtension extension) {
         if (extension.isInstalledExtension()) {
             return claimSession(extension.getFileName(), extension.getCookie());
         }
@@ -52,7 +49,7 @@ public class Authenticator {
 
     private static volatile boolean rememberOption = false;
     //for not-installed extensions, popup a dialog
-    private static boolean askForPermission(GEarthExtension extension) {
+    private static boolean askForPermission(NetworkExtension extension) {
         boolean[] allowConnection = {true};
 
         final String connectExtensionKey = "allow_extension_connection";
