@@ -65,7 +65,8 @@ public class HConnection {
         PREPARING,          // DOMAIN AND PORT BEEN PASSED
         PREPARED,           // FOUND IP ADDRESS OF DOMAIN
         WAITING_FOR_CLIENT, // WAITING FOR CORRECT TCP CONNECTION TO BE SET UP
-        CONNECTED           // CONNECTED
+        CONNECTED,          // CONNECTED
+        ABORTING
     }
 
     // checks if host is a raw IP instead of a domain
@@ -116,7 +117,7 @@ public class HConnection {
 
     private static volatile ConnectionInfoOverrider connectionInfoOverrider;
     public static volatile boolean DECRYPTPACKETS = true;
-    public static volatile boolean DEBUG = false;
+    public static volatile boolean DEBUG = true;
     private static final HostReplacer hostsReplacer = HostReplacerFactory.get();
 
     private volatile boolean hostRedirected = false;
@@ -220,10 +221,10 @@ public class HConnection {
         potentialHost.add(domain+":"+port);
 
         if (hostIsIpAddress(domain)) {
+            setState(State.PREPARING); // state will not be prepared until the server-connection is initialized
             rawIpMode = true;
             potentialProxies.clear();
             potentialProxies.add(new Proxy(domain, domain, port, port, "0.0.0.0"));
-            setState(State.PREPARED);
         }
         else {
             prepare(potentialHost);
@@ -285,18 +286,21 @@ public class HConnection {
         setState(State.PREPARED);
     }
 
-    private void startForRawIp() throws IOException {
+    private void startForRawIp() {
 
         new Thread(() -> {
             try  {
+
                 Proxy proxy = potentialProxies.get(0);
+                IpMapper ipMapper = IpMapperFactory.get();
+                ipMapper.deleteMapping(proxy.actual_domain); // just making sure
+
                 Queue<Socket> preConnectedServerConnections = new LinkedList<>();
                 for (int i = 0; i < 3; i++) {
                     preConnectedServerConnections.add(new Socket(proxy.actual_domain, proxy.actual_port));
-                    Thread.sleep(80);
+                    Thread.sleep(50);
                 }
 
-                IpMapper ipMapper = IpMapperFactory.get();
                 ipMapper.enable();
                 ipMapper.addMapping(proxy.actual_domain);
 
@@ -308,6 +312,8 @@ public class HConnection {
 
 
                 Thread.sleep(30);
+                setState(State.WAITING_FOR_CLIENT);
+
                 while ((state == State.WAITING_FOR_CLIENT) && !proxy_server.isClosed())	{
                     try {
                         if (DEBUG) System.out.println("try accept proxy");
@@ -345,14 +351,14 @@ public class HConnection {
     }
 
     public void start() throws IOException	{
-        if (state == State.PREPARED)	{
+        if (state == State.PREPARING && rawIpMode) {
+            startForRawIp();
+            return;
+        }
+
+        if (state == State.PREPARED && !rawIpMode)	{
 
             setState(State.WAITING_FOR_CLIENT);
-
-            if (rawIpMode) {
-                startForRawIp();
-                return;
-            }
 
             if (!hostRedirected && !connectionInfoOverrider.mustOverrideConnection())	{
                 addToHosts();
@@ -516,21 +522,25 @@ public class HConnection {
             removeFromHosts();
         }
 
-        clearAllProxies();
+        if (!rawIpMode) {
+            clearAllProxies();
+        }
+
     }
     public void abort()	{
+        setState(State.ABORTING);
         if (hostRedirected)	{
             removeFromHosts();
         }
 
-        if (rawIpMode && actual_proxy != null) {
-            IpMapperFactory.get().deleteMapping(actual_proxy.actual_domain);
+        if (rawIpMode && potentialProxies.size() == 1) {
+            IpMapperFactory.get().deleteMapping(potentialProxies.get(0).actual_domain);
         }
 
         actual_proxy = null;
 
-        setState(State.NOT_CONNECTED);
         clearAllProxies();
+        setState(State.NOT_CONNECTED);
     }
 
     private void clearAllProxies() {
@@ -540,9 +550,9 @@ public class HConnection {
     private void closeAllProxies(Proxy except) {
         for (Proxy proxy : potentialProxies) {
             if (except != proxy) {
-                if (proxy.proxy_server != null && !proxy.proxy_server.isClosed())	{
+                if (proxy.getProxy_server() != null && !proxy.getProxy_server().isClosed())	{
                     try {
-                        proxy.proxy_server.close();
+                        proxy.getProxy_server().close();
                     } catch (IOException e) {
                         // TODO Auto-generated catch block
                         e.printStackTrace();

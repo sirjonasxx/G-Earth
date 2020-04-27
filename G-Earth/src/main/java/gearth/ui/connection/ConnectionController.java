@@ -55,10 +55,11 @@ public class ConnectionController extends SubForm {
     }
 
     private void updateInputUI() {
-        if (cbx_autodetect.isSelected()) {
-            btnConnect.setDisable(false);
-        }
-        else {
+        txtfield_hotelversion.setText(getHConnection().getHotelVersion());
+
+        System.out.println(getHConnection().getState());
+        btnConnect.setDisable(getHConnection().getState() == HConnection.State.PREPARING || getHConnection().getState() == HConnection.State.ABORTING);
+        if (!cbx_autodetect.isSelected() && !btnConnect.isDisable()) {
             try {
                 int i = Integer.parseInt(inpPort.getEditor().getText());
                 btnConnect.setDisable(i < 0 || i >= 256 * 256);
@@ -74,29 +75,25 @@ public class ConnectionController extends SubForm {
 
     public void onParentSet(){
         getHConnection().getStateObservable().addListener((oldState, newState) -> Platform.runLater(() -> {
-            txtfield_hotelversion.setText(getHConnection().getHotelVersion());
-            Platform.runLater(() -> {
-                if (newState == HConnection.State.NOT_CONNECTED) {
-                    updateInputUI();
-                    lblState.setText("Not connected");
-                    btnConnect.setText("Connect");
-                    outHost.setText("");
-                    outPort.setText("");
-                }
-                else if (oldState == HConnection.State.NOT_CONNECTED) {
-                    updateInputUI();
-                    btnConnect.setText("Abort");
-                }
+            updateInputUI();
+            if (newState == HConnection.State.NOT_CONNECTED) {
+                lblState.setText("Not connected");
+                btnConnect.setText("Connect");
+                outHost.setText("");
+                outPort.setText("");
+            }
+            else if (oldState == HConnection.State.NOT_CONNECTED) {
+                btnConnect.setText("Abort");
+            }
 
-                if (newState == HConnection.State.CONNECTED) {
-                    lblState.setText("Connected");
-                    outHost.setText(getHConnection().getDomain());
-                    outPort.setText(getHConnection().getServerPort()+"");
-                }
-                if (newState == HConnection.State.WAITING_FOR_CLIENT) {
-                    lblState.setText("Waiting for connection");
-                }
-            });
+            if (newState == HConnection.State.CONNECTED) {
+                lblState.setText("Connected");
+                outHost.setText(getHConnection().getDomain());
+                outPort.setText(getHConnection().getServerPort()+"");
+            }
+            if (newState == HConnection.State.WAITING_FOR_CLIENT) {
+                lblState.setText("Waiting for connection");
+            }
 
 
         }));
@@ -113,10 +110,7 @@ public class ConnectionController extends SubForm {
                 else {
                     getHConnection().prepare(inpHost.getEditor().getText(), Integer.parseInt(inpPort.getEditor().getText()));
                 }
-                Platform.runLater(() -> btnConnect.setDisable(false));
-
                 if (HConnection.DEBUG) System.out.println("connecting");
-
                 try {
                     getHConnection().start();
                 } catch (IOException e) {
