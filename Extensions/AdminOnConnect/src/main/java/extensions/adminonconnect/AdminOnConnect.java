@@ -37,6 +37,7 @@ public class AdminOnConnect extends Extension {
                         packet.replaceBoolean(14, true);
 
                         done = true;
+                        writeToConsole("Replaced user permissions");
                     }
                 }
             }

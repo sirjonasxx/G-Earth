@@ -160,7 +160,7 @@ public abstract class Extension implements IExtension {
                 }
                 else if (packet.headerId() == NetworkExtensionInfo.OUTGOING_MESSAGES_IDS.INIT) {
                     initExtension();
-                    writeToConsole("green","Extension \"" + getInfoAnnotations().Title() + "\" succesfully initialized");
+                    writeToConsole("green","Extension \"" + getInfoAnnotations().Title() + "\" succesfully initialized", false);
                 }
                 else if (packet.headerId() == NetworkExtensionInfo.OUTGOING_MESSAGES_IDS.ONDOUBLECLICK) {
                     onClick();
@@ -301,26 +301,40 @@ public abstract class Extension implements IExtension {
         return true;
     }
 
-    /**
-     * Write to the console in G-Earth
-     * @param s the text to be written
-     */
-    public void writeToConsole(String s) {
-        HPacket packet = new HPacket(NetworkExtensionInfo.INCOMING_MESSAGES_IDS.EXTENSIONCONSOLELOG);
-        packet.appendString(s);
-        try {
-            writeToStream(packet.toBytes());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     /**
      * Write to the console in G-Earth
      * @param s the text to be written
      */
+    public void writeToConsole(String s) {
+        writeToConsole("black", s, true);
+    }
+
+    /**
+     * Write to the console in G-Earth
+     * @param s the text to be written
+     * @param colorClass color of the text to be written
+     */
     public void writeToConsole(String colorClass, String s) {
-        writeToConsole("[" + colorClass + "]" + s);
+        writeToConsole(colorClass, s, true);
+    }
+
+    /**
+     * Write to the console in G-Earth
+     * @param s the text to be written
+     * @param colorClass color of the text to be written
+     * @param mentionTitle log the extension title as well
+     */
+    private void writeToConsole(String colorClass, String s, boolean mentionTitle) {
+        String text = "[" + colorClass + "]" + (mentionTitle ? (getInfoAnnotations().Title() + " --> ") : "") + s;
+
+        HPacket packet = new HPacket(NetworkExtensionInfo.INCOMING_MESSAGES_IDS.EXTENSIONCONSOLELOG);
+        packet.appendString(text);
+        try {
+            writeToStream(packet.toBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 

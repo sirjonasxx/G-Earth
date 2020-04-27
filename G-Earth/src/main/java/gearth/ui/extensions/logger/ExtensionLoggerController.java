@@ -78,6 +78,12 @@ public class ExtensionLoggerController implements Initializable {
             text = s;
         }
 
+        if (text.contains(" --> ")) {
+            int index = text.indexOf(" --> ") + 5;
+            String extensionAnnouncement = text.substring(0, index);
+            text = text.substring(index);
+            elements.add(new Element(extensionAnnouncement, "black"));
+        }
         elements.add(new Element(text + "\n", classname.toLowerCase()));
 
         synchronized (appendOnLoad) {

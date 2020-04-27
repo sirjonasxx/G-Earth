@@ -11,8 +11,28 @@
     -fx-fill: #ffff00;
 }
 
+.orange {
+    -fx-fill: orange;
+}
+
+.white {
+    -fx-fill: white;
+}
+
+.purple {
+    -fx-fill: purple;
+}
+
+.brown {
+    -fx-fill: brown;
+}
+
+.pink {
+    -fx-fill: pink;
+}
+
 .red {
-    -fx-fill: #b22222;
+    -fx-fill: red;
 }
 
 .black {
@@ -20,15 +40,19 @@
 }
 
 .blue {
-    -fx-fill: #0066cc;
+    -fx-fill: blue;
 }
 
-.lightblue {
+.cyan {
     -fx-fill: cyan;
 }
 
 .green {
     -fx-fill: #73b504;
+}
+
+.darkergreen {
+    -fx-fill: green;
 }
 
 .dark {
