@@ -1,0 +1,49 @@
+/* extension logger css */
+.grey {
+    -fx-fill: #a9a9a9;
+}
+
+.lightgrey {
+    -fx-fill: #D0D3D4;
+}
+
+.yellow {
+    -fx-fill: #ffff00;
+}
+
+.red {
+    -fx-fill: #b22222;
+}
+
+.black {
+    -fx-fill: black;
+}
+
+.blue {
+    -fx-fill: #0066cc;
+}
+
+.lightblue {
+    -fx-fill: cyan;
+}
+
+.green {
+    -fx-fill: #73b504;
+}
+
+.dark {
+    -fx-background-color: #000000;
+}
+
+.caret {
+    -fx-stroke: #ffffff;
+}
+
+.label {
+    -fx-text-fill: #000000 !important;
+}
+
+.scroll-bar:vertical {
+    -fx-pref-width: 11.5;
+    -fx-padding: 1;
+}

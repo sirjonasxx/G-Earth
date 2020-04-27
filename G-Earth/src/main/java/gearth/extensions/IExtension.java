@@ -13,7 +13,8 @@ public interface IExtension {
     void intercept(HMessage.Direction direction, int headerId, Extension.MessageListener messageListener);
     void intercept(HMessage.Direction direction, Extension.MessageListener messageListener);
     boolean requestFlags(Extension.FlagsCheckListener flagRequestCallback);
-    void writeToConsole(String s); // not implemented in g-earth yet
+    void writeToConsole(String colorClass, String s);
+    void writeToConsole(String s);
     void onConnect(OnConnectionListener listener);
 
 }

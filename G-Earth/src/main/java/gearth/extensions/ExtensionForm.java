@@ -8,7 +8,7 @@ import gearth.protocol.HPacket;
 /**
  * Created by Jonas on 22/09/18.
  */
-public abstract class ExtensionForm implements IExtension{
+public abstract class ExtensionForm implements IExtension {
 
     volatile Extension extension;
     volatile Stage primaryStage;
@@ -27,6 +27,9 @@ public abstract class ExtensionForm implements IExtension{
     }
     public void writeToConsole(String s) {
         extension.writeToConsole(s);
+    }
+    public void writeToConsole(String colorClass, String s) {
+        extension.writeToConsole(colorClass, s);
     }
     public void intercept(HMessage.Direction direction, Extension.MessageListener messageListener) {
         extension.intercept(direction, messageListener);

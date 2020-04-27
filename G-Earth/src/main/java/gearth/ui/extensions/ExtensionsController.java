@@ -1,11 +1,15 @@
 package gearth.ui.extensions;
 
+import gearth.services.extensionhandler.ExtensionConnectedListener;
 import gearth.services.extensionhandler.ExtensionHandler;
+import gearth.services.extensionhandler.extensions.ExtensionListener;
+import gearth.services.extensionhandler.extensions.GEarthExtension;
 import gearth.services.extensionhandler.extensions.implementations.network.NetworkExtensionsProducer;
 import gearth.services.extensionhandler.extensions.implementations.network.executer.ExecutionInfo;
 import gearth.services.extensionhandler.extensions.implementations.network.executer.ExtensionRunner;
 import gearth.services.extensionhandler.extensions.implementations.network.executer.ExtensionRunnerFactory;
 import gearth.ui.SubForm;
+import gearth.ui.extensions.logger.ExtensionLogger;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
@@ -30,14 +34,19 @@ public class ExtensionsController extends SubForm {
     public VBox extensioncontainer;
     public GridPane header_ext;
     public ScrollPane scroller;
+    public Button btn_viewExtensionConsole;
 
     private ExtensionRunner extensionRunner = null;
     private ExtensionHandler extensionHandler;
     private NetworkExtensionsProducer networkExtensionsProducer; // needed for port
+    private ExtensionLogger extensionLogger = null;
+
+
 
 
     public void initialize() {
         scroller.widthProperty().addListener(observable -> header_ext.setPrefWidth(scroller.getWidth()));
+        extensionLogger = new ExtensionLogger();
     }
 
     protected void onParentSet() {
@@ -60,6 +69,14 @@ public class ExtensionsController extends SubForm {
 
         extensionRunner = ExtensionRunnerFactory.get();
         extensionRunner.runAllExtensions(networkExtensionsProducer.getPort());
+
+
+        extensionHandler.getObservable().addListener(e -> e.getExtensionObservable().addListener(new ExtensionListener() {
+            @Override
+            protected void log(String text) {
+                extensionLogger.log(text);
+            }
+        }));
     }
 
 
@@ -72,5 +89,15 @@ public class ExtensionsController extends SubForm {
         if (selectedFile != null) {
             extensionRunner.installAndRunExtension(selectedFile.getPath(), networkExtensionsProducer.getPort());
         }
+    }
+
+    public void extConsoleBtnClicked(ActionEvent actionEvent) {
+        if (!extensionLogger.isVisible()) {
+            extensionLogger.show();
+        }
+        else {
+            extensionLogger.hide();
+        }
+
     }
 }

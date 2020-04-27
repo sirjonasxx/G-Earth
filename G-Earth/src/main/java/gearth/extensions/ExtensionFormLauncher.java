@@ -7,7 +7,7 @@ import javafx.stage.Stage;
 /**
  * Created by Jeunez on 6/11/2018.
  */
-public class ExtensionFormLauncher extends Application{
+public class ExtensionFormLauncher extends Application {
 
     private static Class<? extends ExtensionForm> extension;
     private static String[] args;

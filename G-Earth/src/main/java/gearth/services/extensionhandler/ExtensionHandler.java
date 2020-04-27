@@ -168,12 +168,6 @@ public class ExtensionHandler {
                     }
 
                     @Override
-                    public void log(String text) {
-                        // todo make simple logger for Extensions, the implementation now is temporary
-                        System.out.println(text);
-                    }
-
-                    @Override
                     public void hasClosed() {
                         synchronized (gEarthExtensions) {
                             gEarthExtensions.remove(extension);

@@ -67,8 +67,6 @@ public class UiLoggerController implements Initializable {
                 appendLater.clear();
             }
         }
-
-
     }
 
     private static String cleanTextContent(String text)

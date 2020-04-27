@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane fx:id="borderPane" prefHeight="230.0" prefWidth="394.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gearth.ui.extensions.logger.ExtensionLoggerController">
+   <padding>
+      <Insets bottom="1.0" left="5.0" right="1.0" top="5.0" />
+   </padding>
+</BorderPane>
