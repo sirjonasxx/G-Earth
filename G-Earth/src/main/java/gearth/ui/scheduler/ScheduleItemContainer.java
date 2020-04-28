@@ -17,15 +17,15 @@ import gearth.ui.buttons.PauseResumeButton;
  */
 public class ScheduleItemContainer extends GridPane {
 
-    public static final int[] columnWidths = {10, 39, 16, 18, 15};
-    InteractableScheduleItem item;
+    private static final int[] columnWidths = {10, 39, 16, 18, 15};
+    private InteractableScheduleItem item;
 
-    Label indexLabel;
-    Label packetLabel;
-    Label delayLabel;
-    Label destinationLabel;
+    private Label indexLabel;
+    private Label packetLabel;
+    private Label delayLabel;
+    private Label destinationLabel;
 
-    VBox parent;
+    private VBox parent;
 
     ScheduleItemContainer(InteractableScheduleItem item, VBox parent, ScrollPane scrollPane) {
         super();
@@ -51,7 +51,7 @@ public class ScheduleItemContainer extends GridPane {
         }
 
         indexLabel = initNewLabelColumn(item.getIndexProperty().get()+"");
-        packetLabel = initNewLabelColumn(item.getPacketProperty().get().toString());
+        packetLabel = initNewLabelColumn(item.getPacketAsStringProperty().get());
         delayLabel = initNewLabelColumn(item.getDelayProperty().get()+"");
         destinationLabel = initNewLabelColumn(item.getDestinationProperty().get().name());
 
@@ -63,7 +63,7 @@ public class ScheduleItemContainer extends GridPane {
 //        getChildren().addAll(indexLabel, packetLabel, delayLabel, destinationLabel);
 
         item.getIndexProperty().addListener(observable -> indexLabel.setText(item.getIndexProperty().get()+""));
-        item.getPacketProperty().addListener(observable -> packetLabel.setText(item.getPacketProperty().get().toString()));
+        item.getPacketAsStringProperty().addListener(observable -> packetLabel.setText(item.getPacketAsStringProperty().get()));
         item.getDelayProperty().addListener(observable -> delayLabel.setText(item.getDelayProperty().get()+""));
         item.getDestinationProperty().addListener(observable -> destinationLabel.setText(item.getDestinationProperty().get().name()));
 

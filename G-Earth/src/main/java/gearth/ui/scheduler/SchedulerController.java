@@ -116,6 +116,7 @@ public class SchedulerController extends SubForm {
                     false,
                     new Interval(txt_delay.getText()),
                     new HPacket(txt_packet.getText()),
+                    txt_packet.getText(),
                     rb_incoming.isSelected() ? HMessage.Direction.TOCLIENT : HMessage.Direction.TOSERVER);
 
             addItem(newItem);
@@ -123,6 +124,7 @@ public class SchedulerController extends SubForm {
         else {
 
             isBeingEdited.getPacketProperty().set(new HPacket(txt_packet.getText()));
+            isBeingEdited.getPacketAsStringProperty().set(txt_packet.getText());
             isBeingEdited.getDelayProperty().set(new Interval(txt_delay.getText()));
             isBeingEdited.getDestinationProperty().set(rb_incoming.isSelected() ? HMessage.Direction.TOCLIENT : HMessage.Direction.TOSERVER);
             isBeingEdited.isUpdatedTrigger();
@@ -154,7 +156,7 @@ public class SchedulerController extends SubForm {
             }
 
             if (isBeingEdited != newItem) {
-                txt_packet.setText(newItem.getPacketProperty().get().toString());
+                txt_packet.setText(newItem.getPacketAsStringProperty().get());
                 txt_delay.setText(newItem.getDelayProperty().get().toString());
                 rb_incoming.setSelected(newItem.getDestinationProperty().get() == HMessage.Direction.TOCLIENT);
                 rb_outgoing.setSelected(newItem.getDestinationProperty().get() == HMessage.Direction.TOSERVER);
