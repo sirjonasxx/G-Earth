@@ -117,7 +117,7 @@ public class HConnection {
 
     private static volatile ConnectionInfoOverrider connectionInfoOverrider;
     public static volatile boolean DECRYPTPACKETS = true;
-    public static volatile boolean DEBUG = true;
+    public static volatile boolean DEBUG = false;
     private static final HostReplacer hostsReplacer = HostReplacerFactory.get();
 
     private volatile boolean hostRedirected = false;

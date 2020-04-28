@@ -1,10 +1,12 @@
 package gearth.ui.connection;
 
+import gearth.misc.Cacher;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.scene.control.*;
 import gearth.protocol.HConnection;
 import gearth.ui.SubForm;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -13,6 +15,11 @@ import java.util.List;
 import java.util.Set;
 
 public class ConnectionController extends SubForm {
+
+    private final String CONNECTION_INFO_CACHE_KEY = "last_connection_settings";
+    private final String AUTODETECT_CACHE = "auto_detect";
+    private final String HOST_CACHE = "host";
+    private final String PORT_CACHE = "port";
 
     public ComboBox<String> inpPort;
     public ComboBox<String> inpHost;
@@ -23,7 +30,21 @@ public class ConnectionController extends SubForm {
     public CheckBox cbx_autodetect;
     public TextField txtfield_hotelversion;
 
+    private final Object lock = new Object();
+    private volatile int fullyInitialized = 0;
+
     public void initialize() {
+        Object object;
+        String hostRemember = null;
+        String portRemember = null;
+        if ((object = Cacher.get(CONNECTION_INFO_CACHE_KEY)) != null) {
+            JSONObject connectionSettings = (JSONObject) object;
+            boolean autoDetect = connectionSettings.getBoolean(AUTODETECT_CACHE);
+            hostRemember = connectionSettings.getString(HOST_CACHE);
+            portRemember = connectionSettings.getInt(PORT_CACHE) + "";
+            cbx_autodetect.setSelected(autoDetect);
+        }
+
         inpPort.getEditor().textProperty().addListener(observable -> {
             updateInputUI();
         });
@@ -47,17 +68,33 @@ public class ConnectionController extends SubForm {
         List<String> portsSorted = new ArrayList<>(ports);
         portsSorted.sort(String::compareTo);
 
+        int hostSelectIndex = 0;
+        int portSelectIndex = 0;
+        if (hostRemember != null) {
+            hostSelectIndex = hostsSorted.indexOf(hostRemember);
+            portSelectIndex = portsSorted.indexOf(portRemember);
+            hostSelectIndex = Math.max(hostSelectIndex, 0);
+            portSelectIndex = Math.max(portSelectIndex, 0);
+        }
+
+
         inpPort.getItems().addAll(portsSorted);
         inpHost.getItems().addAll(hostsSorted);
 
-        inpPort.getSelectionModel().selectFirst();
-        inpHost.getSelectionModel().selectFirst();
+        inpPort.getSelectionModel().select(portSelectIndex);
+        inpHost.getSelectionModel().select(hostSelectIndex);
+
+        synchronized (lock) {
+            fullyInitialized++;
+            if (fullyInitialized == 2) {
+                Platform.runLater(this::updateInputUI);
+            }
+        }
     }
 
     private void updateInputUI() {
         txtfield_hotelversion.setText(getHConnection().getHotelVersion());
 
-        System.out.println(getHConnection().getState());
         btnConnect.setDisable(getHConnection().getState() == HConnection.State.PREPARING || getHConnection().getState() == HConnection.State.ABORTING);
         if (!cbx_autodetect.isSelected() && !btnConnect.isDisable()) {
             try {
@@ -74,6 +111,13 @@ public class ConnectionController extends SubForm {
     }
 
     public void onParentSet(){
+        synchronized (lock) {
+            fullyInitialized++;
+            if (fullyInitialized == 2) {
+                Platform.runLater(this::updateInputUI);
+            }
+        }
+
         getHConnection().getStateObservable().addListener((oldState, newState) -> Platform.runLater(() -> {
             updateInputUI();
             if (newState == HConnection.State.NOT_CONNECTED) {
@@ -95,6 +139,14 @@ public class ConnectionController extends SubForm {
                 lblState.setText("Waiting for connection");
             }
 
+            if (newState == HConnection.State.CONNECTED) {
+                JSONObject connectionSettings = new JSONObject();
+                connectionSettings.put(AUTODETECT_CACHE, cbx_autodetect.isSelected());
+                connectionSettings.put(HOST_CACHE, inpHost.getEditor().getText());
+                connectionSettings.put(PORT_CACHE, Integer.parseInt(inpPort.getEditor().getText()));
+
+                Cacher.put(CONNECTION_INFO_CACHE_KEY, connectionSettings);
+            }
 
         }));
     }
@@ -117,6 +169,7 @@ public class ConnectionController extends SubForm {
                     e.printStackTrace();
                 }
             }).start();
+
 
         }
         else {
