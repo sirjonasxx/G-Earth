@@ -6,6 +6,8 @@ import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 import gearth.ui.logger.loggerdisplays.PacketLogger;
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
 import javafx.scene.control.CheckMenuItem;
@@ -67,10 +69,10 @@ public class UiLoggerController implements Initializable {
                 appendLater.clear();
             }
         }
+        
     }
 
-    private static String cleanTextContent(String text)
-    {
+    private static String cleanTextContent(String text) {
 //        // strips off all non-ASCII characters
 //        text = text.replaceAll("[^\\x00-\\x7F]", "");
 //
@@ -177,7 +179,7 @@ public class UiLoggerController implements Initializable {
             area.setStyleSpans(oldLen, styleSpansBuilder.create());
 
             if (autoScroll) {
-                area.moveTo(area.getLength());
+//                area.moveTo(area.getLength());
                 area.requestFollowCaret();
             }
         });
