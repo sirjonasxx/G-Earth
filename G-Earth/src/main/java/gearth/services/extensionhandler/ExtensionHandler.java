@@ -20,7 +20,7 @@ public class ExtensionHandler {
     private final List<GEarthExtension> gEarthExtensions = new ArrayList<>();
     private final HConnection hConnection;
     private List<ExtensionProducer> extensionProducers;
-    private Observable<ExtensionConnectedListener> observable = new Observable<>() {
+    private Observable<ExtensionConnectedListener> observable = new Observable<ExtensionConnectedListener>() {
         @Override
         public void addListener(ExtensionConnectedListener extensionConnectedListener) {
             super.addListener(extensionConnectedListener);
