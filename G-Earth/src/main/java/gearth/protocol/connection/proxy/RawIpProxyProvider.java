@@ -7,11 +7,13 @@ import gearth.protocol.connection.HState;
 import gearth.protocol.connection.HStateSetter;
 import gearth.protocol.hostreplacer.ipmapping.IpMapper;
 import gearth.protocol.hostreplacer.ipmapping.IpMapperFactory;
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.layout.Region;
 
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.net.*;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -48,7 +50,23 @@ public class RawIpProxyProvider extends ProxyProvider {
 
                 Queue<Socket> preConnectedServerConnections = new LinkedList<>();
                 for (int i = 0; i < 3; i++) {
-                    preConnectedServerConnections.add(new Socket(proxy.getActual_domain(), proxy.getActual_port()));
+                    Socket s1 = new Socket();
+                    s1.setSoTimeout(1200);
+                    try {
+                        s1.connect(new InetSocketAddress(proxy.getActual_domain(), proxy.getActual_port()), 1200);
+                    }
+                    catch (SocketTimeoutException e) {
+                        stateSetter.setState(HState.NOT_CONNECTED);
+                        Platform.runLater(() -> {
+                            Alert alert = new Alert(Alert.AlertType.ERROR, "You entered invalid connection information, G-Earth could not connect", ButtonType.OK);
+                            alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+                            alert.setResizable(false);
+                            alert.show();
+                        });
+                        return;
+                    }
+
+                    preConnectedServerConnections.add(s1);
                     Thread.sleep(50);
                 }
 
