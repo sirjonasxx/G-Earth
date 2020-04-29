@@ -1,5 +1,6 @@
 package gearth.ui.logger;
 
+import gearth.protocol.connection.HState;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
@@ -36,14 +37,14 @@ public class LoggerController extends SubForm {
 
     public void onParentSet(){
         getHConnection().getStateObservable().addListener((oldState, newState) -> Platform.runLater(() -> {
-            if (newState == HConnection.State.PREPARING) {
+            if (newState == HState.PREPARING) {
                 miniLogText(Color.ORANGE, "Connecting to "+getHConnection().getDomain() + ":" + getHConnection().getServerPort());
             }
-            if (newState == HConnection.State.CONNECTED) {
+            if (newState == HState.CONNECTED) {
                 miniLogText(Color.GREEN, "Connected to "+getHConnection().getDomain() + ":" + getHConnection().getServerPort());
                 packetLogger.start();
             }
-            if (newState == HConnection.State.NOT_CONNECTED) {
+            if (newState == HState.NOT_CONNECTED) {
                 miniLogText(Color.RED, "End of connection");
                 packetLogger.stop();
             }

@@ -1,5 +1,6 @@
 package gearth.ui.injection;
 
+import gearth.protocol.connection.HState;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
@@ -81,8 +82,8 @@ public class InjectionController extends SubForm {
         }
 
         if (!dirty) {
-            btn_sendToClient.setDisable(getHConnection().getState() != HConnection.State.CONNECTED);
-            btn_sendToServer.setDisable(getHConnection().getState() != HConnection.State.CONNECTED);
+            btn_sendToClient.setDisable(getHConnection().getState() != HState.CONNECTED);
+            btn_sendToServer.setDisable(getHConnection().getState() != HState.CONNECTED);
             if (packets.length == 1) {
                 lbl_pcktInfo.setText("header (id:" + packets[0].headerId() + ", length:" +
                         packets[0].length() + ")");

@@ -6,6 +6,7 @@ import gearth.misc.listenerpattern.Observable;
 import gearth.protocol.HConnection;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
+import gearth.protocol.connection.HState;
 import gearth.services.extensionhandler.extensions.ExtensionListener;
 import gearth.services.extensionhandler.extensions.extensionproducers.ExtensionProducer;
 import gearth.services.extensionhandler.extensions.extensionproducers.ExtensionProducerFactory;
@@ -39,7 +40,7 @@ public class ExtensionHandler {
     private void initialize() {
 
         hConnection.getStateObservable().addListener((oldState, newState) -> {
-            if (newState == HConnection.State.CONNECTED) {
+            if (newState == HState.CONNECTED) {
                 HarbleAPIFetcher.fetch(hConnection.getHotelVersion());
                 synchronized (gEarthExtensions) {
                     for (GEarthExtension extension : gEarthExtensions) {
@@ -52,7 +53,7 @@ public class ExtensionHandler {
                     }
                 }
             }
-            if (oldState == HConnection.State.CONNECTED) {
+            if (oldState == HState.CONNECTED) {
                 synchronized (hConnection) {
                     for (GEarthExtension extension : gEarthExtensions) {
                         extension.connectionEnd();
@@ -180,7 +181,7 @@ public class ExtensionHandler {
                 extension.getExtensionObservable().addListener(listener);
                 extension.init();
 
-                if (hConnection.getState() == HConnection.State.CONNECTED) {
+                if (hConnection.getState() == HState.CONNECTED) {
                     extension.connectionStart(
                             hConnection.getDomain(),
                             hConnection.getServerPort(),

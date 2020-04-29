@@ -1,6 +1,8 @@
 package gearth.ui.connection;
 
 import gearth.misc.Cacher;
+import gearth.protocol.connection.HState;
+import gearth.protocol.connection.proxy.ProxyProviderFactory;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.scene.control.*;
@@ -52,7 +54,7 @@ public class ConnectionController extends SubForm {
             updateInputUI();
         });
 
-        List<String> knownHosts = HConnection.autoDetectHosts;
+        List<String> knownHosts = ProxyProviderFactory.autoDetectHosts;
         Set<String> hosts = new HashSet<>();
         Set<String> ports = new HashSet<>();
 
@@ -95,7 +97,7 @@ public class ConnectionController extends SubForm {
     private void updateInputUI() {
         txtfield_hotelversion.setText(getHConnection().getHotelVersion());
 
-        btnConnect.setDisable(getHConnection().getState() == HConnection.State.PREPARING || getHConnection().getState() == HConnection.State.ABORTING);
+        btnConnect.setDisable(getHConnection().getState() == HState.PREPARING || getHConnection().getState() == HState.ABORTING);
         if (!cbx_autodetect.isSelected() && !btnConnect.isDisable()) {
             try {
                 int i = Integer.parseInt(inpPort.getEditor().getText());
@@ -106,8 +108,8 @@ public class ConnectionController extends SubForm {
             }
         }
 
-        inpHost.setDisable(getHConnection().getState() != HConnection.State.NOT_CONNECTED || cbx_autodetect.isSelected());
-        inpPort.setDisable(getHConnection().getState() != HConnection.State.NOT_CONNECTED || cbx_autodetect.isSelected());
+        inpHost.setDisable(getHConnection().getState() != HState.NOT_CONNECTED || cbx_autodetect.isSelected());
+        inpPort.setDisable(getHConnection().getState() != HState.NOT_CONNECTED || cbx_autodetect.isSelected());
     }
 
     public void onParentSet(){
@@ -120,26 +122,26 @@ public class ConnectionController extends SubForm {
 
         getHConnection().getStateObservable().addListener((oldState, newState) -> Platform.runLater(() -> {
             updateInputUI();
-            if (newState == HConnection.State.NOT_CONNECTED) {
+            if (newState == HState.NOT_CONNECTED) {
                 lblState.setText("Not connected");
                 btnConnect.setText("Connect");
                 outHost.setText("");
                 outPort.setText("");
             }
-            else if (oldState == HConnection.State.NOT_CONNECTED) {
+            else if (oldState == HState.NOT_CONNECTED) {
                 btnConnect.setText("Abort");
             }
 
-            if (newState == HConnection.State.CONNECTED) {
+            if (newState == HState.CONNECTED) {
                 lblState.setText("Connected");
                 outHost.setText(getHConnection().getDomain());
                 outPort.setText(getHConnection().getServerPort()+"");
             }
-            if (newState == HConnection.State.WAITING_FOR_CLIENT) {
+            if (newState == HState.WAITING_FOR_CLIENT) {
                 lblState.setText("Waiting for connection");
             }
 
-            if (newState == HConnection.State.CONNECTED) {
+            if (newState == HState.CONNECTED) {
                 JSONObject connectionSettings = new JSONObject();
                 connectionSettings.put(AUTODETECT_CACHE, cbx_autodetect.isSelected());
                 connectionSettings.put(HOST_CACHE, inpHost.getEditor().getText());
@@ -152,22 +154,17 @@ public class ConnectionController extends SubForm {
     }
 
     public void btnConnect_clicked(ActionEvent actionEvent) {
-        if (getHConnection().getState() == HConnection.State.NOT_CONNECTED) {
+        if (getHConnection().getState() == HState.NOT_CONNECTED) {
 
             btnConnect.setDisable(true);
             new Thread(() -> {
                 if (cbx_autodetect.isSelected()) {
-                    getHConnection().prepare();
+                    getHConnection().start();
                 }
                 else {
-                    getHConnection().prepare(inpHost.getEditor().getText(), Integer.parseInt(inpPort.getEditor().getText()));
+                    getHConnection().start(inpHost.getEditor().getText(), Integer.parseInt(inpPort.getEditor().getText()));
                 }
                 if (HConnection.DEBUG) System.out.println("connecting");
-                try {
-                    getHConnection().start();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
             }).start();
 
 

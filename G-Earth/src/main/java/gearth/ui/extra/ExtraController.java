@@ -2,7 +2,8 @@ package gearth.ui.extra;
 
 import gearth.misc.Cacher;
 import gearth.protocol.HConnection;
-import gearth.protocol.misc.ConnectionInfoOverrider;
+import gearth.protocol.connection.HProxy;
+import gearth.protocol.connection.HState;
 import gearth.ui.SubForm;
 import gearth.ui.info.InfoController;
 import javafx.scene.control.*;
@@ -11,7 +12,7 @@ import javafx.scene.layout.GridPane;
 /**
  * Created by Jonas on 06/04/18.
  */
-public class ExtraController extends SubForm implements ConnectionInfoOverrider {
+public class ExtraController extends SubForm {
 
     public static final String NOTEPAD_CACHE_KEY = "notepad_text";
 
@@ -35,7 +36,6 @@ public class ExtraController extends SubForm implements ConnectionInfoOverrider 
     public CheckBox cbx_debug;
 
     public void initialize() {
-        HConnection.setConnectionInfoOverrider(this);
 
         url_troubleshooting.setTooltip(new Tooltip("https://github.com/sirjonasxx/G-Earth/wiki/Troubleshooting"));
         InfoController.activateHyperlink(url_troubleshooting);
@@ -58,7 +58,7 @@ public class ExtraController extends SubForm implements ConnectionInfoOverrider 
 
         cbx_advanced.selectedProperty().addListener(observable -> updateAdvancedUI());
         getHConnection().getStateObservable().addListener((oldState, newState) -> {
-            if (oldState == HConnection.State.NOT_CONNECTED || newState == HConnection.State.NOT_CONNECTED) {
+            if (oldState == HState.NOT_CONNECTED || newState == HState.NOT_CONNECTED) {
                 updateAdvancedUI();
             }
         });
@@ -75,28 +75,12 @@ public class ExtraController extends SubForm implements ConnectionInfoOverrider 
         if (!cbx_advanced.isSelected()) {
             cbx_debug.setSelected(false);
             cbx_ovcinfo.setSelected(false);
-            if (getHConnection().getState() == HConnection.State.NOT_CONNECTED) {
+            if (getHConnection().getState() == HState.NOT_CONNECTED) {
                 cbx_disableDecryption.setSelected(false);
             }
         }
         grd_advanced.setDisable(!cbx_advanced.isSelected());
 
-        cbx_disableDecryption.setDisable(getHConnection().getState() != HConnection.State.NOT_CONNECTED);
-    }
-
-    @Override
-    public boolean mustOverrideConnection() {
-        return cbx_ovcinfo.isSelected();
-    }
-
-    @Override
-    public HConnection.Proxy getOverrideProxy() {
-        return new HConnection.Proxy(
-                txt_realIp.getText(),
-                txt_realIp.getText(),
-                Integer.parseInt(txt_realPort.getText()),
-                Integer.parseInt(txt_mitmPort.getText()),
-                txt_mitmIP.getText()
-        );
+        cbx_disableDecryption.setDisable(getHConnection().getState() != HState.NOT_CONNECTED);
     }
 }

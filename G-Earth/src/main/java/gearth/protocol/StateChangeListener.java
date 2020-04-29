@@ -1,7 +1,9 @@
 package gearth.protocol;
 
+import gearth.protocol.connection.HState;
+
 public interface StateChangeListener {
 
-    void stateChanged(HConnection.State oldState, HConnection.State newState);
+    void stateChanged(HState oldState, HState newState);
 
 }
