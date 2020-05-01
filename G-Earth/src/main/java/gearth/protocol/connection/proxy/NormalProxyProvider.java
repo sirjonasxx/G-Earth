@@ -101,7 +101,6 @@ public class NormalProxyProvider extends ProxyProvider {
                     while ((hConnection.getState() == HState.WAITING_FOR_CLIENT) && !proxy_server.isClosed())	{
                         try {
                             Socket client = proxy_server.accept();
-                            client.setTcpNoDelay(true);
                             proxy = potentialProxy;
                             closeAllProxies(proxy);
                             if (HConnection.DEBUG) System.out.println("accepted a proxy");

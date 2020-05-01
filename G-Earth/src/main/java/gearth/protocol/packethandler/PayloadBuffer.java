@@ -14,7 +14,7 @@ public class PayloadBuffer {
         return receive();
     }
     public void push(byte[] tcpData) {
-        buffer = buffer.length == 0 ? tcpData : combineByteArrays(buffer, tcpData);
+        buffer = buffer.length == 0 ? tcpData.clone() : combineByteArrays(buffer, tcpData);
     }
     public HPacket[] receive() {
         if (buffer.length < 6) return new HPacket[0];

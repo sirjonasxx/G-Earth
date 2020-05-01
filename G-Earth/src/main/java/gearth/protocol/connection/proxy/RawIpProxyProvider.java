@@ -87,7 +87,6 @@ public class RawIpProxyProvider extends ProxyProvider {
                     try {
                         if (HConnection.DEBUG) System.out.println("try accept proxy");
                         Socket client = proxy_server.accept();
-                        client.setTcpNoDelay(true);
 
                         if (HConnection.DEBUG) System.out.println("accepted a proxy");
 
