@@ -34,7 +34,6 @@ public class IncomingPacketHandler extends PacketHandler {
 
     @Override
     public void act(byte[] buffer) throws IOException {
-        System.out.println("gotincoming");
         if (isDataStream)	{
             continuedAct(buffer);
         }
