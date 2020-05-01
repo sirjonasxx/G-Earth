@@ -140,7 +140,7 @@ public class NormalProxyProvider extends ProxyProvider {
         }
 
         clearAllProxies();
-        stateSetter.setState(HState.NOT_CONNECTED);
+        super.abort();
     }
 
     @Override

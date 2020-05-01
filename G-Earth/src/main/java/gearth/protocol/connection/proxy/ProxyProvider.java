@@ -23,13 +23,15 @@ public abstract class ProxyProvider {
     protected final HStateSetter stateSetter;
     protected final HConnection hConnection;
 
+    private Semaphore abortSemaphore = null;
+
     public ProxyProvider(HProxySetter proxySetter, HStateSetter stateSetter, HConnection hConnection){
         this.proxySetter = proxySetter;
         this.stateSetter = stateSetter;
         this.hConnection = hConnection;
     }
 
-    protected void startProxyThread(Socket client, Socket server, HProxy proxy) throws InterruptedException, UnknownHostException, IOException {
+    protected void startProxyThread(Socket client, Socket server, HProxy proxy) throws IOException, InterruptedException {
         final boolean[] datastream = new boolean[1];
         server.setTcpNoDelay(true);
         client.setTcpNoDelay(true);
@@ -41,22 +43,22 @@ public abstract class ProxyProvider {
         IncomingPacketHandler incomingHandler = new IncomingPacketHandler(client.getOutputStream(), hConnection.getTrafficObservables());
         rc4Obtainer.setPacketHandlers(outgoingHandler, incomingHandler);
 
+        Semaphore abort = new Semaphore(0);
+
         outgoingHandler.addOnDatastreamConfirmedListener(hotelVersion -> {
             incomingHandler.setAsDataStream();
             proxy.verifyProxy(incomingHandler, outgoingHandler, hotelVersion);
             proxySetter.setProxy(proxy);
             datastream[0] = true;
+            abortSemaphore = abort;
             onConnect();
         });
-
-        Semaphore abort = new Semaphore(0);
 
         handleInputStream(client, outgoingHandler, abort);
         handleInputStream(server, incomingHandler, abort);
 
         // abort can be acquired as soon as one of the sockets is closed
         abort.acquire();
-
         try	{
             if (!server.isClosed()) server.close();
             if (!client.isClosed()) client.close();
@@ -89,13 +91,21 @@ public abstract class ProxyProvider {
 
 
     public abstract void start() throws IOException;
-    public abstract void abort();
+    public void abort() {
+        if (abortSemaphore != null) {
+            abortSemaphore.release();
+        }
+        else {
+            stateSetter.setState(HState.NOT_CONNECTED);
+        }
+    }
 
     protected void onConnect() {
         stateSetter.setState(HState.CONNECTED);
     }
     protected void onConnectEnd() {
         proxySetter.setProxy(null);
+        abortSemaphore = null;
         stateSetter.setState(HState.NOT_CONNECTED);
     }
 

@@ -123,7 +123,7 @@ public class RawIpProxyProvider extends ProxyProvider {
             hasMapped = false;
         }
         tryCloseProxy();
-        stateSetter.setState(HState.NOT_CONNECTED);
+        super.abort();
     }
 
     @Override
