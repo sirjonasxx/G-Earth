@@ -36,6 +36,9 @@ public abstract class ProxyProvider {
         server.setTcpNoDelay(true);
         client.setTcpNoDelay(true);
 
+        client.setSoTimeout(0);
+        server.setSoTimeout(0);
+
         if (HConnection.DEBUG) System.out.println(server.getLocalAddress().getHostAddress() + ": " + server.getLocalPort());
         Rc4Obtainer rc4Obtainer = new Rc4Obtainer(hConnection);
 
@@ -83,7 +86,10 @@ public abstract class ProxyProvider {
                     packetHandler.act(Arrays.copyOf(buffer, readLength));
                 }
             }
-            catch (IOException ignore) {} finally {
+            catch (IOException ignore) {
+//                System.err.println(packetHandler instanceof IncomingPacketHandler ? "incoming" : "outgoing");
+//                ignore.printStackTrace();
+            } finally {
                 abort.release();
             }
         }).start();
