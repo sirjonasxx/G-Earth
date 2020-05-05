@@ -24,7 +24,11 @@ public class IncomingPacketHandler extends PacketHandler {
                     isEncryptedStream = packet.readBoolean();
                     outgoingHandler.isEncryptedStream = true;
                 }
-                else if (message.getIndex() > 3) {
+                else if (isDataStream && message.getPacket().structureEquals("s") && message.getPacket().length() > 200) {
+                    ((Observable<TrafficListener>)trafficObservables[0]).removeListener(this);
+                    outgoingHandler.isEncryptedStream = true;
+                }
+                else if (message.getIndex() > 1) {
                     ((Observable<TrafficListener>)trafficObservables[0]).removeListener(this);
                 }
             }
