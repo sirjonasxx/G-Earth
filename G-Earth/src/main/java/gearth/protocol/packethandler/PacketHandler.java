@@ -16,23 +16,23 @@ public abstract class PacketHandler {
 
     protected static final boolean DEBUG = false;
 
-    volatile PayloadBuffer payloadBuffer = new PayloadBuffer();
-    volatile OutputStream out;
-    volatile Object[] trafficObservables; //get notified on packet send
-    volatile boolean isTempBlocked = false;
+    private volatile PayloadBuffer payloadBuffer = new PayloadBuffer();
+    private volatile OutputStream out;
+    private volatile Object[] trafficObservables; //get notified on packet send
+    private volatile boolean isTempBlocked = false;
     volatile boolean isDataStream = false;
-    volatile int currentIndex = 0;
+    private volatile int currentIndex = 0;
 
-    protected final Object lock = new Object();
+    private final Object lock = new Object();
 
-    protected RC4 decryptcipher = null;
-    protected RC4 encryptcipher = null;
+    private RC4 decryptcipher = null;
+    private RC4 encryptcipher = null;
 
-    protected volatile List<Byte> tempEncryptedBuffer = new ArrayList<>();
-    protected volatile boolean isEncryptedStream = false;
+    private volatile List<Byte> tempEncryptedBuffer = new ArrayList<>();
+    volatile boolean isEncryptedStream = false;
 
 
-    public PacketHandler(OutputStream outputStream, Object[] trafficObservables) {
+    PacketHandler(OutputStream outputStream, Object[] trafficObservables) {
         this.trafficObservables = trafficObservables;
         out = outputStream;
     }
@@ -46,8 +46,12 @@ public abstract class PacketHandler {
         return isEncryptedStream;
     }
 
-    public abstract void act(byte[] buffer) throws IOException;
-    protected void continuedAct(byte[] buffer) throws IOException {
+    public void act(byte[] buffer) throws IOException {
+        if (!isDataStream) {
+            out.write(buffer);
+            return;
+        }
+
         bufferChangeObservable.fireEvent();
 
         if (!isEncryptedStream) {

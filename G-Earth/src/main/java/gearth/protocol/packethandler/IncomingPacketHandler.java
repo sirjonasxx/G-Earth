@@ -11,17 +11,18 @@ import java.util.List;
 
 public class IncomingPacketHandler extends PacketHandler {
 
-    public IncomingPacketHandler(OutputStream outputStream, Object[] trafficObservables) {
+    public IncomingPacketHandler(OutputStream outputStream, Object[] trafficObservables, OutgoingPacketHandler outgoingHandler) {
         super(outputStream, trafficObservables);
 
         TrafficListener listener = new TrafficListener() {
             @Override
             public void onCapture(HMessage message) {
-                if (isDataStream && message.getPacket().structureEquals("s,b")) {
+                if (isDataStream && message.getPacket().structureEquals("s,b") && message.getPacket().length() > 500) {
                     ((Observable<TrafficListener>)trafficObservables[0]).removeListener(this);
                     HPacket packet = message.getPacket();
                     packet.readString();
                     isEncryptedStream = packet.readBoolean();
+                    outgoingHandler.isEncryptedStream = true;
                 }
                 else if (message.getIndex() > 3) {
                     ((Observable<TrafficListener>)trafficObservables[0]).removeListener(this);
@@ -30,16 +31,6 @@ public class IncomingPacketHandler extends PacketHandler {
         };
 
         ((Observable<TrafficListener>)trafficObservables[0]).addListener(listener);
-    }
-
-    @Override
-    public void act(byte[] buffer) throws IOException {
-        if (isDataStream)	{
-            continuedAct(buffer);
-        }
-        else  {
-            out.write(buffer);
-        }
     }
 
     @Override

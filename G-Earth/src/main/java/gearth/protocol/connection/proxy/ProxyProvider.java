@@ -43,7 +43,7 @@ public abstract class ProxyProvider {
         Rc4Obtainer rc4Obtainer = new Rc4Obtainer(hConnection);
 
         OutgoingPacketHandler outgoingHandler = new OutgoingPacketHandler(server.getOutputStream(), hConnection.getTrafficObservables());
-        IncomingPacketHandler incomingHandler = new IncomingPacketHandler(client.getOutputStream(), hConnection.getTrafficObservables());
+        IncomingPacketHandler incomingHandler = new IncomingPacketHandler(client.getOutputStream(), hConnection.getTrafficObservables(), outgoingHandler);
         rc4Obtainer.setPacketHandlers(outgoingHandler, incomingHandler);
 
         Semaphore abort = new Semaphore(0);

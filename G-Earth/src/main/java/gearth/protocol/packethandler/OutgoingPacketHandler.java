@@ -38,17 +38,7 @@ public class OutgoingPacketHandler extends PacketHandler {
     @Override
     public void act(byte[] buffer) throws IOException {
         dataStreamCheck(buffer);
-
-        if (isDataStream)	{
-            if (!isEncryptedStream && (new HPacket(buffer).length() < 2 || new HPacket(buffer).length() > 1000)) {
-                isEncryptedStream = true;
-            }
-
-            continuedAct(buffer);
-        }
-        else  {
-            out.write(buffer);
-        }
+        super.act(buffer);
     }
 
     @Override
