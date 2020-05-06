@@ -59,7 +59,9 @@ public class HConnection {
 
     private void startMITM() {
         try {
-            proxyProvider.start();
+            if (proxyProvider != null) {
+                proxyProvider.start();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -149,5 +151,9 @@ public class HConnection {
 
     public boolean isRawIpMode() {
         return proxyProvider != null && proxyProvider instanceof RawIpProxyProvider;
+    }
+
+    public ProxyProvider getProxyProvider() {
+        return proxyProvider;
     }
 }

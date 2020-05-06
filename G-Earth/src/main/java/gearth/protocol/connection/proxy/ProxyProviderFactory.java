@@ -84,7 +84,15 @@ public class ProxyProviderFactory {
         }
 
         if (hostIsIpAddress(domain)) {
-            return new RawIpProxyProvider(proxySetter, stateSetter, hConnection, domain, port);
+            SocksConfiguration config = SocksProxyProvider.getSocksConfig();
+            if (RawIpProxyProvider.isNoneConnected(domain) &&
+                    (!config.useSocks() || config.dontUseFirstTime()) ) {
+                return new RawIpProxyProvider(proxySetter, stateSetter, hConnection, domain, port);
+            }
+            else if (config.useSocks()) {
+                return new SocksProxyProvider(proxySetter, stateSetter, hConnection, domain, port);
+            }
+            return null;
         }
         else {
             List<String> potentialHost = new ArrayList<>();

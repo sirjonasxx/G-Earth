@@ -31,7 +31,7 @@ public class WindowsIpMapper implements IpMapper {
         runCommand("netsh", "interface", "ip", "delete", "address", "\"Loopback\"", ip);
     }
 
-    //todo implement
+    //todo implement, or don't
     @Override
     public List<String> getCurrentMappings() {
         return new ArrayList<>();
