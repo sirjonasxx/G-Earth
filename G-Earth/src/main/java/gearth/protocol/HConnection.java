@@ -62,6 +62,11 @@ public class HConnection {
             if (proxyProvider != null) {
                 proxyProvider.start();
             }
+            else {
+                // trigger UI update
+                setState(HState.ABORTING);
+                setState(HState.NOT_CONNECTED);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

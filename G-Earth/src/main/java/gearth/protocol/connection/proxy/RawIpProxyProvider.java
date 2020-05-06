@@ -52,7 +52,11 @@ public class RawIpProxyProvider extends ProxyProvider {
                 stateSetter.setState(HState.PREPARING);
                 proxy = new HProxy(input_host, input_host, input_port, input_port, "0.0.0.0");
 
-                onBeforeIpMapping();
+                if (!onBeforeIpMapping()) {
+                    stateSetter.setState(HState.NOT_CONNECTED);
+                    return;
+                }
+
                 maybeAddMapping();
 
                 if (HConnection.DEBUG) System.out.println("Added mapping for raw IP");
@@ -99,6 +103,12 @@ public class RawIpProxyProvider extends ProxyProvider {
     }
 
     @Override
+    protected void onConnect() {
+        super.onConnect();
+        tryCloseProxy();
+    }
+
+    @Override
     protected void onConnectEnd() {
         if (hasMapped) {
             maybeRemoveMapping();
@@ -119,7 +129,8 @@ public class RawIpProxyProvider extends ProxyProvider {
 
     private Queue<Socket> preConnectedServerConnections;
 
-    protected void onBeforeIpMapping() throws IOException, InterruptedException {
+    // returns false if fail
+    protected boolean onBeforeIpMapping() throws IOException, InterruptedException {
         preConnectedServerConnections = new LinkedList<>();
         for (int i = 0; i < 3; i++) {
             Socket s1 = new Socket();
@@ -128,14 +139,15 @@ public class RawIpProxyProvider extends ProxyProvider {
                 s1.connect(new InetSocketAddress(proxy.getActual_domain(), proxy.getActual_port()), 1200);
             }
             catch (SocketTimeoutException e) {
-                stateSetter.setState(HState.NOT_CONNECTED);
                 showInvalidConnectionError();
-                return;
+                return false;
             }
 
             preConnectedServerConnections.add(s1);
             Thread.sleep(50);
         }
+
+        return true;
     }
 
     protected void createProxyThread(Socket client) throws IOException, InterruptedException {
@@ -215,7 +227,7 @@ public class RawIpProxyProvider extends ProxyProvider {
 
     private void removeMappingCache() {
         JSONObject connections = getCurrentConnectionsCache();
-        connections.remove(proxy.getActual_domain());
+        connections.remove(INSTANCE_ID.toString());
         saveCurrentConnectionsCache(connections);
     }
 
@@ -234,7 +246,7 @@ public class RawIpProxyProvider extends ProxyProvider {
 
 
     static private JSONObject getCurrentConnectionsCache(String actual_host) {
-        if (!Cacher.getCacheContents().has(actual_host)) {
+        if (!Cacher.getCacheContents().has(RAWIP_CONNECTIONS)) {
             Cacher.put(RAWIP_CONNECTIONS, new JSONObject());
         }
         JSONObject gearthConnections = Cacher.getCacheContents().getJSONObject(RAWIP_CONNECTIONS);
@@ -252,7 +264,7 @@ public class RawIpProxyProvider extends ProxyProvider {
         BigInteger timeoutTimestamp = BigInteger.valueOf(System.currentTimeMillis() - 60000);
         for (String key : connections.keySet()) {
             JSONObject connection = connections.getJSONObject(key);
-            if (!connection.getString("id").equals(INSTANCE_ID.toString())) {
+            if (!key.equals(INSTANCE_ID.toString())) {
                 if (connection.getBigInteger("timestamp").compareTo(timeoutTimestamp) > 0) {
                     return false;
                 }

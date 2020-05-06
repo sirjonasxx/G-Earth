@@ -20,8 +20,8 @@ public class SocksProxyProvider extends RawIpProxyProvider {
     }
 
     @Override
-    protected void onBeforeIpMapping() {
-        // do nothing
+    protected boolean onBeforeIpMapping() {
+        return true;
     }
 
     @Override

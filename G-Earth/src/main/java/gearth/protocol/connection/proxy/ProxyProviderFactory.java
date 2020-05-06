@@ -5,6 +5,10 @@ import gearth.misc.OSValidator;
 import gearth.protocol.HConnection;
 import gearth.protocol.connection.HProxySetter;
 import gearth.protocol.connection.HStateSetter;
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.layout.Region;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -92,6 +96,16 @@ public class ProxyProviderFactory {
             else if (config.useSocks()) {
                 return new SocksProxyProvider(proxySetter, stateSetter, hConnection, domain, port);
             }
+
+            Platform.runLater(() -> {
+                Alert alert = new Alert(Alert.AlertType.ERROR, "G-Earth is already connected to this hotel. " +
+                        "Due to current limitations you can only connect one session per hotel to G-Earth in Raw IP mode.\n\n" +
+                        "You can bypass this by using a SOCKS proxy [Extra -> Advanced -> SOCKS]", ButtonType.OK);
+                alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+                alert.setResizable(false);
+                alert.show();
+            });
+
             return null;
         }
         else {
