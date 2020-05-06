@@ -52,8 +52,8 @@ public class ExtraController extends SubForm implements SocksConfiguration {
             txtarea_notepad.setText(notepadInitValue);
         }
 
-        JSONObject socksInitValue = Cacher.getCacheContents().getJSONObject(SOCKS_CACHE_KEY);
-        if (socksInitValue != null) {
+        if (Cacher.getCacheContents().has(SOCKS_CACHE_KEY)) {
+            JSONObject socksInitValue = Cacher.getCacheContents().getJSONObject(SOCKS_CACHE_KEY);
             txt_socksIp.setText(socksInitValue.getString(SOCKS_IP));
             txt_socksPort.setText(socksInitValue.getString(SOCKS_PORT));
             cbx_ignoreSocksOnce.setSelected(socksInitValue.getBoolean(IGNORE_ONCE));

@@ -224,6 +224,9 @@ public class RawIpProxyProvider extends ProxyProvider {
     }
 
     private void saveCurrentConnectionsCache(JSONObject connections) {
+        if (!Cacher.getCacheContents().has(proxy.getActual_domain())) {
+            Cacher.put(RAWIP_CONNECTIONS, new JSONObject());
+        }
         JSONObject gearthConnections = Cacher.getCacheContents().getJSONObject(RAWIP_CONNECTIONS);
         gearthConnections.put(proxy.getActual_domain(), connections);
         Cacher.put(RAWIP_CONNECTIONS, gearthConnections);
@@ -231,18 +234,16 @@ public class RawIpProxyProvider extends ProxyProvider {
 
 
     static private JSONObject getCurrentConnectionsCache(String actual_host) {
+        if (!Cacher.getCacheContents().has(actual_host)) {
+            Cacher.put(RAWIP_CONNECTIONS, new JSONObject());
+        }
         JSONObject gearthConnections = Cacher.getCacheContents().getJSONObject(RAWIP_CONNECTIONS);
-        if (gearthConnections == null) {
-            gearthConnections = new JSONObject();
+
+        if (!gearthConnections.has(actual_host)) {
+            gearthConnections.put(actual_host, new JSONObject());
             Cacher.put(RAWIP_CONNECTIONS, gearthConnections);
         }
-        JSONObject connections = gearthConnections.getJSONObject(actual_host);
-        if (connections == null) {
-            connections = new JSONObject();
-            gearthConnections.put(actual_host, connections);
-            Cacher.put(RAWIP_CONNECTIONS, gearthConnections);
-        }
-        return connections;
+        return gearthConnections.getJSONObject(actual_host);
     }
 
     static boolean isNoneConnected(String actual_host) {
