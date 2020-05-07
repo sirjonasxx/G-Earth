@@ -145,7 +145,7 @@ public class UiLoggerController implements Initializable {
                 elements.add(new Element(packet.toString(), "outgoing"));
             }
         }
-        if (!expr.equals("") && displayStructure && (!skiphugepackets || packet.length() <= 8000))
+        if (!expr.equals("") && displayStructure && packet.length() <= 2000)
             elements.add(new Element("\n" + cleanTextContent(expr), "structure"));
 
         elements.add(new Element("\n--------------------\n", ""));
