@@ -3,12 +3,13 @@ package gearth.protocol;
 import gearth.misc.StringifyAble;
 import gearth.misc.harble_api.HarbleAPI;
 import gearth.misc.harble_api.HarbleAPIFetcher;
+import gearth.misc.packetrepresentation.InvalidPacketException;
+import gearth.misc.packetrepresentation.PacketStructure;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidParameterException;
-import java.util.ArrayList;
 import java.util.Arrays;
 
 public class HPacket implements StringifyAble {
@@ -25,7 +26,13 @@ public class HPacket implements StringifyAble {
         isEdited = packet.isEdited;
     }
     public HPacket(String packet)	{
-        packetInBytes = fromStringToBytes(fromExpressionToString(packet));
+        try {
+            packetInBytes = PacketStructure.fromString(packet).packetInBytes;
+        } catch (InvalidPacketException e) {
+            packetInBytes = new byte[0];
+            // will be corrupted
+            e.printStackTrace();
+        }
     }
     public HPacket(int header) {
         packetInBytes = new byte[]{0,0,0,2,0,0};
@@ -68,193 +75,11 @@ public class HPacket implements StringifyAble {
     }
 
     public String toString()	{
-        String teststring = "";
-        for (byte x : packetInBytes)	{
-            if ((x < 32 && x >= 0) || x < -96 || x == 93 || x == 91 || x == 125 || x == 123 || x == 127 )
-                teststring+="["+((((int)x) + 256 ) % 256)+"]";
-            else
-                try {
-                    teststring+=new String(new byte[]{x}, "ISO-8859-1"); //"ISO-8859-1"
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                }
-        }
-        return teststring;
-    }
-
-    /**
-     * returns "" if invalid expression, replaces all {} occurences except {l}
-     * @return
-     */
-    private static String fromExpressionToString(String input) {
-        try {
-            int i = 0;
-            char[] asChararray = input.toCharArray();
-            StringBuilder newString = new StringBuilder();
-            if (input.startsWith("{l}")) {
-                newString.append("{l}");
-                i = 3;
-            }
-
-            while (i < input.length()) {
-                if (asChararray[i] != '{') {
-                    newString.append(asChararray[i]);
-                    i++;
-                }
-                else {
-                    i++;
-                    StringBuilder typeBuilder = new StringBuilder();
-                    while (i < input.length() && asChararray[i] != ':') {
-                        typeBuilder.append(asChararray[i]);
-                        i++;
-                    }
-                    if (i == input.length()) throw new Exception();
-                    String type = typeBuilder.toString();
-                    i++;
-
-                    StringBuilder inhoudBuilder = new StringBuilder();
-                    while (i < input.length() && asChararray[i] != '}') {
-                        inhoudBuilder.append(asChararray[i]);
-                        i++;
-                    }
-                    if (i == input.length()) throw new Exception();
-                    String inhoud = inhoudBuilder.toString();
-                    i++;
-
-                    if (type.equals("u")) {
-                        int probs = Integer.parseInt(inhoud);
-                        if (probs < 0 || probs >= 256 * 256) throw new Exception();
-                        newString.append("[").append(probs / 256).append("][").append(probs % 256).append("]");
-                    }
-                    else if (type.equals("i")) {
-                        ByteBuffer b = ByteBuffer.allocate(4).putInt(Integer.parseInt(inhoud));
-                        newString.append(new HPacket(b.array()).toString());
-                    }
-                    else if (type.equals("d")) {
-                        ByteBuffer b = ByteBuffer.allocate(8).putDouble(Double.parseDouble(inhoud));
-                        newString.append(new HPacket(b.array()).toString());
-                    }
-                    else if (type.equals("b")) { // could be a byte or a boolean, no one cares
-                        if (inhoud.toLowerCase().equals("true") || inhoud.toLowerCase().equals("false")) {
-                            newString.append(inhoud.toLowerCase().equals("true") ? "[1]" : "[0]");
-                        }
-                        else {
-                            int probs = Integer.parseInt(inhoud);
-                            if (probs < 0 || probs >= 256) throw new Exception();
-                            newString.append("[").append(probs).append("]");
-                        }
-                    }
-                    else if (type.equals("s")) {
-                        int probs = inhoud.length();
-                        if (probs < 0 || probs >= 256 * 256) throw new Exception();
-                        newString.append("[").append(probs / 256).append("][").append(probs % 256).append("]");
-
-                        byte[] bts = inhoud.getBytes(StandardCharsets.ISO_8859_1);
-                        for (int j = 0; j < inhoud.length(); j++) {
-                            newString.append("[").append((((int)(bts[j])) + 256) % 256).append("]");
-                        }
-                    }
-                    else throw new Exception();
-
-                }
-            }
-            return newString.toString();
-        }
-        catch( Exception e) {
-            return "";
-        }
-    }
-    private static byte[] fromStringToBytes(String curstring)	{
-        try	{
-            ArrayList<Byte> bytes = new ArrayList<>();
-            int index = 0;
-            char[] asChararray = curstring.toCharArray();
-            byte[] asliteralbytes = curstring.getBytes("ISO-8859-1");
-
-            boolean startWithLength = false;
-            if (curstring.startsWith("{l}")) {
-                startWithLength = true;
-                index = 3;
-            }
-
-            while (index < curstring.length()) {
-                if (asChararray[index] == '[') {
-                    int l = 2;
-                    while (index + l < curstring.length() && asChararray[index + l] != ']') l++;
-                    if (index + l == curstring.length()) throw new Exception();
-
-                    int result = Integer.parseInt(curstring.substring(index + 1, index + l));
-                    if (result > 255 || result < 0) throw new Exception();
-
-                    byte rl = result > 127 ? (byte)(result - 256) : (byte)result ;
-
-                    bytes.add(rl);
-                    index = index + 1 + l;
-                }
-                else {
-                    bytes.add(asliteralbytes[index]);
-                    index++;
-                }
-            }
-
-            byte[] result;
-            if (startWithLength) {
-                result = new byte[bytes.size() + 4];
-
-                ByteBuffer b = ByteBuffer.allocate(4);
-                b.putInt(bytes.size());
-                for (int i = 0; i < 4; i++) {
-                    result[i] = b.array()[i];
-                }
-                for (int i = 0; i < bytes.size(); i++) {
-                    result[i + 4] = bytes.get(i);
-                }
-            }
-            else {
-                result = new byte[bytes.size()];
-                for (int i = 0; i < bytes.size(); i++) {
-                    result[i] = bytes.get(i);
-                }
-            }
-
-            return result;
-        }
-        catch (Exception e){}
-        return new byte[0];
+        return PacketStructure.toString(packetInBytes);
     }
 
     public boolean structureEquals(String structure) {
-        if (isCorrupted()) return false;
-
-        int indexbuffer = readIndex;
-        readIndex = 6;
-
-        String[] split = structure.split(",");
-
-        for (int i = 0; i < split.length; i++) {
-            String s = split[i];
-
-            if (s.equals("s")) {
-                if (readIndex + 2 > getBytesLength() || readUshort(readIndex) + 2 + readIndex > getBytesLength()) return false;
-                readString();
-            }
-            else if (s.equals("i")) {
-                if (readIndex + 4 > getBytesLength()) return false;
-                readInteger();
-            }
-            else if (s.equals("u")) {
-                if (readIndex + 2 > getBytesLength()) return false;
-                readUshort();
-            }
-            else if (s.equals("b")) {
-                if (readIndex + 1 > getBytesLength()) return false;
-                readBoolean();
-            }
-        }
-
-        boolean result = (isEOF() == 1);
-        readIndex = indexbuffer;
-        return result;
+        return PacketStructure.structureEquals(this, structure);
     }
 
     public int isEOF() {
@@ -711,7 +536,7 @@ public class HPacket implements StringifyAble {
                 }
             }
             else if (c == 'i') builder.append("{i:").append(prevInt = readInteger()).append('}');
-            else if (c == 's') builder.append("{s:").append(readString()).append('}');
+            else if (c == 's') builder.append("{s:\"").append(readString().replace("\"", "\\\"")).append("\"}");
             else if (c == 'd') builder.append("{d:").append(readDouble()).append('}');
             else if (c == 'b') builder.append("{b:").append(readByte()).append('}');
             else if (c == 'B') builder.append("{b:").append(readBoolean()).append('}');
@@ -769,7 +594,7 @@ public class HPacket implements StringifyAble {
                 for (int j = i; j < potentialstringlength+i+2; j++) {
                     mask[j] = true;
                 }
-                resultTest[i] = "{s:"+readString(i)+"}";
+                resultTest[i] = "{s:\""+readString(i).replace("\"", "\\\"")+"\"}";
                 i += (1 + potentialstringlength);
             }
         }
@@ -875,7 +700,7 @@ public class HPacket implements StringifyAble {
                         mask[j] = true;
                     }
                     changed = true;
-                    resultTest[i] = "{s:"+readString(i)+"}";
+                    resultTest[i] = "{s:\""+readString(i).replace("\"", "\\\"")+"\"}";
                     i += (1 + potentialstringlength);
                 }
             }
@@ -961,7 +786,7 @@ public class HPacket implements StringifyAble {
                 for (int j = i; j < potentialstringlength+i+2; j++) {
                     mask[j] = true;
                 }
-                resultTest[i] = "{s:"+readString(i)+"}";
+                resultTest[i] = "{s:\""+readString(i).replace("\"", "\\\"")+"\"}";
                 i += (1 + potentialstringlength);
                 changed = true;
             }
@@ -1000,7 +825,7 @@ public class HPacket implements StringifyAble {
             if (resultTest[i] != null) expression.append(resultTest[i]);
         }
 
-        return expression.toString().replace("{i:0}{b:false}{b:true}", "{s:}{i:1}");
+        return expression.toString().replace("{i:0}{b:false}{b:true}", "{s:\"\"}{i:1}");
     }
 
     @Override
@@ -1025,9 +850,9 @@ public class HPacket implements StringifyAble {
     }
 
     public static void main(String[] args) {
-        HPacket packet = new HPacket("{l}{u:4564}{i:3}{i:0}{s:hi}{i:0}{i:1}{s:how}{i:3}{b:1}{b:2}{b:3}{i:2}{s:r u}{i:1}{b:120}{i:2}{b:true}");
+        HPacket packet = new HPacket("{l}{u:4564}{i:3}{i:0}{s:\"hi\"}{i:0}{i:1}{s:\"how\"}{i:3}{b:1}{b:2}{b:3}{i:2}{s:\"r u\"}{i:1}{b:120}{i:2}{b:true}{d:1.4}");
 
-        String str = packet.toExpressionFromGivenStructure("i(isi(b))iB");
+        String str = packet.toExpressionFromGivenStructure("i(isi(b))iBd");
 
         HPacket packetverify = new HPacket(str);
 
