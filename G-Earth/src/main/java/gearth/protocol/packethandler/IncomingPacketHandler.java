@@ -17,7 +17,7 @@ public class IncomingPacketHandler extends PacketHandler {
         TrafficListener listener = new TrafficListener() {
             @Override
             public void onCapture(HMessage message) {
-                if (isDataStream && message.getPacket().structureEquals("s,b") && message.getPacket().length() > 500) {
+                if (isDataStream && message.getPacket().structureEquals("sb") && message.getPacket().length() > 500) {
                     ((Observable<TrafficListener>)trafficObservables[0]).removeListener(this);
                     HPacket packet = message.getPacket();
                     packet.readString();

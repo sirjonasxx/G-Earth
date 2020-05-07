@@ -83,7 +83,6 @@ public class PacketStructure {
         }
         return hPacket;
     }
-
     public static String toString(byte[] packet) {
         StringBuilder teststring = new StringBuilder();
         for (byte x : packet)	{
@@ -96,37 +95,56 @@ public class PacketStructure {
         return teststring.toString();
     }
 
-    public static boolean structureEquals(HPacket packet, String structure) {
+    // generates an expression for a packet from a packet structure (ex. "i(isi(b))iBd")
+    public static String toExpressionFromGivenStructure(HPacket packet, String struct) {
+        int oldReadIndex = packet.getReadIndex();
+        packet.resetReadIndex();
+
+        StringBuilder builder = new StringBuilder();
+        builder.append("{l}{u:").append(packet.headerId()).append("}");
+
+        buildExpressionFromGivenStructure(packet, struct, 0, builder);
+        packet.setReadIndex(oldReadIndex);
+        return builder.toString();
+    }
+    private static void buildExpressionFromGivenStructure(HPacket p, String struct, int indexInGivenStruct, StringBuilder builder) {
+        int prevInt = 0;
+
+        while (indexInGivenStruct < struct.length()) {
+            char c = struct.charAt(indexInGivenStruct++);
+            if (c == '(') {
+                for (int i = 0; i < prevInt; i++) buildExpressionFromGivenStructure(p, struct, indexInGivenStruct, builder);
+                int skipping = 1;
+                while (skipping > 0) {
+                    char c2 = struct.charAt(indexInGivenStruct++);
+                    if (c2 == '(') skipping++;
+                    else if (c2 == ')') skipping--;
+                }
+            }
+            else if (c == 'i') builder.append("{i:").append(prevInt = p.readInteger()).append('}');
+            else if (c == 's') builder.append("{s:\"").append(p.readString().replace("\"", "\\\"")).append("\"}");
+            else if (c == 'd') builder.append("{d:").append(p.readDouble()).append('}');
+            else if (c == 'b') builder.append("{b:").append(p.readByte()).append('}');
+            else if (c == 'B') builder.append("{b:").append(p.readBoolean()).append('}');
+            else return;
+        }
+    }
+
+    public static boolean structureEquals(HPacket packet, String struct) {
         if (packet.isCorrupted()) return false;
 
         int indexbuffer = packet.getReadIndex();
-        packet.setReadIndex(6);
+        packet.resetReadIndex();
 
-        String[] split = structure.split(",");
-
-        for (int i = 0; i < split.length; i++) {
-            String s = split[i];
-
-            if (s.equals("s")) {
-                if (packet.getReadIndex() + 2 > packet.getBytesLength() ||
-                        packet.readUshort(packet.getReadIndex()) + 2 + packet.getReadIndex() > packet.getBytesLength()) return false;
-                packet.readString();
-            }
-            else if (s.equals("i")) {
-                if (packet.getReadIndex() + 4 > packet.getBytesLength()) return false;
-                packet.readInteger();
-            }
-            else if (s.equals("u")) {
-                if (packet.getReadIndex() + 2 > packet.getBytesLength()) return false;
-                packet.readUshort();
-            }
-            else if (s.equals("b")) {
-                if (packet.getReadIndex() + 1 > packet.getBytesLength()) return false;
-                packet.readBoolean();
-            }
+        boolean result;
+        try {
+            buildExpressionFromGivenStructure(packet, struct, 0, new StringBuilder());
+            result = packet.isEOF() == 1;
+        }
+        catch (Exception e) {
+            result = false;
         }
 
-        boolean result = (packet.isEOF() == 1);
         packet.setReadIndex(indexbuffer);
         return result;
     }
@@ -138,6 +156,10 @@ public class PacketStructure {
         HPacket p2 = fromString("{l}{u:4564}{i:3}{i:0}{s:\"hi\"}{i:0}{i:1}{s:\"how\"}{i:3}{b:1}{b:2}{b:3}{i:2}{s:\"r u\"}{i:1}{b:120}{i:2}{b:true}");
         System.out.println(p2);
 
+        System.out.println(structureEquals(
+                new HPacket("{l}{u:5}{s:\"asdas\"}"),
+                "s"
+        ));
     }
 
 }

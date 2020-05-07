@@ -508,42 +508,6 @@ public class HPacket implements StringifyAble {
         isEdited = edited;
     }
 
-
-    private String toExpressionFromGivenStructure(String struct) {
-        int oldReadIndex = readIndex;
-        resetReadIndex();
-
-        StringBuilder builder = new StringBuilder();
-        builder.append("{l}{u:").append(headerId()).append("}");
-
-        buildExpressionFromGivenStructure(struct, 0, builder);
-        readIndex = oldReadIndex;
-        return builder.toString();
-    }
-
-    private void buildExpressionFromGivenStructure(String struct, int indexInGivenStruct, StringBuilder builder) {
-        int prevInt = 0;
-
-        while (indexInGivenStruct < struct.length()) {
-            char c = struct.charAt(indexInGivenStruct++);
-            if (c == '(') {
-                for (int i = 0; i < prevInt; i++) buildExpressionFromGivenStructure(struct, indexInGivenStruct, builder);
-                int skipping = 1;
-                while (skipping > 0) {
-                    char c2 = struct.charAt(indexInGivenStruct++);
-                    if (c2 == '(') skipping++;
-                    else if (c2 == ')') skipping--;
-                }
-            }
-            else if (c == 'i') builder.append("{i:").append(prevInt = readInteger()).append('}');
-            else if (c == 's') builder.append("{s:\"").append(readString().replace("\"", "\\\"")).append("\"}");
-            else if (c == 'd') builder.append("{d:").append(readDouble()).append('}');
-            else if (c == 'b') builder.append("{b:").append(readByte()).append('}');
-            else if (c == 'B') builder.append("{b:").append(readBoolean()).append('}');
-            else return; // ')'
-        }
-    }
-
     public String toExpression(HMessage.Direction direction) {
         if (isCorrupted()) return "";
 
@@ -551,7 +515,7 @@ public class HPacket implements StringifyAble {
         if (HarbleAPIFetcher.HARBLEAPI != null &&
                 ((msg = HarbleAPIFetcher.HARBLEAPI.getHarbleMessageFromHeaderId(direction, headerId())) != null)) {
             if (msg.getStructure() != null) {
-                return toExpressionFromGivenStructure(msg.getStructure());
+                return PacketStructure.toExpressionFromGivenStructure(this, msg.getStructure());
             }
         }
         return toExpression();
@@ -852,7 +816,7 @@ public class HPacket implements StringifyAble {
     public static void main(String[] args) {
         HPacket packet = new HPacket("{l}{u:4564}{i:3}{i:0}{s:\"hi\"}{i:0}{i:1}{s:\"how\"}{i:3}{b:1}{b:2}{b:3}{i:2}{s:\"r u\"}{i:1}{b:120}{i:2}{b:true}{d:1.4}");
 
-        String str = packet.toExpressionFromGivenStructure("i(isi(b))iBd");
+        String str = PacketStructure.toExpressionFromGivenStructure(packet, "i(isi(b))iBd");
 
         HPacket packetverify = new HPacket(str);
 
