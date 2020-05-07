@@ -64,7 +64,7 @@ public class IntegerChecker extends TypeChecker<Integer> {
         // when ordering, it often appears that integers are placed before strings/booleans/etc
         // in the case of empty strings or false booleans, it is as good as always the integer that comes first
         // so we'll try to respect that here with a small score adjust, which doesnt affect anything else than ordering
-        double offset = ((double)index) / 1000000000;
+        double offset = ((double)index) / 1000000000.0;
 
         // since -1 has a byte arrangement barely used by other packets, we can assign full score
         if (value == -1) {

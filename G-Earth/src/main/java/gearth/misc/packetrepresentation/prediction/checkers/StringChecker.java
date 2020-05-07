@@ -17,7 +17,7 @@ public class StringChecker extends TypeChecker<String> {
 
     @Override
     public double score(int index) {
-        return scoreString(get(index));
+        return Math.max(scoreString(get(index)) - (((double)index) / 1000000000000.0), 0);
     }
 
     @Override
