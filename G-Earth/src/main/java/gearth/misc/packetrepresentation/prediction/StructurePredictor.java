@@ -104,6 +104,7 @@ public class StructurePredictor {
                 new HPacket("[0][0][0][6]\u000Ew[0][0][0][0]"),
                 new HPacket("[0][0][0]'[3] [0][5]Login[0][6]socket[0]\u000Eclient.auth_ok[0][0][0][0][0][0]"),
                 new HPacket(4002, false, ""),
+                new HPacket("{l}{u:145}[0][0][0]ÿÿÿÿ[0]"),
 //                new HPacket("[0][0][1]p[13]1[0][0][0][12][0][10]MOUSE_ZOOM[0][0][1][0]\u0015HABBO_CLUB_OFFER_BETA[0][0][1][0]\u000EUSE_GUIDE_TOOL[0]&requirement.unfulfilled.helper_level_4[0][0]\u000FBUILDER_AT_WORK[0](requirement.unfulfilled.group_membership[0][0]\u000FCALL_ON_HELPERS[0][0][1][0]\u001FNAVIGATOR_ROOM_THUMBNAIL_CAMERA[0][0][1][0][7]CITIZEN[0][0][1][0]\u0012JUDGE_CHAT_REVIEWS[0]&requirement.unfulfilled.helper_level_6[0][0][5]TRADE[0][0][1][0][6]CAMERA[0][0][1][0]\u0014VOTE_IN_COMPETITIONS[0][0][1][0]\u0018NAVIGATOR_PHASE_TWO_2014[0][0][1]")
 
         };

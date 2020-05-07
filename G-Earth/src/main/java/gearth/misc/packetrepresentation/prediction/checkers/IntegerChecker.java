@@ -75,13 +75,13 @@ public class IntegerChecker extends TypeChecker<Integer> {
             return 0.99 - offset;
         }
 
-        // if the value is not 0, but the last byte is 0/1, we assign a little less score
+        // if the value is not 0, but the last byte is 0/1, we assign a less score
         // to keep the possibility open for a boolean
         if (value % 256 == 0) {
-            return 0.87 - offset;
+            return 0.06 - offset;
         }
         if (value != 1 && value % 256 == 1) {
-            return 0.88 - offset;
+            return 0.06 - offset;
         }
 
         if (value >= -1) {
