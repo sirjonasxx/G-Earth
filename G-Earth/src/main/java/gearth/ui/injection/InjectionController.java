@@ -28,14 +28,27 @@ public class InjectionController extends SubForm {
     }
 
     private boolean isPacketIncomplete(String line) {
-        int unmatchedBraces = 0;
-        for (int i = 0; i < line.length(); i++)
-            if (line.charAt(i) == '{')
-                unmatchedBraces++;
-            else if (line.charAt(i) == '}')
-                unmatchedBraces--;
+        boolean unmatchedBrace = false;
 
-            return unmatchedBraces != 0;
+        boolean ignoreBrace = false;
+
+        for (int i = 0; i < line.length(); i++) {
+            if (unmatchedBrace && line.charAt(i) == '"' && line.charAt(i - 1) != '\\') {
+                ignoreBrace = !ignoreBrace;
+            }
+
+            if (!ignoreBrace) {
+                if (line.charAt(i) == '{'){
+
+                    unmatchedBrace = true;
+                }
+                else if (line.charAt(i) == '}') {
+                    unmatchedBrace = false;
+                }
+            }
+        }
+
+        return unmatchedBrace;
     }
 
     private HPacket[] parsePackets(String fullText) {

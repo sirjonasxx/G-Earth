@@ -1,5 +1,6 @@
 package gearth.misc.packetrepresentation;
 
+import gearth.misc.packetrepresentation.prediction.StructurePredictor;
 import gearth.protocol.HPacket;
 
 import java.nio.ByteBuffer;
@@ -9,15 +10,18 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 // for all the logistics behind bytes-string conversion
-public class PacketStructure {
+public class PacketStringUtils {
 
     private static String replaceAll(String templateText, String regex,
                                            Function<Matcher, String> replacer) {
-        Pattern pattern = Pattern.compile(regex);
+        Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
         Matcher matcher = pattern.matcher(templateText);
         StringBuffer result = new StringBuffer();
         while (matcher.find()) {
-            matcher.appendReplacement(result, replacer.apply(matcher));
+            matcher.appendReplacement(
+                    result,
+                    Matcher.quoteReplacement(replacer.apply(matcher))
+            );
         }
         matcher.appendTail(result);
         return result.toString();
@@ -128,6 +132,10 @@ public class PacketStructure {
             else if (c == 'B') builder.append("{b:").append(p.readBoolean()).append('}');
             else return;
         }
+    }
+    public static String predictedExpression(HPacket packet) {
+        StructurePredictor structurePredictor = new StructurePredictor(packet);
+        return structurePredictor.getExpression();
     }
 
     public static boolean structureEquals(HPacket packet, String struct) {

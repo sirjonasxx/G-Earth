@@ -4,7 +4,7 @@ import gearth.misc.StringifyAble;
 import gearth.misc.harble_api.HarbleAPI;
 import gearth.misc.harble_api.HarbleAPIFetcher;
 import gearth.misc.packetrepresentation.InvalidPacketException;
-import gearth.misc.packetrepresentation.PacketStructure;
+import gearth.misc.packetrepresentation.PacketStringUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
@@ -27,11 +27,11 @@ public class HPacket implements StringifyAble {
     }
     public HPacket(String packet)	{
         try {
-            packetInBytes = PacketStructure.fromString(packet).packetInBytes;
+            packetInBytes = PacketStringUtils.fromString(packet).packetInBytes;
         } catch (InvalidPacketException e) {
             packetInBytes = new byte[0];
             // will be corrupted
-            e.printStackTrace();
+            // e.printStackTrace();
         }
     }
     public HPacket(int header) {
@@ -75,11 +75,11 @@ public class HPacket implements StringifyAble {
     }
 
     public String toString()	{
-        return PacketStructure.toString(packetInBytes);
+        return PacketStringUtils.toString(packetInBytes);
     }
 
     public boolean structureEquals(String structure) {
-        return PacketStructure.structureEquals(this, structure);
+        return PacketStringUtils.structureEquals(this, structure);
     }
 
     public int isEOF() {
@@ -269,11 +269,6 @@ public class HPacket implements StringifyAble {
             replaceByte(index + i, bytes[i]);
             i++;
         }
-//
-//        if (i < bytes.length) {
-//            appendBytes(Arrays.copyOfRange(bytes, i, bytes.length));
-//            fixLength();
-//        }
         return this;
     }
     public HPacket replaceUShort(int index, int ushort) {
@@ -515,7 +510,7 @@ public class HPacket implements StringifyAble {
         if (HarbleAPIFetcher.HARBLEAPI != null &&
                 ((msg = HarbleAPIFetcher.HARBLEAPI.getHarbleMessageFromHeaderId(direction, headerId())) != null)) {
             if (msg.getStructure() != null) {
-                return PacketStructure.toExpressionFromGivenStructure(this, msg.getStructure());
+                return PacketStringUtils.toExpressionFromGivenStructure(this, msg.getStructure());
             }
         }
         return toExpression();
@@ -527,269 +522,7 @@ public class HPacket implements StringifyAble {
      */
     public String toExpression() {
         if (isCorrupted()) return "";
-
-        boolean[] mask = new boolean[packetInBytes.length];
-        String[] resultTest = new String[packetInBytes.length];
-
-        for (int i = 0; i < 6; i++) {
-            mask[i] = true;
-        }
-
-        resultTest[0] = "{l}";
-        resultTest[4] = "{u:"+headerId()+"}";
-
-        outerloop:
-        for (int i = 6; i < packetInBytes.length - 1; i++) {
-            int potentialstringlength = readUshort(i);
-            if ((potentialstringlength >= 0 && potentialstringlength < 3) || potentialstringlength > packetInBytes.length - i - 2) continue;
-
-            for (int j = i; j < potentialstringlength+i+2; j++) {
-                if (mask[j]) continue outerloop;
-            }
-
-            for (int j = i+2; j < potentialstringlength+i+2; j++) {
-                if (readByte(j) >= 0 && readByte(j) < 6) continue  outerloop;
-            }
-
-            if (i + 2 + potentialstringlength >= packetInBytes.length - 3 ||
-                    (packetInBytes[i+2+potentialstringlength] >= 0 &&
-                            packetInBytes[i+2+potentialstringlength] < 6 )) {
-
-                for (int j = i; j < potentialstringlength+i+2; j++) {
-                    mask[j] = true;
-                }
-                resultTest[i] = "{s:\""+readString(i).replace("\"", "\\\"")+"\"}";
-                i += (1 + potentialstringlength);
-            }
-        }
-
-        //TODO add special case for seperated 5, 6 and 7 bytes here
-        // long live the shitty code.
-
-        //5
-        out:
-        for (int i = 6; i < packetInBytes.length - 4; i++) {
-            for (int j = i; j < i+5; j++) {
-                if (mask[j]) {
-                    i = j;
-                    continue out;
-                }
-            }
-            if (!mask[i-1] || (i+5 < packetInBytes.length && !mask[i+5])) continue;
-
-            if ((readByte(i) == 0 || readByte(i) == 1) && (readInteger(i+1) > 1 || readInteger(i+1) < 0)) {
-                //decide the first byte to be the a boolean
-                resultTest[i] = "{b:"+(readBoolean(i) ? "true" : "false")+"}";
-                resultTest[i+1] = "{i:"+readInteger(i+1)+"}";
-                for (int j = i; j < i+5; j++) {
-                    mask[j] = true;
-                }
-            }
-
-        }
-
-//        //6
-//        out:
-//        for (int i = 6; i < packetInBytes.length - 5; i++) {
-//            for (int j = i; j < i+6; j++) {
-//                if (mask[j]) {
-//                    i = j;
-//                    continue out;
-//                }
-//            }
-//            if (i+6 < packetInBytes.length && !mask[i+6]) continue;
-//
-//
-//
-//        }
-//
-//        //7
-//        out:
-//        for (int i = 6; i < packetInBytes.length - 6; i++) {
-//            for (int j = i; j < i+7; j++) {
-//                if (mask[j]) {
-//                    i = j;
-//                    continue out;
-//                }
-//            }
-//            if (i+7 < packetInBytes.length && !mask[i+7]) continue;
-//
-//
-//
-//        }
-
-        lp22:
-        for (int i = 6; i < packetInBytes.length - 3; i++) {
-            for (int j = i; j < i + 4; j++) {
-                if (mask[j]) {
-                    continue lp22;
-                }
-            }
-
-            int num = readInteger(i);
-            if (num == -1 || (num >= 0 && num < 256)) {
-                for (int j = i; j < i+4; j++) {
-                    mask[j] = true;
-                }
-                resultTest[i] = "{i:"+num+"}";
-                i += 3;
-            }
-        }
-
-
-        boolean changed = true;
-        boolean isfirst = true;
-
-        while (changed) {
-            changed = false;
-            // filtering strings
-            outerloop:
-            for (int i = 6; i < packetInBytes.length - 1; i++) {
-                int potentialstringlength = readUshort(i);
-                if ((potentialstringlength >= 0 && potentialstringlength < 3) || potentialstringlength > packetInBytes.length - i - 2) continue;
-
-                for (int j = i; j < potentialstringlength+i+2; j++) {
-                    if (mask[j]) continue outerloop;
-                }
-
-                for (int j = i+2; j < potentialstringlength+i+2; j++) {
-                    if (readByte(j) >= 0 && readByte(j) < 6) continue  outerloop;
-                }
-
-                if (i + 2 + potentialstringlength >= packetInBytes.length - 3 ||
-                        (packetInBytes[i+2+potentialstringlength] >= 0 &&
-                                packetInBytes[i+2+potentialstringlength] < 6 )) {
-
-                    for (int j = i; j < potentialstringlength+i+2; j++) {
-                        mask[j] = true;
-                    }
-                    changed = true;
-                    resultTest[i] = "{s:\""+readString(i).replace("\"", "\\\"")+"\"}";
-                    i += (1 + potentialstringlength);
-                }
-            }
-
-            if (isfirst) {
-                int count = 0;
-                for (int i = 6; i < packetInBytes.length; i++) {
-                    if (!mask[i]) count++;
-                }
-                if (count > 300) return "";
-            }
-            isfirst = false;
-
-            // filtering integers
-            boolean hasfoundsomtin = true;
-            while (hasfoundsomtin) {
-                hasfoundsomtin = false;
-                outerloop2:
-                for (int i = 6; i < packetInBytes.length - 3; i++) {
-                    for (int j = i; j < i + 4; j++) {
-                        if (mask[j]) {
-                            continue outerloop2;
-                        }
-                    }
-
-                    if (i + 4 == packetInBytes.length || mask[i+4] || mask[i-1]) {
-                        if (packetInBytes[i+1] == 2) { //could be an unfiltered string; don't filter yet
-                            if (((packetInBytes[i+2] >= '0' && packetInBytes[i+2] <= '9') ||
-                                    (packetInBytes[i+2] >= 'a' && packetInBytes[i+2] <= 'z') ||
-                                    (packetInBytes[i+2] >= 'A' && packetInBytes[i+2] <= 'Z')) &&
-                                    ((packetInBytes[i+3] >= '0' && packetInBytes[i+3] <= '9') ||
-                                            (packetInBytes[i+3] >= 'a' && packetInBytes[i+3] <= 'z') ||
-                                            (packetInBytes[i+3] >= 'A' && packetInBytes[i+3] <= 'Z'))) {
-                                changed = true;
-                                for (int j = i; j < i + 4; j++) {
-                                    mask[j] = true;
-                                }
-                                hasfoundsomtin = true;
-                                resultTest[i] = "{i:"+readInteger(i)+"}";
-                                continue;
-                            }
-                            continue ;
-                        }
-                        else {
-                            for (int j = i; j < i + 4; j++) {
-                                mask[j] = true;
-                            }
-                            hasfoundsomtin = true;
-                            changed = true;
-                            resultTest[i] = "{i:"+readInteger(i)+"}";
-                            continue;
-                        }
-                    }
-                    if (readInteger(i) < 65536) {
-                        for (int j = i; j < i + 4; j++) {
-                            mask[j] = true;
-                        }
-                        hasfoundsomtin = true;
-                        resultTest[i] = "{i:"+readInteger(i)+"}";
-                        changed = true;
-                        continue;
-                    }
-
-                }
-            }
-
-
-            // filtering strings
-
-            outerloop3:
-            for (int i = 6; i < packetInBytes.length - 1; i++) {
-                int potentialstringlength = readUshort(i);
-                if (potentialstringlength > packetInBytes.length - i - 2) continue;
-
-                for (int j = i; j < potentialstringlength+i+2; j++) {
-                    if (mask[j]) continue outerloop3;
-                }
-
-                for (int j = i+2; j < potentialstringlength+i+2; j++) {
-                    if (readByte(j) >= 0 && readByte(j) < 6) continue outerloop3;
-                }
-
-                for (int j = i; j < potentialstringlength+i+2; j++) {
-                    mask[j] = true;
-                }
-                resultTest[i] = "{s:\""+readString(i).replace("\"", "\\\"")+"\"}";
-                i += (1 + potentialstringlength);
-                changed = true;
-            }
-        }
-
-        int opeenvolging = 0;
-        for (int i = 6; i < packetInBytes.length; i++) {
-            if (!mask[i]) {
-                opeenvolging++;
-                if (opeenvolging == 4) return "";
-                if (i+1 == packetInBytes.length || mask[i+1]) {
-                    for (int j = i - opeenvolging + 1; j <= i; j++) {
-                        mask[j] = true;
-                        if (packetInBytes[j] == 1 || packetInBytes[j] == 0) {
-                            resultTest[j] = "{b:"+(packetInBytes[j] == 1 ? "true" : "false")+"}";
-                        }
-                        else {
-                            resultTest[j] = "{b:"+((((int)packetInBytes[j])+256)%256)+"}";
-                        }
-                    }
-                    opeenvolging = 0;
-
-
-                }
-            }
-        }
-
-
-        // if all values in mask are true, go further
-        for (boolean bool : mask) {
-            if (!bool) return "";
-        }
-
-        StringBuilder expression = new StringBuilder();
-        for (int i = 0; i < resultTest.length; i++) {
-            if (resultTest[i] != null) expression.append(resultTest[i]);
-        }
-
-        return expression.toString().replace("{i:0}{b:false}{b:true}", "{s:\"\"}{i:1}");
+        return PacketStringUtils.predictedExpression(this);
     }
 
     @Override
@@ -816,7 +549,7 @@ public class HPacket implements StringifyAble {
     public static void main(String[] args) {
         HPacket packet = new HPacket("{l}{u:4564}{i:3}{i:0}{s:\"hi\"}{i:0}{i:1}{s:\"how\"}{i:3}{b:1}{b:2}{b:3}{i:2}{s:\"r u\"}{i:1}{b:120}{i:2}{b:true}{d:1.4}");
 
-        String str = PacketStructure.toExpressionFromGivenStructure(packet, "i(isi(b))iBd");
+        String str = PacketStringUtils.toExpressionFromGivenStructure(packet, "i(isi(b))iBd");
 
         HPacket packetverify = new HPacket(str);
 
