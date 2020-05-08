@@ -102,6 +102,7 @@ public class NormalProxyProvider extends ProxyProvider {
                         try {
                             Socket client = proxy_server.accept();
                             proxy = potentialProxy;
+                            removeFromHosts();
                             closeAllProxies(proxy);
                             if (HConnection.DEBUG) System.out.println("accepted a proxy");
 
@@ -146,10 +147,6 @@ public class NormalProxyProvider extends ProxyProvider {
     @Override
     protected void onConnect() {
         super.onConnect();
-
-        if (hostRedirected)	{
-            removeFromHosts();
-        }
         clearAllProxies();
     }
 
