@@ -1,5 +1,6 @@
 package gearth.protocol.packethandler;
 
+import gearth.misc.listenerpattern.Observable;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 
@@ -7,6 +8,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class OutgoingPacketHandler extends PacketHandler {
 
@@ -14,12 +16,11 @@ public class OutgoingPacketHandler extends PacketHandler {
         super(outputStream, trafficObservables);
     }
 
-    private List<OnDatastreamConfirmedListener> onDatastreamConfirmedListeners = new ArrayList<>();
+
+
+    private Observable<OnDatastreamConfirmedListener> datastreamConfirmedObservable = new Observable<>();
     public void addOnDatastreamConfirmedListener(OnDatastreamConfirmedListener listener) {
-        onDatastreamConfirmedListeners.add(listener);
-    }
-    public interface OnDatastreamConfirmedListener {
-        void confirm(String hotelVersion);
+        datastreamConfirmedObservable.addListener(listener);
     }
 
     private void dataStreamCheck(byte[] buffer)	{
@@ -28,9 +29,7 @@ public class OutgoingPacketHandler extends PacketHandler {
             isDataStream = (hpacket.getBytesLength() > 6 && hpacket.length() < 100);
             if (isDataStream) {
                 String version = hpacket.readString();
-                for (OnDatastreamConfirmedListener listener : onDatastreamConfirmedListeners) {
-                    listener.confirm(version);
-                }
+                datastreamConfirmedObservable.fireEvent(l -> l.confirm(version));
             }
         }
     }

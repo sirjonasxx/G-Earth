@@ -5,13 +5,9 @@ package gearth.services.extensionhandler.extensions.implementations.network.exec
  */
 public class ExtensionRunnerFactory {
 
-    private static ExtensionRunner runner = obtain();
+    private static ExtensionRunner runner = new NormalExtensionRunner();
 
     public static ExtensionRunner get() {
         return runner;
-    }
-
-    private static ExtensionRunner obtain() {
-        return new NormalExtensionRunner();
     }
 }

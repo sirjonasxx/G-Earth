@@ -81,20 +81,20 @@ public class NetworkExtensionInfo {
 
     public static class OUTGOING_MESSAGES_IDS {
         public static final int ONDOUBLECLICK = 1;
-        public static final int INFOREQUEST = 2;        // backend: implemented
-        public static final int PACKETINTERCEPT = 3;    // backend: implemented
-        public static final int FLAGSCHECK = 4;         // backend: implemented
-        public static final int CONNECTIONSTART = 5;    // backend: implemented
-        public static final int CONNECTIONEND = 6;      // backend: implemented
-        public static final int INIT = 7;               // backend: implemented
+        public static final int INFOREQUEST = 2;
+        public static final int PACKETINTERCEPT = 3;
+        public static final int FLAGSCHECK = 4;
+        public static final int CONNECTIONSTART = 5;
+        public static final int CONNECTIONEND = 6;
+        public static final int INIT = 7;
     }
 
 
     public static class INCOMING_MESSAGES_IDS {
-        public static final int EXTENSIONINFO = 1;      // backend: implemented
-        public static final int MANIPULATEDPACKET = 2;  // backend: implemented
-        public static final int REQUESTFLAGS = 3;       // backend: implemented
-        public static final int SENDMESSAGE = 4;        // backend: implemented
+        public static final int EXTENSIONINFO = 1;
+        public static final int MANIPULATEDPACKET = 2;
+        public static final int REQUESTFLAGS = 3;
+        public static final int SENDMESSAGE = 4;
         public static final int EXTENSIONCONSOLELOG = 98;
     }
 
