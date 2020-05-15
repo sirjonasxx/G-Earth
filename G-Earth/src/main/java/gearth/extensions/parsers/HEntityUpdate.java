@@ -35,6 +35,7 @@ public class HEntityUpdate {
             switch(actionValues[0]) {
                 case "flatctrl":
                     isController = true;
+                    this.action = HAction.None;
                     break;
                 case "mv":
                     String[] values = actionValues[1].split(",");

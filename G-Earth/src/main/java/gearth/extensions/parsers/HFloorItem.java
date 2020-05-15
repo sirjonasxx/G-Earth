@@ -46,8 +46,7 @@ public class HFloorItem implements IFurni {
 
     private void setStuffData(HPacket packet)
     {
-        int kind = packet.readInteger();
-        switch(kind)
+        switch(category & 255)
         {
             case 0: // RegularFurni
                 packet.readString();
@@ -102,6 +101,11 @@ public class HFloorItem implements IFurni {
                 packet.readInteger();
                 packet.readInteger();
                 break;
+        }
+        if ((category & 0xFF00 & 0x100) > 0)
+        {
+           packet.readInteger();
+           packet.readInteger();
         }
     }
 
