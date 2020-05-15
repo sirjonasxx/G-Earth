@@ -1,6 +1,5 @@
 package gearth.protocol.connection.proxy;
 
-import com.sun.corba.se.impl.orbutil.concurrent.Mutex;
 import gearth.protocol.HConnection;
 import gearth.protocol.connection.HProxy;
 import gearth.protocol.connection.HProxySetter;
@@ -13,7 +12,6 @@ import gearth.protocol.packethandler.PacketHandler;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.concurrent.Semaphore;
 
