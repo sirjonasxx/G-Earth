@@ -52,6 +52,8 @@ public class RawIpProxyProvider extends ProxyProvider {
                 stateSetter.setState(HState.PREPARING);
                 proxy = new HProxy(input_host, input_host, input_port, input_port, "0.0.0.0");
 
+                maybeRemoveMapping();
+
                 if (!onBeforeIpMapping()) {
                     stateSetter.setState(HState.NOT_CONNECTED);
                     return;

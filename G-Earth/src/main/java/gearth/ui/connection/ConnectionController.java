@@ -173,5 +173,10 @@ public class ConnectionController extends SubForm {
             getHConnection().abort();
         }
     }
+
+    @Override
+    protected void onExit() {
+        getHConnection().abort();
+    }
     
 }
