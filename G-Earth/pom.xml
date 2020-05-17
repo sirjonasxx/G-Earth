@@ -90,7 +90,7 @@
                                     <fileset dir="src/main/resources/build/mac" includes="**/*" />
                                 </copy>
                                 <copy todir="../Build/Linux/">
-                                    <fileset dir="src/main/resources/build/linux" includes="**/*" />
+                                    <fileset dir="src/main/resources/build/linux" includes="**/*" excludes=".gitkeep" />
                                 </copy>
                                 <copy todir="../Build/Windows_32bit/">
                                     <fileset dir="src/main/resources/build/windows/32bit" includes="**/*" />
