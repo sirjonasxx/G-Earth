@@ -1,37 +1,36 @@
-package gearth.protocol.connection.proxy;
+package gearth.protocol.connection.proxy.unix;
 
-import gearth.misc.Cacher;
 import gearth.protocol.HConnection;
 import gearth.protocol.connection.HProxy;
 import gearth.protocol.connection.HProxySetter;
 import gearth.protocol.connection.HState;
 import gearth.protocol.connection.HStateSetter;
+import gearth.protocol.connection.proxy.ProxyProvider;
+import gearth.protocol.connection.proxy.ProxyProviderFactory;
+import gearth.protocol.connection.proxy.SocksConfiguration;
 import gearth.protocol.hostreplacer.ipmapping.IpMapper;
 import gearth.protocol.hostreplacer.ipmapping.IpMapperFactory;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.layout.Region;
-import org.json.JSONObject;
 
 import java.io.IOException;
-import java.math.BigInteger;
 import java.net.*;
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.UUID;
 
-public class RawIpProxyProvider extends ProxyProvider {
+public class LinuxRawIpProxyProvider extends ProxyProvider {
 
     private volatile String input_host;
     private volatile int input_port;
 
-    private IpMapper ipMapper = IpMapperFactory.get();
-    private boolean hasMapped = false;
-
+    protected IpMapper ipMapper = IpMapperFactory.get();
     protected HProxy proxy = null;
 
-    public RawIpProxyProvider(HProxySetter proxySetter, HStateSetter stateSetter, HConnection hConnection, String input_host, int input_port) {
+    protected volatile boolean useSocks = false;
+
+    public LinuxRawIpProxyProvider(HProxySetter proxySetter, HStateSetter stateSetter, HConnection hConnection, String input_host, int input_port) {
         super(proxySetter, stateSetter, hConnection);
         this.input_host = input_host;
         this.input_port = input_port;
@@ -97,9 +96,7 @@ public class RawIpProxyProvider extends ProxyProvider {
     @Override
     public void abort() {
         stateSetter.setState(HState.ABORTING);
-        if (hasMapped) {
-            maybeRemoveMapping();
-        }
+        maybeRemoveMapping();
         tryCloseProxy();
         super.abort();
     }
@@ -107,19 +104,18 @@ public class RawIpProxyProvider extends ProxyProvider {
     @Override
     protected void onConnect() {
         super.onConnect();
+        maybeRemoveMapping();
         tryCloseProxy();
     }
 
     @Override
     protected void onConnectEnd() {
-        if (hasMapped) {
-            maybeRemoveMapping();
-        }
+        maybeRemoveMapping();
         tryCloseProxy();
         super.onConnectEnd();
     }
 
-    private void tryCloseProxy() {
+    protected void tryCloseProxy() {
         if (proxy.getProxy_server() != null && !proxy.getProxy_server().isClosed())	{
             try {
                 proxy.getProxy_server().close();
@@ -133,6 +129,10 @@ public class RawIpProxyProvider extends ProxyProvider {
 
     // returns false if fail
     protected boolean onBeforeIpMapping() throws IOException, InterruptedException {
+        if (useSocks) {
+            return true;
+        }
+
         preConnectedServerConnections = new LinkedList<>();
         for (int i = 0; i < 3; i++) {
             Socket s1 = new Socket();
@@ -153,11 +153,41 @@ public class RawIpProxyProvider extends ProxyProvider {
     }
 
     protected void createProxyThread(Socket client) throws IOException, InterruptedException {
-        if (preConnectedServerConnections.isEmpty()) {
+        if (useSocks) {
+            createSocksProxyThread(client);
+        }
+        else if (preConnectedServerConnections.isEmpty()) {
             if (HConnection.DEBUG) System.out.println("pre-made server connections ran out of stock");
         }
         else {
             startProxyThread(client, preConnectedServerConnections.poll(), proxy);
+        }
+    }
+
+    private void createSocksProxyThread(Socket client) throws SocketException, InterruptedException {
+        SocksConfiguration configuration = ProxyProviderFactory.getSocksConfig();
+
+        if (configuration == null) {
+            maybeRemoveMapping();
+            stateSetter.setState(HState.NOT_CONNECTED);
+            showInvalidConnectionError();
+            return;
+        }
+
+        Proxy socks = new Proxy(Proxy.Type.SOCKS, new InetSocketAddress(configuration.getSocksHost(), configuration.getSocksPort()));
+        Socket server = new Socket(socks);
+        server.setSoTimeout(1200);
+        try {
+            server.connect(new InetSocketAddress(proxy.getActual_domain(), proxy.getActual_port()), 1200);
+            startProxyThread(client, server, proxy);
+        }
+        catch (SocketTimeoutException e) {
+            maybeRemoveMapping();
+            stateSetter.setState(HState.NOT_CONNECTED);
+            showInvalidConnectionError();
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -171,107 +201,14 @@ public class RawIpProxyProvider extends ProxyProvider {
     }
 
 
-    private void maybeAddMapping() {
-        if (!hasMapped) {
-            hasMapped = true;
-            if (isNoneConnected()) {
-                ipMapper.enable();
-                ipMapper.addMapping(proxy.getActual_domain());
-            }
-            addMappingCache();
-        }
-
+    protected void maybeAddMapping() {
+        ipMapper.enable();
+        ipMapper.addMapping(proxy.getActual_domain());
     }
 
     protected void maybeRemoveMapping() {
-        if (hasMapped) {
-            hasMapped = false;
-            removeMappingCache();
-            if (isNoneConnected()) {
-                ipMapper.deleteMapping(proxy.getActual_domain());
-            }
-        }
+        ipMapper.deleteMapping(proxy.getActual_domain());
+
     }
 
-
-
-    private static final UUID INSTANCE_ID = UUID.randomUUID();
-    private static final String RAWIP_CONNECTIONS = "rawip_connections";
-
-
-    // let other G-Earth instances know you're connected
-    private void addMappingCache() {
-        new Thread(() -> {
-            while (hasMapped) {
-                updateMappingCache();
-                try {
-                    Thread.sleep(55000);
-                } catch (InterruptedException ignored) {}
-            }
-        }).start();
-    }
-
-    // checks if no G-Earth instances are connected
-    // every G-Earth instance is supposed to update if it's still connected every 60 seconds
-    private boolean isNoneConnected() {
-        return isNoneConnected(proxy.getActual_domain());
-    }
-
-    private void updateMappingCache() {
-        JSONObject connections = getCurrentConnectionsCache();
-
-        JSONObject instance = new JSONObject();
-        instance.put("timestamp", BigInteger.valueOf(System.currentTimeMillis()));
-
-        connections.put(INSTANCE_ID.toString(), instance);
-        saveCurrentConnectionsCache(connections);
-    }
-
-    private void removeMappingCache() {
-        JSONObject connections = getCurrentConnectionsCache();
-        connections.remove(INSTANCE_ID.toString());
-        saveCurrentConnectionsCache(connections);
-    }
-
-    private JSONObject getCurrentConnectionsCache() {
-        return getCurrentConnectionsCache(proxy.getActual_domain());
-    }
-
-    private void saveCurrentConnectionsCache(JSONObject connections) {
-        if (!Cacher.getCacheContents().has(proxy.getActual_domain())) {
-            Cacher.put(RAWIP_CONNECTIONS, new JSONObject());
-        }
-        JSONObject gearthConnections = Cacher.getCacheContents().getJSONObject(RAWIP_CONNECTIONS);
-        gearthConnections.put(proxy.getActual_domain(), connections);
-        Cacher.put(RAWIP_CONNECTIONS, gearthConnections);
-    }
-
-
-    static private JSONObject getCurrentConnectionsCache(String actual_host) {
-        if (!Cacher.getCacheContents().has(RAWIP_CONNECTIONS)) {
-            Cacher.put(RAWIP_CONNECTIONS, new JSONObject());
-        }
-        JSONObject gearthConnections = Cacher.getCacheContents().getJSONObject(RAWIP_CONNECTIONS);
-
-        if (!gearthConnections.has(actual_host)) {
-            gearthConnections.put(actual_host, new JSONObject());
-            Cacher.put(RAWIP_CONNECTIONS, gearthConnections);
-        }
-        return gearthConnections.getJSONObject(actual_host);
-    }
-
-    static boolean isNoneConnected(String actual_host) {
-        JSONObject connections = getCurrentConnectionsCache(actual_host);
-
-        BigInteger timeoutTimestamp = BigInteger.valueOf(System.currentTimeMillis() - 60000);
-        for (String key : connections.keySet()) {
-            JSONObject connection = connections.getJSONObject(key);
-            if (!key.equals(INSTANCE_ID.toString())) {
-                if (connection.getBigInteger("timestamp").compareTo(timeoutTimestamp) > 0) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
 }

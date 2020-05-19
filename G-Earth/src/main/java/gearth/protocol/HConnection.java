@@ -5,10 +5,9 @@ import gearth.protocol.connection.HProxy;
 import gearth.protocol.connection.HState;
 import gearth.protocol.connection.proxy.ProxyProvider;
 import gearth.protocol.connection.proxy.ProxyProviderFactory;
-import gearth.protocol.connection.proxy.RawIpProxyProvider;
+import gearth.protocol.connection.proxy.windows.WindowsRawIpProxyProvider;
 
 import java.io.IOException;
-import java.net.UnknownHostException;
 
 public class HConnection {
 
@@ -155,7 +154,7 @@ public class HConnection {
     }
 
     public boolean isRawIpMode() {
-        return proxyProvider != null && proxyProvider instanceof RawIpProxyProvider;
+        return proxyProvider != null && proxyProvider instanceof WindowsRawIpProxyProvider;
     }
 
     public ProxyProvider getProxyProvider() {

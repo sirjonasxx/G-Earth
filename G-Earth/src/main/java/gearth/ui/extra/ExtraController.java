@@ -3,8 +3,9 @@ package gearth.ui.extra;
 import gearth.misc.Cacher;
 import gearth.protocol.HConnection;
 import gearth.protocol.connection.HState;
+import gearth.protocol.connection.proxy.ProxyProviderFactory;
 import gearth.protocol.connection.proxy.SocksConfiguration;
-import gearth.protocol.connection.proxy.SocksProxyProvider;
+import gearth.protocol.connection.proxy.windows.WindowsRawIpSocksProxyProvider;
 import gearth.ui.SubForm;
 import gearth.ui.info.InfoController;
 import javafx.scene.control.*;
@@ -64,7 +65,7 @@ public class ExtraController extends SubForm implements SocksConfiguration {
 
         cbx_useSocks.selectedProperty().addListener(observable -> grd_socksInfo.setDisable(!cbx_useSocks.isSelected()));
 
-        SocksProxyProvider.setSocksConfig(this);
+        ProxyProviderFactory.setSocksConfig(this);
     }
 
     @Override

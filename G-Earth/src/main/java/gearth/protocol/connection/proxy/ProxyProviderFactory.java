@@ -5,6 +5,10 @@ import gearth.misc.OSValidator;
 import gearth.protocol.HConnection;
 import gearth.protocol.connection.HProxySetter;
 import gearth.protocol.connection.HStateSetter;
+import gearth.protocol.connection.proxy.unix.LinuxRawIpProxyProvider;
+import gearth.protocol.connection.proxy.unix.LinuxRawIpSocksProxyProvider;
+import gearth.protocol.connection.proxy.windows.WindowsRawIpProxyProvider;
+import gearth.protocol.connection.proxy.windows.WindowsRawIpSocksProxyProvider;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -17,6 +21,7 @@ import java.util.List;
 public class ProxyProviderFactory {
 
     public static final String HOTELS_CACHE_KEY = "hotelsConnectionInfo";
+    private static SocksConfiguration socksConfig = null;
 
     public static List<String> autoDetectHosts;
     static {
@@ -88,25 +93,36 @@ public class ProxyProviderFactory {
         }
 
         if (hostIsIpAddress(domain)) {
-            SocksConfiguration config = SocksProxyProvider.getSocksConfig();
-            if (RawIpProxyProvider.isNoneConnected(domain) &&
-                    (!config.useSocks() || config.dontUseFirstTime()) ) {
-                return new RawIpProxyProvider(proxySetter, stateSetter, hConnection, domain, port);
-            }
-            else if (config.useSocks()) {
-                return new SocksProxyProvider(proxySetter, stateSetter, hConnection, domain, port);
-            }
+            if (OSValidator.isWindows()) {
+                if (WindowsRawIpProxyProvider.isNoneConnected(domain) &&
+                        (!socksConfig.useSocks() || socksConfig.dontUseFirstTime()) ) {
+                    return new WindowsRawIpProxyProvider(proxySetter, stateSetter, hConnection, domain, port);
+                }
+                else if (socksConfig.useSocks()) {
+                    return new WindowsRawIpSocksProxyProvider(proxySetter, stateSetter, hConnection, domain, port);
+                }
 
-            Platform.runLater(() -> {
-                Alert alert = new Alert(Alert.AlertType.ERROR, "G-Earth is already connected to this hotel. " +
-                        "Due to current limitations you can only connect one session per hotel to G-Earth in Raw IP mode.\n\n" +
-                        "You can bypass this by using a SOCKS proxy [Extra -> Advanced -> SOCKS]", ButtonType.OK);
-                alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
-                alert.setResizable(false);
-                alert.show();
-            });
+                Platform.runLater(() -> {
+                    Alert alert = new Alert(Alert.AlertType.ERROR, "G-Earth is already connected to this hotel. " +
+                            "Due to current limitations you can only connect one session per hotel to G-Earth in Raw IP mode on Windows.\n\n" +
+                            "You can bypass this by using a SOCKS proxy [Extra -> Advanced -> SOCKS]", ButtonType.OK);
+                    alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+                    alert.setResizable(false);
+                    alert.show();
+                });
 
+                return null;
+            }
+            else if (OSValidator.isUnix()) {
+                if (!socksConfig.useSocks() || socksConfig.dontUseFirstTime()) {
+                    return new LinuxRawIpProxyProvider(proxySetter, stateSetter, hConnection, domain, port);
+                }
+                else {
+                    return new LinuxRawIpSocksProxyProvider(proxySetter, stateSetter, hConnection, domain, port);
+                }
+            }
             return null;
+
         }
         else {
             List<String> potentialHost = new ArrayList<>();
@@ -117,5 +133,13 @@ public class ProxyProviderFactory {
 
     private ProxyProvider provide(List<String> potentialHosts) {
         return new NormalProxyProvider(proxySetter, stateSetter, hConnection, potentialHosts);
+    }
+
+    public static void setSocksConfig(SocksConfiguration configuration) {
+        socksConfig = configuration;
+    }
+
+    public static SocksConfiguration getSocksConfig() {
+        return socksConfig;
     }
 }
