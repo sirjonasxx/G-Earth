@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 // Temporary class for the sake of not getting nullpointers on linux&mac until they have an IpMapper as well
-public class EmptyIpMapper implements IpMapper {
+public class EmptyIpMapper extends IpMapper {
     @Override
     public void enable() {
 

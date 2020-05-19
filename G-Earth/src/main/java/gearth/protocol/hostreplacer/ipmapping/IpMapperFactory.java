@@ -7,6 +7,7 @@ public class IpMapperFactory {
     public static IpMapper get() {
 
         if (OSValidator.isWindows()) return new WindowsIpMapper();
+        if (OSValidator.isUnix()) return new LinuxIpMapper();
 
         return new EmptyIpMapper();
     }

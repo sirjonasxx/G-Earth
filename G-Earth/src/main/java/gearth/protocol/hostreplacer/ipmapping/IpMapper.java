@@ -1,16 +1,27 @@
 package gearth.protocol.hostreplacer.ipmapping;
 
+import java.io.IOException;
 import java.util.List;
 
 // always map to 127.0.0.1, same port
-public interface IpMapper {
+public abstract class IpMapper {
 
-    void enable();
+    void runCommand(String... args) {
+        ProcessBuilder processBuilder = new ProcessBuilder();
+        processBuilder.command(args);
+        try {
+            processBuilder.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
-    void addMapping(String ip);
+    abstract public void enable();
 
-    void deleteMapping(String ip);
+    abstract public void addMapping(String ip);
 
-    List<String> getCurrentMappings();
+    abstract public void deleteMapping(String ip);
+
+    abstract public List<String> getCurrentMappings();
 
 }

@@ -4,17 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class WindowsIpMapper implements IpMapper {
-
-    private void runCommand(String... args) {
-        ProcessBuilder processBuilder = new ProcessBuilder();
-        processBuilder.command(args);
-        try {
-            processBuilder.start();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+public class WindowsIpMapper extends IpMapper {
 
     @Override
     public void enable() {
