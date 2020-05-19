@@ -5,6 +5,7 @@ import gearth.protocol.connection.HProxy;
 import gearth.protocol.connection.HState;
 import gearth.protocol.connection.proxy.ProxyProvider;
 import gearth.protocol.connection.proxy.ProxyProviderFactory;
+import gearth.protocol.connection.proxy.unix.LinuxRawIpProxyProvider;
 import gearth.protocol.connection.proxy.windows.WindowsRawIpProxyProvider;
 
 import java.io.IOException;
@@ -154,7 +155,8 @@ public class HConnection {
     }
 
     public boolean isRawIpMode() {
-        return proxyProvider != null && proxyProvider instanceof WindowsRawIpProxyProvider;
+        return proxyProvider != null && proxyProvider instanceof LinuxRawIpProxyProvider;
+        // WindowsRawIpProxyProvider extends LinuxRawIpProxyProvider
     }
 
     public ProxyProvider getProxyProvider() {
