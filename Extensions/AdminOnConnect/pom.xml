@@ -87,10 +87,10 @@
                         <phase>package</phase>
                         <configuration>
                             <target name="copy to extensions folder">
-                                <copy file="target/bin/AdminOnConnect.jar" todir="../../Build/Linux/extensions"/>
-                                <copy file="target/bin/AdminOnConnect.jar" todir="../../Build/Mac/extensions"/>
-                                <copy file="target/bin/AdminOnConnect.jar" todir="../../Build/Windows_64bit/extensions"/>
-                                <copy file="target/bin/AdminOnConnect.jar" todir="../../Build/Windows_64bit/extensions"/>
+                                <copy file="target/bin/AdminOnConnect.jar" todir="../../Build/Linux/Extensions"/>
+                                <copy file="target/bin/AdminOnConnect.jar" todir="../../Build/Mac/Extensions"/>
+                                <copy file="target/bin/AdminOnConnect.jar" todir="../../Build/Windows_64bit/Extensions"/>
+                                <copy file="target/bin/AdminOnConnect.jar" todir="../../Build/Windows_64bit/Extensions"/>
                             </target>
                         </configuration>
                         <goals>
