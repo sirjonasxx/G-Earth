@@ -179,7 +179,7 @@ public class NormalProxyProvider extends ProxyProvider {
 
     private void clearAllProxies() {
         closeAllProxies(null);
-        potentialProxies = new ArrayList<>();
+//        potentialProxies = new ArrayList<>();
     }
     private void closeAllProxies(HProxy except) {
         for (HProxy proxy : potentialProxies) {
@@ -194,6 +194,6 @@ public class NormalProxyProvider extends ProxyProvider {
                 }
             }
         }
-        potentialProxies = Collections.singletonList(except);
+//        potentialProxies = Collections.singletonList(except);
     }
 }
