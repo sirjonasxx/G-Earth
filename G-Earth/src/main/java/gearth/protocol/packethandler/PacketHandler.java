@@ -23,7 +23,8 @@ public abstract class PacketHandler {
     volatile boolean isDataStream = false;
     private volatile int currentIndex = 0;
 
-    private final Object lock = new Object();
+    private final Object manipulationLock = new Object();
+    private final Object sendLock = new Object();
 
     private RC4 decryptcipher = null;
     private RC4 encryptcipher = null;
@@ -58,7 +59,7 @@ public abstract class PacketHandler {
             payloadBuffer.push(buffer);
         }
         else if (!HConnection.DECRYPTPACKETS) {
-            synchronized (lock) {
+            synchronized (sendLock) {
                 out.write(buffer);
             }
         }
@@ -125,7 +126,7 @@ public abstract class PacketHandler {
     }
 
     public void sendToStream(byte[] buffer) {
-        synchronized (lock) {
+        synchronized (sendLock) {
             try {
                 out.write(
                         (!isEncryptedStream)
@@ -139,7 +140,7 @@ public abstract class PacketHandler {
     }
 
     public void flush() throws IOException {
-        synchronized (lock) {
+        synchronized (manipulationLock) {
             HPacket[] hpackets = payloadBuffer.receive();
 
             for (HPacket hpacket : hpackets){
@@ -150,11 +151,13 @@ public abstract class PacketHandler {
                 }
 
                 if (!hMessage.isBlocked())	{
-                    out.write(
-                            (!isencrypted)
-                                    ? hMessage.getPacket().toBytes()
-                                    : encryptcipher.rc4(hMessage.getPacket().toBytes())
-                    );
+                    synchronized (sendLock) {
+                        out.write(
+                                (!isencrypted)
+                                        ? hMessage.getPacket().toBytes()
+                                        : encryptcipher.rc4(hMessage.getPacket().toBytes())
+                        );
+                    }
                 }
                 currentIndex++;
             }
