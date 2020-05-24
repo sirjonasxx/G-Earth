@@ -2,6 +2,9 @@ package gearth.extensions.parsers;
 
 import gearth.protocol.HPacket;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class HEntity {
     private int id;
     private int index;
@@ -13,6 +16,7 @@ public class HEntity {
     private String figureId;
     private String favoriteGroup = null;
     private HEntityUpdate lastUpdate = null;
+    private Object[] stuff = new Object[0];
 
     public HEntity(HPacket packet) {
         id = packet.readInteger();
@@ -29,37 +33,41 @@ public class HEntity {
 
         switch (entityTypeId) {
             case 1:
+                stuff = new Object[5];
                 gender = HGender.fromString(packet.readString());
-                packet.readInteger();
-                packet.readInteger();
+                stuff[0] = packet.readInteger();
+                stuff[1] = packet.readInteger();
                 favoriteGroup = packet.readString();
-                packet.readString();
-                packet.readInteger();
-                packet.readBoolean();
+                stuff[2] = packet.readString();
+                stuff[3] = packet.readInteger();
+                stuff[4] = packet.readBoolean();
                 break;
             case 2:
-                packet.readInteger();
-                packet.readInteger();
-                packet.readString();
-                packet.readInteger();
-                packet.readBoolean();
-                packet.readBoolean();
-                packet.readBoolean();
-                packet.readBoolean();
-                packet.readBoolean();
-                packet.readBoolean();
-                packet.readInteger();
-                packet.readString();
+                stuff = new Object[20];
+                stuff[0] = packet.readInteger();
+                stuff[1] = packet.readInteger();
+                stuff[2] = packet.readString();
+                stuff[3] = packet.readInteger();
+                stuff[4] = packet.readBoolean();
+                stuff[5] = packet.readBoolean();
+                stuff[6] = packet.readBoolean();
+                stuff[7] = packet.readBoolean();
+                stuff[8] = packet.readBoolean();
+                stuff[9] = packet.readBoolean();
+                stuff[10] = packet.readInteger();
+                stuff[11] = packet.readString();
                 break;
             case 4:
-
-                packet.readString();
-                packet.readInteger();
-                packet.readString();
+                stuff = new Object[4];
+                stuff[0] = packet.readString();
+                stuff[1] = packet.readInteger();
+                stuff[2] = packet.readString();
+                List<Short> list = new ArrayList<>();
                 for (int j = packet.readInteger(); j > 0; j--)
                 {
-                    packet.readShort();
+                    list.add(packet.readShort());
                 }
+                stuff[3] = list;
                 break;
         }
     }
@@ -119,5 +127,9 @@ public class HEntity {
 
     public HEntityUpdate getLastUpdate() {
         return lastUpdate;
+    }
+
+    public Object[] getStuff() {
+        return stuff;
     }
 }
