@@ -88,12 +88,16 @@ public class ExtensionHandler {
                                         collection.remove(extension);
                                     }
 
-                                    extension.getExtensionObservable().removeListener(this);
+                                    synchronized (extension) {
+                                        extension.getExtensionObservable().removeListener(this);
+                                    }
                                 }
                             }
                         }
                     };
-                    extension.getExtensionObservable().addListener(respondCallback);
+                    synchronized (extension) {
+                        extension.getExtensionObservable().addListener(respondCallback);
+                    }
                 }
             }
 
@@ -104,7 +108,9 @@ public class ExtensionHandler {
 
             synchronized (collection2) {
                 for (GEarthExtension extension : collection2) {
-                    extension.packetIntercept(new HMessage(message));
+                    synchronized (extension) {
+                        extension.packetIntercept(new HMessage(message));
+                    }
                 }
             }
 
