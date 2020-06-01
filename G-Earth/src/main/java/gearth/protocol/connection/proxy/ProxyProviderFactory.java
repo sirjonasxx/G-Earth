@@ -6,9 +6,7 @@ import gearth.protocol.HConnection;
 import gearth.protocol.connection.HProxySetter;
 import gearth.protocol.connection.HStateSetter;
 import gearth.protocol.connection.proxy.unix.LinuxRawIpProxyProvider;
-import gearth.protocol.connection.proxy.unix.LinuxRawIpSocksProxyProvider;
 import gearth.protocol.connection.proxy.windows.WindowsRawIpProxyProvider;
-import gearth.protocol.connection.proxy.windows.WindowsRawIpSocksProxyProvider;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -95,11 +93,11 @@ public class ProxyProviderFactory {
         if (hostIsIpAddress(domain)) {
             if (OSValidator.isWindows()) {
                 if (WindowsRawIpProxyProvider.isNoneConnected(domain) &&
-                        (!socksConfig.useSocks() || socksConfig.dontUseFirstTime()) ) {
-                    return new WindowsRawIpProxyProvider(proxySetter, stateSetter, hConnection, domain, port);
+                        (!socksConfig.useSocks() || socksConfig.onlyUseIfNeeded()) ) {
+                    return new WindowsRawIpProxyProvider(proxySetter, stateSetter, hConnection, domain, port, false);
                 }
                 else if (socksConfig.useSocks()) {
-                    return new WindowsRawIpSocksProxyProvider(proxySetter, stateSetter, hConnection, domain, port);
+                    return new WindowsRawIpProxyProvider(proxySetter, stateSetter, hConnection, domain, port, true);
                 }
 
                 Platform.runLater(() -> {
@@ -114,12 +112,7 @@ public class ProxyProviderFactory {
                 return null;
             }
             else if (OSValidator.isUnix()) {
-                if (!socksConfig.useSocks() || socksConfig.dontUseFirstTime()) {
-                    return new LinuxRawIpProxyProvider(proxySetter, stateSetter, hConnection, domain, port);
-                }
-                else {
-                    return new LinuxRawIpSocksProxyProvider(proxySetter, stateSetter, hConnection, domain, port);
-                }
+                return new LinuxRawIpProxyProvider(proxySetter, stateSetter, hConnection, domain, port, socksConfig.useSocks() && !socksConfig.onlyUseIfNeeded());
             }
             return null;
 
@@ -132,7 +125,7 @@ public class ProxyProviderFactory {
     }
 
     private ProxyProvider provide(List<String> potentialHosts) {
-        return new NormalProxyProvider(proxySetter, stateSetter, hConnection, potentialHosts);
+        return new NormalProxyProvider(proxySetter, stateSetter, hConnection, potentialHosts, socksConfig.useSocks() && !socksConfig.onlyUseIfNeeded());
     }
 
     public static void setSocksConfig(SocksConfiguration configuration) {

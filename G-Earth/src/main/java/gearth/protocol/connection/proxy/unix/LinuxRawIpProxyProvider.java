@@ -28,12 +28,13 @@ public class LinuxRawIpProxyProvider extends ProxyProvider {
     protected IpMapper ipMapper = IpMapperFactory.get();
     protected HProxy proxy = null;
 
-    protected volatile boolean useSocks = false;
+    private boolean useSocks;
 
-    public LinuxRawIpProxyProvider(HProxySetter proxySetter, HStateSetter stateSetter, HConnection hConnection, String input_host, int input_port) {
+    public LinuxRawIpProxyProvider(HProxySetter proxySetter, HStateSetter stateSetter, HConnection hConnection, String input_host, int input_port, boolean useSocks) {
         super(proxySetter, stateSetter, hConnection);
         this.input_host = input_host;
         this.input_port = input_port;
+        this.useSocks = useSocks;
     }
 
     @Override
@@ -164,7 +165,7 @@ public class LinuxRawIpProxyProvider extends ProxyProvider {
         }
     }
 
-    private void createSocksProxyThread(Socket client) throws SocketException, InterruptedException {
+    private void createSocksProxyThread(Socket client) throws SocketException {
         SocksConfiguration configuration = ProxyProviderFactory.getSocksConfig();
 
         if (configuration == null) {
@@ -174,32 +175,18 @@ public class LinuxRawIpProxyProvider extends ProxyProvider {
             return;
         }
 
-        Proxy socks = new Proxy(Proxy.Type.SOCKS, new InetSocketAddress(configuration.getSocksHost(), configuration.getSocksPort()));
-        Socket server = new Socket(socks);
-        server.setSoTimeout(1200);
+        Socket server = configuration.createSocket();
         try {
             server.connect(new InetSocketAddress(proxy.getActual_domain(), proxy.getActual_port()), 1200);
             startProxyThread(client, server, proxy);
         }
-        catch (SocketTimeoutException e) {
+        catch (Exception e) {
             maybeRemoveMapping();
             stateSetter.setState(HState.NOT_CONNECTED);
             showInvalidConnectionError();
             e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
-
-    protected void showInvalidConnectionError() {
-        Platform.runLater(() -> {
-            Alert alert = new Alert(Alert.AlertType.ERROR, "You entered invalid connection information, G-Earth could not connect", ButtonType.OK);
-            alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
-            alert.setResizable(false);
-            alert.show();
-        });
-    }
-
 
     protected void maybeAddMapping() {
         ipMapper.enable();

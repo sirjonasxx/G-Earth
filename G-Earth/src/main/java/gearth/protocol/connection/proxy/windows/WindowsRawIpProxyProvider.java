@@ -29,8 +29,8 @@ public class WindowsRawIpProxyProvider extends LinuxRawIpProxyProvider {
 
     private boolean hasMapped = false;
 
-    public WindowsRawIpProxyProvider(HProxySetter proxySetter, HStateSetter stateSetter, HConnection hConnection, String input_host, int input_port) {
-        super(proxySetter, stateSetter, hConnection, input_host, input_port);
+    public WindowsRawIpProxyProvider(HProxySetter proxySetter, HStateSetter stateSetter, HConnection hConnection, String input_host, int input_port, boolean useSocks) {
+        super(proxySetter, stateSetter, hConnection, input_host, input_port, useSocks);
     }
 
 

@@ -9,6 +9,10 @@ import gearth.protocol.memory.Rc4Obtainer;
 import gearth.protocol.packethandler.IncomingPacketHandler;
 import gearth.protocol.packethandler.OutgoingPacketHandler;
 import gearth.protocol.packethandler.PacketHandler;
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.layout.Region;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -113,5 +117,13 @@ public abstract class ProxyProvider {
         stateSetter.setState(HState.NOT_CONNECTED);
     }
 
+    protected void showInvalidConnectionError() {
+        Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.ERROR, "You entered invalid connection information, G-Earth could not connect", ButtonType.OK);
+            alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+            alert.setResizable(false);
+            alert.show();
+        });
+    }
 
 }

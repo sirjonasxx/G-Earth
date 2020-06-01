@@ -26,11 +26,13 @@ public class NormalProxyProvider extends ProxyProvider {
     private volatile List<HProxy> potentialProxies = new ArrayList<>();
     private volatile HProxy proxy = null;
 
+    private boolean useSocks;
 
 
-    public NormalProxyProvider(HProxySetter proxySetter, HStateSetter stateSetter, HConnection hConnection, List<String> potentialHosts) {
+    public NormalProxyProvider(HProxySetter proxySetter, HStateSetter stateSetter, HConnection hConnection, List<String> potentialHosts, boolean useSocks) {
         super(proxySetter, stateSetter, hConnection);
         this.potentialHosts = potentialHosts;
+        this.useSocks = useSocks;
     }
 
 
@@ -107,9 +109,29 @@ public class NormalProxyProvider extends ProxyProvider {
 
                             new Thread(() -> {
                                 try {
-                                    Socket server = new Socket(proxy.getActual_domain(), proxy.getActual_port());
+                                    Socket server;
+                                    if (!useSocks) {
+                                         server = new Socket(proxy.getActual_domain(), proxy.getActual_port());
+                                    }
+                                    else {
+                                        SocksConfiguration configuration = ProxyProviderFactory.getSocksConfig();
+                                        if (configuration == null) {
+                                            showInvalidConnectionError();
+                                            abort();
+                                            return;
+                                        }
+                                        server = configuration.createSocket();
+                                        server.connect(new InetSocketAddress(proxy.getActual_domain(), proxy.getActual_port()), 1200);
+                                    }
+
                                     startProxyThread(client, server, proxy);
-                                } catch (InterruptedException | IOException e) {
+                                } catch (SocketException | SocketTimeoutException e) {
+                                    // should only happen when SOCKS configured badly
+                                    showInvalidConnectionError();
+                                    abort();
+                                    e.printStackTrace();
+                                }
+                                catch (InterruptedException | IOException e) {
                                     // TODO Auto-generated catch block
                                     e.printStackTrace();
                                 }

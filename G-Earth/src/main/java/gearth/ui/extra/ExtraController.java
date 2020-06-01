@@ -5,7 +5,6 @@ import gearth.protocol.HConnection;
 import gearth.protocol.connection.HState;
 import gearth.protocol.connection.proxy.ProxyProviderFactory;
 import gearth.protocol.connection.proxy.SocksConfiguration;
-import gearth.protocol.connection.proxy.windows.WindowsRawIpSocksProxyProvider;
 import gearth.ui.SubForm;
 import gearth.ui.info.InfoController;
 import javafx.scene.control.*;
@@ -41,7 +40,7 @@ public class ExtraController extends SubForm implements SocksConfiguration {
     public GridPane grd_socksInfo;
     public TextField txt_socksPort;
     public TextField txt_socksIp;
-    public CheckBox cbx_ignoreSocksOnce;
+    public CheckBox cbx_socksUseIfNeeded;
 
     public void initialize() {
 
@@ -57,7 +56,7 @@ public class ExtraController extends SubForm implements SocksConfiguration {
             JSONObject socksInitValue = Cacher.getCacheContents().getJSONObject(SOCKS_CACHE_KEY);
             txt_socksIp.setText(socksInitValue.getString(SOCKS_IP));
             txt_socksPort.setText(socksInitValue.getString(SOCKS_PORT));
-            cbx_ignoreSocksOnce.setSelected(socksInitValue.getBoolean(IGNORE_ONCE));
+            cbx_socksUseIfNeeded.setSelected(socksInitValue.getBoolean(IGNORE_ONCE));
         }
 
         cbx_debug.selectedProperty().addListener(observable -> HConnection.DEBUG = cbx_debug.isSelected());
@@ -93,7 +92,7 @@ public class ExtraController extends SubForm implements SocksConfiguration {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put(SOCKS_IP, txt_socksIp.getText());
         jsonObject.put(SOCKS_PORT, txt_socksPort.getText());
-        jsonObject.put(IGNORE_ONCE, cbx_ignoreSocksOnce.isSelected());
+        jsonObject.put(IGNORE_ONCE, cbx_socksUseIfNeeded.isSelected());
         Cacher.put(SOCKS_CACHE_KEY, jsonObject);
     }
 
@@ -127,7 +126,7 @@ public class ExtraController extends SubForm implements SocksConfiguration {
     }
 
     @Override
-    public boolean dontUseFirstTime() {
-        return cbx_ignoreSocksOnce.isSelected();
+    public boolean onlyUseIfNeeded() {
+        return cbx_socksUseIfNeeded.isSelected();
     }
 }
