@@ -33,6 +33,7 @@ public class NetworkExtensionsProducer implements ExtensionProducer {
             try {
                 while (!serverSocket.isClosed()) {
                     Socket extensionSocket = serverSocket.accept();
+                    extensionSocket.setTcpNoDelay(true);
 
                     new Thread(() -> {
                         try {
