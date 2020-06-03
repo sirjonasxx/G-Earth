@@ -38,7 +38,7 @@ public class ChatConsole {
     public ChatConsole(final HashSupport hashSupport, IExtension extension, String infoMessage) {
         this.hashSupport = hashSupport;
         this.name = extension.getClass().getAnnotation(ExtensionInfo.class).Title();
-        chatid = this.name.hashCode();
+        chatid = (this.name.hashCode() % 300000000) + 300000000;
         this.infoMessage = infoMessage;
 
         final boolean[] doOncePerConnection = {false};
@@ -88,7 +88,9 @@ public class ChatConsole {
 
     private void createChat() {
         hashSupport.sendToClient("UpdateFriend",
-                0, 1, false, false, "", chatid, " [G-Earth] - " + name, 1, true, false, "", 0, "", 0, true, true, true, ""
+                0, 1, 0, chatid, " [G-Earth] - " + name,
+                1, true, false, "ha-1015-64.hd-209-30.cc-260-64.ch-235-64.sh-305-64.lg-285-64",
+                0, "", 0, true, false, true, ""
         );
 
         if (infoMessage != null) {
