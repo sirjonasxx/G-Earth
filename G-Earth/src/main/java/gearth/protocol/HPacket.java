@@ -54,21 +54,7 @@ public class HPacket implements StringifyAble {
         this(header);
         for (int i = 0; i < objects.length; i++) {
             Object o = objects[i];
-            if (o instanceof Byte) {
-                appendByte((Byte)o);
-            }
-            else if (o instanceof Integer) {
-                appendInt((Integer)o);
-            }
-            else if (o instanceof String) {
-                appendString((String)o);
-            }
-            else if (o instanceof Boolean) {
-                appendBoolean((Boolean) o);
-            }
-            else {
-                throw new InvalidParameterException();
-            }
+            appendObject(o);
         }
 
         isEdited = false;
@@ -475,6 +461,28 @@ public class HPacket implements StringifyAble {
         appendBytes(s.getBytes(StandardCharsets.ISO_8859_1));
         return this;
     }
+    public HPacket appendObject(Object o) throws InvalidParameterException {
+        isEdited = true;
+
+        if (o instanceof Byte) {
+            appendByte((Byte)o);
+        }
+        else if (o instanceof Integer) {
+            appendInt((Integer)o);
+        }
+        else if (o instanceof String) {
+            appendString((String)o);
+        }
+        else if (o instanceof Boolean) {
+            appendBoolean((Boolean) o);
+        }
+        else {
+            throw new InvalidParameterException();
+        }
+
+        return this;
+    }
+
 
     public HPacket removeFrom(int index) {
         return removeRange(index, packetInBytes.length - index);
