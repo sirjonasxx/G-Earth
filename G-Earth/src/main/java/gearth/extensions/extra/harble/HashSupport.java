@@ -128,4 +128,7 @@ public class HashSupport {
         return send(HMessage.Direction.TOSERVER, hashOrName, objects);
     }
 
+    public HarbleAPI getHarbleAPI() {
+        return harbleAPI;
+    }
 }
