@@ -111,7 +111,7 @@ public class ProxyProviderFactory {
 
                 return null;
             }
-            else if (OSValidator.isUnix()) {
+            else if (OSValidator.isUnix() || OSValidator.isMac()) {
                 return new LinuxRawIpProxyProvider(proxySetter, stateSetter, hConnection, domain, port, socksConfig.useSocks() && !socksConfig.onlyUseIfNeeded());
             }
             return null;

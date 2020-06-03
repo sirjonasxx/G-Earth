@@ -3,8 +3,7 @@ package gearth.protocol.hostreplacer.ipmapping;
 import java.util.ArrayList;
 import java.util.List;
 
-// Temporary class for the sake of not getting nullpointers on linux&mac until they have an IpMapper as well
-public class EmptyIpMapper extends IpMapper {
+public class MacIpMapper extends IpMapper {
     @Override
     public void enable() {
 
@@ -12,12 +11,12 @@ public class EmptyIpMapper extends IpMapper {
 
     @Override
     public void addMapping(String ip) {
-
+        runCommand("ifconfig", "lo0", "alias", ip);
     }
 
     @Override
     public void deleteMapping(String ip) {
-
+        runCommand("ifconfig", "lo0", "-alias", ip);
     }
 
     @Override

@@ -8,8 +8,7 @@ public class IpMapperFactory {
 
         if (OSValidator.isWindows()) return new WindowsIpMapper();
         if (OSValidator.isUnix()) return new LinuxIpMapper();
-
-        return new EmptyIpMapper();
+        else return new MacIpMapper();
     }
 
 }
