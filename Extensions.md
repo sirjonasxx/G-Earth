@@ -1,4 +1,5 @@
 G-Earth supports console & GUI extensions, this page is focused on extension structure and development.
+Visit https://github.com/sirjonasxx/G-Earth-template-extensions to start from a minimalistic template extension
 
 ## Features
 * Packet hash/name support
