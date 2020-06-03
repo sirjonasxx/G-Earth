@@ -51,11 +51,29 @@ public class PacketStringUtils {
         packet = replaceAll(packet, "\\{b:([0-9]{1,3})}",
                 m -> "[" + Integer.parseInt(m.group(1)) + "]");
 
-        packet = replaceAll(packet, "\\{s:\"(([^\"]|(\\\\\"))*)\"}",
-                m -> {
-            String match = m.group(1).replace("\\\"", "\"");
-            return toString(new HPacket(0, match).readBytes(match.length() + 2, 6));
-        });
+        // results in regex stackoverflow for long strings
+//        packet = replaceAll(packet, "\\{s:\"(([^\"]|(\\\\\"))*)\"}",
+//                m -> {
+//            String match = m.group(1).replace("\\\"", "\"");
+//            return toString(new HPacket(0, match).readBytes(match.length() + 2, 6));
+//        });
+
+        while (packet.contains("{s:\"")) {
+            int start = packet.indexOf("{s:\"");
+            int end = packet.indexOf("\"}");
+            while (end != -1 && packet.charAt(end - 1) == '\\') {
+                end = packet.indexOf("\"}", end + 1);
+            }
+            if (end == -1) {
+                throw new InvalidPacketException();
+            }
+
+            String match = packet.substring(start + 4, end).replace("\\\"", "\"");;
+            packet = packet.substring(0, start) +
+                    toString(new HPacket(0, match).readBytes(match.length() + 2, 6)) +
+                    packet.substring(end + 2);
+        }
+
 
         if (packet.contains("{") || packet.contains("}")) {
             throw new InvalidPacketException();

@@ -27,7 +27,7 @@ public class InjectionController extends SubForm {
         inputPacket.textProperty().addListener(event -> Platform.runLater(this::updateUI));
     }
 
-    private boolean isPacketIncomplete(String line) {
+    private static boolean isPacketIncomplete(String line) {
         boolean unmatchedBrace = false;
 
         boolean ignoreBrace = false;
@@ -51,7 +51,7 @@ public class InjectionController extends SubForm {
         return unmatchedBrace;
     }
 
-    private HPacket[] parsePackets(String fullText) {
+    private static HPacket[] parsePackets(String fullText) {
         LinkedList<HPacket> packets = new LinkedList<>();
         String[] lines = fullText.split("\n");
 
@@ -132,5 +132,13 @@ public class InjectionController extends SubForm {
             getHConnection().sendToClientAsync(packet);
             writeToLog(Color.RED, "CS -> packet with id: " + packet.headerId());
         }
+    }
+
+
+    public static void main(String[] args) {
+        HPacket[] packets = parsePackets("{l}{u:3}{i:967585}{i:9589}{s:\"furni_inscriptionfuckfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionsssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss\"}{s:\"sirjonasxx-II\"}{s:\"\"}{i:188}{i:0}{i:0}{b:false}");
+        System.out.println(new HPacket("{l}{u:2550}{s:\"ClientPerf\"\"ormance\\\"}\"}{s:\"23\"}{s:\"fps\"}{s:\"Avatars: 1, Objects: 0\"}{i:76970180}").toExpression());
+
+        System.out.println("hi");
     }
 }
