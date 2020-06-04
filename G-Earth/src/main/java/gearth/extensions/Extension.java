@@ -209,7 +209,7 @@ public abstract class Extension implements IExtension {
 
         } catch (IOException | ArrayIndexOutOfBoundsException e) {
             System.err.println("Connection failed; is G-Earth active?");
-//            e.printStackTrace();
+            e.printStackTrace();
         }
         finally {
             if (gEarthExtensionServer != null && !gEarthExtensionServer.isClosed()) {
