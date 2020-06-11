@@ -195,11 +195,7 @@ public class HPacket implements StringifyAble {
     private String readString(int index, int length) {
         byte[] x = new byte[length];
         for (int i = 0; i < x.length; i++)	{ x[i] = readByte(index); index++;	}
-        try {
-            return new String(x, "ISO-8859-1");
-        } catch (UnsupportedEncodingException e) {	}
-
-        return null;
+        return new String(x, StandardCharsets.ISO_8859_1);
     }
 
     public String readLongString()	{
