@@ -121,7 +121,7 @@ public class NormalProxyProvider extends ProxyProvider {
                                             return;
                                         }
                                         server = configuration.createSocket();
-                                        server.connect(new InetSocketAddress(proxy.getActual_domain(), proxy.getActual_port()), 1200);
+                                        server.connect(new InetSocketAddress(proxy.getActual_domain(), proxy.getActual_port()), 5000);
                                     }
 
                                     startProxyThread(client, server, proxy);

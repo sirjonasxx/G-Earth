@@ -177,7 +177,7 @@ public class LinuxRawIpProxyProvider extends ProxyProvider {
 
         Socket server = configuration.createSocket();
         try {
-            server.connect(new InetSocketAddress(proxy.getActual_domain(), proxy.getActual_port()), 1200);
+            server.connect(new InetSocketAddress(proxy.getActual_domain(), proxy.getActual_port()), 5000);
             startProxyThread(client, server, proxy);
         }
         catch (Exception e) {

@@ -16,7 +16,7 @@ public interface SocksConfiguration {
     default Socket createSocket() throws SocketException {
         Proxy socks = new Proxy(Proxy.Type.SOCKS, new InetSocketAddress(getSocksHost(), getSocksPort()));
         Socket server = new Socket(socks);
-        server.setSoTimeout(1200);
+        server.setSoTimeout(5000);
 
         return server;
     }
