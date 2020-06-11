@@ -29,6 +29,29 @@ public class HWallItem implements IFurni {
         ownerId = packet.readInteger();
     }
 
+    public void appendToPacket(HPacket packet) {
+//            id = Integer.decode(packet.readString());
+        packet.appendString(id + "");
+
+//            typeId = packet.readInteger();
+        packet.appendInt(typeId);
+
+//            location = packet.readString();
+        packet.appendString(location);
+
+//            state = packet.readString();
+        packet.appendString(state);
+
+//            secondsToExpiration = packet.readInteger();
+        packet.appendInt(secondsToExpiration);
+
+//            usagePolicy = packet.readInteger();
+        packet.appendInt(usagePolicy);
+
+//            ownerId = packet.readInteger();
+        packet.appendInt(ownerId);
+    }
+
     public static HWallItem[] parse(HPacket packet) {
         int ownersCount = packet.readInteger();
         HashMap<Integer, String> owners = new HashMap<>(ownersCount);
@@ -40,7 +63,7 @@ public class HWallItem implements IFurni {
 
         for (int i = 0; i < furniture.length; i++) {
             HWallItem furni = new HWallItem(packet);
-            furni.ownerName = owners.get(furni.ownerId);
+            furni.setOwnerName(owners.get(furni.ownerId));
 
             furniture[i] = furni;
         }
@@ -62,26 +85,7 @@ public class HWallItem implements IFurni {
 
         packet.appendInt(wallItems.length);
         for (HWallItem wallItem : wallItems) {
-//            id = Integer.decode(packet.readString());
-            packet.appendString(wallItem.id + "");
-
-//            typeId = packet.readInteger();
-            packet.appendInt(wallItem.typeId);
-
-//            location = packet.readString();
-            packet.appendString(wallItem.location);
-
-//            state = packet.readString();
-            packet.appendString(wallItem.state);
-
-//            secondsToExpiration = packet.readInteger();
-            packet.appendInt(wallItem.secondsToExpiration);
-
-//            usagePolicy = packet.readInteger();
-            packet.appendInt(wallItem.usagePolicy);
-
-//            ownerId = packet.readInteger();
-            packet.appendInt(wallItem.ownerId);
+            wallItem.appendToPacket(packet);
         }
 
         return packet;
@@ -117,5 +121,37 @@ public class HWallItem implements IFurni {
 
     public int getSecondsToExpiration() {
         return secondsToExpiration;
+    }
+
+    public void setOwnerName(String ownerName) {
+        this.ownerName = ownerName;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setTypeId(int typeId) {
+        this.typeId = typeId;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public void setUsagePolicy(int usagePolicy) {
+        this.usagePolicy = usagePolicy;
+    }
+
+    public void setSecondsToExpiration(int secondsToExpiration) {
+        this.secondsToExpiration = secondsToExpiration;
+    }
+
+    public void setOwnerId(int ownerId) {
+        this.ownerId = ownerId;
     }
 }

@@ -56,6 +56,57 @@ public class HFloorItem implements IFurni {
 
     }
 
+    public void appendToPacket(HPacket packet) {
+        //            id = packet.readInteger();
+        packet.appendInt(id);
+
+//            typeId = packet.readInteger();
+        packet.appendInt(typeId);
+
+//            int x = packet.readInteger();
+        packet.appendInt(tile.getX());
+
+//            int y = packet.readInteger();
+        packet.appendInt(tile.getY());
+
+//            facing = HDirection.values()[packet.readInteger()];
+        packet.appendInt(facing.ordinal());
+
+//            tile = new HPoint(x, y, Double.parseDouble(packet.readString()));
+        packet.appendString(tile.getZ() + "");
+
+
+//            ignore1 = packet.readString();
+        packet.appendString(ignore1);
+
+//            ignore2 = packet.readInteger();
+        packet.appendInt(ignore2);
+
+//            category = packet.readInteger();
+        packet.appendInt(category);
+
+
+//            stuff = HStuff.readData(packet, category);
+        for (Object object : stuff) {
+            packet.appendObject(object);
+        }
+
+//            secondsToExpiration = packet.readInteger();
+        packet.appendInt(secondsToExpiration);
+
+//            usagePolicy = packet.readInteger();
+        packet.appendInt(usagePolicy);
+
+//            ownerId = packet.readInteger();
+        packet.appendInt(ownerId);
+
+
+        if (typeId < 0) {
+            // ignore3 = packet.readString();
+            packet.appendString(ignore3);
+        }
+    }
+
     public static HFloorItem[] parse(HPacket packet) {
         int ownersCount = packet.readInteger();
         Map<Integer, String> owners = new HashMap<>(ownersCount);
@@ -66,7 +117,7 @@ public class HFloorItem implements IFurni {
         HFloorItem[] furniture = new HFloorItem[packet.readInteger()];
         for (int i = 0; i < furniture.length; i++) {
             HFloorItem furni = new HFloorItem(packet);
-            furni.ownerName = owners.get(furni.ownerId);
+            furni.setOwnerName(owners.get(furni.ownerId));
 
             furniture[i] = furni;
         }
@@ -88,54 +139,7 @@ public class HFloorItem implements IFurni {
 
         packet.appendInt(floorItems.length);
         for (HFloorItem floorItem : floorItems) {
-//            id = packet.readInteger();
-            packet.appendInt(floorItem.id);
-
-//            typeId = packet.readInteger();
-            packet.appendInt(floorItem.typeId);
-
-//            int x = packet.readInteger();
-            packet.appendInt(floorItem.tile.getX());
-
-//            int y = packet.readInteger();
-            packet.appendInt(floorItem.tile.getY());
-
-//            facing = HDirection.values()[packet.readInteger()];
-            packet.appendInt(floorItem.facing.ordinal());
-
-//            tile = new HPoint(x, y, Double.parseDouble(packet.readString()));
-            packet.appendString(floorItem.tile.getZ() + "");
-
-
-//            ignore1 = packet.readString();
-            packet.appendString(floorItem.ignore1);
-
-//            ignore2 = packet.readInteger();
-            packet.appendInt(floorItem.ignore2);
-
-//            category = packet.readInteger();
-            packet.appendInt(floorItem.category);
-
-
-//            stuff = HStuff.readData(packet, category);
-            for (Object object : floorItem.stuff) {
-                packet.appendObject(object);
-            }
-
-//            secondsToExpiration = packet.readInteger();
-            packet.appendInt(floorItem.secondsToExpiration);
-
-//            usagePolicy = packet.readInteger();
-            packet.appendInt(floorItem.usagePolicy);
-
-//            ownerId = packet.readInteger();
-            packet.appendInt(floorItem.ownerId);
-
-
-            if (floorItem.typeId < 0) {
-                // ignore3 = packet.readString();
-                packet.appendString(floorItem.ignore3);
-            }
+            floorItem.appendToPacket(packet);
         }
 
         return packet;
@@ -180,5 +184,49 @@ public class HFloorItem implements IFurni {
 
     public HPoint getTile() {
         return tile;
+    }
+
+    public Object[] getStuff() {
+        return stuff;
+    }
+
+    public void setOwnerName(String ownerName) {
+        this.ownerName = ownerName;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setTypeId(int typeId) {
+        this.typeId = typeId;
+    }
+
+    public void setTile(HPoint tile) {
+        this.tile = tile;
+    }
+
+    public void setFacing(HDirection facing) {
+        this.facing = facing;
+    }
+
+    public void setCategory(int category) {
+        this.category = category;
+    }
+
+    public void setSecondsToExpiration(int secondsToExpiration) {
+        this.secondsToExpiration = secondsToExpiration;
+    }
+
+    public void setUsagePolicy(int usagePolicy) {
+        this.usagePolicy = usagePolicy;
+    }
+
+    public void setOwnerId(int ownerId) {
+        this.ownerId = ownerId;
+    }
+
+    public void setStuff(Object[] stuff) {
+        this.stuff = stuff;
     }
 }
