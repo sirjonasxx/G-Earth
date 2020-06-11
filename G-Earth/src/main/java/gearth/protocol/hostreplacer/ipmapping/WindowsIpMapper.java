@@ -12,12 +12,12 @@ public class WindowsIpMapper extends IpMapper {
     }
 
     @Override
-    public void addMapping(String ip) {
+    public void addMapping(String ip, int listenport, int connectport) {
         runCommand("netsh", "interface", "ip", "add", "address", "\"Loopback\"", ip, "255.255.255.255");
     }
 
     @Override
-    public void deleteMapping(String ip) {
+    public void deleteMapping(String ip, int listenport, int connectport) {
         runCommand("netsh", "interface", "ip", "delete", "address", "\"Loopback\"", ip);
     }
 

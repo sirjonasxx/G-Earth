@@ -190,11 +190,11 @@ public class LinuxRawIpProxyProvider extends ProxyProvider {
 
     protected void maybeAddMapping() {
         ipMapper.enable();
-        ipMapper.addMapping(proxy.getActual_domain());
+        ipMapper.addMapping(proxy.getActual_domain(), proxy.getActual_port(), proxy.getIntercept_port());
     }
 
     protected void maybeRemoveMapping() {
-        ipMapper.deleteMapping(proxy.getActual_domain());
+        ipMapper.deleteMapping(proxy.getActual_domain(), proxy.getActual_port(), proxy.getIntercept_port());
 
     }
 

@@ -18,9 +18,9 @@ public abstract class IpMapper {
 
     abstract public void enable();
 
-    abstract public void addMapping(String ip);
+    abstract public void addMapping(String ip, int listenport, int connectport);
 
-    abstract public void deleteMapping(String ip);
+    abstract public void deleteMapping(String ip, int listenport, int connectport);
 
     abstract public List<String> getCurrentMappings();
 

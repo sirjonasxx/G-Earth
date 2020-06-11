@@ -48,7 +48,7 @@ public class WindowsRawIpProxyProvider extends LinuxRawIpProxyProvider {
             hasMapped = true;
             if (isNoneConnected()) {
                 ipMapper.enable();
-                ipMapper.addMapping(proxy.getActual_domain());
+                ipMapper.addMapping(proxy.getActual_domain(), proxy.getActual_port(), proxy.getIntercept_port());
             }
             addMappingCache();
         }
@@ -60,7 +60,7 @@ public class WindowsRawIpProxyProvider extends LinuxRawIpProxyProvider {
             hasMapped = false;
             removeMappingCache();
             if (isNoneConnected()) {
-                ipMapper.deleteMapping(proxy.getActual_domain());
+                ipMapper.deleteMapping(proxy.getActual_domain(), proxy.getActual_port(), proxy.getIntercept_port());
             }
         }
     }

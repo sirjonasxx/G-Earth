@@ -10,12 +10,12 @@ public class MacIpMapper extends IpMapper {
     }
 
     @Override
-    public void addMapping(String ip) {
+    public void addMapping(String ip, int listenport, int connectport) {
         runCommand("ifconfig", "lo0", "alias", ip);
     }
 
     @Override
-    public void deleteMapping(String ip) {
+    public void deleteMapping(String ip, int listenport, int connectport) {
         runCommand("ifconfig", "lo0", "-alias", ip);
     }
 
