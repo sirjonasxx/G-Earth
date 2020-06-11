@@ -92,12 +92,17 @@ public class BlockAndReplacePackets extends ExtensionForm {
             isValid = false;
         }
         else if (type.equals("Block packet")) {
-            try {
-                int v = Integer.parseInt(val);
-                isValid = (v < (Short.MAX_VALUE * 2 + 2) && v > 0);
+            if (val.equals("")) {
+                isValid = true;
             }
-            catch (Exception e) {
-                isValid = false;
+            else {
+                try {
+                    int v = Integer.parseInt(val);
+                    isValid = (v < (Short.MAX_VALUE * 2 + 2) && v > 0);
+                }
+                catch (Exception e) {
+                    isValid = false;
+                }
             }
         }
         else {

@@ -20,7 +20,7 @@ public class BlockPacketRule extends BlockReplaceRule{
         if (side == Side.ALL
                 || (message.getDestination() == HMessage.Direction.TOSERVER && side == Side.OUTGOING)
                 || (message.getDestination() == HMessage.Direction.TOCLIENT && side ==Side.INCOMING)) {
-            if (message.getPacket().headerId() == headerId) {
+            if (headerId == -1 || message.getPacket().headerId() == headerId) {
                 message.setBlocked(true);
             }
         }
@@ -43,7 +43,7 @@ public class BlockPacketRule extends BlockReplaceRule{
 
     @Override
     public String value() {
-        return headerId+"";
+        return headerId == -1 ? "ALL" : (headerId+"");
     }
 
     @Override

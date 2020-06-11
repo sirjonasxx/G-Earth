@@ -13,7 +13,11 @@ public class RuleFactory {
         BlockReplaceRule.Side rSide = BlockReplaceRule.Side.valueOf(side.toUpperCase());
 
         if (rOption == BlockReplaceRule.Option.BLOCK) {
-            return new BlockPacketRule(rSide, Integer.parseInt(value));
+            return new BlockPacketRule(rSide,
+                    value.equals("") ?
+                            -1 : // block ALL headerIds if no headerId given
+                            Integer.parseInt(value)
+            );
         }
         if (rOption == BlockReplaceRule.Option.REPLACE) {
             if (rType == BlockReplaceRule.Type.INTEGER) {
