@@ -94,6 +94,11 @@ public class ExtensionHandler {
                         editedMessages.get(hMessage).setBlocked(true);
                     }
                 }
+                else if (edited.isBlocked()) {
+                    editedMessages.putIfAbsent(hMessage, edited);
+                    editedMessages.get(hMessage).setBlocked(true);
+                }
+
             }
             else {
                 hMessage = null;
