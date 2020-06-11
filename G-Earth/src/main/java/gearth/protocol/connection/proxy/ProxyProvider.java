@@ -44,8 +44,8 @@ public abstract class ProxyProvider {
         if (HConnection.DEBUG) System.out.println(server.getLocalAddress().getHostAddress() + ": " + server.getLocalPort());
         Rc4Obtainer rc4Obtainer = new Rc4Obtainer(hConnection);
 
-        OutgoingPacketHandler outgoingHandler = new OutgoingPacketHandler(server.getOutputStream(), hConnection.getTrafficObservables());
-        IncomingPacketHandler incomingHandler = new IncomingPacketHandler(client.getOutputStream(), hConnection.getTrafficObservables(), outgoingHandler);
+        OutgoingPacketHandler outgoingHandler = new OutgoingPacketHandler(server.getOutputStream(), hConnection.getTrafficObservables(), hConnection.getExtensionHandler());
+        IncomingPacketHandler incomingHandler = new IncomingPacketHandler(client.getOutputStream(), hConnection.getTrafficObservables(), outgoingHandler, hConnection.getExtensionHandler());
         rc4Obtainer.setPacketHandlers(outgoingHandler, incomingHandler);
 
         Semaphore abort = new Semaphore(0);

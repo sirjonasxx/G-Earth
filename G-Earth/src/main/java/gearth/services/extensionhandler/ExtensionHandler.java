@@ -8,13 +8,14 @@ import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 import gearth.protocol.connection.HState;
 import gearth.services.extensionhandler.extensions.ExtensionListener;
+import gearth.services.extensionhandler.extensions.GEarthExtension;
 import gearth.services.extensionhandler.extensions.extensionproducers.ExtensionProducer;
 import gearth.services.extensionhandler.extensions.extensionproducers.ExtensionProducerFactory;
 import gearth.services.extensionhandler.extensions.extensionproducers.ExtensionProducerObserver;
-import gearth.services.extensionhandler.extensions.GEarthExtension;
+import javafx.util.Pair;
 
+import java.io.IOException;
 import java.util.*;
-import java.util.function.Consumer;
 
 public class ExtensionHandler {
 
@@ -31,9 +32,15 @@ public class ExtensionHandler {
         }
     };
 
+    private final Map<HMessage, Set<GEarthExtension>> awaitManipulation = new HashMap<>();
+    private final Map<HMessage, OnHMessageHandled> finishManipulationCallback = new HashMap<>();
+    private final Map<Pair<HMessage.Direction, Integer>, HMessage> originalMessages = new HashMap<>();
+    private final Map<HMessage, HMessage> editedMessages = new HashMap<>();
+    private final TreeSet<HMessage> allAwaitingMessages = new TreeSet<>(Comparator.comparingInt(HMessage::getIndex));
 
     public ExtensionHandler(HConnection hConnection) {
         this.hConnection = hConnection;
+        hConnection.setExtensionHandler(this);
         initialize();
     }
 
@@ -54,7 +61,7 @@ public class ExtensionHandler {
                 }
             }
             if (oldState == HState.CONNECTED) {
-                synchronized (hConnection) {
+                synchronized (gEarthExtensions) {
                     for (GEarthExtension extension : gEarthExtensions) {
                         extension.connectionEnd();
                     }
@@ -62,92 +69,104 @@ public class ExtensionHandler {
             }
         });
 
-
-        hConnection.addTrafficListener(1, message -> {
-            Set<GEarthExtension> collection;
-            synchronized (gEarthExtensions) {
-                collection = new HashSet<>(gEarthExtensions);
-            }
-            HMessage result = new HMessage(message);
-
-            boolean[] isblock = new boolean[1];
-            synchronized (collection) {
-                for (GEarthExtension extension : collection) {
-                    ExtensionListener respondCallback = new ExtensionListener() {
-                        @Override
-                        public void manipulatedPacket(HMessage responseMessage) {
-                            if (responseMessage.getDestination() == message.getDestination() && responseMessage.getIndex() == message.getIndex()) {
-                                synchronized (result) {
-                                    if (!message.equals(responseMessage)) {
-                                        result.constructFromHMessage(responseMessage);
-                                    }
-                                    if (responseMessage.isBlocked()) {
-                                        isblock[0] = true;
-                                    }
-                                    synchronized (collection) {
-                                        collection.remove(extension);
-                                    }
-
-                                    synchronized (extension) {
-                                        extension.getExtensionObservable().removeListener(this);
-                                    }
-                                }
-                            }
-                        }
-                    };
-                    synchronized (extension) {
-                        extension.getExtensionObservable().addListener(respondCallback);
-                    }
-                }
-            }
-
-            Set<GEarthExtension> collection2;
-            synchronized (collection) {
-                collection2 = new HashSet<>(collection);
-            }
-
-            synchronized (collection2) {
-                for (GEarthExtension extension : collection2) {
-                    synchronized (extension) {
-                        extension.packetIntercept(new HMessage(message));
-                    }
-                }
-            }
-
-            //block untill all extensions have responded
-            List<GEarthExtension> willdelete = new ArrayList<>();
-            while (true) {
-                synchronized (collection) {
-                    if (collection.isEmpty()) {
-                        break;
-                    }
-
-                    synchronized (gEarthExtensions) {
-                        for (GEarthExtension extension : collection) {
-                            if (!gEarthExtensions.contains(extension)) willdelete.add(extension);
-                        }
-                    }
-
-                    for (int i = willdelete.size() - 1; i >= 0; i--) {
-                        collection.remove(willdelete.get(i));
-                        willdelete.remove(i);
-                    }
-                }
-
-
-                try {Thread.sleep(1);} catch (InterruptedException e) {e.printStackTrace();}
-            }
-
-            message.constructFromHMessage(result);
-
-            if (isblock[0]) {
-                message.setBlocked(true);
-            }
-        });
-
         extensionProducers = ExtensionProducerFactory.getAll();
         extensionProducers.forEach(this::initializeExtensionProducer);
     }
+
+
+    private final Object hMessageStuffLock = new Object();
+    private void onExtensionRespond(GEarthExtension extension, HMessage edited) {
+        HMessage hMessage;
+
+        synchronized (hMessageStuffLock) {
+            Pair<HMessage.Direction, Integer> msgDirAndId = new Pair<>(edited.getDestination(), edited.getIndex());
+            hMessage = originalMessages.get(msgDirAndId);
+
+            if (awaitManipulation.containsKey(hMessage)) {
+                awaitManipulation.get(hMessage).remove(extension);
+
+                boolean wasBlocked = hMessage.isBlocked() ||
+                        (editedMessages.get(hMessage) != null && editedMessages.get(hMessage).isBlocked());
+
+                if (!hMessage.equals(edited)) {
+                    editedMessages.put(hMessage, edited);
+                    if (wasBlocked) {
+                        editedMessages.get(hMessage).setBlocked(true);
+                    }
+                }
+            }
+            else {
+                hMessage = null;
+            }
+        }
+
+        if (hMessage != null) {
+            maybeFinishHmessage(hMessage);
+        }
+    }
+    private void onExtensionRemoved(GEarthExtension extension) {
+        List<HMessage> awaiting;
+        synchronized (hMessageStuffLock) {
+            awaiting = new ArrayList<>(allAwaitingMessages);
+        }
+        for (HMessage hMessage : awaiting) {
+            synchronized (hMessageStuffLock) {
+                awaitManipulation.get(hMessage).remove(extension);
+            }
+            maybeFinishHmessage(hMessage);
+        }
+    }
+
+    // argument is the original hmessage, not an edited one
+    private void maybeFinishHmessage(HMessage hMessage) {
+        OnHMessageHandled maybeCallback = null;
+        HMessage result = null;
+
+        synchronized (hMessageStuffLock) {
+            if (hMessage != null && awaitManipulation.containsKey(hMessage)) {
+                boolean isFinished = awaitManipulation.get(hMessage).isEmpty();
+
+                if (isFinished) {
+                    awaitManipulation.remove(hMessage);
+                    result = editedMessages.get(hMessage) == null ? hMessage : editedMessages.get(hMessage);
+                    editedMessages.remove(hMessage);
+                    originalMessages.remove(new Pair<>(result.getDestination(), result.getIndex()));
+                    allAwaitingMessages.remove(hMessage);
+                    maybeCallback = finishManipulationCallback.remove(hMessage);
+                }
+            }
+        }
+
+        if (maybeCallback != null) {
+            try {
+                maybeCallback.finished(result);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    public void handle(HMessage hMessage, OnHMessageHandled callback) {
+        synchronized (hMessageStuffLock) {
+            Pair<HMessage.Direction, Integer> msgDirectionAndId = new Pair<>(hMessage.getDestination(), hMessage.getIndex());
+            originalMessages.put(msgDirectionAndId, hMessage);
+            finishManipulationCallback.put(hMessage, callback);
+            editedMessages.put(hMessage, null);
+            allAwaitingMessages.add(hMessage);
+
+            synchronized (gEarthExtensions) {
+                awaitManipulation.put(hMessage, new HashSet<>(gEarthExtensions));
+
+                for (GEarthExtension extension : gEarthExtensions) {
+                    extension.packetIntercept(hMessage);
+                }
+            }
+        }
+
+
+        maybeFinishHmessage(hMessage);
+    }
+
+
 
     private void initializeExtensionProducer(ExtensionProducer producer) {
         producer.startProducing(new ExtensionProducerObserver() {
@@ -179,8 +198,14 @@ public class ExtensionHandler {
                         synchronized (gEarthExtensions) {
                             gEarthExtensions.remove(extension);
                         }
+                        onExtensionRemoved(extension);
                         extension.getExtensionObservable().removeListener(this);
                         extension.getDeletedObservable().fireEvent();
+                    }
+
+                    @Override
+                    protected void manipulatedPacket(HMessage hMessage) {
+                        onExtensionRespond(extension, hMessage);
                     }
                 };
 
@@ -204,11 +229,9 @@ public class ExtensionHandler {
         });
     }
 
-
     public List<ExtensionProducer> getExtensionProducers() {
         return extensionProducers;
     }
-
     public Observable<ExtensionConnectedListener> getObservable() {
         return observable;
     }

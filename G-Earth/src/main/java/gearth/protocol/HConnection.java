@@ -7,6 +7,7 @@ import gearth.protocol.connection.proxy.ProxyProvider;
 import gearth.protocol.connection.proxy.ProxyProviderFactory;
 import gearth.protocol.connection.proxy.unix.LinuxRawIpProxyProvider;
 import gearth.protocol.connection.proxy.windows.WindowsRawIpProxyProvider;
+import gearth.services.extensionhandler.ExtensionHandler;
 
 import java.io.IOException;
 
@@ -14,6 +15,8 @@ public class HConnection {
 
     public static volatile boolean DECRYPTPACKETS = true;
     public static volatile boolean DEBUG = false;
+
+    private volatile ExtensionHandler extensionHandler = null;
 
     private volatile Object[] trafficObservables = {new Observable<TrafficListener>(), new Observable<TrafficListener>(), new Observable<TrafficListener>()};
     private volatile Observable<StateChangeListener> stateObservable = new Observable<>();
@@ -98,6 +101,14 @@ public class HConnection {
         ((Observable<TrafficListener>) trafficObservables[0]).removeListener(listener);
         ((Observable<TrafficListener>) trafficObservables[1]).removeListener(listener);
         ((Observable<TrafficListener>) trafficObservables[2]).removeListener(listener);
+    }
+
+    public void setExtensionHandler(ExtensionHandler handler) {
+        this.extensionHandler = handler;
+    }
+
+    public ExtensionHandler getExtensionHandler() {
+        return extensionHandler;
     }
 
     public Object[] getTrafficObservables() {

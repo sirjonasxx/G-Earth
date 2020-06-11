@@ -6,6 +6,8 @@ import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 import gearth.protocol.TrafficListener;
 import gearth.protocol.crypto.RC4;
+import gearth.services.extensionhandler.ExtensionHandler;
+import gearth.services.extensionhandler.OnHMessageHandled;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -18,6 +20,7 @@ public abstract class PacketHandler {
 
     private volatile PayloadBuffer payloadBuffer = new PayloadBuffer();
     private volatile OutputStream out;
+    private volatile ExtensionHandler extensionHandler;
     private volatile Object[] trafficObservables; //get notified on packet send
     private volatile boolean isTempBlocked = false;
     volatile boolean isDataStream = false;
@@ -33,8 +36,9 @@ public abstract class PacketHandler {
     volatile boolean isEncryptedStream = false;
 
 
-    PacketHandler(OutputStream outputStream, Object[] trafficObservables) {
+    PacketHandler(OutputStream outputStream, Object[] trafficObservables, ExtensionHandler extensionHandler) {
         this.trafficObservables = trafficObservables;
+        this.extensionHandler = extensionHandler;
         out = outputStream;
     }
 
@@ -115,13 +119,11 @@ public abstract class PacketHandler {
      * LISTENERS CAN EDIT THE MESSAGE BEFORE BEING SENT
      * @param message
      */
-    void notifyListeners(HMessage message) {
-        for (int x = 0; x < 3; x++) {
-            ((Observable<TrafficListener>) trafficObservables[x]).fireEvent(trafficListener -> {
-                message.getPacket().resetReadIndex();
-                trafficListener.onCapture(message);
-            });
-        }
+    private void notifyListeners(int i, HMessage message) {
+        ((Observable<TrafficListener>) trafficObservables[i]).fireEvent(trafficListener -> {
+            message.getPacket().resetReadIndex();
+            trafficListener.onCapture(message);
+        });
         message.getPacket().resetReadIndex();
     }
 
@@ -146,19 +148,32 @@ public abstract class PacketHandler {
             for (HPacket hpacket : hpackets){
                 HMessage hMessage = new HMessage(hpacket, getMessageSide(), currentIndex);
                 boolean isencrypted = isEncryptedStream;
+
+                OnHMessageHandled afterExtensionIntercept = hMessage1 -> {
+                    if (isDataStream) {
+                        notifyListeners(2, hMessage1);
+                    }
+
+                    if (!hMessage1.isBlocked())	{
+                        synchronized (sendLock) {
+                            out.write(
+                                    (!isencrypted)
+                                            ? hMessage1.getPacket().toBytes()
+                                            : encryptcipher.rc4(hMessage1.getPacket().toBytes())
+                            );
+                        }
+                    }
+                };
+
                 if (isDataStream) {
-                    notifyListeners(hMessage);
+                    notifyListeners(0, hMessage);
+                    notifyListeners(1, hMessage);
+                    extensionHandler.handle(hMessage, afterExtensionIntercept);
+                }
+                else {
+                    afterExtensionIntercept.finished(hMessage);
                 }
 
-                if (!hMessage.isBlocked())	{
-                    synchronized (sendLock) {
-                        out.write(
-                                (!isencrypted)
-                                        ? hMessage.getPacket().toBytes()
-                                        : encryptcipher.rc4(hMessage.getPacket().toBytes())
-                        );
-                    }
-                }
                 currentIndex++;
             }
         }

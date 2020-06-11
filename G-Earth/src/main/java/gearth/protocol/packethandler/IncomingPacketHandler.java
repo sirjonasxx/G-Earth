@@ -4,6 +4,7 @@ import gearth.misc.listenerpattern.Observable;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 import gearth.protocol.TrafficListener;
+import gearth.services.extensionhandler.ExtensionHandler;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -11,8 +12,8 @@ import java.util.List;
 
 public class IncomingPacketHandler extends PacketHandler {
 
-    public IncomingPacketHandler(OutputStream outputStream, Object[] trafficObservables, OutgoingPacketHandler outgoingHandler) {
-        super(outputStream, trafficObservables);
+    public IncomingPacketHandler(OutputStream outputStream, Object[] trafficObservables, OutgoingPacketHandler outgoingHandler, ExtensionHandler extensionHandler) {
+        super(outputStream, trafficObservables, extensionHandler);
 
         TrafficListener listener = new TrafficListener() {
             @Override
