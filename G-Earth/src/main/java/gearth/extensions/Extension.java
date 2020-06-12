@@ -160,7 +160,7 @@ public abstract class Extension implements IExtension {
                 }
                 else if (packet.headerId() == NetworkExtensionInfo.OUTGOING_MESSAGES_IDS.INIT) {
                     initExtension();
-                    writeToConsole("green","Extension \"" + getInfoAnnotations().Title() + "\" succesfully initialized", false);
+                    writeToConsole("green","Extension \"" + getInfoAnnotations().Title() + "\" successfully initialized", false);
                 }
                 else if (packet.headerId() == NetworkExtensionInfo.OUTGOING_MESSAGES_IDS.ONDOUBLECLICK) {
                     onClick();
