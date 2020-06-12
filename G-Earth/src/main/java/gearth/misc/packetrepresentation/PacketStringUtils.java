@@ -60,17 +60,67 @@ public class PacketStringUtils {
 
         while (packet.contains("{s:\"")) {
             int start = packet.indexOf("{s:\"");
-            int end = packet.indexOf("\"}");
-            while (end != -1 && packet.charAt(end - 1) == '\\') {
+            int end = -1;
+            boolean valid;
+            do {
                 end = packet.indexOf("\"}", end + 1);
-            }
+
+                valid = false;
+                if (end != -1) {
+                    int amountBackslashes = 0;
+                    int pos = end - 1;
+
+                    while (pos >= start + 4 && packet.charAt(pos) == '\\') {
+                        amountBackslashes++;
+                        pos -= 1;
+                    }
+
+                    valid = amountBackslashes % 2 == 0;
+                }
+            } while (end != -1 && !valid);
+
             if (end == -1) {
                 throw new InvalidPacketException();
             }
 
-            String match = packet.substring(start + 4, end).replace("\\\"", "\"");;
+//            String match = packet.substring(start + 4, end).replace("\\\"", "\"");
+            String match = packet.substring(start + 4, end);
+            StringBuilder actualString = new StringBuilder();
+
+            while (match.contains("\\")) {
+                int index = match.indexOf("\\");
+                // we know this can't be the last character
+                char c = match.charAt(index + 1);
+                actualString.append(match, 0, index);
+
+                switch (c) {
+                    // all characters that can be backslashed
+                    case '"': {
+                        actualString.append('"');
+                        match = match.substring(index + 2);
+                        break;
+                    }
+                    case 'r': {
+                        actualString.append('\r');
+                        match = match.substring(index + 2);
+                        break;
+                    }
+                    case '\\': {
+                        actualString.append('\\');
+                        match = match.substring(index + 2);
+                        break;
+                    }
+                    default: {
+//                        actualString.append('\\');
+//                        match = match.substring(index + 1);
+                        throw new InvalidPacketException();
+                    }
+                }
+            }
+            actualString.append(match);
+
             packet = packet.substring(0, start) +
-                    toString(new HPacket(0, match).readBytes(match.length() + 2, 6)) +
+                    toString(new HPacket(0, actualString.toString()).readBytes(actualString.length() + 2, 6)) +
                     packet.substring(end + 2);
         }
 
@@ -144,7 +194,12 @@ public class PacketStringUtils {
                 }
             }
             else if (c == 'i') builder.append("{i:").append(prevInt = p.readInteger()).append('}');
-            else if (c == 's') builder.append("{s:\"").append(p.readString().replace("\"", "\\\"")).append("\"}");
+            else if (c == 's') builder.append("{s:\"").append(
+                    p.readString()
+                            .replace("\\", "\\\\")  // \ -> \\
+                            .replace("\"", "\\\"")  // " -> \"
+                            .replace("\r", "\\r")   // CR -> \r
+            ).append("\"}");
             else if (c == 'd') builder.append("{d:").append(p.readDouble()).append('}');
             else if (c == 'b') builder.append("{b:").append(p.readByte()).append('}');
             else if (c == 'B') builder.append("{b:").append(p.readBoolean()).append('}');
@@ -176,8 +231,10 @@ public class PacketStringUtils {
     }
 
     public static void main(String[] args) throws InvalidPacketException {
-        HPacket p1 = fromString("{l}{u:1129}{s:\"g\\\"fs\"}{i:0}{i:0}{d:5.7}");
-        System.out.println(p1);
+        HPacket p1 = fromString("{l}{u:1129}{s:\"\\\\\\\\\"}{i:0}{i:0}");
+        System.out.println(p1.toExpression());
+        HPacket p1_2 = fromString(p1.toExpression());
+        System.out.println(p1_2.toExpression());
 
         HPacket p2 = fromString("{l}{u:4564}{i:3}{i:0}{s:\"hi\"}{i:0}{i:1}{s:\"how\"}{i:3}{b:1}{b:2}{b:3}{i:2}{s:\"r u\"}{i:1}{b:120}{i:2}{b:true}");
         System.out.println(p2);
