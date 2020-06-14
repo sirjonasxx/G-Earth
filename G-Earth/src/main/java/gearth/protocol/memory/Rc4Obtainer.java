@@ -60,6 +60,7 @@ public class Rc4Obtainer {
 
         new Thread(() -> {
 
+            long startTime = System.currentTimeMillis();
             if (DEBUG) System.out.println("[+] send encrypted");
 
             boolean worked = false;
@@ -99,6 +100,11 @@ public class Rc4Obtainer {
 
                 });
 
+            }
+
+            long endTime = System.currentTimeMillis();
+            if (DEBUG) {
+                System.out.println("Cracked RC4 in " + (endTime - startTime) + "ms");
             }
 
             packetHandlers.forEach(PacketHandler::unblock);
