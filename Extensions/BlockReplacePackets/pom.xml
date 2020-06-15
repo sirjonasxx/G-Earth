@@ -88,7 +88,7 @@
                             <target name="copy to extensions folder">
                                 <copy file="target/bin/BlockReplacePackets.jar" todir="../../Build/Linux/Extensions"/>
                                 <copy file="target/bin/BlockReplacePackets.jar" todir="../../Build/Mac/Extensions"/>
-                                <copy file="target/bin/BlockReplacePackets.jar" todir="../../Build/Windows_64bit/Extensions"/>
+                                <copy file="target/bin/BlockReplacePackets.jar" todir="../../Build/Windows_32bit/Extensions"/>
                                 <copy file="target/bin/BlockReplacePackets.jar" todir="../../Build/Windows_64bit/Extensions"/>
                             </target>
                         </configuration>
