@@ -44,6 +44,7 @@ public class HarbleAPIFetcher {
         else {
             Connection connection = Jsoup.connect(HARBLE_API_URL.replace("$hotelversion$", hotelversion)).ignoreContentType(true);
             try {
+                connection.timeout(3000);
                 Connection.Response response = connection.execute();
                 if (response.statusCode() == 200) {
                     String messagesBodyJson = response.body();
