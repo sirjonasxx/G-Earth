@@ -118,9 +118,10 @@ public class PacketStringUtils {
                 }
             }
             actualString.append(match);
+            String latin = new String(actualString.toString().getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1);
 
             packet = packet.substring(0, start) +
-                    toString(new HPacket(0, actualString.toString()).readBytes(actualString.length() + 2, 6)) +
+                    toString(new HPacket(0, latin).readBytes(latin.length() + 2, 6)) +
                     packet.substring(end + 2);
         }
 
@@ -195,7 +196,7 @@ public class PacketStringUtils {
             }
             else if (c == 'i') builder.append("{i:").append(prevInt = p.readInteger()).append('}');
             else if (c == 's') builder.append("{s:\"").append(
-                    p.readString()
+                    new String(p.readString().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8)
                             .replace("\\", "\\\\")  // \ -> \\
                             .replace("\"", "\\\"")  // " -> \"
                             .replace("\r", "\\r")   // CR -> \r
