@@ -106,7 +106,7 @@
         <dependency>
             <groupId>G-Earth</groupId>
             <artifactId>G-Earth</artifactId>
-            <version>1.0</version>
+            <version>1.1</version>
             <!--<scope>provided</scope>-->
         </dependency>
     </dependencies>
