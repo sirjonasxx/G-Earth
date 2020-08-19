@@ -14,7 +14,7 @@ import javafx.scene.image.ImageView;
  */
 public class InfoController extends SubForm {
     public ImageView img_logo;
-    public Hyperlink link_sng;
+    public Hyperlink link_ase;
     public Hyperlink link_darkbox;
     public Hyperlink link_d_harble;
     public Hyperlink link_g_gearth;
@@ -38,16 +38,16 @@ public class InfoController extends SubForm {
 
         img_logo.setImage(new Image("/gearth/G-EarthLogo.png"));
 
-        link_sng.setTooltip(new Tooltip("https://www.sngforum.info"));
+        link_ase.setTooltip(new Tooltip("https://allseeingeye.to"));
         link_darkbox.setTooltip(new Tooltip("https://darkbox.nl"));
+        link_d_harble.setTooltip(new Tooltip("https://discord.gg/CzRuHvW"));
         link_g_gearth.setTooltip(new Tooltip("https://github.com/sirjonasxx/G-Earth"));
         link_g_tanji.setTooltip(new Tooltip("https://github.com/ArachisH/Tanji"));
-        link_d_harble.setTooltip(new Tooltip("https://discord.gg/CzRuHvW"));
 
+        activateHyperlink(link_ase);
+        activateHyperlink(link_darkbox);
         activateHyperlink(link_d_harble);
         activateHyperlink(link_g_gearth);
         activateHyperlink(link_g_tanji);
-        activateHyperlink(link_sng);
-        activateHyperlink(link_darkbox);
     }
 }
