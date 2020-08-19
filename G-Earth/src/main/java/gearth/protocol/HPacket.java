@@ -8,6 +8,7 @@ import gearth.misc.packetrepresentation.PacketStringUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidParameterException;
 import java.util.Arrays;
@@ -180,34 +181,49 @@ public class HPacket implements StringifyAble {
         return java.nio.ByteBuffer.wrap(btarray).getLong();
     }
 
-    public String readString()	{
-        String r = readString(readIndex);
-        readIndex += (2 + r.length());
+
+    public String readString(Charset charset)	{
+        String r = readString(readIndex, charset);
+        readIndex += (2 + readUshort(readIndex));
         return r;
     }
-    public String readString(int index)	{
+    public String readString(int index, Charset charset)	{
         int length = readUshort(index);
         index+=2;
-
-        return readString(index, length);
+        return readString(index, length, charset);
     }
 
-    private String readString(int index, int length) {
+    public String readString()	{
+        return readString(StandardCharsets.ISO_8859_1);
+    }
+    public String readString(int index)	{
+        return readString(index, StandardCharsets.ISO_8859_1);
+    }
+
+    private String readString(int index, int length, Charset charset) {
         byte[] x = new byte[length];
         for (int i = 0; i < x.length; i++)	{ x[i] = readByte(index); index++;	}
-        return new String(x, StandardCharsets.ISO_8859_1);
+        return new String(x, charset);
     }
 
-    public String readLongString()	{
-        String r = readLongString(readIndex);
-        readIndex += (4 + r.length());
+
+    public String readLongString(Charset charset)	{
+        String r = readLongString(readIndex, charset);
+        readIndex += (4 + readInteger(readIndex));
         return r;
     }
-    public String readLongString(int index) {
+    public String readLongString(int index, Charset charset) {
         int length = readInteger(index);
         index += 4;
 
-        return readString(index, length);
+        return readString(index, length, charset);
+    }
+
+    public String readLongString()	{
+        return readLongString(StandardCharsets.ISO_8859_1);
+    }
+    public String readLongString(int index)	{
+        return readLongString(index, StandardCharsets.ISO_8859_1);
     }
 
     public boolean readBoolean()	{
@@ -267,10 +283,11 @@ public class HPacket implements StringifyAble {
         packetInBytes[index + 1] = b.array()[1];
         return this;
     }
-    public HPacket replaceString(int index, String s) {
+
+    public HPacket replaceString(int index, String s, Charset charset) {
         isEdited = true;
-        byte[] sbytes = s.getBytes(StandardCharsets.ISO_8859_1);
-        int mover = s.length() - readUshort(index);
+        byte[] sbytes = s.getBytes(charset);
+        int mover = sbytes.length - readUshort(index);
 
         if (mover != 0) {
             byte[] newPacket = Arrays.copyOf(packetInBytes, packetInBytes.length + mover);
@@ -283,7 +300,7 @@ public class HPacket implements StringifyAble {
                 }
             }
             else {
-                int i = index + 2 + s.length();
+                int i = index + 2 + sbytes.length;
                 while (i < newPacket.length) {
                     newPacket[i] = packetInBytes[i - mover];
                     i++;
@@ -294,11 +311,15 @@ public class HPacket implements StringifyAble {
             fixLength();
         }
 
-        replaceUShort(index, s.length());
-        for (int i = 0; i < s.length(); i++) {
+        replaceUShort(index, sbytes.length);
+        for (int i = 0; i < sbytes.length; i++) {
             packetInBytes[index + 2 + i] = sbytes[i];
         }
         return this;
+    }
+
+    public HPacket replaceString(int index, String s) {
+        return replaceString(index, s, StandardCharsets.ISO_8859_1);
     }
 
     private boolean canReadString(int index) {
@@ -445,18 +466,27 @@ public class HPacket implements StringifyAble {
         fixLength();
         return this;
     }
+    public HPacket appendString(String s, Charset charset) {
+        isEdited = true;
+        appendUShort(s.getBytes(charset).length);
+        appendBytes(s.getBytes(charset));
+        return this;
+    }
     public HPacket appendString(String s) {
+        return appendString(s, StandardCharsets.ISO_8859_1);
+    }
+
+    public HPacket appendLongString(String s, Charset charset) {
         isEdited = true;
-        appendUShort(s.length());
-        appendBytes(s.getBytes(StandardCharsets.ISO_8859_1));
+        appendInt(s.getBytes(charset).length);
+        appendBytes(s.getBytes(charset));
         return this;
     }
+
     public HPacket appendLongString(String s) {
-        isEdited = true;
-        appendInt(s.length());
-        appendBytes(s.getBytes(StandardCharsets.ISO_8859_1));
-        return this;
+        return appendLongString(s, StandardCharsets.ISO_8859_1);
     }
+
     public HPacket appendObject(Object o) throws InvalidParameterException {
         isEdited = true;
 

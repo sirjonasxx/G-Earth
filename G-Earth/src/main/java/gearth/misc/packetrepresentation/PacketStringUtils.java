@@ -196,7 +196,7 @@ public class PacketStringUtils {
             }
             else if (c == 'i') builder.append("{i:").append(prevInt = p.readInteger()).append('}');
             else if (c == 's') builder.append("{s:\"").append(
-                    new String(p.readString().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8)
+                    p.readString(StandardCharsets.UTF_8)
                             .replace("\\", "\\\\")  // \ -> \\
                             .replace("\"", "\\\"")  // " -> \"
                             .replace("\r", "\\r")   // CR -> \r
