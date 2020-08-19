@@ -19,7 +19,8 @@ public class InfoController extends SubForm {
     public Hyperlink link_d_harble;
     public Hyperlink link_g_gearth;
     public Hyperlink link_g_tanji;
-    public Hyperlink link_d_bonnie;
+    public Hyperlink link_d_gearth;
+
     public Label version;
 
     // this is a TEMPORARY info tab
@@ -41,12 +42,14 @@ public class InfoController extends SubForm {
         link_ase.setTooltip(new Tooltip("https://allseeingeye.to"));
         link_darkbox.setTooltip(new Tooltip("https://darkbox.nl"));
         link_d_harble.setTooltip(new Tooltip("https://discord.gg/CzRuHvW"));
+        link_d_gearth.setTooltip(new Tooltip("https://discord.gg/AVkcF8y"));
         link_g_gearth.setTooltip(new Tooltip("https://github.com/sirjonasxx/G-Earth"));
         link_g_tanji.setTooltip(new Tooltip("https://github.com/ArachisH/Tanji"));
 
         activateHyperlink(link_ase);
         activateHyperlink(link_darkbox);
         activateHyperlink(link_d_harble);
+        activateHyperlink(link_d_gearth);
         activateHyperlink(link_g_gearth);
         activateHyperlink(link_g_tanji);
     }

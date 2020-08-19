@@ -72,7 +72,8 @@
          </Label>
          <Hyperlink fx:id="link_ase" layoutX="487.0" layoutY="107.0" text="AllSeeingEye" />
          <Hyperlink fx:id="link_darkbox" layoutX="487.0" layoutY="127.0" text="Darkbox" />
-         <Hyperlink fx:id="link_d_harble" layoutX="487.0" layoutY="187.0" text="Discord - Harble" />
+         <Hyperlink fx:id="link_d_gearth" layoutX="487.0" layoutY="187.0" text="Discord - G-Earth" />
+         <Hyperlink fx:id="link_d_harble" layoutX="487.0" layoutY="207.0" text="Discord - Harble" />
          <Hyperlink fx:id="link_g_gearth" layoutX="487.0" layoutY="147.0" text="Github - G-Earth" />
          <Hyperlink fx:id="link_g_tanji" layoutX="487.0" layoutY="167.0" text="Github - Tanji" />
          <!--<Hyperlink fx:id="link_d_bonnie" layoutX="400.0" layoutY="221.0" text="Discord - BonnieScripting (pt/br)" />-->
