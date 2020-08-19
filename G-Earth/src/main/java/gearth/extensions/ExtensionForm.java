@@ -11,7 +11,7 @@ import gearth.protocol.HPacket;
 public abstract class ExtensionForm implements IExtension {
 
     volatile Extension extension;
-    volatile Stage primaryStage;
+    protected volatile Stage primaryStage;
 
     protected static void runExtensionForm(String[] args, Class<? extends ExtensionForm> extension) {
         ExtensionFormLauncher launcher = new ExtensionFormLauncher();
