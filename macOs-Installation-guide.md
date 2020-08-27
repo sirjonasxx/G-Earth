@@ -21,4 +21,4 @@ Once created, we are able to codesign gmem from Terminal<br>
 Now you're ready to open G-Earth from Terminal<br>
 `sudo java -jar G-Earth.jar`
 
-If you experience any other issues and the troubleshooting page doesn't help, it might be useful to have a look at the following issues: [#67](../../issues/67) [#10](../../issues/10)
+If you experience any other issues and the troubleshooting page doesn't help, it might be useful to have a look at the following issues: [#67](../issues/67) [#10](../issues/10)
