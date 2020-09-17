@@ -1,47 +1,47 @@
 /* packet logger css */
 .text {
-    -fx-fill: #a9a9a9;
+    color: #a9a9a9;
 }
 
 .messageinfo {
-    -fx-fill: #D0D3D4;
+    color: #D0D3D4;
 }
 
 .blocked, .replaced {
-    -fx-fill: #ffff00;
+    color: #ffff00;
 }
 
 .incoming {
-    -fx-fill: #b22222;
+    color: #b22222;
 }
 
 .outgoing {
-    -fx-fill: #0066cc;
+    color: #0066cc;
 }
 
 .structure, .skipped {
-    -fx-fill: cyan;
+    color: cyan;
 }
 
 .dark {
-    -fx-background-color: #000000;
+    background-color: #000000;
+    color: #a9a9a9;
 }
 
 .caret {
-    -fx-stroke: #ffffff;
+    stroke: #ffffff;
 }
 
 .label {
-    -fx-text-fill: #000000 !important;
+    color: #000000 !important;
 }
 
 .menu-bar .text, .menu .text {
-    -fx-text-fill: #000000 !important;
-    -fx-fill: #000000 !important;
-    -fx-padding: -2 0 -2 0 !important;
+    color: #000000 !important;
+    padding: -2px 0 -2px 0 !important;
 }
 
 .scroll-bar:vertical {
-    -fx-pref-width: 16.5;
-    -fx-padding: 1;
+    width: 17px;
+    padding: 1px;
 }

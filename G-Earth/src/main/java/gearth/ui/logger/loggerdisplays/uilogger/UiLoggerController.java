@@ -6,18 +6,16 @@ import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 import gearth.ui.logger.loggerdisplays.PacketLogger;
 import javafx.application.Platform;
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
+import javafx.concurrent.Worker;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
 import javafx.stage.Stage;
-import org.fxmisc.flowless.VirtualizedScrollPane;
-import org.fxmisc.richtext.StyleClassedTextArea;
-import org.fxmisc.richtext.model.StyleSpansBuilder;
 
 import java.net.URL;
 import java.util.*;
@@ -37,7 +35,7 @@ public class UiLoggerController implements Initializable {
     public CheckMenuItem chkMessageHash;
     public Label lblHarbleAPI;
 
-    private StyleClassedTextArea area;
+    private WebView webView;
 
     private Stage stage;
 
@@ -55,20 +53,22 @@ public class UiLoggerController implements Initializable {
 
     @Override
     public void initialize(URL arg0, ResourceBundle arg1) {
-        area = new StyleClassedTextArea();
-        area.getStyleClass().add("dark");
-        area.setWrapText(true);
+        webView = new WebView();
 
-        VirtualizedScrollPane<StyleClassedTextArea> vsPane = new VirtualizedScrollPane<>(area);
-        borderPane.setCenter(vsPane);
+        borderPane.setCenter(webView);
 
-        synchronized (appendLater) {
-            initialized = true;
-            if (!appendLater.isEmpty()) {
-                appendLog(appendLater);
-                appendLater.clear();
-            }
-        }
+        webView.getEngine().getLoadWorker().stateProperty().addListener((observableValue, oldState, newState) -> {
+            if (newState == Worker.State.SUCCEEDED)
+                synchronized (appendLater) {
+                    initialized = true;
+                    if (!appendLater.isEmpty()) {
+                        appendLog(appendLater);
+                        appendLater.clear();
+                    }
+                }
+        });
+
+        webView.getEngine().load(getClass().getResource("/gearth/ui/logger/uilogger/logger.html").toString());
     }
 
     private static String cleanTextContent(String text) {
@@ -168,25 +168,52 @@ public class UiLoggerController implements Initializable {
 
     private synchronized void appendLog(List<Element> elements) {
         Platform.runLater(() -> {
-            StringBuilder sb = new StringBuilder();
-            StyleSpansBuilder<Collection<String>> styleSpansBuilder = new StyleSpansBuilder<>(0);
 
             for (Element element : elements) {
-                sb.append(element.text);
+                String script = "$('#output').append('<span class=\"" + element.className + "\">"
+                        + escapeMessage(element.text) + "</span>');";
 
-                styleSpansBuilder.add(Collections.singleton(element.className), element.text.length());
+                try {
+                    executejQuery(webView.getEngine(), script);
+                } catch (Exception e) {
+                    System.out.println("Malformed JS message " + script);
+                }
             }
-
-            int oldLen = area.getLength();
-            area.appendText(sb.toString());
-//            System.out.println(sb.toString());
-            area.setStyleSpans(oldLen, styleSpansBuilder.create());
 
             if (autoScroll) {
-//                area.moveTo(area.getLength());
-                area.requestFollowCaret();
+                webView.getEngine().executeScript("window.scrollTo(0, document.body.scrollHeight);");
             }
         });
+    }
+
+    // escapes logger text so that there are no javascript errors
+    private String escapeMessage(String text) {
+        return text
+                .replace("\n\r", "<br />")
+                .replace("\n", "<br />")
+                .replace("\r", "<br />")
+                .replace("'", "\\'");
+    }
+
+    private static Object executejQuery(final WebEngine engine, String script) {
+        return engine.executeScript(
+                "(function(window, document, version, callback) { "
+                        + "var j, d;"
+                        + "var loaded = false;"
+                        + "if (!(j = window.jQuery) || version > j.fn.jquery || callback(j, loaded)) {"
+                        + " var script = document.createElement(\"script\");"
+                        + " script.type = \"text/javascript\";"
+                        + " script.src = \"http://code.jquery.com/jquery-1.7.2.min.js\";"
+                        + " script.onload = script.onreadystatechange = function() {"
+                        + " if (!loaded && (!(d = this.readyState) || d == \"loaded\" || d == \"complete\")) {"
+                        + " callback((j = window.jQuery).noConflict(1), loaded = true);"
+                        + " j(script).remove();"
+                        + " }"
+                        + " };"
+                        + " document.documentElement.childNodes[0].appendChild(script) "
+                        + "} "
+                        + "})(window, document, \"1.7.2\", function($, jquery_loaded) {" + script + "});"
+        );
     }
 
     public void setStage(Stage stage) {
@@ -233,6 +260,6 @@ public class UiLoggerController implements Initializable {
     }
 
     public void clearText(ActionEvent actionEvent) {
-        area.clear();
+        webView.getEngine().executeScript("$('#output').html = \\'\\'");
     }
 }
