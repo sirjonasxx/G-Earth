@@ -49,7 +49,7 @@ public class UiLoggerController implements Initializable {
     private boolean alwaysOnTop = false;
 
     private volatile boolean initialized = false;
-    private final List<Element> appendLater = new ArrayList<>();
+    private final List<String> appendLater = new LinkedList<>();
 
     @Override
     public void initialize(URL arg0, ResourceBundle arg1) {
@@ -58,18 +58,17 @@ public class UiLoggerController implements Initializable {
         borderPane.setCenter(webView);
 
         webView.getEngine().getLoadWorker().stateProperty().addListener((observableValue, oldState, newState) -> {
-            if (newState == Worker.State.SUCCEEDED)
-                synchronized (appendLater) {
-                    initialized = true;
-                    if (!appendLater.isEmpty()) {
-                        appendLog(appendLater);
-                        appendLater.clear();
-                    }
-                }
+            if (newState == Worker.State.SUCCEEDED) {
+                initialized = true;
+                webView.prefHeightProperty().bind(stage.heightProperty());
+                webView.prefWidthProperty().bind(stage.widthProperty());
+                appendLog(appendLater);
+            }
         });
 
         webView.getEngine().load(getClass().getResource("/gearth/ui/logger/uilogger/logger.html").toString());
     }
+
 
     private static String cleanTextContent(String text) {
 //        // strips off all non-ASCII characters
@@ -84,7 +83,7 @@ public class UiLoggerController implements Initializable {
         return text.trim();
     }
 
-    public void appendMessage(HPacket packet, int types) {
+    public synchronized void appendMessage(HPacket packet, int types) {
         boolean isBlocked = (types & PacketLogger.MESSAGE_TYPE.BLOCKED.getValue()) != 0;
         boolean isReplaced = (types & PacketLogger.MESSAGE_TYPE.REPLACED.getValue()) != 0;
         boolean isIncoming = (types & PacketLogger.MESSAGE_TYPE.INCOMING.getValue()) != 0;
@@ -92,7 +91,7 @@ public class UiLoggerController implements Initializable {
         if (isIncoming && !viewIncoming) return;
         if (!isIncoming && !viewOutgoing) return;
 
-        ArrayList<Element> elements = new ArrayList<>();
+        StringBuilder packetHtml = new StringBuilder("<div>");
 
         String expr = packet.toExpression(isIncoming ? HMessage.Direction.TOCLIENT : HMessage.Direction.TOSERVER);
 
@@ -104,84 +103,57 @@ public class UiLoggerController implements Initializable {
                     packet.headerId()
             );
 
-            if ( message != null && !(viewMessageName && !viewMessageHash && message.getName() == null)) {
+            if (message != null && !(viewMessageName && !viewMessageHash && message.getName() == null)) {
                 if (viewMessageName && message.getName() != null) {
-                    elements.add(new Element("["+message.getName()+"]", "messageinfo"));
+                    packetHtml.append(divWithClass("[" + message.getName() + "]", "messageinfo"));
                 }
                 if (viewMessageHash) {
-                    elements.add(new Element("["+message.getHash()+"]", "messageinfo"));
+                    packetHtml.append(divWithClass("[" + message.getHash() + "]", "messageinfo"));
                 }
-                elements.add(new Element("\n", ""));
             }
         }
 
-        if (isBlocked) elements.add(new Element("[Blocked]\n", "blocked"));
-        else if (isReplaced) elements.add(new Element("[Replaced]\n", "replaced"));
+        if (isBlocked) packetHtml.append(divWithClass("[Blocked]", "blocked"));
+        else if (isReplaced) packetHtml.append(divWithClass("[Replaced]", "replaced"));
 
-        if (isIncoming) {
-            // handle skipped eventually
-            elements.add(new Element("Incoming[", "incoming"));
-            elements.add(new Element(String.valueOf(packet.headerId()), ""));
-            elements.add(new Element("]", "incoming"));
 
-            elements.add(new Element(" <- ", ""));
-            if (skiphugepackets && packet.length() > 8000) {
-                elements.add(new Element("<packet skipped>", "skipped"));
-            }
-            else {
-                elements.add(new Element(packet.toString(), "incoming"));
-            }
-        } else {
-            elements.add(new Element("Outgoing[", "outgoing"));
-            elements.add(new Element(String.valueOf(packet.headerId()), ""));
-            elements.add(new Element("]", "outgoing"));
+        packetHtml
+                .append("<div>")
+                .append(isIncoming ? spanWithClass("Incoming[", "incoming") :
+                        spanWithClass("Outgoing[", "outgoing"))
+                .append(packet.headerId())
+                .append(spanWithClass("]", isIncoming ? "incoming" : "outgoing"))
+                .append(isIncoming ? " <- " : " -> ")
+                .append(skiphugepackets && packet.length() > 8000 ?
+                        divWithClass("<packet skipped>", "skipped") :
+                        divWithClass(packet.toString(), isIncoming ? "incoming" : "outgoing"));
 
-            elements.add(new Element(" -> ", ""));
-
-            if (skiphugepackets && packet.length() > 8000) {
-                elements.add(new Element("<packet skipped>", "skipped"));
-            }
-            else {
-                elements.add(new Element(packet.toString(), "outgoing"));
-            }
-        }
 
         String cleaned = cleanTextContent(expr);
         if (cleaned.equals(expr)) {
             if (!expr.equals("") && displayStructure && packet.length() <= 2000)
-                elements.add(new Element("\n" + cleanTextContent(expr), "structure"));
+                packetHtml.append(divWithClass(cleanTextContent(expr), "structure"));
         }
 
 
-        elements.add(new Element("\n--------------------\n", ""));
+        packetHtml.append(divWithClass("--------------------", ""));
 
         synchronized (appendLater) {
             if (initialized) {
-                appendLog(elements);
-            }
-            else {
-                appendLater.addAll(elements);
+                appendLog(Collections.singletonList(packetHtml.toString()));
+            } else {
+                appendLater.add(packetHtml.toString());
             }
         }
-
     }
 
-    private synchronized void appendLog(List<Element> elements) {
+    private synchronized void appendLog(List<String> html) {
         Platform.runLater(() -> {
-
-            for (Element element : elements) {
-                String script = "$('#output').append('<span class=\"" + element.className + "\">"
-                        + escapeMessage(element.text) + "</span>');";
-
-                try {
-                    executejQuery(webView.getEngine(), script);
-                } catch (Exception e) {
-                    System.out.println("Malformed JS message " + script);
-                }
-            }
+            String script = "document.getElementById('output').innerHTML += '" + String.join("", html) + "';";
+            webView.getEngine().executeScript(script);
 
             if (autoScroll) {
-                webView.getEngine().executeScript("window.scrollTo(0, document.body.scrollHeight);");
+                executejQuery(webView.getEngine(), "$('html, body').animate({scrollTop:$(document).height()}, 'slow');");
             }
         });
     }
@@ -260,6 +232,14 @@ public class UiLoggerController implements Initializable {
     }
 
     public void clearText(ActionEvent actionEvent) {
-        webView.getEngine().executeScript("$('#output').html = \\'\\'");
+        executejQuery(webView.getEngine(), "$('#output').empty();");
+    }
+
+    private String divWithClass(String content, String klass) {
+        return escapeMessage("<div class=\"" + klass + "\">" + content + "</div>");
+    }
+
+    private String spanWithClass(String content, String klass) {
+        return escapeMessage("<span class=\"" + klass + "\">" + content + "</span>");
     }
 }

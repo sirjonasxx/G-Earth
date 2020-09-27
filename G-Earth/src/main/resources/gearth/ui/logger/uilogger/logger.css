@@ -38,7 +38,7 @@
 
 .menu-bar .text, .menu .text {
     color: #000000 !important;
-    padding: -2px 0 -2px 0 !important;
+    /*padding: -2px 0 -2px 0 !important;*/
 }
 
 .scroll-bar:vertical {

@@ -1,13 +1,12 @@
 package gearth.ui.extensions.logger;
 
 import javafx.application.Platform;
+import javafx.concurrent.Worker;
 import javafx.fxml.Initializable;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
 import javafx.stage.Stage;
-import org.fxmisc.flowless.VirtualizedScrollPane;
-import org.fxmisc.richtext.StyleClassedTextArea;
-import org.fxmisc.richtext.model.StyleSpansBuilder;
 
 import java.net.URL;
 import java.util.*;
@@ -16,57 +15,42 @@ public class ExtensionLoggerController implements Initializable {
     public BorderPane borderPane;
 
     private Stage stage = null;
-    private StyleClassedTextArea area;
+    private WebView webView;
 
     private volatile boolean initialized = false;
-    private final List<Element> appendOnLoad = new ArrayList<>();
+    private final List<String> appendOnLoad = new LinkedList<>();
 
 
     @Override
     public void initialize(URL arg0, ResourceBundle arg1) {
-        area = new StyleClassedTextArea();
-        area.getStyleClass().add("white");
-        area.setWrapText(true);
-        area.setEditable(false);
+        webView = new WebView();
 
-        VirtualizedScrollPane<StyleClassedTextArea> vsPane = new VirtualizedScrollPane<>(area);
-        borderPane.setCenter(vsPane);
+        borderPane.setCenter(webView);
 
-        synchronized (appendOnLoad) {
-            initialized = true;
-            if (!appendOnLoad.isEmpty()) {
+        webView.getEngine().getLoadWorker().stateProperty().addListener((observableValue, oldState, newState) -> {
+            if (newState == Worker.State.SUCCEEDED) {
+                initialized = true;
+                webView.prefHeightProperty().bind(stage.heightProperty());
+                webView.prefWidthProperty().bind(stage.widthProperty());
                 appendLog(appendOnLoad);
-                appendOnLoad.clear();
             }
-        }
+        });
+
+        webView.getEngine().load(getClass().getResource("/gearth/ui/logger/uilogger/logger.html").toString());
     }
 
-    private synchronized void appendLog(List<Element> elements) {
+    private synchronized void appendLog(List<String> html) {
         Platform.runLater(() -> {
-            StringBuilder sb = new StringBuilder();
-            StyleSpansBuilder<Collection<String>> styleSpansBuilder = new StyleSpansBuilder<>(0);
+            String script = "document.getElementById('output').innerHTML += '" + String.join("", html) + "';";
+            webView.getEngine().executeScript(script);
 
-            for (Element element : elements) {
-                sb.append(element.text);
-
-                styleSpansBuilder.add(Collections.singleton(element.className), element.text.length());
-            }
-
-            int oldLen = area.getLength();
-            area.appendText(sb.toString());
-//            System.out.println(sb.toString());
-            area.setStyleSpans(oldLen, styleSpansBuilder.create());
-
-//            if (autoScroll) {
-                area.moveTo(area.getLength());
-                area.requestFollowCaret();
-//            }
+            executejQuery(webView.getEngine(), "$('html, body').animate({scrollTop:$(document).height()}, 'slow');");
         });
     }
 
     void log(String s) {
         s = cleanTextContent(s);
-        ArrayList<Element> elements = new ArrayList<>();
+        List<String> elements = new LinkedList<>();
 
         String classname, text;
         if (s.startsWith("[") && s.contains("]")) {
@@ -82,9 +66,9 @@ public class ExtensionLoggerController implements Initializable {
             int index = text.indexOf(" --> ") + 5;
             String extensionAnnouncement = text.substring(0, index);
             text = text.substring(index);
-            elements.add(new Element(extensionAnnouncement, "black"));
+            elements.add(divWithClass(extensionAnnouncement, "black"));
         }
-        elements.add(new Element(text + "\n", classname.toLowerCase()));
+        elements.add(divWithClass(text, classname.toLowerCase()));
 
         synchronized (appendOnLoad) {
             if (initialized) {
@@ -113,5 +97,43 @@ public class ExtensionLoggerController implements Initializable {
 
         return text.trim();
     }
+
+    private String divWithClass(String content, String klass) {
+        return escapeMessage("<div class=\"" + klass + "\">" + content + "</div>");
+    }
+
+    private String spanWithClass(String content, String klass) {
+        return escapeMessage("<span class=\"" + klass + "\">" + content + "</span>");
+    }
+
+    private String escapeMessage(String text) {
+        return text
+                .replace("\n\r", "<br />")
+                .replace("\n", "<br />")
+                .replace("\r", "<br />")
+                .replace("'", "\\'");
+    }
+
+    private static Object executejQuery(final WebEngine engine, String script) {
+        return engine.executeScript(
+                "(function(window, document, version, callback) { "
+                        + "var j, d;"
+                        + "var loaded = false;"
+                        + "if (!(j = window.jQuery) || version > j.fn.jquery || callback(j, loaded)) {"
+                        + " var script = document.createElement(\"script\");"
+                        + " script.type = \"text/javascript\";"
+                        + " script.src = \"http://code.jquery.com/jquery-1.7.2.min.js\";"
+                        + " script.onload = script.onreadystatechange = function() {"
+                        + " if (!loaded && (!(d = this.readyState) || d == \"loaded\" || d == \"complete\")) {"
+                        + " callback((j = window.jQuery).noConflict(1), loaded = true);"
+                        + " j(script).remove();"
+                        + " }"
+                        + " };"
+                        + " document.documentElement.childNodes[0].appendChild(script) "
+                        + "} "
+                        + "})(window, document, \"1.7.2\", function($, jquery_loaded) {" + script + "});"
+        );
+    }
+
 
 }
