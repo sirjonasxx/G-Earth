@@ -8,6 +8,8 @@ import gearth.services.extensionhandler.extensions.listeners.OmRemoveClickListen
 import gearth.services.extensionhandler.extensions.listeners.OnClickListener;
 import gearth.services.extensionhandler.extensions.listeners.OnDeleteListener;
 
+import java.util.function.Consumer;
+
 public abstract class GEarthExtension {
 
 
@@ -40,6 +42,8 @@ public abstract class GEarthExtension {
     public abstract void connectionEnd();
     public abstract void init();
     public abstract void close();
+    public abstract void packetToStringResponse(String string, String expression);
+    public abstract void stringToPacketResponse(HPacket packet);
     // ---------------------------------------------------------------
 
 
@@ -78,6 +82,19 @@ public abstract class GEarthExtension {
     protected void hasClosed() {
         extensionObservable.fireEvent(ExtensionListener::hasClosed);
     }
+
+    protected void packetToStringRequest(HPacket packet) {
+        int orgIndex = packet.getReadIndex();
+        extensionObservable.fireEvent(listener -> {
+            packet.setReadIndex(6);
+            listener.packetToStringRequest(packet);
+        });
+        packet.setReadIndex(orgIndex);
+    }
+    protected void stringToPacketRequest(String string) {
+        extensionObservable.fireEvent(l -> l.stringToPacketRequest(string));
+    }
+
     // --------------------------------------------------------------------
 
 

@@ -88,6 +88,14 @@ public class NetworkExtension extends GEarthExtension {
                         else if (message.headerId() == NetworkExtensionInfo.INCOMING_MESSAGES_IDS.EXTENSIONCONSOLELOG) {
                             log(message.readString());
                         }
+                        else if (message.headerId() == NetworkExtensionInfo.INCOMING_MESSAGES_IDS.PACKETTOSTRING_REQUEST) {
+                            HPacket p = new HPacket(new byte[0]);
+                            p.constructFromString(message.readLongString());
+                            packetToStringRequest(p);
+                        }
+                        else if (message.headerId() == NetworkExtensionInfo.INCOMING_MESSAGES_IDS.STRINGTOPACKET_REQUEST) {
+                            stringToPacketRequest(message.readLongString());
+                        }
 
                     }
 
@@ -210,5 +218,20 @@ public class NetworkExtension extends GEarthExtension {
         try {
             connection.close();
         } catch (IOException ignored) { }
+    }
+
+    @Override
+    public void packetToStringResponse(String string, String expression) {
+        HPacket packet = new HPacket(NetworkExtensionInfo.OUTGOING_MESSAGES_IDS.PACKETTOSTRING_RESPONSE);
+        packet.appendLongString(string);
+        packet.appendLongString(expression);
+        sendMessage(packet);
+    }
+
+    @Override
+    public void stringToPacketResponse(HPacket packetFromString) {
+        HPacket packet = new HPacket(NetworkExtensionInfo.OUTGOING_MESSAGES_IDS.STRINGTOPACKET_RESPONSE);
+        packet.appendLongString(packet.stringify());
+        sendMessage(packet);
     }
 }

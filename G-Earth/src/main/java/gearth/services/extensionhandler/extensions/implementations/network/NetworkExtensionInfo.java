@@ -87,6 +87,9 @@ public class NetworkExtensionInfo {
         public static final int CONNECTIONSTART = 5;
         public static final int CONNECTIONEND = 6;
         public static final int INIT = 7;
+
+        public static final int PACKETTOSTRING_RESPONSE = 20;
+        public static final int STRINGTOPACKET_RESPONSE = 21;
     }
 
 
@@ -95,6 +98,10 @@ public class NetworkExtensionInfo {
         public static final int MANIPULATEDPACKET = 2;
         public static final int REQUESTFLAGS = 3;
         public static final int SENDMESSAGE = 4;
+
+        public static final int PACKETTOSTRING_REQUEST = 20;
+        public static final int STRINGTOPACKET_REQUEST = 21;
+
         public static final int EXTENSIONCONSOLELOG = 98;
     }
 
