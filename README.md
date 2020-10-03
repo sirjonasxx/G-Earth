@@ -5,6 +5,8 @@ Habbo packet logger & manipulator for Windows, Linux and Mac.
 
 FOR TROUBLESHOOTING, GO TO https://github.com/sirjonasxx/G-Earth/wiki/Troubleshooting
 
+Join the G-Earth Discord server: https://discord.gg/AVkcF8y
+
 # Windows execution
 Double click G-Earth.exe, which will be delivered in the release. Note that executing G-Earth requires admin privileges.
 
