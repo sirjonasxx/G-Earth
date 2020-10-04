@@ -8,6 +8,7 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Created by Jonas on 21/06/18.
@@ -224,7 +225,7 @@ public class NetworkExtension extends GEarthExtension {
     public void packetToStringResponse(String string, String expression) {
         HPacket packet = new HPacket(NetworkExtensionInfo.OUTGOING_MESSAGES_IDS.PACKETTOSTRING_RESPONSE);
         packet.appendLongString(string);
-        packet.appendLongString(expression);
+        packet.appendLongString(expression, StandardCharsets.UTF_8);
         sendMessage(packet);
     }
 

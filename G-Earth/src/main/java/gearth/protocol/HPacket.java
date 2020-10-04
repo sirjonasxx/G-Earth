@@ -537,25 +537,44 @@ public class HPacket implements StringifyAble {
         isEdited = edited;
     }
 
-    public String toExpression(HMessage.Direction direction) {
-        if (isCorrupted()) return "";
-
+    private String getHarbleStructure(HMessage.Direction direction) {
         HarbleAPI.HarbleMessage msg;
         if (HarbleAPIFetcher.HARBLEAPI != null &&
                 ((msg = HarbleAPIFetcher.HARBLEAPI.getHarbleMessageFromHeaderId(direction, headerId())) != null)) {
-            if (msg.getStructure() != null) {
-                return PacketStringUtils.toExpressionFromGivenStructure(this, msg.getStructure());
+            if (msg.getStructure() != null && structureEquals(msg.getStructure())) {
+                return msg.getStructure();
             }
         }
-        return toExpression();
+
+        return null;
+    }
+
+    public String toExpression(HMessage.Direction direction) {
+        if (isCorrupted()) return "";
+
+        String structure = getHarbleStructure(direction);
+        if (structure != null) {
+            return PacketStringUtils.toExpressionFromGivenStructure(this, structure);
+        }
+
+        return PacketStringUtils.predictedExpression(this);
     }
 
     /**
      * returns "" if not found or not sure enough
-     * dont hate on the coding quality in this function, its pretty effective.
      */
     public String toExpression() {
         if (isCorrupted()) return "";
+
+        String structure1 = getHarbleStructure(HMessage.Direction.TOCLIENT);
+        String structure2 = getHarbleStructure(HMessage.Direction.TOSERVER);
+        if (structure1 != null && structure2 == null) {
+            return PacketStringUtils.toExpressionFromGivenStructure(this, structure1);
+        }
+        else if (structure1 == null && structure2 != null) {
+            return PacketStringUtils.toExpressionFromGivenStructure(this, structure2);
+        }
+
         return PacketStringUtils.predictedExpression(this);
     }
 
