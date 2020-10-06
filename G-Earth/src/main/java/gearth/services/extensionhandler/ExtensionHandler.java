@@ -216,10 +216,10 @@ public class ExtensionHandler {
                     @Override
                     protected void packetToStringRequest(HPacket packet) {
                         String s = "";
-                        String expression = "s";
+                        String expression = "";
                         try {
                             s = packet.toString();
-                            if (packet.length() > 3000) {
+                            if (packet.length() < 3000) {
                                 expression = packet.toExpression();
                             }
                         }
