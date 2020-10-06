@@ -95,7 +95,7 @@ public class NetworkExtension extends GEarthExtension {
                             packetToStringRequest(p);
                         }
                         else if (message.headerId() == NetworkExtensionInfo.INCOMING_MESSAGES_IDS.STRINGTOPACKET_REQUEST) {
-                            stringToPacketRequest(message.readLongString());
+                            stringToPacketRequest(message.readLongString(StandardCharsets.UTF_8));
                         }
 
                     }
@@ -232,7 +232,7 @@ public class NetworkExtension extends GEarthExtension {
     @Override
     public void stringToPacketResponse(HPacket packetFromString) {
         HPacket packet = new HPacket(NetworkExtensionInfo.OUTGOING_MESSAGES_IDS.STRINGTOPACKET_RESPONSE);
-        packet.appendLongString(packet.stringify());
+        packet.appendLongString(packetFromString.stringify());
         sendMessage(packet);
     }
 }
