@@ -29,12 +29,12 @@ public class ExtensionsController extends SubForm {
 
 
     public Button btn_install;
-    public Button btn_remove;
     public TextField ext_port;
     public VBox extensioncontainer;
     public GridPane header_ext;
     public ScrollPane scroller;
     public Button btn_viewExtensionConsole;
+    public Button btn_gpython;
 
     private ExtensionRunner extensionRunner = null;
     private ExtensionHandler extensionHandler;
@@ -98,6 +98,10 @@ public class ExtensionsController extends SubForm {
         else {
             extensionLogger.hide();
         }
+
+    }
+
+    public void gpythonBtnClicked(ActionEvent actionEvent) {
 
     }
 }
