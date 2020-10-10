@@ -23,8 +23,6 @@ public class InfoController extends SubForm {
 
     public Label version;
 
-    // this is a TEMPORARY info tab
-
     public static void activateHyperlink(Hyperlink link) {
         link.setOnAction((ActionEvent event) -> {
             Hyperlink h = (Hyperlink) event.getTarget();

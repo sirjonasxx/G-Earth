@@ -31,6 +31,7 @@ public class ExtraController extends SubForm implements SocksConfiguration {
     public CheckBox cbx_alwaysOnTop;
     public Hyperlink url_troubleshooting;
 
+    //TODO add setup link to g-earth wiki
     public CheckBox cbx_gpython;
 
     public CheckBox cbx_advanced;

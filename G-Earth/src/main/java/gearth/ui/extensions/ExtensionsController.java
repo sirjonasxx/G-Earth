@@ -8,6 +8,7 @@ import gearth.services.extensionhandler.extensions.implementations.network.Netwo
 import gearth.services.extensionhandler.extensions.implementations.network.executer.ExecutionInfo;
 import gearth.services.extensionhandler.extensions.implementations.network.executer.ExtensionRunner;
 import gearth.services.extensionhandler.extensions.implementations.network.executer.ExtensionRunnerFactory;
+import gearth.services.gpython.GPythonShell;
 import gearth.ui.SubForm;
 import gearth.ui.extensions.logger.ExtensionLogger;
 import javafx.application.Platform;
@@ -106,6 +107,6 @@ public class ExtensionsController extends SubForm {
     }
 
     public void gpythonBtnClicked(ActionEvent actionEvent) {
-
+        new GPythonShell().launch();
     }
 }
