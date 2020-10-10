@@ -4,7 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<GridPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="258.0" prefWidth="650.0" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gearth.ui.extra.ExtraController">
+<GridPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="258.0" prefWidth="650.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gearth.ui.extra.ExtraController">
     <columnConstraints>
         <ColumnConstraints hgrow="SOMETIMES" maxWidth="331.0" minWidth="10.0" prefWidth="318.0" />
         <ColumnConstraints hgrow="SOMETIMES" maxWidth="390.0" minWidth="10.0" prefWidth="247.0" />
@@ -26,18 +26,20 @@
           <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
         </columnConstraints>
         <rowConstraints>
-          <RowConstraints maxHeight="125.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-          <RowConstraints maxHeight="235.0" minHeight="10.0" prefHeight="232.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="7.0" minHeight="7.0" prefHeight="7.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="30.0" minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints maxHeight="28.0" minHeight="28.0" prefHeight="28.0" vgrow="SOMETIMES" />
+          <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" prefHeight="232.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
-            <GridPane fx:id="grd_advanced" disable="true" style="-fx-border-color: #888888; -fx-border-radius: 5px;" GridPane.rowIndex="1">
+            <GridPane fx:id="grd_advanced" disable="true" style="-fx-border-color: #888888; -fx-border-radius: 5px;" GridPane.rowIndex="3">
               <columnConstraints>
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
               </columnConstraints>
               <rowConstraints>
                 <RowConstraints maxHeight="30.0" minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                <RowConstraints maxHeight="119.0" minHeight="58.0" vgrow="SOMETIMES" />
-                  <RowConstraints maxHeight="119.0" minHeight="6.0" prefHeight="15.0" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="60.0" minHeight="60.0" prefHeight="60.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="1.7976931348623157E308" minHeight="6.0" prefHeight="15.0" vgrow="SOMETIMES" />
                 <RowConstraints maxHeight="30.0" minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES" />
                   <RowConstraints maxHeight="30.0" minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>
@@ -57,7 +59,6 @@
                     </columnConstraints>
                     <rowConstraints>
                       <RowConstraints maxHeight="60.0" minHeight="60.0" prefHeight="60.0" vgrow="SOMETIMES" />
-                      <RowConstraints maxHeight="30.0" minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES" />
                     </rowConstraints>
                      <GridPane.margin>
                         <Insets />
@@ -66,7 +67,6 @@
                         <Insets left="5.0" />
                      </padding>
                      <children>
-                        <CheckBox fx:id="cbx_socksUseIfNeeded" mnemonicParsing="false" selected="true" text="Only use if needed" GridPane.rowIndex="1" />
                         <GridPane prefHeight="119.0" prefWidth="259.0">
                           <columnConstraints>
                             <ColumnConstraints hgrow="SOMETIMES" maxWidth="159.0" minWidth="10.0" prefWidth="68.0" />
@@ -104,12 +104,23 @@
                   </GridPane>
                </children>
             </GridPane>
-            <CheckBox fx:id="cbx_advanced" mnemonicParsing="false" text="Advanced" textFill="#000000ba">
+            <CheckBox fx:id="cbx_advanced" mnemonicParsing="false" text="Advanced" textFill="#000000ba" GridPane.rowIndex="2">
+               <GridPane.margin>
+                  <Insets left="10.0" top="2.0" />
+               </GridPane.margin>
+               <padding>
+                  <Insets top="2.0" />
+               </padding>
+            </CheckBox>
+            <CheckBox fx:id="cbx_gpython" mnemonicParsing="false" text="Enable G-Python scripting" textFill="#000000ba" GridPane.rowIndex="1">
                <GridPane.margin>
                   <Insets left="10.0" top="2.0" />
                </GridPane.margin>
             </CheckBox>
          </children>
+         <GridPane.margin>
+            <Insets />
+         </GridPane.margin>
       </GridPane>
    </children>
 </GridPane>

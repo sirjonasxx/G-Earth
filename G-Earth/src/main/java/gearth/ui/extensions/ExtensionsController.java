@@ -98,7 +98,11 @@ public class ExtensionsController extends SubForm {
         else {
             extensionLogger.hide();
         }
+    }
 
+    @Override
+    protected void onTabOpened() {
+        btn_gpython.setDisable(!parentController.extraController.useGPython());
     }
 
     public void gpythonBtnClicked(ActionEvent actionEvent) {

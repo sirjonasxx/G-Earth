@@ -107,39 +107,4 @@ public class GEarthController {
         tabs.forEach(SubForm::exit);
         hConnection.abort();
     }
-
-
-
-    
-    public ConnectionController getConnectionController() {
-        return connectionController;
-    }
-
-    public InjectionController getInjectionController() {
-        return injectionController;
-    }
-
-    public LoggerController getLoggerController() {
-        return loggerController;
-    }
-
-    public ToolsController getToolsController() {
-        return toolsController;
-    }
-
-    public SchedulerController getSchedulerController() {
-        return schedulerController;
-    }
-
-    public ExtraController getExtraController() {
-        return extraController;
-    }
-
-    public InfoController getInfoController() {
-        return infoController;
-    }
-
-    public ExtensionsController getExtensionsController() {
-        return extensionsController;
-    }
 }
