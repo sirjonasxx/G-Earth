@@ -28,6 +28,10 @@ public class SubForm {
 
     }
 
+    protected void onTabOpened() {
+
+    }
+
     protected HConnection getHConnection() {
         return parentController.getHConnection();
     }
