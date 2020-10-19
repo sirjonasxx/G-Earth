@@ -1,21 +1,29 @@
 package gearth.ui.extra;
 
+import gearth.Main;
 import gearth.misc.Cacher;
 import gearth.protocol.HConnection;
 import gearth.protocol.connection.HState;
 import gearth.protocol.connection.proxy.ProxyProviderFactory;
 import gearth.protocol.connection.proxy.SocksConfiguration;
+import gearth.services.gpython.GPythonVersionUtils;
 import gearth.ui.SubForm;
 import gearth.ui.info.InfoController;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.scene.control.*;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Region;
+import javafx.scene.web.WebView;
 import org.json.JSONObject;
 
 /**
  * Created by Jonas on 06/04/18.
  */
 public class ExtraController extends SubForm implements SocksConfiguration {
+
+    public static final String INFO_URL_GPYTHON = "www.placeholder.com";
 
     public static final String NOTEPAD_CACHE_KEY = "notepad_text";
     public static final String SOCKS_CACHE_KEY = "socks_config";
@@ -142,5 +150,48 @@ public class ExtraController extends SubForm implements SocksConfiguration {
 
     public boolean useGPython() {
         return cbx_gpython.isSelected();
+    }
+
+    public void gpythonCbxClick(ActionEvent actionEvent) {
+        if (cbx_gpython.isSelected()) {
+            new Thread(() -> {
+                Platform.runLater(() -> {
+                    cbx_gpython.setSelected(false);
+                    cbx_gpython.setDisable(true);
+                });
+                if (!GPythonVersionUtils.validInstallation()) {
+                    Platform.runLater(() -> {
+                        Alert alert = new Alert(Alert.AlertType.ERROR, "G-Python installation", ButtonType.OK);
+                        alert.setTitle("G-Python installation");
+
+                        FlowPane fp = new FlowPane();
+                        Label lbl = new Label("Before using G-Python, install the right packages using pip!" +
+                                System.lineSeparator() + System.lineSeparator() + "More information here:");
+                        Hyperlink link = new Hyperlink(INFO_URL_GPYTHON);
+                        fp.getChildren().addAll( lbl, link);
+                        link.setOnAction(event -> {
+                            Main.main.getHostServices().showDocument(link.getText());
+                            event.consume();
+                        });
+
+                        alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+                        alert.getDialogPane().setContent(fp);
+                        alert.show();
+
+                        cbx_gpython.setDisable(false);
+                    });
+                }
+                else {
+                    Platform.runLater(() -> {
+                        cbx_gpython.setSelected(true);
+                        cbx_gpython.setDisable(false);
+                        parentController.extensionsController.updateGPythonStatus();
+                    });
+                }
+            }).start();
+
+
+        }
+
     }
 }
