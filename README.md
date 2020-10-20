@@ -3,9 +3,9 @@ Habbo packet logger & manipulator for Windows, Linux and Mac.
 
 - Requires Java 8
 
-FOR TROUBLESHOOTING, GO TO https://github.com/sirjonasxx/G-Earth/wiki/Troubleshooting
+[CLICK HERE FOR TROUBLESHOOTING](https://github.com/sirjonasxx/G-Earth/wiki/Troubleshooting)
 
-Join the G-Earth Discord server: https://discord.gg/AVkcF8y
+Join the G-Earth [Discord server](https://discord.gg/AVkcF8y)
 
 # Windows execution
 Double click G-Earth.exe, which will be delivered in the release. Note that executing G-Earth requires admin privileges.
@@ -17,7 +17,7 @@ Execution command:
 Additionally, you can add the -t flag to log the packets in your terminal instead of opening a new window for it.
 
 # Mac execution
-https://github.com/sirjonasxx/G-Earth/wiki/macOs-Installation-guide
+[MacOs Installation guide](https://github.com/sirjonasxx/G-Earth/wiki/macOs-Installation-guide)
 
 # Features
 * Log outgoing and incoming packets
