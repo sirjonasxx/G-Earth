@@ -23,7 +23,7 @@ import org.json.JSONObject;
  */
 public class ExtraController extends SubForm implements SocksConfiguration {
 
-    public static final String INFO_URL_GPYTHON = "www.placeholder.com";
+    public static final String INFO_URL_GPYTHON = "https://github.com/sirjonasxx/G-Earth/wiki/G-Python-qtConsole";
 
     public static final String NOTEPAD_CACHE_KEY = "notepad_text";
     public static final String SOCKS_CACHE_KEY = "socks_config";
