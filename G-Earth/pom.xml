@@ -36,7 +36,7 @@
                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>gearth.J11Main</mainClass>
+                            <mainClass>gearth.Main</mainClass>
                             <useUniqueVersions>false</useUniqueVersions>
                         </manifest>
                     </archive>
@@ -58,7 +58,7 @@
                     <outputDirectory>${project.build.directory}/bin</outputDirectory>
                     <archive>
                         <manifest>
-                            <mainClass>gearth.J11Main</mainClass>
+                            <mainClass>gearth.Main</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>

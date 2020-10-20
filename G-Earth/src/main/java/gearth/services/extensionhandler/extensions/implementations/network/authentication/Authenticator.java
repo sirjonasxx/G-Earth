@@ -6,9 +6,7 @@ import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Created by Jonas on 16/10/18.
@@ -16,15 +14,24 @@ import java.util.Random;
 public class Authenticator {
 
     private static Map<String, String> cookies = new HashMap<>();
+    private static Set<String> perma_cookies = new HashSet<>();
 
     public static String generateCookieForExtension(String filename) {
         String cookie = getRandomCookie();
         cookies.put(filename, cookie);
-
+        return cookie;
+    }
+    public static String generatePermanentCookie() {
+        String cookie = getRandomCookie();
+        perma_cookies.add(cookie);
         return cookie;
     }
 
     public static boolean evaluate(NetworkExtension extension) {
+        if (extension.getCookie() != null && perma_cookies.contains(extension.getCookie())) {
+            return true;
+        }
+
         if (extension.isInstalledExtension()) {
             return claimSession(extension.getFileName(), extension.getCookie());
         }

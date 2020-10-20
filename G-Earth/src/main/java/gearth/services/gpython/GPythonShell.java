@@ -10,20 +10,25 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Region;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.*;
+import java.net.URI;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class GPythonShell {
 
     private final String extensionName;
+    private final int port;
     private final String cookie;
 
-    public GPythonShell(String extensionName, String cookie) {
+    public GPythonShell(String extensionName, int port, String cookie) {
         this.extensionName = extensionName;
+        this.port = port;
         this.cookie = cookie;
     }
 
@@ -43,6 +48,41 @@ public class GPythonShell {
                 List<String> sysargs = enterCommandAndAwait(out, in, "import sys; sys.argv");
                 String kernelName = extractKernelName(sysargs);
 
+                InputStream initScriptResource = getClass().getResourceAsStream("init_script.py");
+                List<String> initScript = new BufferedReader(new InputStreamReader(initScriptResource,
+                                    StandardCharsets.UTF_8)).lines().collect(Collectors.toList());
+
+                for (String line : initScript) {
+                    line = line.replace("$G_PYTHON_SHELL_TITLE$", extensionName)
+                            .replace("$G_EARTH_PORT$", "" + port)
+                            .replace("$COOKIE$", cookie);
+                    enterCommandAndAwait(out, in, line);
+                }
+
+                ProcessBuilder qtConsoleBuilder = new ProcessBuilder("python", "-m", "jupyter", "qtconsole",
+                        "--ConsoleWidget.include_other_output", "True",
+                        "--ConsoleWidget.gui_completion", "'droplist'",
+//                        "--ConsoleWidget.other_output_prefix", "'[G-Earth]'",
+//                        "--JupyterWidget.in_prompt", "'>>>: '",
+//                        "--JupyterWidget.out_prompt", "''",
+                        "--KernelManager.autorestart", "False",
+                        "--JupyterConsoleApp.confirm_exit", "False",
+                        "--JupyterConsoleApp.existing", kernelName);
+                Process qtConsole = qtConsoleBuilder.start();
+
+                new Thread(() -> {
+                    try {
+                        qtConsole.waitFor();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    try {
+                        enterCommandAndAwait(out, in, "ext.stop()");
+                        enterCommand(out, "exit()");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }).start();
 
                 onLaunch.launched(false);
             }
@@ -123,7 +163,7 @@ public class GPythonShell {
 
         for (int i = 0; i < params.size() - 1; i++) {
             if (params.get(i).equals("-f")) {
-                return params.get(i+1);
+                return "'" + params.get(i+1) + "'";
             }
         }
         return null;
@@ -155,8 +195,8 @@ public class GPythonShell {
         return extensionName;
     }
 
-    public static void main(String[] args) throws IOException {
-        GPythonShell shell = new GPythonShell("test", "cookie");
+    public static void main(String[] args) {
+        GPythonShell shell = new GPythonShell("test", 9092, "cookie");
         shell.launch((b) -> {
             System.out.println("launched");
         });

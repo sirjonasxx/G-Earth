@@ -18,8 +18,8 @@ public class BoxButton extends StackPane {
 
     //paths zijn relatief aan deze classpath
     public BoxButton(String imageName, String imageOnHoverName) {
-        this.image = new Image(getClass().getResourceAsStream("/gearth/ui/buttons/files/" + imageName));
-        this.imageOnHover = new Image(getClass().getResourceAsStream("/gearth/ui/buttons/files/" + imageOnHoverName));
+        this.image = new Image(getClass().getResourceAsStream("files/" + imageName));
+        this.imageOnHover = new Image(getClass().getResourceAsStream("files/" + imageOnHoverName));
         this.imageView = new ImageView();
 
         setCursor(Cursor.DEFAULT);

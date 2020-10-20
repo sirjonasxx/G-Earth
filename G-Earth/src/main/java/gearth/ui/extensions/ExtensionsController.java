@@ -6,6 +6,7 @@ import gearth.services.extensionhandler.ExtensionHandler;
 import gearth.services.extensionhandler.extensions.ExtensionListener;
 import gearth.services.extensionhandler.extensions.GEarthExtension;
 import gearth.services.extensionhandler.extensions.implementations.network.NetworkExtensionsProducer;
+import gearth.services.extensionhandler.extensions.implementations.network.authentication.Authenticator;
 import gearth.services.extensionhandler.extensions.implementations.network.executer.ExecutionInfo;
 import gearth.services.extensionhandler.extensions.implementations.network.executer.ExtensionRunner;
 import gearth.services.extensionhandler.extensions.implementations.network.executer.ExtensionRunnerFactory;
@@ -117,11 +118,16 @@ public class ExtensionsController extends SubForm {
     }
 
 
+    private volatile int gpytonShellCounter = 1;
     private volatile boolean pythonShellLaunching = false;
     public void gpythonBtnClicked(ActionEvent actionEvent) {
         pythonShellLaunching = true;
         Platform.runLater(() -> btn_gpython.setDisable(true));
-        GPythonShell shell = new GPythonShell("test", "cookie");
+        GPythonShell shell = new GPythonShell(
+                "Scripting shell " + gpytonShellCounter++,
+                networkExtensionsProducer.getPort(),
+                Authenticator.generatePermanentCookie()
+        );
         shell.launch((b) -> {
             pythonShellLaunching = false;
             Platform.runLater(this::updateGPythonStatus);
