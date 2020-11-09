@@ -44,18 +44,19 @@ public class StructurePredictor {
         while (index < packet.getBytesLength()) {
             double currentLogScore = dynamic[index - 6].logScore;
             for (TypeChecker typeChecker : typeCheckers) {
-                if (typeChecker.canRead(index)) {
-                    double score = typeChecker.score(index);
-                    double newScore = currentLogScore + Math.log(score);
-                    int nextIndex = typeChecker.nextIndex(index) - 6;
-                    if (dynamic[nextIndex] == null || newScore > dynamic[nextIndex].logScore) {
-                        dynamic[nextIndex] = new SubStructure(
-                                index - 6,
-                                typeChecker.getStructCode(),
-                                newScore
-                        );
-                    }
+                if (!typeChecker.canRead(index)) continue;
+
+                double score = typeChecker.score(index);
+                double newScore = currentLogScore + Math.log(score);
+                int nextIndex = typeChecker.nextIndex(index) - 6;
+                if (dynamic[nextIndex] == null || newScore > dynamic[nextIndex].logScore) {
+                    dynamic[nextIndex] = new SubStructure(
+                            index - 6,
+                            typeChecker.getStructCode(),
+                            newScore
+                    );
                 }
+
             }
             index++;
         }
