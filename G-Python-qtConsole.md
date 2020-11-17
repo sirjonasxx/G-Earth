@@ -3,6 +3,8 @@
 * Make sure your python version (`python --version` on commandline) is >= 3.2
 * Execute the following line on commandline: `python -m pip install qtconsole pyqt5 jupyter-console g-python` to install the required packages
 
+(IMPORTANT: On Linux devices, the installation command might require a `sudo`, since G-Earth runs in `sudo` as well.)
+
 ## Usage
 1. Go to the "Extra" tab on G-Earth and check the "Enable G-Python Scripting" checkbox
 2. Go to the "Extensions" tab and open a G-Python shell
