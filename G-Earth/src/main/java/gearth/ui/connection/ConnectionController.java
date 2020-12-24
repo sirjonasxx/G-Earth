@@ -98,7 +98,9 @@ public class ConnectionController extends SubForm {
         txtfield_hotelversion.setText(getHConnection().getHotelVersion());
 
         btnConnect.setDisable(getHConnection().getState() == HState.PREPARING || getHConnection().getState() == HState.ABORTING);
-        if (!cbx_autodetect.isSelected() && !btnConnect.isDisable()) {
+
+
+        if (!cbx_autodetect.isSelected() && !btnConnect.isDisable() && useFlash()) {
             try {
                 int i = Integer.parseInt(inpPort.getEditor().getText());
                 btnConnect.setDisable(i < 0 || i >= 256 * 256);
@@ -110,6 +112,13 @@ public class ConnectionController extends SubForm {
 
         inpHost.setDisable(getHConnection().getState() != HState.NOT_CONNECTED || cbx_autodetect.isSelected());
         inpPort.setDisable(getHConnection().getState() != HState.NOT_CONNECTED || cbx_autodetect.isSelected());
+
+        cbx_autodetect.setDisable(!useFlash());
+        outHost.setDisable(!useFlash());
+        outPort.setDisable(!useFlash());
+
+        inpHost.setDisable(!useFlash() || getHConnection().getState() != HState.NOT_CONNECTED || cbx_autodetect.isSelected());
+        inpPort.setDisable(!useFlash() || getHConnection().getState() != HState.NOT_CONNECTED || cbx_autodetect.isSelected());
     }
 
     public void onParentSet(){
@@ -134,14 +143,15 @@ public class ConnectionController extends SubForm {
 
             if (newState == HState.CONNECTED) {
                 lblState.setText("Connected");
-                outHost.setText(getHConnection().getDomain());
-                outPort.setText(getHConnection().getServerPort()+"");
             }
             if (newState == HState.WAITING_FOR_CLIENT) {
                 lblState.setText("Waiting for connection");
             }
 
-            if (newState == HState.CONNECTED) {
+            if (newState == HState.CONNECTED && useFlash()) {
+                outHost.setText(getHConnection().getDomain());
+                outPort.setText(getHConnection().getServerPort()+"");
+
                 JSONObject connectionSettings = new JSONObject();
                 connectionSettings.put(AUTODETECT_CACHE, cbx_autodetect.isSelected());
                 connectionSettings.put(HOST_CACHE, inpHost.getEditor().getText());
@@ -178,5 +188,12 @@ public class ConnectionController extends SubForm {
     protected void onExit() {
         getHConnection().abort();
     }
-    
+
+    public void changeClientMode() {
+        updateInputUI();
+    }
+
+    private boolean useFlash() {
+        return parentController.extraController.rd_flash.isSelected();
+    }
 }

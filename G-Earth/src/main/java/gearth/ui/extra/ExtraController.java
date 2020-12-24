@@ -10,12 +10,13 @@ import gearth.services.gpython.GPythonVersionUtils;
 import gearth.ui.SubForm;
 import gearth.ui.info.InfoController;
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.event.ActionEvent;
 import javafx.scene.control.*;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Region;
-import javafx.scene.web.WebView;
 import org.json.JSONObject;
 
 /**
@@ -28,6 +29,8 @@ public class ExtraController extends SubForm implements SocksConfiguration {
     public static final String NOTEPAD_CACHE_KEY = "notepad_text";
     public static final String SOCKS_CACHE_KEY = "socks_config";
     public static final String GPYTHON_CACHE_KEY = "use_gpython";
+
+    public static final String USE_UNITY_CLIENT_CACHE_KEY = "use_unity";
 
     public static final String SOCKS_IP = "ip";
     public static final String SOCKS_PORT = "port";
@@ -52,9 +55,14 @@ public class ExtraController extends SubForm implements SocksConfiguration {
     public GridPane grd_socksInfo;
     public TextField txt_socksPort;
     public TextField txt_socksIp;
-//    public CheckBox cbx_socksUseIfNeeded;
+
+
+    public ToggleGroup tgl_clientMode;
+    public RadioButton rd_unity;
+    public RadioButton rd_flash;
 
     public void initialize() {
+        tgl_clientMode.selectedToggleProperty().addListener(observable -> parentController.connectionController.changeClientMode());
 
         url_troubleshooting.setTooltip(new Tooltip("https://github.com/sirjonasxx/G-Earth/wiki/Troubleshooting"));
         InfoController.activateHyperlink(url_troubleshooting);
@@ -73,6 +81,11 @@ public class ExtraController extends SubForm implements SocksConfiguration {
 
         if (Cacher.getCacheContents().has(GPYTHON_CACHE_KEY)) {
             cbx_gpython.setSelected(Cacher.getCacheContents().getBoolean(GPYTHON_CACHE_KEY));
+        }
+
+        if (Cacher.getCacheContents().has(USE_UNITY_CLIENT_CACHE_KEY)) {
+            rd_unity.setSelected(Cacher.getCacheContents().getBoolean(USE_UNITY_CLIENT_CACHE_KEY));
+            rd_flash.setSelected(!Cacher.getCacheContents().getBoolean(USE_UNITY_CLIENT_CACHE_KEY));
         }
 
         cbx_debug.selectedProperty().addListener(observable -> HConnection.DEBUG = cbx_debug.isSelected());
@@ -102,6 +115,7 @@ public class ExtraController extends SubForm implements SocksConfiguration {
     protected void onExit() {
         Cacher.put(NOTEPAD_CACHE_KEY, txtarea_notepad.getText());
         Cacher.put(GPYTHON_CACHE_KEY, cbx_gpython.isSelected());
+        Cacher.put(USE_UNITY_CLIENT_CACHE_KEY, rd_unity.isSelected());
         saveSocksConfig();
     }
 
