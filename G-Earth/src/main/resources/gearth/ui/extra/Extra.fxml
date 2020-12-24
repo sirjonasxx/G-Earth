@@ -27,7 +27,7 @@
         </columnConstraints>
         <rowConstraints>
             <RowConstraints maxHeight="7.0" minHeight="7.0" prefHeight="7.0" vgrow="SOMETIMES" />
-            <RowConstraints maxHeight="30.0" minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="34.0" minHeight="34.0" prefHeight="34.0" vgrow="SOMETIMES" />
             <RowConstraints maxHeight="30.0" minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES" />
           <RowConstraints maxHeight="28.0" minHeight="28.0" prefHeight="28.0" vgrow="SOMETIMES" />
           <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" prefHeight="232.0" vgrow="SOMETIMES" />
@@ -117,25 +117,32 @@
                   <Insets left="10.0" top="2.0" />
                </GridPane.margin>
             </CheckBox>
-            <GridPane GridPane.rowIndex="1">
+            <GridPane prefHeight="26.0" prefWidth="286.0" style="-fx-border-color: #888888; -fx-border-radius: 5px;" GridPane.rowIndex="1">
               <columnConstraints>
-                <ColumnConstraints hgrow="SOMETIMES" maxWidth="149.0" minWidth="10.0" prefWidth="67.0" />
-                <ColumnConstraints hgrow="SOMETIMES" maxWidth="242.0" minWidth="10.0" prefWidth="242.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="149.0" minWidth="10.0" prefWidth="38.0" />
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="81.0" minWidth="69.0" prefWidth="75.0" />
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="83.0" minWidth="66.0" prefWidth="72.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="82.0" minWidth="61.0" prefWidth="65.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="242.0" minWidth="10.0" prefWidth="47.0" />
               </columnConstraints>
               <rowConstraints>
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="20.0" prefHeight="34.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <RadioButton fx:id="rd_unity" mnemonicParsing="false" selected="true" text="Unity">
+                  <RadioButton fx:id="rd_unity" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" selected="true" text="Unity" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS">
                      <toggleGroup>
                         <ToggleGroup fx:id="tgl_clientMode" />
                      </toggleGroup>
                   </RadioButton>
-                  <RadioButton fx:id="rd_flash" mnemonicParsing="false" text="Flash" toggleGroup="$tgl_clientMode" GridPane.columnIndex="1" />
+                  <RadioButton fx:id="rd_flash" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Flash" toggleGroup="$tgl_clientMode" GridPane.columnIndex="2" />
+                  <RadioButton disable="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Anime" GridPane.columnIndex="3" />
                </children>
                <GridPane.margin>
-                  <Insets bottom="2.0" left="10.0" top="2.0" />
+                  <Insets left="10.0" right="10.0" />
                </GridPane.margin>
+               <padding>
+                  <Insets bottom="8.0" top="8.0" />
+               </padding>
             </GridPane>
          </children>
          <GridPane.margin>

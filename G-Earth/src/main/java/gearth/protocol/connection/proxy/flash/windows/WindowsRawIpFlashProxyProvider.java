@@ -1,35 +1,23 @@
-package gearth.protocol.connection.proxy.windows;
+package gearth.protocol.connection.proxy.flash.windows;
 
 import gearth.misc.Cacher;
 import gearth.protocol.HConnection;
-import gearth.protocol.connection.HProxy;
 import gearth.protocol.connection.HProxySetter;
 import gearth.protocol.connection.HState;
 import gearth.protocol.connection.HStateSetter;
-import gearth.protocol.connection.proxy.ProxyProvider;
-import gearth.protocol.connection.proxy.unix.LinuxRawIpProxyProvider;
-import gearth.protocol.hostreplacer.ipmapping.IpMapper;
-import gearth.protocol.hostreplacer.ipmapping.IpMapperFactory;
-import javafx.application.Platform;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.layout.Region;
+import gearth.protocol.connection.proxy.flash.unix.LinuxRawIpFlashProxyProvider;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.math.BigInteger;
-import java.net.*;
-import java.util.LinkedList;
-import java.util.Queue;
 import java.util.UUID;
 
 // windows raw ip proxy provider extends the Linux one with the exception that it does not want to close
 // the IP redirect on connect
-public class WindowsRawIpProxyProvider extends LinuxRawIpProxyProvider {
+public class WindowsRawIpFlashProxyProvider extends LinuxRawIpFlashProxyProvider {
 
     private boolean hasMapped = false;
 
-    public WindowsRawIpProxyProvider(HProxySetter proxySetter, HStateSetter stateSetter, HConnection hConnection, String input_host, int input_port, boolean useSocks) {
+    public WindowsRawIpFlashProxyProvider(HProxySetter proxySetter, HStateSetter stateSetter, HConnection hConnection, String input_host, int input_port, boolean useSocks) {
         super(proxySetter, stateSetter, hConnection, input_host, input_port, useSocks);
     }
 
