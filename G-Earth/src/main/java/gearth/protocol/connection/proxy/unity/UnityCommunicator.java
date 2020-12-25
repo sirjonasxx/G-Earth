@@ -13,7 +13,6 @@ import gearth.protocol.packethandler.unity.UnityPacketHandler;
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 @ServerEndpoint(value = "/packethandler")
@@ -36,15 +35,11 @@ public class UnityCommunicator {
 
     @OnOpen
     public void onOpen(Session session) throws IOException {
-
+        session.setMaxBinaryMessageBufferSize(1024 * 1024 * 100);
     }
 
     @OnMessage
     public void onMessage(byte[] b, Session session) throws IOException {
-//        session.getBasicRemote().sendText(message.toUpperCase());
-//        session.getBasicRemote().sendBinary(ByteBuffer.wrap(b));
-//        System.out.println("received " + new HPacket(b).toString());
-
         byte[] packet = Arrays.copyOfRange(b, 1, b.length);
 
         if (hProxy == null && b[0] == 1) {
