@@ -7,9 +7,9 @@ import gearth.protocol.connection.HState;
 import gearth.protocol.connection.HStateSetter;
 import gearth.protocol.connection.proxy.ProxyProvider;
 import gearth.protocol.memory.Rc4Obtainer;
-import gearth.protocol.packethandler.IncomingPacketHandler;
-import gearth.protocol.packethandler.OutgoingPacketHandler;
-import gearth.protocol.packethandler.PacketHandler;
+import gearth.protocol.packethandler.flash.IncomingFlashPacketHandler;
+import gearth.protocol.packethandler.flash.OutgoingFlashPacketHandler;
+import gearth.protocol.packethandler.flash.FlashPacketHandler;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -45,9 +45,9 @@ public abstract class FlashProxyProvider implements ProxyProvider {
         if (HConnection.DEBUG) System.out.println(server.getLocalAddress().getHostAddress() + ": " + server.getLocalPort());
         Rc4Obtainer rc4Obtainer = new Rc4Obtainer(hConnection);
 
-        OutgoingPacketHandler outgoingHandler = new OutgoingPacketHandler(server.getOutputStream(), hConnection.getTrafficObservables(), hConnection.getExtensionHandler());
-        IncomingPacketHandler incomingHandler = new IncomingPacketHandler(client.getOutputStream(), hConnection.getTrafficObservables(), outgoingHandler, hConnection.getExtensionHandler());
-        rc4Obtainer.setPacketHandlers(outgoingHandler, incomingHandler);
+        OutgoingFlashPacketHandler outgoingHandler = new OutgoingFlashPacketHandler(server.getOutputStream(), hConnection.getTrafficObservables(), hConnection.getExtensionHandler());
+        IncomingFlashPacketHandler incomingHandler = new IncomingFlashPacketHandler(client.getOutputStream(), hConnection.getTrafficObservables(), outgoingHandler, hConnection.getExtensionHandler());
+        rc4Obtainer.setFlashPacketHandlers(outgoingHandler, incomingHandler);
 
         Semaphore abort = new Semaphore(0);
 
@@ -78,7 +78,7 @@ public abstract class FlashProxyProvider implements ProxyProvider {
         }
     }
 
-    private void handleInputStream(Socket socket, PacketHandler packetHandler, Semaphore abort) {
+    private void handleInputStream(Socket socket, FlashPacketHandler flashPacketHandler, Semaphore abort) {
         new Thread(() -> {
             try {
                 int readLength;
@@ -86,7 +86,7 @@ public abstract class FlashProxyProvider implements ProxyProvider {
                 while (!socket.isClosed() &&
                         (hConnection.getState() == HState.WAITING_FOR_CLIENT || hConnection.getState() == HState.CONNECTED) &&
                         (readLength = socket.getInputStream().read(buffer)) != -1) {
-                    packetHandler.act(Arrays.copyOf(buffer, readLength));
+                    flashPacketHandler.act(Arrays.copyOf(buffer, readLength));
                 }
             }
             catch (IOException ignore) {

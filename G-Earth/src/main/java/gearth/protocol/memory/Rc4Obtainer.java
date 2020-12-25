@@ -7,7 +7,9 @@ import gearth.protocol.HPacket;
 import gearth.protocol.crypto.RC4;
 import gearth.protocol.memory.habboclient.HabboClient;
 import gearth.protocol.memory.habboclient.HabboClientFactory;
-import gearth.protocol.packethandler.*;
+import gearth.protocol.packethandler.flash.BufferChangeListener;
+import gearth.protocol.packethandler.flash.FlashPacketHandler;
+import gearth.protocol.packethandler.PayloadBuffer;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -25,17 +27,17 @@ public class Rc4Obtainer {
     public static final boolean DEBUG = false;
 
     private HabboClient client;
-    private List<PacketHandler> packetHandlers;
+    private List<FlashPacketHandler> flashPacketHandlers;
 
     public Rc4Obtainer(HConnection hConnection) {
         client = HabboClientFactory.get(hConnection);
     }
 
 
-    public void setPacketHandlers(PacketHandler... packetHandlers) {
-        this.packetHandlers = Arrays.asList(packetHandlers);
+    public void setFlashPacketHandlers(FlashPacketHandler... flashPacketHandlers) {
+        this.flashPacketHandlers = Arrays.asList(flashPacketHandlers);
 
-        for (PacketHandler handler : packetHandlers) {
+        for (FlashPacketHandler handler : flashPacketHandlers) {
             BufferChangeListener bufferChangeListener = new BufferChangeListener() {
                 @Override
                 public void act() {
@@ -53,10 +55,10 @@ public class Rc4Obtainer {
 
 
 
-    private void onSendFirstEncryptedMessage(PacketHandler packetHandler) {
+    private void onSendFirstEncryptedMessage(FlashPacketHandler flashPacketHandler) {
         if (!HConnection.DECRYPTPACKETS) return;
 
-        packetHandlers.forEach(PacketHandler::block);
+        flashPacketHandlers.forEach(FlashPacketHandler::block);
 
         new Thread(() -> {
 
@@ -67,8 +69,8 @@ public class Rc4Obtainer {
             int i = 0;
             while (!worked && i < 4) {
                 worked = (i % 2 == 0) ?
-                        onSendFirstEncryptedMessage(packetHandler, client.getRC4cached()) :
-                        onSendFirstEncryptedMessage(packetHandler, client.getRC4possibilities());
+                        onSendFirstEncryptedMessage(flashPacketHandler, client.getRC4cached()) :
+                        onSendFirstEncryptedMessage(flashPacketHandler, client.getRC4possibilities());
                 i++;
             }
 
@@ -107,16 +109,16 @@ public class Rc4Obtainer {
                 System.out.println("Cracked RC4 in " + (endTime - startTime) + "ms");
             }
 
-            packetHandlers.forEach(PacketHandler::unblock);
+            flashPacketHandlers.forEach(FlashPacketHandler::unblock);
         }).start();
     }
 
-    private boolean onSendFirstEncryptedMessage(PacketHandler packetHandler, List<byte[]> potentialRC4tables) {
+    private boolean onSendFirstEncryptedMessage(FlashPacketHandler flashPacketHandler, List<byte[]> potentialRC4tables) {
         for (byte[] possible : potentialRC4tables) {
 
-            byte[] encBuffer = new byte[packetHandler.getEncryptedBuffer().size()];
+            byte[] encBuffer = new byte[flashPacketHandler.getEncryptedBuffer().size()];
             for (int i = 0; i < encBuffer.length; i++) {
-                encBuffer[i] = packetHandler.getEncryptedBuffer().get(i);
+                encBuffer[i] = flashPacketHandler.getEncryptedBuffer().get(i);
             }
 
             for (int i = 0; i < 256; i++) {
@@ -124,7 +126,7 @@ public class Rc4Obtainer {
                     byte[] keycpy = Arrays.copyOf(possible, possible.length);
                     RC4 rc4Tryout = new RC4(keycpy, i, j);
 
-                    if (packetHandler.getMessageSide() == HMessage.Direction.TOSERVER) rc4Tryout.undoRc4(encBuffer);
+                    if (flashPacketHandler.getMessageSide() == HMessage.Direction.TOSERVER) rc4Tryout.undoRc4(encBuffer);
                     if (rc4Tryout.couldBeFresh()) {
                         byte[] encDataCopy = Arrays.copyOf(encBuffer, encBuffer.length);
                         RC4 rc4TryCopy = rc4Tryout.deepCopy();
@@ -135,7 +137,7 @@ public class Rc4Obtainer {
                             HPacket[] checker = payloadBuffer.pushAndReceive(decoded);
 
                             if (payloadBuffer.peak().length == 0) {
-                                packetHandler.setRc4(rc4Tryout);
+                                flashPacketHandler.setRc4(rc4Tryout);
                                 return true;
                             }
 

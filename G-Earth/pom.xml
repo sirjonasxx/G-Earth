@@ -12,6 +12,7 @@
 
     <properties>
         <javafx.version>1.8</javafx.version>
+        <jettyVersion>9.2.14.v20151106</jettyVersion>
     </properties>
 
     <parent>
@@ -123,6 +124,7 @@
         </plugins>
     </build>
 
+
     <dependencies>
 <!--        <dependency>-->
 <!--            <groupId>org.openjfx</groupId>-->
@@ -169,6 +171,24 @@
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-artifact</artifactId>
             <version>3.6.3</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>javax.websocket</groupId>
+            <artifactId>javax.websocket-api</artifactId>
+            <version>1.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-server</artifactId>
+            <version>${jettyVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty.websocket</groupId>
+            <artifactId>javax-websocket-server-impl</artifactId>
+            <version>${jettyVersion}</version>
         </dependency>
 
 

@@ -1,7 +1,8 @@
 package gearth.protocol.connection;
 
-import gearth.protocol.packethandler.IncomingPacketHandler;
-import gearth.protocol.packethandler.OutgoingPacketHandler;
+import gearth.protocol.packethandler.PacketHandler;
+import gearth.protocol.packethandler.flash.IncomingFlashPacketHandler;
+import gearth.protocol.packethandler.flash.OutgoingFlashPacketHandler;
 
 import java.net.ServerSocket;
 
@@ -15,8 +16,8 @@ public class HProxy {
 
     private volatile ServerSocket proxy_server = null;     //listener for the client
 
-    private volatile IncomingPacketHandler inHandler = null;     //connection with client (only initialized when verified habbo connection)
-    private volatile OutgoingPacketHandler outHandler = null;    //connection with server (only initialized when verified habbo connection)
+    private volatile PacketHandler inHandler = null;     //connection with client (only initialized when verified habbo connection)
+    private volatile PacketHandler outHandler = null;    //connection with server (only initialized when verified habbo connection)
 
     private volatile String hotelVersion = "";
     private volatile AsyncPacketSender asyncPacketSender = null;
@@ -33,7 +34,7 @@ public class HProxy {
         this.proxy_server = socket;
     }
 
-    public void verifyProxy(IncomingPacketHandler incomingHandler, OutgoingPacketHandler outgoingHandler, String hotelVersion) {
+    public void verifyProxy(PacketHandler incomingHandler, PacketHandler outgoingHandler, String hotelVersion) {
         this.inHandler = incomingHandler;
         this.outHandler = outgoingHandler;
         this.hotelVersion = hotelVersion;
@@ -64,11 +65,11 @@ public class HProxy {
         return intercept_host;
     }
 
-    public IncomingPacketHandler getInHandler() {
+    public PacketHandler getInHandler() {
         return inHandler;
     }
 
-    public OutgoingPacketHandler getOutHandler() {
+    public PacketHandler getOutHandler() {
         return outHandler;
     }
 

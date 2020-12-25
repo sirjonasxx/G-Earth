@@ -168,12 +168,19 @@ public class ConnectionController extends SubForm {
 
             btnConnect.setDisable(true);
             new Thread(() -> {
-                if (cbx_autodetect.isSelected()) {
-                    getHConnection().start();
+                if (useFlash()) {
+                    if (cbx_autodetect.isSelected()) {
+                        getHConnection().start();
+                    }
+                    else {
+                        getHConnection().start(inpHost.getEditor().getText(), Integer.parseInt(inpPort.getEditor().getText()));
+                    }
                 }
                 else {
-                    getHConnection().start(inpHost.getEditor().getText(), Integer.parseInt(inpPort.getEditor().getText()));
+                    getHConnection().startUnity();
                 }
+
+
                 if (HConnection.DEBUG) System.out.println("connecting");
             }).start();
 
