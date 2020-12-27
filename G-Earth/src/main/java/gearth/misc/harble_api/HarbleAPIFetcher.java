@@ -1,11 +1,14 @@
 package gearth.misc.harble_api;
 
+import gearth.Main;
 import gearth.misc.Cacher;
 import gearth.protocol.HMessage;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 
 /**
  * Created by Jonas on 10/11/2018.
@@ -36,6 +39,20 @@ public class HarbleAPIFetcher {
     public static HarbleAPI HARBLEAPI = null;
 
     public synchronized static void fetch(String hotelversion) {
+        // if unity
+        if (!(hotelversion.toLowerCase().contains("production") || hotelversion.toLowerCase().contains("release"))) {
+            try {
+                HARBLEAPI = new HarbleAPI(
+                        new File(new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI())
+                                .getParentFile(), "messages.json"
+                        )
+                );
+            } catch (URISyntaxException e) {
+                HARBLEAPI = null;
+            }
+            return;
+        }
+
         String cacheName = CACHE_PREFIX + hotelversion;
 
         if (Cacher.cacheFileExists(cacheName)) {

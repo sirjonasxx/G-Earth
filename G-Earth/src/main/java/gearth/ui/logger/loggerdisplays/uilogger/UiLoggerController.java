@@ -96,7 +96,7 @@ public class UiLoggerController implements Initializable {
 
         String expr = packet.toExpression(isIncoming ? HMessage.Direction.TOCLIENT : HMessage.Direction.TOSERVER);
 
-        lblHarbleAPI.setText("HarbleAPI: " + (HarbleAPIFetcher.HARBLEAPI == null ? "False" : "True"));
+        lblHarbleAPI.setText("Messages: " + (HarbleAPIFetcher.HARBLEAPI == null ? "False" : "True"));
         if ((viewMessageName || viewMessageHash) && HarbleAPIFetcher.HARBLEAPI != null) {
             HarbleAPI api = HarbleAPIFetcher.HARBLEAPI;
             HarbleAPI.HarbleMessage message = api.getHarbleMessageFromHeaderId(

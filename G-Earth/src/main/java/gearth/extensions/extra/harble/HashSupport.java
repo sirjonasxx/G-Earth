@@ -6,6 +6,7 @@ import gearth.misc.harble_api.HarbleAPI;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 
+import java.io.File;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,7 +31,7 @@ public class HashSupport {
 
         extension.onConnect((host, port, hotelversion, cachePath) -> {
 //            synchronized (lock) {
-            harbleAPI = new HarbleAPI(hotelversion, cachePath);
+            harbleAPI = new HarbleAPI(new File(cachePath));
 //            }
         });
 
