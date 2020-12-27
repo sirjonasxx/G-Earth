@@ -13,6 +13,7 @@ import gearth.protocol.packethandler.unity.UnityPacketHandler;
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 @ServerEndpoint(value = "/packethandler")
@@ -23,7 +24,9 @@ public class UnityCommunicator {
     private final HConnection hConnection;
     private final ProxyProvider proxyProvider;
 
-    HProxy hProxy = null;
+    private HProxy hProxy = null;
+    private String allowedSession = null;
+    private String revision = null;
 
     public UnityCommunicator(HProxySetter proxySetter, HStateSetter stateSetter, HConnection hConnection, ProxyProvider proxyProvider) {
         this.proxySetter = proxySetter;
@@ -40,6 +43,16 @@ public class UnityCommunicator {
 
     @OnMessage
     public void onMessage(byte[] b, Session session) throws IOException {
+        if (allowedSession != null && !session.getId().equals(allowedSession)) {
+            return;
+        }
+
+        if (revision == null) {
+            revision = new String(b, StandardCharsets.ISO_8859_1);
+            allowedSession = session.getId();
+            return;
+        }
+
         byte[] packet = Arrays.copyOfRange(b, 1, b.length);
 
         if (hProxy == null && b[0] == 1) {
@@ -50,7 +63,7 @@ public class UnityCommunicator {
                 hProxy.verifyProxy(
                         new UnityPacketHandler(hConnection.getExtensionHandler(), hConnection.getTrafficObservables(), session, HMessage.Direction.TOCLIENT),
                         new UnityPacketHandler(hConnection.getExtensionHandler(), hConnection.getTrafficObservables(), session, HMessage.Direction.TOSERVER),
-                        hotelVersion
+                        revision
                 );
                 proxySetter.setProxy(hProxy);
                 stateSetter.setState(HState.CONNECTED);

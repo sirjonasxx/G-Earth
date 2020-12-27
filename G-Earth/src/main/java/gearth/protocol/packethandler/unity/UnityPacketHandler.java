@@ -46,7 +46,10 @@ public class UnityPacketHandler extends PacketHandler {
 
             OnHMessageHandled afterExtensionIntercept = hMessage1 -> {
                 notifyListeners(2, hMessage1);
-                sendToStream(hMessage1.getPacket().toBytes());
+
+                if (!hMessage1.isBlocked())	{
+                    sendToStream(hMessage1.getPacket().toBytes());
+                }
             };
 
             notifyListeners(0, hMessage);
