@@ -37,7 +37,7 @@ public class HPacket implements StringifyAble {
     }
     public HPacket(int header) {
         packetInBytes = new byte[]{0,0,0,2,0,0};
-        replaceUShort(4, header);
+        replaceShort(4, (short)header);
         isEdited = false;
     }
     public HPacket(int header, byte[] bytes) {
@@ -127,7 +127,7 @@ public class HPacket implements StringifyAble {
     }
 
     public int headerId()	{
-        return readUshort(4);
+        return readShort(4);
     }
 
     public int readInteger(){
