@@ -2,6 +2,8 @@ package gearth.ui.extra;
 
 import gearth.Main;
 import gearth.misc.Cacher;
+import gearth.misc.packetrepresentation.prediction.StructurePredictor;
+import gearth.misc.packetrepresentation.prediction.checkers.TypeCheckerProducer;
 import gearth.protocol.HConnection;
 import gearth.protocol.connection.HState;
 import gearth.protocol.connection.proxy.ProxyProviderFactory;
@@ -62,7 +64,11 @@ public class ExtraController extends SubForm implements SocksConfiguration {
     public RadioButton rd_flash;
 
     public void initialize() {
-        tgl_clientMode.selectedToggleProperty().addListener(observable -> parentController.connectionController.changeClientMode());
+        TypeCheckerProducer.USE_LONG_DATATYPE = rd_unity.isSelected();
+        tgl_clientMode.selectedToggleProperty().addListener(observable -> {
+            parentController.connectionController.changeClientMode();
+            TypeCheckerProducer.USE_LONG_DATATYPE = rd_unity.isSelected();
+        });
 
         url_troubleshooting.setTooltip(new Tooltip("https://github.com/sirjonasxx/G-Earth/wiki/Troubleshooting"));
         InfoController.activateHyperlink(url_troubleshooting);
