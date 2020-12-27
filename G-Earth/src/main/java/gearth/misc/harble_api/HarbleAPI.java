@@ -118,15 +118,16 @@ public class HarbleAPI {
 
     private void addMessage(HMessage.Direction direction, JSONObject object) {
         String name;
-        try {
-            name = object.getString("Name");
-        } catch (Exception e) {
-            name = null;
-        }
-        String hash = object.getString("Hash");
-        Integer headerId = object.getInt("Id");
-        String structure;
+        String hash;
+        try { name = object.getString("Name"); }
+        catch (Exception e) { name = null; }
+        try { hash = object.getString("Hash"); }
+        catch (Exception e) { hash = null; }
 
+
+        int headerId = object.getInt("Id");
+
+        String structure;
         try {
             structure = object.getString("Structure");
         } catch (Exception e) {

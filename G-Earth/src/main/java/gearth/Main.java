@@ -78,7 +78,7 @@ public class Main extends Application {
                 if (!gitv.equals(version)) {
                     Platform.runLater(() -> {
                         String body = (String)object.get("body");
-                        boolean isForcedUpdate = body.contains("<F>");
+                        boolean isForcedUpdate = body.contains("(!)");
 
                         Alert alert = new Alert(isForcedUpdate ? Alert.AlertType.ERROR : Alert.AlertType.INFORMATION, "G-Earth is outdated!", ButtonType.OK);
 

@@ -87,6 +87,11 @@
                                 <copy file="target/bin/G-Earth.jar" todir="../Build/Windows_32bit/"/>
                                 <copy file="target/bin/G-Earth.jar" todir="../Build/Windows_64bit/"/>
 
+                                <copy file="src/main/resources/build/messages.json" todir="../Build/Mac/"/>
+                                <copy file="src/main/resources/build/messages.json" todir="../Build/Linux/"/>
+                                <copy file="src/main/resources/build/messages.json" todir="../Build/Windows_32bit/"/>
+                                <copy file="src/main/resources/build/messages.json" todir="../Build/Windows_64bit/"/>
+
                                 <copy todir="../Build/Mac/">
                                     <fileset dir="src/main/resources/build/mac" includes="**/*" />
                                 </copy>
