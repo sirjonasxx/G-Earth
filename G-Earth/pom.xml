@@ -12,7 +12,7 @@
 
     <properties>
         <javafx.version>1.8</javafx.version>
-        <jettyVersion>9.2.14.v20151106</jettyVersion>
+        <jettyVersion>9.4.35.v20201120</jettyVersion>
     </properties>
 
     <parent>
@@ -190,7 +190,19 @@
             <artifactId>javax-websocket-server-impl</artifactId>
             <version>${jettyVersion}</version>
         </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-http</artifactId>
+            <version>${jettyVersion}</version>
+        </dependency>
 
+
+
+        <dependency>
+            <groupId>G-Earth</groupId>
+            <artifactId>G-Wasm</artifactId>
+            <version>1.0</version>
+        </dependency>
 
     </dependencies>
 
