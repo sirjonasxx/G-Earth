@@ -204,6 +204,7 @@ public class PacketStringUtils {
             else if (c == 'd') builder.append("{d:").append(p.readDouble()).append('}');
             else if (c == 'b') builder.append("{b:").append(p.readByte()).append('}');
             else if (c == 'B') builder.append("{b:").append(p.readBoolean()).append('}');
+            else if (c == 'l') builder.append("{l:").append(p.readLong()).append('}');
             else return;
         }
     }

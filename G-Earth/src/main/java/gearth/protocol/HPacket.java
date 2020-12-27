@@ -247,6 +247,14 @@ public class HPacket implements StringifyAble {
         }
         return this;
     }
+    public HPacket replaceLong(int index, long l) {
+        isEdited = true;
+        ByteBuffer b = ByteBuffer.allocate(8).putLong(l);
+        for (int j = 0; j < 8; j++) {
+            packetInBytes[index + j] = b.array()[j];
+        }
+        return this;
+    }
     public HPacket replaceDouble(int index, double d) {
         isEdited = true;
         ByteBuffer b = ByteBuffer.allocate(8).putDouble(d);
@@ -415,6 +423,16 @@ public class HPacket implements StringifyAble {
         fixLength();
         return this;
     }
+    public HPacket appendLong(long l) {
+        isEdited = true;
+        packetInBytes = Arrays.copyOf(packetInBytes, packetInBytes.length + 8);
+        ByteBuffer byteBuffer = ByteBuffer.allocate(8).putLong(l);
+        for (int j = 0; j < 8; j++) {
+            packetInBytes[packetInBytes.length - 8 + j] = byteBuffer.array()[j];
+        }
+        fixLength();
+        return this;
+    }
     public HPacket appendDouble(double d) {
         isEdited = true;
         packetInBytes = Arrays.copyOf(packetInBytes, packetInBytes.length + 8);
@@ -502,24 +520,13 @@ public class HPacket implements StringifyAble {
         else if (o instanceof Boolean) {
             appendBoolean((Boolean) o);
         }
+        else if (o instanceof Long) {
+            appendLong((Long) o);
+        }
         else {
             throw new InvalidParameterException();
         }
 
-        return this;
-    }
-
-
-    public HPacket removeFrom(int index) {
-        return removeRange(index, packetInBytes.length - index);
-    }
-    public HPacket removeRange(int index, int length) {
-        isEdited = true;
-        for (int i = index; i < packetInBytes.length - length; i++) {
-            packetInBytes[i] = packetInBytes[i + length];
-        }
-        packetInBytes = Arrays.copyOf(packetInBytes, packetInBytes.length - length);
-        fixLength();
         return this;
     }
 
