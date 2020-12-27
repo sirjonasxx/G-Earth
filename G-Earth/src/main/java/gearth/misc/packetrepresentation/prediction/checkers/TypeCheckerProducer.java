@@ -8,7 +8,7 @@ import java.util.List;
 
 public class TypeCheckerProducer {
 
-    public static volatile boolean USE_LONG_DATATYPE = false;
+    public static volatile boolean UNITY_PACKETS = false;
 
     public static List<TypeChecker> getValidators(HPacket packet) {
         List<TypeChecker> typeCheckers = new ArrayList<>(Arrays.asList(
@@ -17,8 +17,9 @@ public class TypeCheckerProducer {
                 new IntegerChecker(packet),
                 new StringChecker(packet)));
 
-        if (USE_LONG_DATATYPE) {
+        if (UNITY_PACKETS) {
             typeCheckers.add(new LongChecker(packet));
+            typeCheckers.add(new ShortChecker(packet));
         }
 
         return typeCheckers;

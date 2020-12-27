@@ -2,7 +2,6 @@ package gearth.ui.extra;
 
 import gearth.Main;
 import gearth.misc.Cacher;
-import gearth.misc.packetrepresentation.prediction.StructurePredictor;
 import gearth.misc.packetrepresentation.prediction.checkers.TypeCheckerProducer;
 import gearth.protocol.HConnection;
 import gearth.protocol.connection.HState;
@@ -12,8 +11,6 @@ import gearth.services.gpython.GPythonVersionUtils;
 import gearth.ui.SubForm;
 import gearth.ui.info.InfoController;
 import javafx.application.Platform;
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.event.ActionEvent;
 import javafx.scene.control.*;
 import javafx.scene.layout.FlowPane;
@@ -64,10 +61,10 @@ public class ExtraController extends SubForm implements SocksConfiguration {
     public RadioButton rd_flash;
 
     public void initialize() {
-        TypeCheckerProducer.USE_LONG_DATATYPE = rd_unity.isSelected();
+        TypeCheckerProducer.UNITY_PACKETS = rd_unity.isSelected();
         tgl_clientMode.selectedToggleProperty().addListener(observable -> {
             parentController.connectionController.changeClientMode();
-            TypeCheckerProducer.USE_LONG_DATATYPE = rd_unity.isSelected();
+            TypeCheckerProducer.UNITY_PACKETS = rd_unity.isSelected();
         });
 
         url_troubleshooting.setTooltip(new Tooltip("https://github.com/sirjonasxx/G-Earth/wiki/Troubleshooting"));

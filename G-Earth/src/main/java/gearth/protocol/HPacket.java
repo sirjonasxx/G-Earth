@@ -607,7 +607,7 @@ public class HPacket implements StringifyAble {
     }
 
     public static void main(String[] args) {
-        HPacket packet = new HPacket("{l}{u:4564}{i:3}{i:0}{s:\"hi\"}{i:0}{i:1}{s:\"how\"}{i:3}{b:1}{b:2}{b:3}{i:2}{s:\"r u\"}{i:1}{b:120}{i:2}{b:true}{d:1.4}");
+        HPacket packet = new HPacket("{l}{h:4564}{i:3}{i:0}{s:\"hi\"}{i:0}{i:1}{s:\"how\"}{i:3}{b:1}{b:2}{b:3}{i:2}{s:\"r u\"}{i:1}{b:120}{i:2}{b:true}{d:1.4}");
 
         String str = PacketStringUtils.toExpressionFromGivenStructure(packet, "i(isi(b))iBd");
 

@@ -9,8 +9,8 @@ import java.util.List;
 
 public class StructurePredictor {
 
-    HPacket packet;
-    String structure; // null if not found/ didnt try to find
+    private HPacket packet;
+    private String structure; // null if not found/ didnt try to find
 
     public StructurePredictor(HPacket packet) {
         this.packet = packet;

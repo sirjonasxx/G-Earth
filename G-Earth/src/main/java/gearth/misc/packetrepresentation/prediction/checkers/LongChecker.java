@@ -21,8 +21,13 @@ public class LongChecker extends TypeChecker<Long> {
         int split1 = hPacket.readInteger(index);
         int split2 = hPacket.readInteger(index + 4);
 
-        if (split2 > 256 * 256 * 3 && split1 == 0) {
-            return integerChecker.score(index);
+        int zeros = 0;
+        for (int i = index + 4; i < index + 8; i++) {
+            zeros += hPacket.readByte(i) == 0 ? 1 : 0;
+        }
+
+        if (split2 > 256 * 256 * 3 && split1 == 0 && zeros < 2) {
+            return integerChecker.score(index) * integerChecker.score(index + 4) + 0.0000000001;
         }
 
         return 0;

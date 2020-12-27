@@ -45,6 +45,9 @@ public class PacketStringUtils {
         packet = replaceAll(packet, "\\{u:([0-9]+)}",
                 m -> "[" + (Integer.parseInt(m.group(1))/256) + "][" + (Integer.parseInt(m.group(1)) % 256) + "]");
 
+        packet = replaceAll(packet, "\\{h:([0-9]+)}",
+                m -> "[" + (Integer.parseInt(m.group(1))/256) + "][" + (Integer.parseInt(m.group(1)) % 256) + "]");
+
         packet = replaceAll(packet, "\\{b:([Ff]alse|[Tt]rue)}",
                 m -> m.group(1).toLowerCase().equals("true") ? "[1]" : "[0]");
 
@@ -174,7 +177,7 @@ public class PacketStringUtils {
         packet.resetReadIndex();
 
         StringBuilder builder = new StringBuilder();
-        builder.append("{l}{u:").append(packet.headerId()).append("}");
+        builder.append("{l}{h:").append(packet.headerId()).append("}");
 
         buildExpressionFromGivenStructure(packet, struct, 0, builder);
         packet.setReadIndex(oldReadIndex);
@@ -205,6 +208,7 @@ public class PacketStringUtils {
             else if (c == 'b') builder.append("{b:").append(p.readByte()).append('}');
             else if (c == 'B') builder.append("{b:").append(p.readBoolean()).append('}');
             else if (c == 'l') builder.append("{l:").append(p.readLong()).append('}');
+            else if (c == 'u') builder.append("{u:").append(p.readShort()).append('}');
             else return;
         }
     }
@@ -233,16 +237,16 @@ public class PacketStringUtils {
     }
 
     public static void main(String[] args) throws InvalidPacketException {
-        HPacket p1 = fromString("{l}{u:1129}{s:\"\\\\\\\\\"}{i:0}{i:0}");
+        HPacket p1 = fromString("{l}{h:1129}{s:\"\\\\\\\\\"}{i:0}{i:0}");
         System.out.println(p1.toExpression());
         HPacket p1_2 = fromString(p1.toExpression());
         System.out.println(p1_2.toExpression());
 
-        HPacket p2 = fromString("{l}{u:4564}{i:3}{i:0}{s:\"hi\"}{i:0}{i:1}{s:\"how\"}{i:3}{b:1}{b:2}{b:3}{i:2}{s:\"r u\"}{i:1}{b:120}{i:2}{b:true}");
+        HPacket p2 = fromString("{l}{h:4564}{i:3}{i:0}{s:\"hi\"}{i:0}{i:1}{s:\"how\"}{i:3}{b:1}{b:2}{b:3}{i:2}{s:\"r u\"}{i:1}{b:120}{i:2}{b:true}");
         System.out.println(p2);
 
         System.out.println(structureEquals(
-                new HPacket("{l}{u:5}{s:\"asdas\"}"),
+                new HPacket("{l}{h:5}{s:\"asdas\"}"),
                 "s"
         ));
     }

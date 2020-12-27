@@ -33,7 +33,7 @@ public class IntegerChecker extends TypeChecker<Integer> {
         }
 
         // 4 bytes that read [0][2]xy could be a string
-        if (ushortTest >= 2 && ushortTest <= 6 && StringChecker.canReadString(hPacket, index)) {
+        if (ushortTest == 2 && StringChecker.canReadString(hPacket, index)) {
             return (1 - StringChecker.scoreString(hPacket.readString(index)));
         }
 
@@ -99,5 +99,18 @@ public class IntegerChecker extends TypeChecker<Integer> {
     @Override
     int nextIndexSafe(int index) {
         return index + 4;
+    }
+
+    public static void main(String[] args) {
+        HPacket packet = new HPacket("{l}{h:901}{b:false}{b:9}{i:0}{i:20064977}");
+//        System.out.println(new IntegerChecker(packet).score(30));
+//        System.out.println(new IntegerChecker(packet).score(26));
+//        System.out.println(new StringChecker(packet).score(30));
+
+        TypeCheckerProducer.UNITY_PACKETS = true;
+
+        System.out.println(new LongChecker(packet).score(8));
+
+        System.out.println(packet.toExpression());
     }
 }
