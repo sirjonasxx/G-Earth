@@ -1,10 +1,7 @@
 package gearth.protocol.connection.proxy.flash.unix;
 
 import gearth.protocol.HConnection;
-import gearth.protocol.connection.HProxy;
-import gearth.protocol.connection.HProxySetter;
-import gearth.protocol.connection.HState;
-import gearth.protocol.connection.HStateSetter;
+import gearth.protocol.connection.*;
 import gearth.protocol.connection.proxy.flash.FlashProxyProvider;
 import gearth.protocol.connection.proxy.ProxyProviderFactory;
 import gearth.protocol.connection.proxy.SocksConfiguration;
@@ -46,7 +43,7 @@ public class LinuxRawIpFlashProxyProvider extends FlashProxyProvider {
         new Thread(() -> {
             try  {
                 stateSetter.setState(HState.PREPARING);
-                proxy = new HProxy(input_host, input_host, input_port, input_port, "0.0.0.0");
+                proxy = new HProxy(HClient.FLASH, input_host, input_host, input_port, input_port, "0.0.0.0");
 
                 maybeRemoveMapping();
 

@@ -2,10 +2,7 @@ package gearth.protocol.connection.proxy.flash;
 
 import gearth.misc.Cacher;
 import gearth.protocol.HConnection;
-import gearth.protocol.connection.HProxy;
-import gearth.protocol.connection.HProxySetter;
-import gearth.protocol.connection.HState;
-import gearth.protocol.connection.HStateSetter;
+import gearth.protocol.connection.*;
 import gearth.protocol.connection.proxy.ProxyProviderFactory;
 import gearth.protocol.connection.proxy.SocksConfiguration;
 import gearth.protocol.hostreplacer.hostsfile.HostReplacer;
@@ -73,7 +70,7 @@ public class NormalFlashProxyProvider extends FlashProxyProvider {
 
                 int intercept_port = port;
                 String intercept_host = "127.0." + (c / 254) + "." + (1 + c % 254);
-                potentialProxies.add(new HProxy(input_dom, actual_dom, port, intercept_port, intercept_host));
+                potentialProxies.add(new HProxy(HClient.FLASH, input_dom, actual_dom, port, intercept_port, intercept_host));
                 c++;
             }
         }

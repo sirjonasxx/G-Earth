@@ -1,12 +1,13 @@
 package gearth.protocol.connection;
 
 import gearth.protocol.packethandler.PacketHandler;
-import gearth.protocol.packethandler.flash.IncomingFlashPacketHandler;
-import gearth.protocol.packethandler.flash.OutgoingFlashPacketHandler;
 
 import java.net.ServerSocket;
 
 public class HProxy {
+
+    private final HClient hClient;
+
     private volatile String input_domain;           //string representation of the domain to intercept
     private volatile String actual_domain;          //dns resolved domain (ignoring hosts file)
     private volatile int actual_port;               //port of the server
@@ -22,7 +23,8 @@ public class HProxy {
     private volatile String hotelVersion = "";
     private volatile AsyncPacketSender asyncPacketSender = null;
 
-    public HProxy(String input_domain, String actual_domain, int actual_port, int intercept_port, String intercept_host) {
+    public HProxy(HClient hClient, String input_domain, String actual_domain, int actual_port, int intercept_port, String intercept_host) {
+        this.hClient = hClient;
         this.input_domain = input_domain;
         this.actual_domain = actual_domain;
         this.actual_port = actual_port;
@@ -79,5 +81,9 @@ public class HProxy {
 
     public AsyncPacketSender getAsyncPacketSender() {
         return asyncPacketSender;
+    }
+
+    public HClient gethClient() {
+        return hClient;
     }
 }

@@ -3,10 +3,7 @@ package gearth.protocol.connection.proxy.unity;
 import gearth.protocol.HConnection;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
-import gearth.protocol.connection.HProxy;
-import gearth.protocol.connection.HProxySetter;
-import gearth.protocol.connection.HState;
-import gearth.protocol.connection.HStateSetter;
+import gearth.protocol.connection.*;
 import gearth.protocol.connection.proxy.ProxyProvider;
 import gearth.protocol.packethandler.unity.UnityPacketHandler;
 
@@ -58,8 +55,7 @@ public class UnityCommunicator {
         if (hProxy == null && b[0] == 1) {
             HPacket maybe = new HPacket(packet);
             if (maybe.getBytesLength() > 6 && maybe.headerId() == 4000) {
-                String hotelVersion = maybe.readString();
-                hProxy = new HProxy("", "", -1, -1, "");
+                hProxy = new HProxy(HClient.UNITY, "", "", -1, -1, "");
                 hProxy.verifyProxy(
                         new UnityPacketHandler(hConnection.getExtensionHandler(), hConnection.getTrafficObservables(), session, HMessage.Direction.TOCLIENT),
                         new UnityPacketHandler(hConnection.getExtensionHandler(), hConnection.getTrafficObservables(), session, HMessage.Direction.TOSERVER),
