@@ -117,7 +117,7 @@
                   <Insets left="10.0" top="2.0" />
                </GridPane.margin>
             </CheckBox>
-            <GridPane prefHeight="26.0" prefWidth="286.0" style="-fx-border-color: #888888; -fx-border-radius: 5px;" GridPane.rowIndex="1">
+            <GridPane fx:id="grd_clientSelection" prefHeight="26.0" prefWidth="286.0" style="-fx-border-color: #888888; -fx-border-radius: 5px;" GridPane.rowIndex="1">
               <columnConstraints>
                   <ColumnConstraints hgrow="SOMETIMES" maxWidth="149.0" minWidth="10.0" prefWidth="38.0" />
                 <ColumnConstraints hgrow="SOMETIMES" maxWidth="81.0" minWidth="69.0" prefWidth="75.0" />

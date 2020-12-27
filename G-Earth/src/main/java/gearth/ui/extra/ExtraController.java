@@ -59,6 +59,7 @@ public class ExtraController extends SubForm implements SocksConfiguration {
     public ToggleGroup tgl_clientMode;
     public RadioButton rd_unity;
     public RadioButton rd_flash;
+    public GridPane grd_clientSelection;
 
     public void initialize() {
         TypeCheckerProducer.UNITY_PACKETS = rd_unity.isSelected();
@@ -131,6 +132,8 @@ public class ExtraController extends SubForm implements SocksConfiguration {
     }
 
     private void updateAdvancedUI() {
+        grd_clientSelection.setDisable(getHConnection().getState() != HState.NOT_CONNECTED);
+
         if (!cbx_advanced.isSelected()) {
             cbx_debug.setSelected(false);
             cbx_useSocks.setSelected(false);
