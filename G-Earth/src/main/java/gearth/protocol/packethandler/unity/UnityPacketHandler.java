@@ -25,16 +25,12 @@ public class UnityPacketHandler extends PacketHandler {
 
     @Override
     public void sendToStream(byte[] buffer) {
-        synchronized (sendLock) {
-            try {
-                byte[] prefix = new byte[]{(direction == HMessage.Direction.TOCLIENT ? ((byte)0) : ((byte)1))};
-                byte[] combined = ByteArrayUtils.combineByteArrays(prefix, buffer);
+//        synchronized (session) {
+            byte[] prefix = new byte[]{(direction == HMessage.Direction.TOCLIENT ? ((byte)0) : ((byte)1))};
+            byte[] combined = ByteArrayUtils.combineByteArrays(prefix, buffer);
 
-                session.getBasicRemote().sendBinary(ByteBuffer.wrap(combined));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+            session.getAsyncRemote().sendBinary(ByteBuffer.wrap(combined));
+//        }
     }
 
     @Override
