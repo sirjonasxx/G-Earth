@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<GridPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="258.0" prefWidth="650.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gearth.ui.info.InfoController">
+<GridPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="258.0" prefWidth="650.0" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gearth.ui.info.InfoController">
     <columnConstraints>
         <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="332.0" />
     </columnConstraints>
@@ -20,62 +20,63 @@
                <Font size="18.0" />
             </font>
          </Label>
-         <Label layoutX="260.0" layoutY="50.0" text="Habbo packet manipulator for Linux, Windows &amp; Mac" textFill="#000000b2">
+         <Label layoutX="260.0" layoutY="57.0" text="Habbo packet manipulator for Linux, Windows &amp; Mac" textFill="#000000b2">
             <font>
                <Font size="14.0" />
             </font>
          </Label>
-         <Label layoutX="260.0" layoutY="87.0" text="Made by:" textFill="#000000b2">
+         <Label layoutX="260.0" layoutY="94.0" text="Made by:" textFill="#000000b2">
             <font>
                <Font name="System Bold" size="14.0" />
             </font>
          </Label>
-         <Label layoutX="260.0" layoutY="107.0" text="sirjonasxx" textFill="#000000b2">
+         <Label layoutX="260.0" layoutY="114.0" text="sirjonasxx" textFill="#000000b2">
             <font>
                <Font size="14.0" />
             </font>
          </Label>
-         <Label layoutX="363.0" layoutY="87.0" text="Contributors:" textFill="#000000b2">
+         <Label layoutX="363.0" layoutY="94.0" text="Contributors:" textFill="#000000b2">
             <font>
                <Font name="System Bold" size="14.0" />
             </font>
          </Label>
-         <Label layoutX="363.0" layoutY="107.0" text="XePeleato" textFill="#000000b2">
+         <Label layoutX="363.0" layoutY="114.0" text="XePeleato" textFill="#000000b2">
             <font>
                <Font size="14.0" />
             </font>
          </Label>
-         <Label layoutX="363.0" layoutY="127.0" text="Scott Stamp" textFill="#000000b2">
+         <Label layoutX="363.0" layoutY="134.0" text="Scott Stamp" textFill="#000000b2">
             <font>
                <Font size="14.0" />
             </font>
          </Label>
-         <Label layoutX="363.0" layoutY="147.0" text="LittleJ" textFill="#000000b2">
+         <Label layoutX="363.0" layoutY="154.0" text="LittleJ" textFill="#000000b2">
             <font>
                <Font size="14.0" />
             </font>
          </Label>
-         <Label layoutX="363.0" layoutY="167.0" text="ArachisH" textFill="#000000b2">
+         <Label layoutX="363.0" layoutY="174.0" text="ArachisH" textFill="#000000b2">
             <font>
                <Font size="14.0" />
             </font>
          </Label>
-         <Label layoutX="363.0" layoutY="187.0" text="BurakDev" textFill="#000000b2">
+         <Label layoutX="363.0" layoutY="194.0" text="BurakDev" textFill="#000000b2">
             <font>
                <Font size="14.0" />
             </font>
          </Label>
-         <Label layoutX="491.0" layoutY="87.0" text="Links:" textFill="#000000b2">
+         <Label layoutX="491.0" layoutY="94.0" text="Links:" textFill="#000000b2">
             <font>
                <Font name="System Bold" size="14.0" />
             </font>
          </Label>
-         <Hyperlink fx:id="link_ase" layoutX="487.0" layoutY="107.0" text="AllSeeingEye" />
-         <Hyperlink fx:id="link_darkbox" layoutX="487.0" layoutY="127.0" text="Darkbox" />
-         <Hyperlink fx:id="link_d_gearth" layoutX="487.0" layoutY="187.0" text="Discord - G-Earth" />
-         <Hyperlink fx:id="link_d_harble" layoutX="487.0" layoutY="207.0" text="Discord - Harble" />
-         <Hyperlink fx:id="link_g_gearth" layoutX="487.0" layoutY="147.0" text="Github - G-Earth" />
-         <Hyperlink fx:id="link_g_tanji" layoutX="487.0" layoutY="167.0" text="Github - Tanji" />
+         <Hyperlink fx:id="link_ase" layoutX="487.0" layoutY="114.0" text="AllSeeingEye" />
+         <Hyperlink fx:id="link_darkbox" layoutX="487.0" layoutY="134.0" text="Darkbox" />
+         <Hyperlink fx:id="link_d_gearth" layoutX="487.0" layoutY="194.0" text="Discord - G-Earth" />
+         <Hyperlink fx:id="link_d_harble" layoutX="487.0" layoutY="214.0" text="Discord - Harble" />
+         <Hyperlink fx:id="link_g_gearth" layoutX="487.0" layoutY="154.0" text="Github - G-Earth" />
+         <Hyperlink fx:id="link_g_tanji" layoutX="487.0" layoutY="174.0" text="Github - Tanji" />
+         <Button layoutX="537.0" layoutY="14.0" mnemonicParsing="false" onAction="#donate" prefHeight="20.0" prefWidth="100.0" text="Donate BTC" />
          <!--<Hyperlink fx:id="link_d_bonnie" layoutX="400.0" layoutY="221.0" text="Discord - BonnieScripting (pt/br)" />-->
       </children>
    </AnchorPane>
