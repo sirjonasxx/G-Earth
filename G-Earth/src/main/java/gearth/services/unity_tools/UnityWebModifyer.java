@@ -96,8 +96,7 @@ public class UnityWebModifyer {
         URL codeUrl = new URL(currentUrl + UNITY_CODE);
         downloadToFile(codeUrl, codeFile);
 
-        WasmCodePatcher patcher = new WasmCodePatcher(codeFile.getAbsolutePath());
-        patcher.patch();
+        new WasmCodePatcher(codeFile.getAbsolutePath()).patch();
     }
 
 

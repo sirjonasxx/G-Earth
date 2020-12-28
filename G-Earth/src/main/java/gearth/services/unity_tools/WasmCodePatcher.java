@@ -25,30 +25,30 @@ import java.util.*;
 
 public class WasmCodePatcher {
 
-    private final Module module;
     private String file;
 
-    public WasmCodePatcher(String file) throws IOException, InvalidOpCodeException {
-        module = new Module(file);
+    public WasmCodePatcher(String file) {
         this.file = file;
     }
 
     public void patch() throws IOException, InvalidOpCodeException {
-        FuncIdx returnByteId = findReturnByteFunc();
-        FuncIdx setkey = findSetKeyFunc();
-        FuncIdx outgoingIdx = findOutFunc();
-        FuncIdx incomingIdx = findInFunc();
+        Module module = new Module(file);
 
-        hook(setkey, "g_chacha_setkey");
-        copyEmptyHook(returnByteId, "_gearth_returnbyte_copy", "g_chacha_returnbyte");
-        copyEmptyHook(outgoingIdx, "_gearth_outgoing_copy", "g_outgoing_packet");
-        copyEmptyHook(incomingIdx, "_gearth_incoming_copy", "g_incoming_packet");
+        FuncIdx returnByteId = findReturnByteFunc(module);
+        FuncIdx setkey = findSetKeyFunc(module);
+        FuncIdx outgoingIdx = findOutFunc(module);
+        FuncIdx incomingIdx = findInFunc(module);
+
+        hook(module, setkey, "g_chacha_setkey");
+        copyEmptyHook(module, returnByteId, "_gearth_returnbyte_copy", "g_chacha_returnbyte");
+        copyEmptyHook(module, outgoingIdx, "_gearth_outgoing_copy", "g_outgoing_packet");
+        copyEmptyHook(module, incomingIdx, "_gearth_incoming_copy", "g_incoming_packet");
 
         module.assembleToFile(file);
     }
 
 
-    private FuncIdx findOutFunc() {
+    private FuncIdx findOutFunc(Module module) {
         TypeIdx expectedTypeIdx = module.getTypeSection().getTypeIdxForFuncType(new FuncType(
                 new ResultType(Arrays.asList(ValType.I32, ValType.I32, ValType.I32)),
                 new ResultType(Collections.emptyList())
@@ -78,7 +78,7 @@ public class WasmCodePatcher {
 
         return null;
     }
-    private FuncIdx findSetKeyFunc() {
+    private FuncIdx findSetKeyFunc(Module module) {
         FuncType expectedType = new FuncType(
                 new ResultType(Arrays.asList(ValType.I32, ValType.I32, ValType.I32, ValType.I32)),
                 new ResultType(Collections.emptyList())
@@ -108,7 +108,7 @@ public class WasmCodePatcher {
 
         return null;
     }
-    private FuncIdx findReturnByteFunc() {
+    private FuncIdx findReturnByteFunc(Module module) {
         FuncType expectedType = new FuncType(
                 new ResultType(Arrays.asList(ValType.I32, ValType.I32, ValType.I32)),
                 new ResultType(Collections.singletonList(ValType.I32))
@@ -131,7 +131,7 @@ public class WasmCodePatcher {
 
         return null;
     }
-    private FuncIdx findInFunc() {
+    private FuncIdx findInFunc(Module module) {
         FuncType expectedType = new FuncType(
                 new ResultType(Arrays.asList(ValType.I32, ValType.I32, ValType.I32, ValType.I32, ValType.I32)),
                 new ResultType(Collections.emptyList())
@@ -161,7 +161,7 @@ public class WasmCodePatcher {
         return null;
     }
 
-    private void copyEmptyHook(FuncIdx orgFuncIdx, String exportName, String hookname) throws InvalidOpCodeException, IOException {
+    private void copyEmptyHook(Module module, FuncIdx orgFuncIdx, String exportName, String hookname) throws InvalidOpCodeException, IOException {
         // copies the method, empties the first one
         // export the copy
         // hooks to the emptied one
@@ -197,7 +197,7 @@ public class WasmCodePatcher {
 
     }
 
-    private void hook(FuncIdx funcIdx, String jsFunctionName) throws InvalidOpCodeException, IOException {
+    private void hook(Module module, FuncIdx funcIdx, String jsFunctionName) throws InvalidOpCodeException, IOException {
         FuncType funcType = module.getTypeSection().getByFuncIdx(funcIdx);
 
         Import imp = new Import(
