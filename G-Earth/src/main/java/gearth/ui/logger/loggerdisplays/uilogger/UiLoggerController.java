@@ -125,7 +125,7 @@ public class UiLoggerController implements Initializable {
             elements.add(new Element("]", "incoming"));
 
             elements.add(new Element(" <- ", ""));
-            if (skiphugepackets && packet.length() > 8000) {
+            if (skiphugepackets && packet.length() > 4000) {
                 elements.add(new Element("<packet skipped>", "skipped"));
             }
             else {

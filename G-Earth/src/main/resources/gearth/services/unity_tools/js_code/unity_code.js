@@ -87,6 +87,11 @@ let _g_packet_split = 600;
 
 function inject_out(packet) {
 
+    if (chachas.length > 1) {
+        packet[5] =  _gearth_returnbyte_copy(chachas[0], packet[5], chachaClass);
+        packet[4] =  _gearth_returnbyte_copy(chachas[0], packet[4], chachaClass);
+    }
+
     let i = 0;
     while (i < packet.length) {
         let inject_amount = Math.min(_g_packet_split, packet.length - i);
@@ -96,11 +101,6 @@ function inject_out(packet) {
         unityInstance.Module.HEAPU8.fill(0, packet_location + 4, packet_location + 12);
         unityInstance.Module.HEAPU8.set(writeLittleEndian(inject_amount), packet_location + 12);
         unityInstance.Module.HEAPU8.set(packet.slice(i, i + inject_amount), packet_location + 16);
-
-        if (i === 0 && chachas.length > 1) {
-            unityInstance.Module.HEAPU8[packet_location + 16 + 5] = _gearth_returnbyte_copy(chachas[0], unityInstance.Module.HEAPU8[packet_location + 16 + 5], chachaClass);
-            unityInstance.Module.HEAPU8[packet_location + 16 + 4] = _gearth_returnbyte_copy(chachas[0], unityInstance.Module.HEAPU8[packet_location + 16 + 4], chachaClass);
-        }
 
         _gearth_outgoing_copy(out_send_param1, packet_location, out_send_param3);
         _free(packet_location);
