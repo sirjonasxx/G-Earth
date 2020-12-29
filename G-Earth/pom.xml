@@ -23,8 +23,6 @@
 
     <build>
         <plugins>
-
-
             <!-- this builds a non-standalone JAR file -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
