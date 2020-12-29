@@ -6,9 +6,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class TypeCheckerProducer {
+import static gearth.services.Constants.UNITY_PACKETS;
 
-    public static volatile boolean UNITY_PACKETS = false;
+public class TypeCheckerProducer {
 
     public static List<TypeChecker> getValidators(HPacket packet) {
         List<TypeChecker> typeCheckers = new ArrayList<>(Arrays.asList(

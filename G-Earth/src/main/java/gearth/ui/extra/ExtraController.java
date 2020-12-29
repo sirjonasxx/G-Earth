@@ -7,6 +7,7 @@ import gearth.protocol.HConnection;
 import gearth.protocol.connection.HState;
 import gearth.protocol.connection.proxy.ProxyProviderFactory;
 import gearth.protocol.connection.proxy.SocksConfiguration;
+import gearth.services.Constants;
 import gearth.services.gpython.GPythonVersionUtils;
 import gearth.ui.SubForm;
 import gearth.ui.info.InfoController;
@@ -62,10 +63,10 @@ public class ExtraController extends SubForm implements SocksConfiguration {
     public GridPane grd_clientSelection;
 
     public void initialize() {
-        TypeCheckerProducer.UNITY_PACKETS = rd_unity.isSelected();
+        Constants.UNITY_PACKETS = rd_unity.isSelected();
         tgl_clientMode.selectedToggleProperty().addListener(observable -> {
-            parentController.connectionController.changeClientMode();
-            TypeCheckerProducer.UNITY_PACKETS = rd_unity.isSelected();
+            if (parentController != null) parentController.connectionController.changeClientMode();
+            Constants.UNITY_PACKETS = rd_unity.isSelected();
         });
 
         url_troubleshooting.setTooltip(new Tooltip("https://github.com/sirjonasxx/G-Earth/wiki/Troubleshooting"));
