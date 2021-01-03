@@ -1,14 +1,22 @@
 package gearth.ui.extra;
 
+import gearth.Main;
 import gearth.misc.Cacher;
+import gearth.misc.packetrepresentation.prediction.checkers.TypeCheckerProducer;
 import gearth.protocol.HConnection;
 import gearth.protocol.connection.HState;
 import gearth.protocol.connection.proxy.ProxyProviderFactory;
 import gearth.protocol.connection.proxy.SocksConfiguration;
+import gearth.services.Constants;
+import gearth.services.gpython.GPythonVersionUtils;
 import gearth.ui.SubForm;
 import gearth.ui.info.InfoController;
+import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.scene.control.*;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Region;
 import org.json.JSONObject;
 
 /**
@@ -16,12 +24,17 @@ import org.json.JSONObject;
  */
 public class ExtraController extends SubForm implements SocksConfiguration {
 
+    public static final String INFO_URL_GPYTHON = "https://github.com/sirjonasxx/G-Earth/wiki/G-Python-qtConsole";
+
     public static final String NOTEPAD_CACHE_KEY = "notepad_text";
     public static final String SOCKS_CACHE_KEY = "socks_config";
+    public static final String GPYTHON_CACHE_KEY = "use_gpython";
+
+    public static final String USE_UNITY_CLIENT_CACHE_KEY = "use_unity";
 
     public static final String SOCKS_IP = "ip";
     public static final String SOCKS_PORT = "port";
-    public static final String IGNORE_ONCE = "ignore_once";
+//    public static final String IGNORE_ONCE = "ignore_once";
 
 
     public TextArea txtarea_notepad;
@@ -29,20 +42,32 @@ public class ExtraController extends SubForm implements SocksConfiguration {
     public CheckBox cbx_alwaysOnTop;
     public Hyperlink url_troubleshooting;
 
+    //TODO add setup link to g-earth wiki
+    public CheckBox cbx_gpython;
+
     public CheckBox cbx_advanced;
     public GridPane grd_advanced;
 
     public CheckBox cbx_disableDecryption;
     public CheckBox cbx_debug;
 
-
     public CheckBox cbx_useSocks;
     public GridPane grd_socksInfo;
     public TextField txt_socksPort;
     public TextField txt_socksIp;
-    public CheckBox cbx_socksUseIfNeeded;
+
+
+    public ToggleGroup tgl_clientMode;
+    public RadioButton rd_unity;
+    public RadioButton rd_flash;
+    public GridPane grd_clientSelection;
 
     public void initialize() {
+        Constants.UNITY_PACKETS = rd_unity.isSelected();
+        tgl_clientMode.selectedToggleProperty().addListener(observable -> {
+            if (parentController != null) parentController.connectionController.changeClientMode();
+            Constants.UNITY_PACKETS = rd_unity.isSelected();
+        });
 
         url_troubleshooting.setTooltip(new Tooltip("https://github.com/sirjonasxx/G-Earth/wiki/Troubleshooting"));
         InfoController.activateHyperlink(url_troubleshooting);
@@ -56,7 +81,16 @@ public class ExtraController extends SubForm implements SocksConfiguration {
             JSONObject socksInitValue = Cacher.getCacheContents().getJSONObject(SOCKS_CACHE_KEY);
             txt_socksIp.setText(socksInitValue.getString(SOCKS_IP));
             txt_socksPort.setText(socksInitValue.getString(SOCKS_PORT));
-            cbx_socksUseIfNeeded.setSelected(socksInitValue.getBoolean(IGNORE_ONCE));
+//            cbx_socksUseIfNeeded.setSelected(socksInitValue.getBoolean(IGNORE_ONCE));
+        }
+
+        if (Cacher.getCacheContents().has(GPYTHON_CACHE_KEY)) {
+            cbx_gpython.setSelected(Cacher.getCacheContents().getBoolean(GPYTHON_CACHE_KEY));
+        }
+
+        if (Cacher.getCacheContents().has(USE_UNITY_CLIENT_CACHE_KEY)) {
+            rd_unity.setSelected(Cacher.getCacheContents().getBoolean(USE_UNITY_CLIENT_CACHE_KEY));
+            rd_flash.setSelected(!Cacher.getCacheContents().getBoolean(USE_UNITY_CLIENT_CACHE_KEY));
         }
 
         cbx_debug.selectedProperty().addListener(observable -> HConnection.DEBUG = cbx_debug.isSelected());
@@ -85,6 +119,8 @@ public class ExtraController extends SubForm implements SocksConfiguration {
     @Override
     protected void onExit() {
         Cacher.put(NOTEPAD_CACHE_KEY, txtarea_notepad.getText());
+        Cacher.put(GPYTHON_CACHE_KEY, cbx_gpython.isSelected());
+        Cacher.put(USE_UNITY_CLIENT_CACHE_KEY, rd_unity.isSelected());
         saveSocksConfig();
     }
 
@@ -92,11 +128,13 @@ public class ExtraController extends SubForm implements SocksConfiguration {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put(SOCKS_IP, txt_socksIp.getText());
         jsonObject.put(SOCKS_PORT, txt_socksPort.getText());
-        jsonObject.put(IGNORE_ONCE, cbx_socksUseIfNeeded.isSelected());
+//        jsonObject.put(IGNORE_ONCE, cbx_socksUseIfNeeded.isSelected());
         Cacher.put(SOCKS_CACHE_KEY, jsonObject);
     }
 
     private void updateAdvancedUI() {
+        grd_clientSelection.setDisable(getHConnection().getState() != HState.NOT_CONNECTED);
+
         if (!cbx_advanced.isSelected()) {
             cbx_debug.setSelected(false);
             cbx_useSocks.setSelected(false);
@@ -127,6 +165,54 @@ public class ExtraController extends SubForm implements SocksConfiguration {
 
     @Override
     public boolean onlyUseIfNeeded() {
-        return cbx_socksUseIfNeeded.isSelected();
+//        return cbx_socksUseIfNeeded.isSelected();
+        return false;
+    }
+
+    public boolean useGPython() {
+        return cbx_gpython.isSelected();
+    }
+
+    public void gpythonCbxClick(ActionEvent actionEvent) {
+        if (cbx_gpython.isSelected()) {
+            new Thread(() -> {
+                Platform.runLater(() -> {
+                    cbx_gpython.setSelected(false);
+                    cbx_gpython.setDisable(true);
+                });
+                if (!GPythonVersionUtils.validInstallation()) {
+                    Platform.runLater(() -> {
+                        Alert alert = new Alert(Alert.AlertType.ERROR, "G-Python installation", ButtonType.OK);
+                        alert.setTitle("G-Python installation");
+
+                        FlowPane fp = new FlowPane();
+                        Label lbl = new Label("Before using G-Python, install the right packages using pip!" +
+                                System.lineSeparator() + System.lineSeparator() + "More information here:");
+                        Hyperlink link = new Hyperlink(INFO_URL_GPYTHON);
+                        fp.getChildren().addAll( lbl, link);
+                        link.setOnAction(event -> {
+                            Main.main.getHostServices().showDocument(link.getText());
+                            event.consume();
+                        });
+
+                        alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+                        alert.getDialogPane().setContent(fp);
+                        alert.show();
+
+                        cbx_gpython.setDisable(false);
+                    });
+                }
+                else {
+                    Platform.runLater(() -> {
+                        cbx_gpython.setSelected(true);
+                        cbx_gpython.setDisable(false);
+                        parentController.extensionsController.updateGPythonStatus();
+                    });
+                }
+            }).start();
+
+
+        }
+
     }
 }

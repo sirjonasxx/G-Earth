@@ -12,4 +12,7 @@ public abstract class ExtensionListener {
     protected void log(String text) {}
     protected void hasClosed() {}
 
+    protected void packetToStringRequest(HPacket packet) {}
+    protected void stringToPacketRequest(String string) {}
+
 }

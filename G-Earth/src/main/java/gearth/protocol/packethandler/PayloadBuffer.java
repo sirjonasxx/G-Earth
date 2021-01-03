@@ -14,7 +14,7 @@ public class PayloadBuffer {
         return receive();
     }
     public void push(byte[] tcpData) {
-        buffer = buffer.length == 0 ? tcpData.clone() : combineByteArrays(buffer, tcpData);
+        buffer = buffer.length == 0 ? tcpData.clone() : ByteArrayUtils.combineByteArrays(buffer, tcpData);
     }
     public HPacket[] receive() {
         if (buffer.length < 6) return new HPacket[0];
@@ -27,14 +27,6 @@ public class PayloadBuffer {
             total = new HPacket(buffer);
         }
         return all.toArray(new HPacket[all.size()]);
-    }
-
-
-    private byte[] combineByteArrays(byte[] arr1, byte[] arr2)	{
-        byte[] combined = new byte[arr1.length + arr2.length];
-        System.arraycopy(arr1,0,combined,0         ,arr1.length);
-        System.arraycopy(arr2,0,combined,arr1.length,arr2.length);
-        return combined;
     }
 
 

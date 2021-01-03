@@ -1,26 +1,19 @@
-package gearth.protocol.connection.proxy.unix;
+package gearth.protocol.connection.proxy.flash.unix;
 
 import gearth.protocol.HConnection;
-import gearth.protocol.connection.HProxy;
-import gearth.protocol.connection.HProxySetter;
-import gearth.protocol.connection.HState;
-import gearth.protocol.connection.HStateSetter;
-import gearth.protocol.connection.proxy.ProxyProvider;
+import gearth.protocol.connection.*;
+import gearth.protocol.connection.proxy.flash.FlashProxyProvider;
 import gearth.protocol.connection.proxy.ProxyProviderFactory;
 import gearth.protocol.connection.proxy.SocksConfiguration;
 import gearth.protocol.hostreplacer.ipmapping.IpMapper;
 import gearth.protocol.hostreplacer.ipmapping.IpMapperFactory;
-import javafx.application.Platform;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.layout.Region;
 
 import java.io.IOException;
 import java.net.*;
 import java.util.LinkedList;
 import java.util.Queue;
 
-public class LinuxRawIpProxyProvider extends ProxyProvider {
+public class LinuxRawIpFlashProxyProvider extends FlashProxyProvider {
 
     private volatile String input_host;
     private volatile int input_port;
@@ -30,7 +23,7 @@ public class LinuxRawIpProxyProvider extends ProxyProvider {
 
     private boolean useSocks;
 
-    public LinuxRawIpProxyProvider(HProxySetter proxySetter, HStateSetter stateSetter, HConnection hConnection, String input_host, int input_port, boolean useSocks) {
+    public LinuxRawIpFlashProxyProvider(HProxySetter proxySetter, HStateSetter stateSetter, HConnection hConnection, String input_host, int input_port, boolean useSocks) {
         super(proxySetter, stateSetter, hConnection);
         this.input_host = input_host;
         this.input_port = input_port;
@@ -50,7 +43,7 @@ public class LinuxRawIpProxyProvider extends ProxyProvider {
         new Thread(() -> {
             try  {
                 stateSetter.setState(HState.PREPARING);
-                proxy = new HProxy(input_host, input_host, input_port, input_port, "0.0.0.0");
+                proxy = new HProxy(HClient.FLASH, input_host, input_host, input_port, input_port, "0.0.0.0");
 
                 maybeRemoveMapping();
 

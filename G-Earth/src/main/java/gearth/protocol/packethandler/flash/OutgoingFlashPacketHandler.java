@@ -1,4 +1,4 @@
-package gearth.protocol.packethandler;
+package gearth.protocol.packethandler.flash;
 
 import gearth.misc.listenerpattern.Observable;
 import gearth.protocol.HMessage;
@@ -7,13 +7,10 @@ import gearth.services.extensionhandler.ExtensionHandler;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Consumer;
 
-public class OutgoingPacketHandler extends PacketHandler {
+public class OutgoingFlashPacketHandler extends FlashPacketHandler {
 
-    public OutgoingPacketHandler(OutputStream outputStream, Object[] trafficObservables, ExtensionHandler extensionHandler) {
+    public OutgoingFlashPacketHandler(OutputStream outputStream, Object[] trafficObservables, ExtensionHandler extensionHandler) {
         super(outputStream, trafficObservables, extensionHandler);
     }
 

@@ -1,6 +1,8 @@
 package gearth.ui;
 
 import gearth.ui.logger.loggerdisplays.PacketLoggerFactory;
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.Pane;
@@ -44,52 +46,35 @@ public class GEarthController {
 
     public void initialize() {
         tabs = new ArrayList<>();
+        // must be ordered correctly
         tabs.add(connectionController);
         tabs.add(injectionController);
         tabs.add(loggerController);
         tabs.add(toolsController);
         tabs.add(schedulerController);
+        tabs.add(extensionsController);
         tabs.add(extraController);
         tabs.add(infoController);
-        tabs.add(extensionsController);
 
         synchronized (this) {
             trySetController();
         }
 
+        List<Tab> uiTabs = tabBar.getTabs();
+        for (int i = 0; i < uiTabs.size(); i++) {
+            Tab tab = uiTabs.get(i);
+            int[] ii = {i};
+
+            tab.setOnSelectionChanged(event -> {
+                if (tab.isSelected()) {
+                    tabs.get(ii[0]).onTabOpened();
+                }
+            });
+        }
+
         if (PacketLoggerFactory.usesUIlogger()) {
             tabBar.getTabs().remove(tab_Logger);
         }
-
-        //custom header bar
-//        final Point[] startpos = {null};
-//        final Double[] xx = {0.0};
-//        final Double[] yy = {0.0};
-//        final Boolean[] isMoving = {false};
-//
-//        mover.addEventHandler(MouseEvent.MOUSE_PRESSED,
-//                event -> {
-//                    startpos[0] = MouseInfo.getPointerInfo().getLocation();
-//                    xx[0] = stage.getX();
-//                    yy[0] = stage.getY();
-//                    isMoving[0] = true;
-//                });
-//
-//        mover.addEventHandler(MouseEvent.MOUSE_RELEASED,
-//                event -> {
-//                    isMoving[0] = false;
-//                });
-//
-//
-//        mover.setOnMouseDragged(event -> {
-//            if (isMoving[0]) {
-//                Point now = MouseInfo.getPointerInfo().getLocation();
-//                double diffX = now.getX() - startpos[0].getX();
-//                double diffY = now.getY() - startpos[0].getY();
-//                stage.setX(xx[0] + diffX);
-//                stage.setY(yy[0] + diffY);
-//            }
-//        });
     }
 
     public void setStage(Stage stage) {
@@ -122,5 +107,4 @@ public class GEarthController {
         tabs.forEach(SubForm::exit);
         hConnection.abort();
     }
-
 }

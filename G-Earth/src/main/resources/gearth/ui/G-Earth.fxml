@@ -11,7 +11,7 @@
       fx:controller="gearth.ui.GEarthController">
     <Pane fx:id="mover" maxHeight="0.0" minHeight="0.0" prefWidth="200.0"/>
     <TabPane fx:id="tabBar" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity"
-             minWidth="-Infinity" prefHeight="295.0" prefWidth="565.0" tabClosingPolicy="UNAVAILABLE">
+             minWidth="-Infinity" prefHeight="295.0" prefWidth="650.0" tabClosingPolicy="UNAVAILABLE">
         <Tab text="Connection">
             <fx:include fx:id="connection" source="connection/Connection.fxml"/>
         </Tab>

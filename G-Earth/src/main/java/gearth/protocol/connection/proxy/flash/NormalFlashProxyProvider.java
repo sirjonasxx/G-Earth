@@ -1,21 +1,19 @@
-package gearth.protocol.connection.proxy;
+package gearth.protocol.connection.proxy.flash;
 
 import gearth.misc.Cacher;
 import gearth.protocol.HConnection;
-import gearth.protocol.connection.HProxy;
-import gearth.protocol.connection.HProxySetter;
-import gearth.protocol.connection.HState;
-import gearth.protocol.connection.HStateSetter;
+import gearth.protocol.connection.*;
+import gearth.protocol.connection.proxy.ProxyProviderFactory;
+import gearth.protocol.connection.proxy.SocksConfiguration;
 import gearth.protocol.hostreplacer.hostsfile.HostReplacer;
 import gearth.protocol.hostreplacer.hostsfile.HostReplacerFactory;
 
 import java.io.IOException;
 import java.net.*;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-public class NormalProxyProvider extends ProxyProvider {
+public class NormalFlashProxyProvider extends FlashProxyProvider {
 
     private List<String> potentialHosts;
 
@@ -29,7 +27,7 @@ public class NormalProxyProvider extends ProxyProvider {
     private boolean useSocks;
 
 
-    public NormalProxyProvider(HProxySetter proxySetter, HStateSetter stateSetter, HConnection hConnection, List<String> potentialHosts, boolean useSocks) {
+    public NormalFlashProxyProvider(HProxySetter proxySetter, HStateSetter stateSetter, HConnection hConnection, List<String> potentialHosts, boolean useSocks) {
         super(proxySetter, stateSetter, hConnection);
         this.potentialHosts = potentialHosts;
         this.useSocks = useSocks;
@@ -72,7 +70,7 @@ public class NormalProxyProvider extends ProxyProvider {
 
                 int intercept_port = port;
                 String intercept_host = "127.0." + (c / 254) + "." + (1 + c % 254);
-                potentialProxies.add(new HProxy(input_dom, actual_dom, port, intercept_port, intercept_host));
+                potentialProxies.add(new HProxy(HClient.FLASH, input_dom, actual_dom, port, intercept_port, intercept_host));
                 c++;
             }
         }

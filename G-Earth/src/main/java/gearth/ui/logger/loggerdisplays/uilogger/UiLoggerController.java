@@ -95,7 +95,7 @@ public class UiLoggerController implements Initializable {
 
         String expr = packet.toExpression(isIncoming ? HMessage.Direction.TOCLIENT : HMessage.Direction.TOSERVER);
 
-        lblHarbleAPI.setText("HarbleAPI: " + (HarbleAPIFetcher.HARBLEAPI == null ? "False" : "True"));
+        lblHarbleAPI.setText("Messages: " + (HarbleAPIFetcher.HARBLEAPI == null ? "False" : "True"));
         if ((viewMessageName || viewMessageHash) && HarbleAPIFetcher.HARBLEAPI != null) {
             HarbleAPI api = HarbleAPIFetcher.HARBLEAPI;
             HarbleAPI.HarbleMessage message = api.getHarbleMessageFromHeaderId(
@@ -124,7 +124,7 @@ public class UiLoggerController implements Initializable {
                 .append(packet.headerId())
                 .append(spanWithClass("]", isIncoming ? "incoming" : "outgoing"))
                 .append(isIncoming ? " <- " : " -> ")
-                .append(skiphugepackets && packet.length() > 8000 ?
+                .append(skiphugepackets && packet.length() > 4000 ?
                         divWithClass("<packet skipped>", "skipped") :
                         divWithClass(packet.toString(), isIncoming ? "incoming" : "outgoing"));
 

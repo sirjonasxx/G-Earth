@@ -75,7 +75,7 @@
                <Insets right="10.0" />
             </FlowPane.margin>
          </Label>
-         <Label fx:id="lblHarbleAPI" layoutX="283.0" layoutY="11.0" style="-fx-text-fill: black !important" text="HarbleAPI: False">
+         <Label fx:id="lblHarbleAPI" layoutX="283.0" layoutY="11.0" style="-fx-text-fill: black !important" text="Messages: False">
             <FlowPane.margin>
                <Insets right="10.0" />
             </FlowPane.margin>

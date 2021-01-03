@@ -298,7 +298,13 @@ public abstract class Extension implements IExtension {
     public boolean requestFlags(FlagsCheckListener flagRequestCallback) {
         if (this.flagRequestCallback != null) return false;
         this.flagRequestCallback = flagRequestCallback;
-        return true;
+        try {
+            writeToStream(new HPacket(NetworkExtensionInfo.INCOMING_MESSAGES_IDS.REQUESTFLAGS).toBytes());
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
 

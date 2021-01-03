@@ -71,7 +71,6 @@ public class HarbleAPI {
 
     private boolean success = false;
     private String fullPath = null;
-    private String revision = null;
 
     /**
      * cache file must be generated first within G-Earth, inb4 20 extensions requesting it at the same time
@@ -92,22 +91,18 @@ public class HarbleAPI {
         if (Cacher.cacheFileExists(possibleCachedMessagesPath)) {
             JSONObject object = Cacher.getCacheContents(possibleCachedMessagesPath);
             success = true;
-            revision = hotelversion;
             fullPath = Cacher.getCacheDir() + File.separator + possibleCachedMessagesPath;
             parse(object);
         }
     }
 
-    public HarbleAPI(String hotelversion, String path_to_file) {
-
-        File f = new File(path_to_file);
+    public HarbleAPI(File f) {
         if (f.exists() && !f.isDirectory()) {
             try {
                 String contents = String.join("\n", Files.readAllLines(f.toPath()));
                 JSONObject object = new JSONObject(contents);
                 success = true;
-                revision = hotelversion;
-                fullPath = path_to_file;
+                fullPath = f.getAbsolutePath();
                 parse(object);
 
             } catch (IOException e) {
@@ -118,15 +113,16 @@ public class HarbleAPI {
 
     private void addMessage(HMessage.Direction direction, JSONObject object) {
         String name;
-        try {
-            name = object.getString("Name");
-        } catch (Exception e) {
-            name = null;
-        }
-        String hash = object.getString("Hash");
-        Integer headerId = object.getInt("Id");
-        String structure;
+        String hash;
+        try { name = object.getString("Name"); }
+        catch (Exception e) { name = null; }
+        try { hash = object.getString("Hash"); }
+        catch (Exception e) { hash = null; }
 
+
+        int headerId = object.getInt("Id");
+
+        String structure;
         try {
             structure = object.getString("Structure");
         } catch (Exception e) {
@@ -216,10 +212,6 @@ public class HarbleAPI {
                         : nameToMessage_incoming);
 
         return nameToMessage.get(name);
-    }
-
-    public String getRevision() {
-        return revision;
     }
 
     public String getPath() {

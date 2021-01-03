@@ -5,8 +5,10 @@ import gearth.misc.OSValidator;
 import gearth.protocol.HConnection;
 import gearth.protocol.connection.HProxySetter;
 import gearth.protocol.connection.HStateSetter;
-import gearth.protocol.connection.proxy.unix.LinuxRawIpProxyProvider;
-import gearth.protocol.connection.proxy.windows.WindowsRawIpProxyProvider;
+import gearth.protocol.connection.proxy.flash.NormalFlashProxyProvider;
+import gearth.protocol.connection.proxy.flash.FlashProxyProvider;
+import gearth.protocol.connection.proxy.flash.unix.LinuxRawIpFlashProxyProvider;
+import gearth.protocol.connection.proxy.flash.windows.WindowsRawIpFlashProxyProvider;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -67,7 +69,7 @@ public class ProxyProviderFactory {
 
     // checks if host is a raw IP instead of a domain
     // TODO support ipv6 (not only here, also in IPmapper)
-    static boolean hostIsIpAddress(String host){
+    public static boolean hostIsIpAddress(String host){
         for (char c : host.toCharArray()) {
             if (c != '.' && (c < '0' || c > '9')) {
                 return false;
@@ -79,7 +81,6 @@ public class ProxyProviderFactory {
     public ProxyProvider provide()  {
         return provide(autoDetectHosts);
     }
-
     public ProxyProvider provide(String domain, int port)  {
         List<Object> additionalCachedHotels = Cacher.getList(HOTELS_CACHE_KEY);
         if (additionalCachedHotels == null) {
@@ -92,12 +93,12 @@ public class ProxyProviderFactory {
 
         if (hostIsIpAddress(domain)) {
             if (OSValidator.isWindows()) {
-                if (WindowsRawIpProxyProvider.isNoneConnected(domain) &&
+                if (WindowsRawIpFlashProxyProvider.isNoneConnected(domain) &&
                         (!socksConfig.useSocks() || socksConfig.onlyUseIfNeeded()) ) {
-                    return new WindowsRawIpProxyProvider(proxySetter, stateSetter, hConnection, domain, port, false);
+                    return new WindowsRawIpFlashProxyProvider(proxySetter, stateSetter, hConnection, domain, port, false);
                 }
                 else if (socksConfig.useSocks()) {
-                    return new WindowsRawIpProxyProvider(proxySetter, stateSetter, hConnection, domain, port, true);
+                    return new WindowsRawIpFlashProxyProvider(proxySetter, stateSetter, hConnection, domain, port, true);
                 }
 
                 Platform.runLater(() -> {
@@ -112,7 +113,7 @@ public class ProxyProviderFactory {
                 return null;
             }
             else if (OSValidator.isUnix() || OSValidator.isMac()) {
-                return new LinuxRawIpProxyProvider(proxySetter, stateSetter, hConnection, domain, port, socksConfig.useSocks() && !socksConfig.onlyUseIfNeeded());
+                return new LinuxRawIpFlashProxyProvider(proxySetter, stateSetter, hConnection, domain, port, socksConfig.useSocks() && !socksConfig.onlyUseIfNeeded());
             }
             return null;
 
@@ -123,9 +124,8 @@ public class ProxyProviderFactory {
             return provide(potentialHost);
         }
     }
-
     private ProxyProvider provide(List<String> potentialHosts) {
-        return new NormalProxyProvider(proxySetter, stateSetter, hConnection, potentialHosts, socksConfig.useSocks() && !socksConfig.onlyUseIfNeeded());
+        return new NormalFlashProxyProvider(proxySetter, stateSetter, hConnection, potentialHosts, socksConfig.useSocks() && !socksConfig.onlyUseIfNeeded());
     }
 
     public static void setSocksConfig(SocksConfiguration configuration) {

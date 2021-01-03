@@ -8,22 +8,21 @@
 
     <packaging>jar</packaging>
 
-    <version>1.1</version>
+    <version>1.3</version>
 
     <properties>
         <javafx.version>1.8</javafx.version>
+        <jettyVersion>9.4.35.v20201120</jettyVersion>
     </properties>
 
     <parent>
         <groupId>G-Earth</groupId>
         <artifactId>G-Earth-Parent</artifactId>
-        <version>1.1</version>
+        <version>1.3</version>
     </parent>
 
     <build>
         <plugins>
-
-
             <!-- this builds a non-standalone JAR file -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -36,7 +35,7 @@
                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>gearth.J11Main</mainClass>
+                            <mainClass>gearth.Main</mainClass>
                             <useUniqueVersions>false</useUniqueVersions>
                         </manifest>
                     </archive>
@@ -58,7 +57,7 @@
                     <outputDirectory>${project.build.directory}/bin</outputDirectory>
                     <archive>
                         <manifest>
-                            <mainClass>gearth.J11Main</mainClass>
+                            <mainClass>gearth.Main</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
@@ -85,6 +84,11 @@
                                 <copy file="target/bin/G-Earth.jar" todir="../Build/Linux/"/>
                                 <copy file="target/bin/G-Earth.jar" todir="../Build/Windows_32bit/"/>
                                 <copy file="target/bin/G-Earth.jar" todir="../Build/Windows_64bit/"/>
+
+                                <copy file="src/main/resources/build/messages.json" todir="../Build/Mac/"/>
+                                <copy file="src/main/resources/build/messages.json" todir="../Build/Linux/"/>
+                                <copy file="src/main/resources/build/messages.json" todir="../Build/Windows_32bit/"/>
+                                <copy file="src/main/resources/build/messages.json" todir="../Build/Windows_64bit/"/>
 
                                 <copy todir="../Build/Mac/">
                                     <fileset dir="src/main/resources/build/mac" includes="**/*" />
@@ -123,6 +127,7 @@
         </plugins>
     </build>
 
+
     <dependencies>
 <!--        <dependency>-->
 <!--            <groupId>org.openjfx</groupId>-->
@@ -152,13 +157,51 @@
         <dependency>
             <groupId>com.github.tulskiy</groupId>
             <artifactId>jkeymaster</artifactId>
-            <version>1.2</version>
+            <version>1.3</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-jdk14</artifactId>
             <version>2.0.0-alpha0</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.maven/maven-artifact -->
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-artifact</artifactId>
+            <version>3.6.3</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>javax.websocket</groupId>
+            <artifactId>javax.websocket-api</artifactId>
+            <version>1.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-server</artifactId>
+            <version>${jettyVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty.websocket</groupId>
+            <artifactId>javax-websocket-server-impl</artifactId>
+            <version>${jettyVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-http</artifactId>
+            <version>${jettyVersion}</version>
+        </dependency>
+
+
+
+        <dependency>
+            <groupId>G-Earth</groupId>
+            <artifactId>G-Wasm</artifactId>
+            <version>1.0</version>
+        </dependency>
+
     </dependencies>
 
     <repositories>

@@ -1,11 +1,13 @@
 package gearth.protocol.connection;
 
-import gearth.protocol.packethandler.IncomingPacketHandler;
-import gearth.protocol.packethandler.OutgoingPacketHandler;
+import gearth.protocol.packethandler.PacketHandler;
 
 import java.net.ServerSocket;
 
 public class HProxy {
+
+    private final HClient hClient;
+
     private volatile String input_domain;           //string representation of the domain to intercept
     private volatile String actual_domain;          //dns resolved domain (ignoring hosts file)
     private volatile int actual_port;               //port of the server
@@ -15,13 +17,14 @@ public class HProxy {
 
     private volatile ServerSocket proxy_server = null;     //listener for the client
 
-    private volatile IncomingPacketHandler inHandler = null;     //connection with client (only initialized when verified habbo connection)
-    private volatile OutgoingPacketHandler outHandler = null;    //connection with server (only initialized when verified habbo connection)
+    private volatile PacketHandler inHandler = null;     //connection with client (only initialized when verified habbo connection)
+    private volatile PacketHandler outHandler = null;    //connection with server (only initialized when verified habbo connection)
 
     private volatile String hotelVersion = "";
     private volatile AsyncPacketSender asyncPacketSender = null;
 
-    public HProxy(String input_domain, String actual_domain, int actual_port, int intercept_port, String intercept_host) {
+    public HProxy(HClient hClient, String input_domain, String actual_domain, int actual_port, int intercept_port, String intercept_host) {
+        this.hClient = hClient;
         this.input_domain = input_domain;
         this.actual_domain = actual_domain;
         this.actual_port = actual_port;
@@ -33,7 +36,7 @@ public class HProxy {
         this.proxy_server = socket;
     }
 
-    public void verifyProxy(IncomingPacketHandler incomingHandler, OutgoingPacketHandler outgoingHandler, String hotelVersion) {
+    public void verifyProxy(PacketHandler incomingHandler, PacketHandler outgoingHandler, String hotelVersion) {
         this.inHandler = incomingHandler;
         this.outHandler = outgoingHandler;
         this.hotelVersion = hotelVersion;
@@ -64,11 +67,11 @@ public class HProxy {
         return intercept_host;
     }
 
-    public IncomingPacketHandler getInHandler() {
+    public PacketHandler getInHandler() {
         return inHandler;
     }
 
-    public OutgoingPacketHandler getOutHandler() {
+    public PacketHandler getOutHandler() {
         return outHandler;
     }
 
@@ -78,5 +81,9 @@ public class HProxy {
 
     public AsyncPacketSender getAsyncPacketSender() {
         return asyncPacketSender;
+    }
+
+    public HClient gethClient() {
+        return hClient;
     }
 }

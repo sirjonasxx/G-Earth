@@ -1,6 +1,7 @@
 package gearth.misc.packetrepresentation.prediction.checkers;
 
 import gearth.protocol.HPacket;
+import gearth.services.Constants;
 
 import java.nio.charset.StandardCharsets;
 
@@ -33,7 +34,7 @@ public class IntegerChecker extends TypeChecker<Integer> {
         }
 
         // 4 bytes that read [0][2]xy could be a string
-        if (ushortTest >= 2 && ushortTest <= 6 && StringChecker.canReadString(hPacket, index)) {
+        if (ushortTest == 2 && StringChecker.canReadString(hPacket, index)) {
             return (1 - StringChecker.scoreString(hPacket.readString(index)));
         }
 

@@ -1,25 +1,31 @@
 package gearth.ui.extensions;
 
+import gearth.Main;
 import gearth.services.extensionhandler.ExtensionConnectedListener;
 import gearth.services.extensionhandler.ExtensionHandler;
 import gearth.services.extensionhandler.extensions.ExtensionListener;
 import gearth.services.extensionhandler.extensions.GEarthExtension;
 import gearth.services.extensionhandler.extensions.implementations.network.NetworkExtensionsProducer;
+import gearth.services.extensionhandler.extensions.implementations.network.authentication.Authenticator;
 import gearth.services.extensionhandler.extensions.implementations.network.executer.ExecutionInfo;
 import gearth.services.extensionhandler.extensions.implementations.network.executer.ExtensionRunner;
 import gearth.services.extensionhandler.extensions.implementations.network.executer.ExtensionRunnerFactory;
+import gearth.services.gpython.GPythonShell;
+import gearth.services.gpython.OnQtConsoleLaunch;
 import gearth.ui.SubForm;
 import gearth.ui.extensions.logger.ExtensionLogger;
+import gearth.ui.extra.ExtraController;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
-import javafx.scene.control.Button;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  * Created by Jonas on 06/04/18.
@@ -29,12 +35,12 @@ public class ExtensionsController extends SubForm {
 
 
     public Button btn_install;
-    public Button btn_remove;
     public TextField ext_port;
     public VBox extensioncontainer;
     public GridPane header_ext;
     public ScrollPane scroller;
     public Button btn_viewExtensionConsole;
+    public Button btn_gpython;
 
     private ExtensionRunner extensionRunner = null;
     private ExtensionHandler extensionHandler;
@@ -98,6 +104,33 @@ public class ExtensionsController extends SubForm {
         else {
             extensionLogger.hide();
         }
+    }
 
+    @Override
+    protected void onTabOpened() {
+        updateGPythonStatus();
+    }
+
+    public void updateGPythonStatus() {
+        if (!pythonShellLaunching) {
+            btn_gpython.setDisable(!parentController.extraController.useGPython());
+        }
+    }
+
+
+    private volatile int gpytonShellCounter = 1;
+    private volatile boolean pythonShellLaunching = false;
+    public void gpythonBtnClicked(ActionEvent actionEvent) {
+        pythonShellLaunching = true;
+        Platform.runLater(() -> btn_gpython.setDisable(true));
+        GPythonShell shell = new GPythonShell(
+                "Scripting shell " + gpytonShellCounter++,
+                networkExtensionsProducer.getPort(),
+                Authenticator.generatePermanentCookie()
+        );
+        shell.launch((b) -> {
+            pythonShellLaunching = false;
+            Platform.runLater(this::updateGPythonStatus);
+        });
     }
 }

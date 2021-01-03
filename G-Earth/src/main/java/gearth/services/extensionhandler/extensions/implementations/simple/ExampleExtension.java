@@ -1,6 +1,7 @@
 package gearth.services.extensionhandler.extensions.implementations.simple;
 
 import gearth.protocol.HMessage;
+import gearth.protocol.HPacket;
 import gearth.services.extensionhandler.extensions.GEarthExtension;
 
 public class ExampleExtension extends GEarthExtension {
@@ -104,5 +105,19 @@ public class ExampleExtension extends GEarthExtension {
 
         // finish up and call "hasClosed()"
         hasClosed();
+    }
+
+
+
+
+    // ignore these
+    @Override
+    public void packetToStringResponse(String string, String expression) {
+
+    }
+
+    @Override
+    public void stringToPacketResponse(HPacket packet) {
+
     }
 }

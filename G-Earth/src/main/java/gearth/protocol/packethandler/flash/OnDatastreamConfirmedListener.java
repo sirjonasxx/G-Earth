@@ -1,4 +1,4 @@
-package gearth.protocol.packethandler;
+package gearth.protocol.packethandler.flash;
 
 public interface OnDatastreamConfirmedListener {
 

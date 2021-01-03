@@ -212,6 +212,27 @@ public class ExtensionHandler {
                     protected void manipulatedPacket(HMessage hMessage) {
                         onExtensionRespond(extension, hMessage);
                     }
+
+                    @Override
+                    protected void packetToStringRequest(HPacket packet) {
+                        String s = "";
+                        String expression = "";
+                        try {
+                            s = packet.toString();
+                            if (packet.length() < 3000) {
+                                expression = packet.toExpression();
+                            }
+                        }
+                        finally {
+                            extension.packetToStringResponse(s, expression);
+                        }
+                    }
+
+                    @Override
+                    protected void stringToPacketRequest(String string) {
+                        HPacket packet = new HPacket(string);
+                        extension.stringToPacketResponse(packet);
+                    }
                 };
 
                 extension.getExtensionObservable().addListener(listener);

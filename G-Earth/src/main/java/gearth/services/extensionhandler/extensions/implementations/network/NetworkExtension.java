@@ -8,6 +8,7 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Created by Jonas on 21/06/18.
@@ -87,6 +88,14 @@ public class NetworkExtension extends GEarthExtension {
                         }
                         else if (message.headerId() == NetworkExtensionInfo.INCOMING_MESSAGES_IDS.EXTENSIONCONSOLELOG) {
                             log(message.readString());
+                        }
+                        else if (message.headerId() == NetworkExtensionInfo.INCOMING_MESSAGES_IDS.PACKETTOSTRING_REQUEST) {
+                            HPacket p = new HPacket(new byte[0]);
+                            p.constructFromString(message.readLongString());
+                            packetToStringRequest(p);
+                        }
+                        else if (message.headerId() == NetworkExtensionInfo.INCOMING_MESSAGES_IDS.STRINGTOPACKET_REQUEST) {
+                            stringToPacketRequest(message.readLongString(StandardCharsets.UTF_8));
                         }
 
                     }
@@ -210,5 +219,20 @@ public class NetworkExtension extends GEarthExtension {
         try {
             connection.close();
         } catch (IOException ignored) { }
+    }
+
+    @Override
+    public void packetToStringResponse(String string, String expression) {
+        HPacket packet = new HPacket(NetworkExtensionInfo.OUTGOING_MESSAGES_IDS.PACKETTOSTRING_RESPONSE);
+        packet.appendLongString(string);
+        packet.appendLongString(expression, StandardCharsets.UTF_8);
+        sendMessage(packet);
+    }
+
+    @Override
+    public void stringToPacketResponse(HPacket packetFromString) {
+        HPacket packet = new HPacket(NetworkExtensionInfo.OUTGOING_MESSAGES_IDS.STRINGTOPACKET_RESPONSE);
+        packet.appendLongString(packetFromString.stringify());
+        sendMessage(packet);
     }
 }

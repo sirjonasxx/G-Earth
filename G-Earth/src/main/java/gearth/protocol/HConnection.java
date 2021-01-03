@@ -4,9 +4,10 @@ import gearth.misc.listenerpattern.Observable;
 import gearth.protocol.connection.HProxy;
 import gearth.protocol.connection.HState;
 import gearth.protocol.connection.proxy.ProxyProvider;
+import gearth.protocol.connection.proxy.flash.FlashProxyProvider;
 import gearth.protocol.connection.proxy.ProxyProviderFactory;
-import gearth.protocol.connection.proxy.unix.LinuxRawIpProxyProvider;
-import gearth.protocol.connection.proxy.windows.WindowsRawIpProxyProvider;
+import gearth.protocol.connection.proxy.flash.unix.LinuxRawIpFlashProxyProvider;
+import gearth.protocol.connection.proxy.unity.UnityProxyProvider;
 import gearth.services.extensionhandler.ExtensionHandler;
 
 import java.io.IOException;
@@ -57,6 +58,12 @@ public class HConnection {
     // manual input mode
     public void start(String host, int port) {
         proxyProvider = proxyProviderFactory.provide(host, port);
+        startMITM();
+    }
+
+    public void startUnity() {
+        HConnection selff = this;
+        proxyProvider = new UnityProxyProvider(proxy -> selff.proxy = proxy, selff::setState, this);
         startMITM();
     }
 
@@ -166,7 +173,7 @@ public class HConnection {
     }
 
     public boolean isRawIpMode() {
-        return proxyProvider != null && proxyProvider instanceof LinuxRawIpProxyProvider;
+        return proxyProvider != null && proxyProvider instanceof LinuxRawIpFlashProxyProvider;
         // WindowsRawIpProxyProvider extends LinuxRawIpProxyProvider
     }
 

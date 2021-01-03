@@ -8,6 +8,7 @@ import gearth.misc.packetrepresentation.PacketStringUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidParameterException;
 import java.util.Arrays;
@@ -36,7 +37,7 @@ public class HPacket implements StringifyAble {
     }
     public HPacket(int header) {
         packetInBytes = new byte[]{0,0,0,2,0,0};
-        replaceUShort(4, header);
+        replaceShort(4, (short)header);
         isEdited = false;
     }
     public HPacket(int header, byte[] bytes) {
@@ -126,7 +127,7 @@ public class HPacket implements StringifyAble {
     }
 
     public int headerId()	{
-        return readUshort(4);
+        return readShort(4);
     }
 
     public int readInteger(){
@@ -180,34 +181,49 @@ public class HPacket implements StringifyAble {
         return java.nio.ByteBuffer.wrap(btarray).getLong();
     }
 
-    public String readString()	{
-        String r = readString(readIndex);
-        readIndex += (2 + r.length());
+
+    public String readString(Charset charset)	{
+        String r = readString(readIndex, charset);
+        readIndex += (2 + readUshort(readIndex));
         return r;
     }
-    public String readString(int index)	{
+    public String readString(int index, Charset charset)	{
         int length = readUshort(index);
         index+=2;
-
-        return readString(index, length);
+        return readString(index, length, charset);
     }
 
-    private String readString(int index, int length) {
+    public String readString()	{
+        return readString(StandardCharsets.ISO_8859_1);
+    }
+    public String readString(int index)	{
+        return readString(index, StandardCharsets.ISO_8859_1);
+    }
+
+    private String readString(int index, int length, Charset charset) {
         byte[] x = new byte[length];
         for (int i = 0; i < x.length; i++)	{ x[i] = readByte(index); index++;	}
-        return new String(x, StandardCharsets.ISO_8859_1);
+        return new String(x, charset);
     }
 
-    public String readLongString()	{
-        String r = readLongString(readIndex);
-        readIndex += (4 + r.length());
+
+    public String readLongString(Charset charset)	{
+        String r = readLongString(readIndex, charset);
+        readIndex += (4 + readInteger(readIndex));
         return r;
     }
-    public String readLongString(int index) {
+    public String readLongString(int index, Charset charset) {
         int length = readInteger(index);
         index += 4;
 
-        return readString(index, length);
+        return readString(index, length, charset);
+    }
+
+    public String readLongString()	{
+        return readLongString(StandardCharsets.ISO_8859_1);
+    }
+    public String readLongString(int index)	{
+        return readLongString(index, StandardCharsets.ISO_8859_1);
     }
 
     public boolean readBoolean()	{
@@ -227,6 +243,14 @@ public class HPacket implements StringifyAble {
         isEdited = true;
         ByteBuffer b = ByteBuffer.allocate(4).putInt(i);
         for (int j = 0; j < 4; j++) {
+            packetInBytes[index + j] = b.array()[j];
+        }
+        return this;
+    }
+    public HPacket replaceLong(int index, long l) {
+        isEdited = true;
+        ByteBuffer b = ByteBuffer.allocate(8).putLong(l);
+        for (int j = 0; j < 8; j++) {
             packetInBytes[index + j] = b.array()[j];
         }
         return this;
@@ -267,10 +291,11 @@ public class HPacket implements StringifyAble {
         packetInBytes[index + 1] = b.array()[1];
         return this;
     }
-    public HPacket replaceString(int index, String s) {
+
+    public HPacket replaceString(int index, String s, Charset charset) {
         isEdited = true;
-        byte[] sbytes = s.getBytes(StandardCharsets.ISO_8859_1);
-        int mover = s.length() - readUshort(index);
+        byte[] sbytes = s.getBytes(charset);
+        int mover = sbytes.length - readUshort(index);
 
         if (mover != 0) {
             byte[] newPacket = Arrays.copyOf(packetInBytes, packetInBytes.length + mover);
@@ -283,7 +308,7 @@ public class HPacket implements StringifyAble {
                 }
             }
             else {
-                int i = index + 2 + s.length();
+                int i = index + 2 + sbytes.length;
                 while (i < newPacket.length) {
                     newPacket[i] = packetInBytes[i - mover];
                     i++;
@@ -294,11 +319,15 @@ public class HPacket implements StringifyAble {
             fixLength();
         }
 
-        replaceUShort(index, s.length());
-        for (int i = 0; i < s.length(); i++) {
+        replaceUShort(index, sbytes.length);
+        for (int i = 0; i < sbytes.length; i++) {
             packetInBytes[index + 2 + i] = sbytes[i];
         }
         return this;
+    }
+
+    public HPacket replaceString(int index, String s) {
+        return replaceString(index, s, StandardCharsets.ISO_8859_1);
     }
 
     private boolean canReadString(int index) {
@@ -394,6 +423,16 @@ public class HPacket implements StringifyAble {
         fixLength();
         return this;
     }
+    public HPacket appendLong(long l) {
+        isEdited = true;
+        packetInBytes = Arrays.copyOf(packetInBytes, packetInBytes.length + 8);
+        ByteBuffer byteBuffer = ByteBuffer.allocate(8).putLong(l);
+        for (int j = 0; j < 8; j++) {
+            packetInBytes[packetInBytes.length - 8 + j] = byteBuffer.array()[j];
+        }
+        fixLength();
+        return this;
+    }
     public HPacket appendDouble(double d) {
         isEdited = true;
         packetInBytes = Arrays.copyOf(packetInBytes, packetInBytes.length + 8);
@@ -445,18 +484,27 @@ public class HPacket implements StringifyAble {
         fixLength();
         return this;
     }
+    public HPacket appendString(String s, Charset charset) {
+        isEdited = true;
+        appendUShort(s.getBytes(charset).length);
+        appendBytes(s.getBytes(charset));
+        return this;
+    }
     public HPacket appendString(String s) {
+        return appendString(s, StandardCharsets.ISO_8859_1);
+    }
+
+    public HPacket appendLongString(String s, Charset charset) {
         isEdited = true;
-        appendUShort(s.length());
-        appendBytes(s.getBytes(StandardCharsets.ISO_8859_1));
+        appendInt(s.getBytes(charset).length);
+        appendBytes(s.getBytes(charset));
         return this;
     }
+
     public HPacket appendLongString(String s) {
-        isEdited = true;
-        appendInt(s.length());
-        appendBytes(s.getBytes(StandardCharsets.ISO_8859_1));
-        return this;
+        return appendLongString(s, StandardCharsets.ISO_8859_1);
     }
+
     public HPacket appendObject(Object o) throws InvalidParameterException {
         isEdited = true;
 
@@ -472,24 +520,13 @@ public class HPacket implements StringifyAble {
         else if (o instanceof Boolean) {
             appendBoolean((Boolean) o);
         }
+        else if (o instanceof Long) {
+            appendLong((Long) o);
+        }
         else {
             throw new InvalidParameterException();
         }
 
-        return this;
-    }
-
-
-    public HPacket removeFrom(int index) {
-        return removeRange(index, packetInBytes.length - index);
-    }
-    public HPacket removeRange(int index, int length) {
-        isEdited = true;
-        for (int i = index; i < packetInBytes.length - length; i++) {
-            packetInBytes[i] = packetInBytes[i + length];
-        }
-        packetInBytes = Arrays.copyOf(packetInBytes, packetInBytes.length - length);
-        fixLength();
         return this;
     }
 
@@ -507,25 +544,44 @@ public class HPacket implements StringifyAble {
         isEdited = edited;
     }
 
-    public String toExpression(HMessage.Direction direction) {
-        if (isCorrupted()) return "";
-
+    private String getHarbleStructure(HMessage.Direction direction) {
         HarbleAPI.HarbleMessage msg;
         if (HarbleAPIFetcher.HARBLEAPI != null &&
                 ((msg = HarbleAPIFetcher.HARBLEAPI.getHarbleMessageFromHeaderId(direction, headerId())) != null)) {
-            if (msg.getStructure() != null) {
-                return PacketStringUtils.toExpressionFromGivenStructure(this, msg.getStructure());
+            if (msg.getStructure() != null && structureEquals(msg.getStructure())) {
+                return msg.getStructure();
             }
         }
-        return toExpression();
+
+        return null;
+    }
+
+    public String toExpression(HMessage.Direction direction) {
+        if (isCorrupted()) return "";
+
+        String structure = getHarbleStructure(direction);
+        if (structure != null) {
+            return PacketStringUtils.toExpressionFromGivenStructure(this, structure);
+        }
+
+        return PacketStringUtils.predictedExpression(this);
     }
 
     /**
      * returns "" if not found or not sure enough
-     * dont hate on the coding quality in this function, its pretty effective.
      */
     public String toExpression() {
         if (isCorrupted()) return "";
+
+        String structure1 = getHarbleStructure(HMessage.Direction.TOCLIENT);
+        String structure2 = getHarbleStructure(HMessage.Direction.TOSERVER);
+        if (structure1 != null && structure2 == null) {
+            return PacketStringUtils.toExpressionFromGivenStructure(this, structure1);
+        }
+        else if (structure1 == null && structure2 != null) {
+            return PacketStringUtils.toExpressionFromGivenStructure(this, structure2);
+        }
+
         return PacketStringUtils.predictedExpression(this);
     }
 
@@ -551,7 +607,7 @@ public class HPacket implements StringifyAble {
     }
 
     public static void main(String[] args) {
-        HPacket packet = new HPacket("{l}{u:4564}{i:3}{i:0}{s:\"hi\"}{i:0}{i:1}{s:\"how\"}{i:3}{b:1}{b:2}{b:3}{i:2}{s:\"r u\"}{i:1}{b:120}{i:2}{b:true}{d:1.4}");
+        HPacket packet = new HPacket("{l}{h:4564}{i:3}{i:0}{s:\"hi\"}{i:0}{i:1}{s:\"how\"}{i:3}{b:1}{b:2}{b:3}{i:2}{s:\"r u\"}{i:1}{b:120}{i:2}{b:true}{d:1.4}");
 
         String str = PacketStringUtils.toExpressionFromGivenStructure(packet, "i(isi(b))iBd");
 

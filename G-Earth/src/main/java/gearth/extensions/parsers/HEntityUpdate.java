@@ -4,14 +4,14 @@ import gearth.protocol.HPacket;
 
 public class HEntityUpdate {
     private int index;
-    private boolean isController;
+    private boolean isController = false;
 
     private HPoint tile;
-    private HPoint movingTo;
+    private HPoint movingTo = null;
 
-    private HSign sign;
-    private HStance stance;
-    private HAction action;
+    private HSign sign = null;
+    private HStance stance = null;
+    private HAction action = null;
     private HDirection headFacing;
     private HDirection bodyFacing;
 
