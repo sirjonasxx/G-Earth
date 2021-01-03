@@ -25,34 +25,28 @@ public class UnityPacketHandler extends PacketHandler {
 
     @Override
     public void sendToStream(byte[] buffer) {
-        synchronized (session) {
-            byte[] prefix = new byte[]{(direction == HMessage.Direction.TOCLIENT ? ((byte)0) : ((byte)1))};
-            byte[] combined = ByteArrayUtils.combineByteArrays(prefix, buffer);
+        byte[] prefix = new byte[]{(direction == HMessage.Direction.TOCLIENT ? ((byte)0) : ((byte)1))};
+        byte[] combined = ByteArrayUtils.combineByteArrays(prefix, buffer);
 
-            session.getAsyncRemote().sendBinary(ByteBuffer.wrap(combined));
-        }
+        session.getAsyncRemote().sendBinary(ByteBuffer.wrap(combined));
     }
 
     @Override
     public void act(byte[] buffer) throws IOException {
-        HPacket[] packets = payloadBuffer.pushAndReceive(buffer);
+        HMessage hMessage = new HMessage(new HPacket(buffer), direction, currentIndex);
 
-        for (HPacket hPacket : packets) {
-            HMessage hMessage = new HMessage(hPacket, direction, currentIndex);
+        OnHMessageHandled afterExtensionIntercept = hMessage1 -> {
+            notifyListeners(2, hMessage1);
 
-            OnHMessageHandled afterExtensionIntercept = hMessage1 -> {
-                notifyListeners(2, hMessage1);
+            if (!hMessage1.isBlocked())	{
+                sendToStream(hMessage1.getPacket().toBytes());
+            }
+        };
 
-                if (!hMessage1.isBlocked())	{
-                    sendToStream(hMessage1.getPacket().toBytes());
-                }
-            };
+        notifyListeners(0, hMessage);
+        notifyListeners(1, hMessage);
+        extensionHandler.handle(hMessage, afterExtensionIntercept);
 
-            notifyListeners(0, hMessage);
-            notifyListeners(1, hMessage);
-            extensionHandler.handle(hMessage, afterExtensionIntercept);
-
-            currentIndex++;
-        }
+        currentIndex++;
     }
 }
