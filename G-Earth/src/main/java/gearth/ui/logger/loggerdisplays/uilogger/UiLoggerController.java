@@ -6,18 +6,16 @@ import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 import gearth.ui.logger.loggerdisplays.PacketLogger;
 import javafx.application.Platform;
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
+import javafx.concurrent.Worker;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
 import javafx.stage.Stage;
-import org.fxmisc.flowless.VirtualizedScrollPane;
-import org.fxmisc.richtext.StyleClassedTextArea;
-import org.fxmisc.richtext.model.StyleSpansBuilder;
 
 import java.net.URL;
 import java.util.*;
@@ -37,7 +35,7 @@ public class UiLoggerController implements Initializable {
     public CheckMenuItem chkMessageHash;
     public Label lblHarbleAPI;
 
-    private StyleClassedTextArea area;
+    private WebView webView;
 
     private Stage stage;
 
@@ -51,25 +49,26 @@ public class UiLoggerController implements Initializable {
     private boolean alwaysOnTop = false;
 
     private volatile boolean initialized = false;
-    private final List<Element> appendLater = new ArrayList<>();
+    private final List<String> appendLater = new LinkedList<>();
 
     @Override
     public void initialize(URL arg0, ResourceBundle arg1) {
-        area = new StyleClassedTextArea();
-        area.getStyleClass().add("dark");
-        area.setWrapText(true);
+        webView = new WebView();
 
-        VirtualizedScrollPane<StyleClassedTextArea> vsPane = new VirtualizedScrollPane<>(area);
-        borderPane.setCenter(vsPane);
+        borderPane.setCenter(webView);
 
-        synchronized (appendLater) {
-            initialized = true;
-            if (!appendLater.isEmpty()) {
+        webView.getEngine().getLoadWorker().stateProperty().addListener((observableValue, oldState, newState) -> {
+            if (newState == Worker.State.SUCCEEDED) {
+                initialized = true;
+                webView.prefHeightProperty().bind(stage.heightProperty());
+                webView.prefWidthProperty().bind(stage.widthProperty());
                 appendLog(appendLater);
-                appendLater.clear();
             }
-        }
+        });
+
+        webView.getEngine().load(getClass().getResource("/gearth/ui/logger/uilogger/logger.html").toString());
     }
+
 
     private static String cleanTextContent(String text) {
 //        // strips off all non-ASCII characters
@@ -84,7 +83,7 @@ public class UiLoggerController implements Initializable {
         return text.trim();
     }
 
-    public void appendMessage(HPacket packet, int types) {
+    public synchronized void appendMessage(HPacket packet, int types) {
         boolean isBlocked = (types & PacketLogger.MESSAGE_TYPE.BLOCKED.getValue()) != 0;
         boolean isReplaced = (types & PacketLogger.MESSAGE_TYPE.REPLACED.getValue()) != 0;
         boolean isIncoming = (types & PacketLogger.MESSAGE_TYPE.INCOMING.getValue()) != 0;
@@ -92,7 +91,7 @@ public class UiLoggerController implements Initializable {
         if (isIncoming && !viewIncoming) return;
         if (!isIncoming && !viewOutgoing) return;
 
-        ArrayList<Element> elements = new ArrayList<>();
+        StringBuilder packetHtml = new StringBuilder("<div>");
 
         String expr = packet.toExpression(isIncoming ? HMessage.Direction.TOCLIENT : HMessage.Direction.TOSERVER);
 
@@ -104,89 +103,89 @@ public class UiLoggerController implements Initializable {
                     packet.headerId()
             );
 
-            if ( message != null && !(viewMessageName && !viewMessageHash && message.getName() == null)) {
+            if (message != null && !(viewMessageName && !viewMessageHash && message.getName() == null)) {
                 if (viewMessageName && message.getName() != null) {
-                    elements.add(new Element("["+message.getName()+"]", "messageinfo"));
+                    packetHtml.append(divWithClass("[" + message.getName() + "]", "messageinfo"));
                 }
                 if (viewMessageHash) {
-                    elements.add(new Element("["+message.getHash()+"]", "messageinfo"));
+                    packetHtml.append(divWithClass("[" + message.getHash() + "]", "messageinfo"));
                 }
-                elements.add(new Element("\n", ""));
             }
         }
 
-        if (isBlocked) elements.add(new Element("[Blocked]\n", "blocked"));
-        else if (isReplaced) elements.add(new Element("[Replaced]\n", "replaced"));
+        if (isBlocked) packetHtml.append(divWithClass("[Blocked]", "blocked"));
+        else if (isReplaced) packetHtml.append(divWithClass("[Replaced]", "replaced"));
 
-        if (isIncoming) {
-            // handle skipped eventually
-            elements.add(new Element("Incoming[", "incoming"));
-            elements.add(new Element(String.valueOf(packet.headerId()), ""));
-            elements.add(new Element("]", "incoming"));
 
-            elements.add(new Element(" <- ", ""));
-            if (skiphugepackets && packet.length() > 4000) {
-                elements.add(new Element("<packet skipped>", "skipped"));
-            }
-            else {
-                elements.add(new Element(packet.toString(), "incoming"));
-            }
-        } else {
-            elements.add(new Element("Outgoing[", "outgoing"));
-            elements.add(new Element(String.valueOf(packet.headerId()), ""));
-            elements.add(new Element("]", "outgoing"));
+        packetHtml
+                .append("<div>")
+                .append(isIncoming ? spanWithClass("Incoming[", "incoming") :
+                        spanWithClass("Outgoing[", "outgoing"))
+                .append(packet.headerId())
+                .append(spanWithClass("]", isIncoming ? "incoming" : "outgoing"))
+                .append(isIncoming ? " <- " : " -> ")
+                .append(skiphugepackets && packet.length() > 4000 ?
+                        divWithClass("<packet skipped>", "skipped") :
+                        divWithClass(packet.toString(), isIncoming ? "incoming" : "outgoing"));
 
-            elements.add(new Element(" -> ", ""));
-
-            if (skiphugepackets && packet.length() > 8000) {
-                elements.add(new Element("<packet skipped>", "skipped"));
-            }
-            else {
-                elements.add(new Element(packet.toString(), "outgoing"));
-            }
-        }
 
         String cleaned = cleanTextContent(expr);
         if (cleaned.equals(expr)) {
             if (!expr.equals("") && displayStructure && packet.length() <= 2000)
-                elements.add(new Element("\n" + cleanTextContent(expr), "structure"));
+                packetHtml.append(divWithClass(cleanTextContent(expr), "structure"));
         }
 
 
-        elements.add(new Element("\n--------------------\n", ""));
+        packetHtml.append(divWithClass("--------------------", ""));
 
         synchronized (appendLater) {
             if (initialized) {
-                appendLog(elements);
-            }
-            else {
-                appendLater.addAll(elements);
+                appendLog(Collections.singletonList(packetHtml.toString()));
+            } else {
+                appendLater.add(packetHtml.toString());
             }
         }
-
     }
 
-    private synchronized void appendLog(List<Element> elements) {
+    private synchronized void appendLog(List<String> html) {
         Platform.runLater(() -> {
-            StringBuilder sb = new StringBuilder();
-            StyleSpansBuilder<Collection<String>> styleSpansBuilder = new StyleSpansBuilder<>(0);
-
-            for (Element element : elements) {
-                sb.append(element.text);
-
-                styleSpansBuilder.add(Collections.singleton(element.className), element.text.length());
-            }
-
-            int oldLen = area.getLength();
-            area.appendText(sb.toString());
-//            System.out.println(sb.toString());
-            area.setStyleSpans(oldLen, styleSpansBuilder.create());
+            String script = "document.getElementById('output').innerHTML += '" + String.join("", html) + "';";
+            webView.getEngine().executeScript(script);
 
             if (autoScroll) {
-//                area.moveTo(area.getLength());
-                area.requestFollowCaret();
+                executejQuery(webView.getEngine(), "$('html, body').animate({scrollTop:$(document).height()}, 'slow');");
             }
         });
+    }
+
+    // escapes logger text so that there are no javascript errors
+    private String escapeMessage(String text) {
+        return text
+                .replace("\n\r", "<br />")
+                .replace("\n", "<br />")
+                .replace("\r", "<br />")
+                .replace("'", "\\'");
+    }
+
+    private static Object executejQuery(final WebEngine engine, String script) {
+        return engine.executeScript(
+                "(function(window, document, version, callback) { "
+                        + "var j, d;"
+                        + "var loaded = false;"
+                        + "if (!(j = window.jQuery) || version > j.fn.jquery || callback(j, loaded)) {"
+                        + " var script = document.createElement(\"script\");"
+                        + " script.type = \"text/javascript\";"
+                        + " script.src = \"http://code.jquery.com/jquery-1.7.2.min.js\";"
+                        + " script.onload = script.onreadystatechange = function() {"
+                        + " if (!loaded && (!(d = this.readyState) || d == \"loaded\" || d == \"complete\")) {"
+                        + " callback((j = window.jQuery).noConflict(1), loaded = true);"
+                        + " j(script).remove();"
+                        + " }"
+                        + " };"
+                        + " document.documentElement.childNodes[0].appendChild(script) "
+                        + "} "
+                        + "})(window, document, \"1.7.2\", function($, jquery_loaded) {" + script + "});"
+        );
     }
 
     public void setStage(Stage stage) {
@@ -233,6 +232,14 @@ public class UiLoggerController implements Initializable {
     }
 
     public void clearText(ActionEvent actionEvent) {
-        area.clear();
+        executejQuery(webView.getEngine(), "$('#output').empty();");
+    }
+
+    private String divWithClass(String content, String klass) {
+        return escapeMessage("<div class=\"" + klass + "\">" + content + "</div>");
+    }
+
+    private String spanWithClass(String content, String klass) {
+        return escapeMessage("<span class=\"" + klass + "\">" + content + "</span>");
     }
 }
