@@ -1,5 +1,6 @@
 package gearth.services.unity_tools;
 
+import org.codehaus.plexus.util.FileUtils;
 import wasm.disassembly.InvalidOpCodeException;
 
 import java.io.*;
@@ -46,7 +47,11 @@ public class UnityWebModifyer {
 
         } catch (Exception e) {
             e.printStackTrace();
-            saveFolder.delete();
+            try {
+                FileUtils.deleteDirectory(saveFolder);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
             return false;
         }
         return true;
