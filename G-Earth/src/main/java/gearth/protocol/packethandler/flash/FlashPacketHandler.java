@@ -32,10 +32,13 @@ public abstract class FlashPacketHandler extends PacketHandler {
     private volatile List<Byte> tempEncryptedBuffer = new ArrayList<>();
     volatile boolean isEncryptedStream = false;
 
+    private final PayloadBuffer payloadBuffer;
+
 
     FlashPacketHandler(OutputStream outputStream, Object[] trafficObservables, ExtensionHandler extensionHandler) {
         super(extensionHandler, trafficObservables);
         out = outputStream;
+        this.payloadBuffer = new PayloadBuffer();
     }
 
     public boolean isDataStream() {return isDataStream;}

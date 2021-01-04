@@ -11,14 +11,12 @@ public abstract class PacketHandler {
 
     protected final ExtensionHandler extensionHandler;
     private final Object[] trafficObservables; //get notified on packet send
-    protected final PayloadBuffer payloadBuffer;
     protected volatile int currentIndex = 0;
     protected final Object sendLock = new Object();
 
     protected PacketHandler(ExtensionHandler extensionHandler, Object[] trafficObservables) {
         this.extensionHandler = extensionHandler;
         this.trafficObservables = trafficObservables;
-        this.payloadBuffer = new PayloadBuffer();
     }
 
 
