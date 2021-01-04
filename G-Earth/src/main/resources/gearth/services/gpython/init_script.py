@@ -3,8 +3,8 @@ from time import sleep
 from g_python.gextension import Extension
 from g_python.hmessage import Direction, HMessage
 from g_python.hpacket import HPacket
-from g_python import hparsers
-from g_python import htools
+from g_python import hparsers, hunityparsers
+from g_python import htools, hunitytools
 
 extension_info = {"title": "$G_PYTHON_SHELL_TITLE$", "description": "G-Python scripting console", "version": "1.0", "author": ""}
 
@@ -24,7 +24,7 @@ def send_to_server(packet): return ext.send_to_server(packet)
 def on_event(event_name: str, func): return ext.on_event(event_name, func)
 
 
-def intercept(direction: Direction, callback, id=-1): return ext.intercept(direction, callback, id)
+def intercept(direction: Direction, callback, id=-1, mode='default'): return ext.intercept(direction, callback, id, mode)
 
 
 def start(): return ext.start()
