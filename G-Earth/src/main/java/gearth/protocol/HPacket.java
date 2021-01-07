@@ -491,6 +491,7 @@ public class HPacket implements StringifyAble {
         return this;
     }
     public HPacket appendString(String s) {
+        s = new String(s.getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1);
         return appendString(s, StandardCharsets.ISO_8859_1);
     }
 
