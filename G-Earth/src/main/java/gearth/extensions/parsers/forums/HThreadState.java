@@ -2,7 +2,7 @@ package gearth.extensions.parsers.forums;
 
 public enum HThreadState {
     OPEN(0),
-    HIDDEN_BY_ADMIN(10), //DELETED
+    HIDDEN_BY_ADMIN(10),
     HIDDEN_BY_STAFF(20);
 
     public final int state;
