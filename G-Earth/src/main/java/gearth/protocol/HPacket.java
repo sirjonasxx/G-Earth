@@ -491,7 +491,6 @@ public class HPacket implements StringifyAble {
         return this;
     }
     public HPacket appendString(String s) {
-        s = new String(s.getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1);
         return appendString(s, StandardCharsets.ISO_8859_1);
     }
 
@@ -516,7 +515,7 @@ public class HPacket implements StringifyAble {
             appendInt((Integer)o);
         }
         else if (o instanceof String) {
-            appendString((String)o);
+            appendString((String)o, StandardCharsets.UTF_8);
         }
         else if (o instanceof Boolean) {
             appendBoolean((Boolean) o);
