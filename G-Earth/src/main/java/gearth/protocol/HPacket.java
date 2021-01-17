@@ -514,6 +514,9 @@ public class HPacket implements StringifyAble {
         else if (o instanceof Integer) {
             appendInt((Integer)o);
         }
+        else if (o instanceof Short) {
+            appendShort((Short)o);
+        }
         else if (o instanceof String) {
             appendString((String)o, StandardCharsets.UTF_8);
         }
