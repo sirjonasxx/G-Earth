@@ -515,7 +515,7 @@ public class HPacket implements StringifyAble {
             appendInt((Integer)o);
         }
         else if (o instanceof String) {
-            appendString((String)o);
+            appendString((String)o, StandardCharsets.UTF_8);
         }
         else if (o instanceof Boolean) {
             appendBoolean((Boolean) o);
