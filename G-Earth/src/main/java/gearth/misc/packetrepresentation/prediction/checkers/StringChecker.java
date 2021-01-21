@@ -64,13 +64,29 @@ public class StringChecker extends TypeChecker<String> {
         };
 
         for (int i = 0; i < s.length(); i++) {
-            score *= penalties[isCommon(
-                    asChars[i],
-                    asBytes[i]
-            )];
 
-            if (score < 0.001) {
-                return 0;
+            // detect UTF8 extended chars
+            if ((asBytes[i] & 0b11100000) == 0b11000000 && i < s.length() - 1 && (asBytes[i+1] & 0b11000000) == 0b10000000) {
+                i += 1;
+                score *= penalties[2]*penalties[2];
+            }
+            else if ((asBytes[i] & 0b11110000) == 0b11100000 && i < s.length() - 2 && (asBytes[i+1] & 0b11000000) == 0b10000000 && (asBytes[i+2] & 0b11000000) == 0b10000000) {
+                i += 2;
+                score *= penalties[2]*penalties[2]*penalties[2];
+            }
+            else if ((asBytes[i] & 0b11111000) == 0b11110000 && i < s.length() - 3 && (asBytes[i+1] & 0b11000000) == 0b10000000 && (asBytes[i+2] & 0b11000000) == 0b10000000 && (asBytes[i+3] & 0b11000000) == 0b10000000) {
+                i += 3;
+                score *= penalties[2]*penalties[2]*penalties[2]*penalties[2];
+            }
+            else {
+                score *= penalties[isCommon(
+                        asChars[i],
+                        asBytes[i]
+                )];
+
+                if (score < 0.001) {
+                    return 0;
+                }
             }
         }
 
