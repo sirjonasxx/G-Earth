@@ -149,6 +149,15 @@ public class HPacket implements StringifyAble {
         return java.nio.ByteBuffer.wrap(packetInBytes).getDouble(index);
     }
 
+    public float readFloat(){
+        float result = readFloat(readIndex);
+        readIndex += 4;
+        return result;
+    }
+    public float readFloat(int index)	{
+        return java.nio.ByteBuffer.wrap(packetInBytes).getFloat(index);
+    }
+
     public int length()	{
         return readInteger(0);
     }
@@ -259,6 +268,14 @@ public class HPacket implements StringifyAble {
         isEdited = true;
         ByteBuffer b = ByteBuffer.allocate(8).putDouble(d);
         for (int j = 0; j < 8; j++) {
+            packetInBytes[index + j] = b.array()[j];
+        }
+        return this;
+    }
+    public HPacket replaceFloat(int index, float f) {
+        isEdited = true;
+        ByteBuffer b = ByteBuffer.allocate(4).putFloat(f);
+        for (int j = 0; j < 4; j++) {
             packetInBytes[index + j] = b.array()[j];
         }
         return this;
@@ -443,6 +460,16 @@ public class HPacket implements StringifyAble {
         fixLength();
         return this;
     }
+    public HPacket appendFloat(float f) {
+        isEdited = true;
+        packetInBytes = Arrays.copyOf(packetInBytes, packetInBytes.length + 4);
+        ByteBuffer byteBuffer = ByteBuffer.allocate(4).putFloat(f);
+        for (int j = 0; j < 4; j++) {
+            packetInBytes[packetInBytes.length - 4 + j] = byteBuffer.array()[j];
+        }
+        fixLength();
+        return this;
+    }
     public HPacket appendByte(byte b) {
         isEdited = true;
         packetInBytes = Arrays.copyOf(packetInBytes, packetInBytes.length + 1);
@@ -526,6 +553,12 @@ public class HPacket implements StringifyAble {
         else if (o instanceof Long) {
             appendLong((Long) o);
         }
+        else if (o instanceof Float) {
+            appendFloat((Float) o);
+        }
+        else if (o instanceof Double) {
+            appendDouble((Double) o);
+        }
         else {
             throw new InvalidParameterException();
         }
@@ -607,17 +640,5 @@ public class HPacket implements StringifyAble {
 
         HPacket packet2 = (HPacket) object;
         return Arrays.equals(packetInBytes, packet2.packetInBytes) && (isEdited == packet2.isEdited);
-    }
-
-    public static void main(String[] args) {
-        HPacket packet = new HPacket("{l}{h:4564}{i:3}{i:0}{s:\"hi\"}{i:0}{i:1}{s:\"how\"}{i:3}{b:1}{b:2}{b:3}{i:2}{s:\"r u\"}{i:1}{b:120}{i:2}{b:true}{d:1.4}");
-
-        String str = PacketStringUtils.toExpressionFromGivenStructure(packet, "i(isi(b))iBd");
-
-        HPacket packetverify = new HPacket(str);
-
-        System.out.println(str);
-        System.out.println(packetverify.toString().equals(packet.toString()));
-
     }
 }

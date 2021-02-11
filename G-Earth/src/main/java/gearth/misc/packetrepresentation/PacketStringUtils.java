@@ -208,6 +208,7 @@ public class PacketStringUtils {
                             .replace("\r", "\\r")   // CR -> \r
             ).append("\"}");
             else if (c == 'd') builder.append("{d:").append(p.readDouble()).append('}');
+            else if (c == 'f') builder.append("{f:").append(p.readFloat()).append('}');
             else if (c == 'b') builder.append("{b:").append(p.readByte()).append('}');
             else if (c == 'B') builder.append("{b:").append(p.readBoolean()).append('}');
             else if (c == 'l') builder.append("{l:").append(p.readLong()).append('}');
