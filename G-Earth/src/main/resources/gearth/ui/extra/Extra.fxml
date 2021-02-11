@@ -129,12 +129,12 @@
                 <RowConstraints minHeight="20.0" prefHeight="34.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <RadioButton fx:id="rd_unity" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" selected="true" text="Unity" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS">
+                  <RadioButton fx:id="rd_unity" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Unity" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS">
                      <toggleGroup>
                         <ToggleGroup fx:id="tgl_clientMode" />
                      </toggleGroup>
                   </RadioButton>
-                  <RadioButton fx:id="rd_flash" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Flash" toggleGroup="$tgl_clientMode" GridPane.columnIndex="2" />
+                  <RadioButton fx:id="rd_flash" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" selected="true" text="Flash" toggleGroup="$tgl_clientMode" GridPane.columnIndex="2" />
                   <RadioButton disable="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Anime" GridPane.columnIndex="3" />
                </children>
                <GridPane.margin>
