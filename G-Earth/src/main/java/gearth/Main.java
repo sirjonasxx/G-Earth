@@ -57,17 +57,17 @@ public class Main extends Application {
             System.exit(0);
         });
 
-//        new Thread(() -> {
-//            if (!AdminValidator.isAdmin()) {
-//                Platform.runLater(() -> {
-//                    Alert alert = new Alert(Alert.AlertType.ERROR, "G-Earth needs admin privileges in order to work properly, please restart G-Earth with admin permissions unless you know what you're doing", ButtonType.OK);
-//                    alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
-//                    alert.setResizable(false);
-//                    alert.show();
-//                });
-//
-//            }
-//        }).start();
+        new Thread(() -> {
+            if (!AdminValidator.isAdmin()) {
+                Platform.runLater(() -> {
+                    Alert alert = new Alert(Alert.AlertType.WARNING, "G-Earth needs admin privileges in order to work on Flash, please restart G-Earth with admin permissions unless you're using Unity", ButtonType.OK);
+                    alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+                    alert.setResizable(false);
+                    alert.show();
+                });
+
+            }
+        }).start();
 
         new Thread(() -> {
             try {
