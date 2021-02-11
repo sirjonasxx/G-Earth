@@ -35,6 +35,7 @@ public class ProxyProviderFactory {
         autoDetectHosts.add("game-nl.habbo.com:30000");
         autoDetectHosts.add("game-tr.habbo.com:30000");
         autoDetectHosts.add("game-us.habbo.com:38101");
+        autoDetectHosts.add("game-s2.habbo.com:30000");
 
         List<Object> additionalCachedHotels = Cacher.getList(HOTELS_CACHE_KEY);
         if (additionalCachedHotels != null) {
