@@ -3,11 +3,13 @@ package gearth.ui.connection;
 import gearth.misc.Cacher;
 import gearth.protocol.connection.HState;
 import gearth.protocol.connection.proxy.ProxyProviderFactory;
+import gearth.services.Constants;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.scene.control.*;
 import gearth.protocol.HConnection;
 import gearth.ui.SubForm;
+import javafx.scene.layout.GridPane;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -35,7 +37,27 @@ public class ConnectionController extends SubForm {
     private final Object lock = new Object();
     private volatile int fullyInitialized = 0;
 
+
+    public static final String USE_UNITY_CLIENT_CACHE_KEY = "use_unity";
+    public ToggleGroup tgl_clientMode;
+    public RadioButton rd_unity;
+    public RadioButton rd_flash;
+    public GridPane grd_clientSelection;
+
     public void initialize() {
+
+        Constants.UNITY_PACKETS = rd_unity.isSelected();
+        tgl_clientMode.selectedToggleProperty().addListener(observable -> {
+            changeClientMode();
+            Constants.UNITY_PACKETS = rd_unity.isSelected();
+        });
+
+        if (Cacher.getCacheContents().has(USE_UNITY_CLIENT_CACHE_KEY)) {
+            rd_unity.setSelected(Cacher.getCacheContents().getBoolean(USE_UNITY_CLIENT_CACHE_KEY));
+            rd_flash.setSelected(!Cacher.getCacheContents().getBoolean(USE_UNITY_CLIENT_CACHE_KEY));
+        }
+
+
         Object object;
         String hostRemember = null;
         String portRemember = null;
@@ -95,6 +117,7 @@ public class ConnectionController extends SubForm {
     }
 
     private void updateInputUI() {
+        grd_clientSelection.setDisable(getHConnection().getState() != HState.NOT_CONNECTED);
         txtfield_hotelversion.setText(getHConnection().getHotelVersion());
 
         btnConnect.setDisable(getHConnection().getState() == HState.PREPARING || getHConnection().getState() == HState.ABORTING);
@@ -193,6 +216,7 @@ public class ConnectionController extends SubForm {
 
     @Override
     protected void onExit() {
+        Cacher.put(USE_UNITY_CLIENT_CACHE_KEY, rd_unity.isSelected());
         getHConnection().abort();
     }
 
@@ -201,6 +225,6 @@ public class ConnectionController extends SubForm {
     }
 
     private boolean useFlash() {
-        return parentController.extraController.rd_flash.isSelected();
+        return rd_flash.isSelected();
     }
 }
