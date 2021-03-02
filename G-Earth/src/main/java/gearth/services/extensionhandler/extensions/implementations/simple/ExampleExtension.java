@@ -83,7 +83,7 @@ public class ExampleExtension extends GEarthExtension {
     }
 
     @Override
-    public void connectionStart(String host, int port, String hotelVersion, String harbleMessagesPath) {
+    public void connectionStart(String host, int port, String hotelVersion, String clientType, String harbleMessagesPath) {
         // a new habbo client has connected
         System.out.println("Connected to " + host);
     }

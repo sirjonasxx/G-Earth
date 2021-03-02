@@ -190,13 +190,14 @@ public class NetworkExtension extends GEarthExtension {
     }
 
     @Override
-    public void connectionStart(String host, int port, String hotelVersion, String harbleMessagesPath) {
+    public void connectionStart(String host, int port, String hotelVersion, String clientType, String harbleMessagesPath) {
         sendMessage(
                 new HPacket(NetworkExtensionInfo.OUTGOING_MESSAGES_IDS.CONNECTIONSTART)
                         .appendString(host)
                         .appendInt(port)
                         .appendString(hotelVersion)
                         .appendString(harbleMessagesPath)
+                        .appendString(clientType)
         );
     }
 

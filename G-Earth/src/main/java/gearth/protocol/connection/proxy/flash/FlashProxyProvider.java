@@ -51,9 +51,9 @@ public abstract class FlashProxyProvider implements ProxyProvider {
 
         Semaphore abort = new Semaphore(0);
 
-        outgoingHandler.addOnDatastreamConfirmedListener(hotelVersion -> {
+        outgoingHandler.addOnDatastreamConfirmedListener((hotelVersion, clientType) -> {
             incomingHandler.setAsDataStream();
-            proxy.verifyProxy(incomingHandler, outgoingHandler, hotelVersion);
+            proxy.verifyProxy(incomingHandler, outgoingHandler, hotelVersion, clientType);
             proxySetter.setProxy(proxy);
             datastream[0] = true;
             abortSemaphore = abort;

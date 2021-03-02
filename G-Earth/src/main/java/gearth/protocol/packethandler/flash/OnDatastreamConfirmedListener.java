@@ -2,6 +2,6 @@ package gearth.protocol.packethandler.flash;
 
 public interface OnDatastreamConfirmedListener {
 
-    void confirm(String hotelVersion);
+    void confirm(String hotelVersion, String clientType);
 
 }

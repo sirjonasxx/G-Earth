@@ -38,7 +38,7 @@ public abstract class GEarthExtension {
     public abstract void doubleclick();
     public abstract void packetIntercept(HMessage hMessage);
     public abstract void provideFlags(String[] flags);
-    public abstract void connectionStart(String host, int port, String hotelVersion, String harbleMessagesPath);
+    public abstract void connectionStart(String host, int port, String hotelVersion, String clientType, String harbleMessagesPath);
     public abstract void connectionEnd();
     public abstract void init();
     public abstract void close();

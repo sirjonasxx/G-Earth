@@ -29,7 +29,7 @@ public class HashSupport {
     public HashSupport(IExtension extension) {
         this.extension = extension;
 
-        extension.onConnect((host, port, hotelversion, cachePath) -> {
+        extension.onConnect((host, port, hotelversion, clientType, cachePath) -> {
 //            synchronized (lock) {
             harbleAPI = new HarbleAPI(new File(cachePath));
 //            }

@@ -172,6 +172,13 @@ public class HConnection {
         return proxy.getHotelVersion();
     }
 
+    public String getClientType() {
+        if (proxy == null) {
+            return "";
+        }
+        return proxy.getClientType();
+    }
+
     public boolean isRawIpMode() {
         return proxyProvider != null && proxyProvider instanceof LinuxRawIpFlashProxyProvider;
         // WindowsRawIpProxyProvider extends LinuxRawIpProxyProvider

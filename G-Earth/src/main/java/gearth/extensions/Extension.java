@@ -3,6 +3,7 @@ package gearth.extensions;
 import gearth.misc.listenerpattern.Observable;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
+import gearth.services.Constants;
 import gearth.services.extensionhandler.extensions.implementations.network.NetworkExtensionInfo;
 
 import java.io.*;
@@ -140,7 +141,9 @@ public abstract class Extension implements IExtension {
                     int connectionPort = packet.readInteger();
                     String hotelVersion = packet.readString();
                     String harbleMessagesPath = packet.readString();
-                    onConnectionObservable.fireEvent(l -> l.onConnection(host, connectionPort, hotelVersion, harbleMessagesPath));
+                    String clientType = packet.readString();
+                    Constants.UNITY_PACKETS = clientType.toLowerCase().contains("unity");
+                    onConnectionObservable.fireEvent(l -> l.onConnection(host, connectionPort, hotelVersion, clientType, harbleMessagesPath));
                     onStartConnection();
                 }
                 else if (packet.headerId() == NetworkExtensionInfo.OUTGOING_MESSAGES_IDS.CONNECTIONEND) {

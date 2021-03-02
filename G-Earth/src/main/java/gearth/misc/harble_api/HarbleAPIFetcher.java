@@ -38,9 +38,9 @@ public class HarbleAPIFetcher {
     //latest fetched
     public static HarbleAPI HARBLEAPI = null;
 
-    public synchronized static void fetch(String hotelversion) {
+    public synchronized static void fetch(String hotelversion, String clientType) {
         // if unity
-        if (!(hotelversion.toLowerCase().contains("production") || hotelversion.toLowerCase().contains("release"))) {
+        if (clientType.toLowerCase().contains("unity")) {
             try {
                 HARBLEAPI = new HarbleAPI(
                         new File(new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI())
@@ -76,13 +76,5 @@ public class HarbleAPIFetcher {
             }
 
         }
-    }
-
-    public static void main(String[] args) {
-        fetch("PRODUCTION-201901141210-114421986");
-
-        HarbleAPI api = HARBLEAPI;
-        HarbleAPI.HarbleMessage haMessage = api.getHarbleMessageFromHeaderId(HMessage.Direction.TOSERVER, 525);
-        System.out.println(haMessage);
     }
 }
