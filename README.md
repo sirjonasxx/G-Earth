@@ -7,6 +7,8 @@ Habbo packet logger & manipulator for Windows, Linux and Mac.
 
 Join the G-Earth [Discord server](https://discord.gg/AVkcF8y)
 
+**Download the [chrome extension](https://chrome.google.com/webstore/detail/g-chrome/cdjgbghobmfmfcenhoahgfnfpcadddag) if you're using Unity**
+
 # Windows execution
 Double click G-Earth.exe, which will be delivered in the release. Double clicking the .jar file might work as well.
 
@@ -17,7 +19,7 @@ Execution command:
 Additionally, you can add the -t flag to log the packets in your terminal instead of opening a new window for it.
 
 # Mac execution
-[MacOs Installation guide](https://github.com/sirjonasxx/G-Earth/wiki/macOs-Installation-guide)
+[MacOs Installation guide](https://github.com/sirjonasxx/G-Earth/wiki/macOs-Installation-guide) (flash only)
 
 # Features
 * Log outgoing and incoming packets
