@@ -43,7 +43,7 @@ _(hint: to save this script: `%save all_signs 23-24`)_
 
 ![example 2](https://i.imgur.com/xo6GhOi.png)
 
-_(hint: if you're going to `sleep()` during an `intercept()` callback, create a new thread first, or all incoming/outgoing packet flow will be paused)_
+_(hint: if you're going to `sleep()` during an `intercept()` callback, do an asynchronous intercept (check g-python repo), or all incoming/outgoing packet flow will be paused)_
 
 _(hint: in the method signature `def on_speech(message: HMessage)`, `: HMessage` isn't required but makes auto-completion easier)_
 
