@@ -55,7 +55,7 @@ public class ChatConsole {
             }
         });
 
-        hashSupport.intercept(HMessage.Direction.TOCLIENT, "Friends", hMessage -> {
+        hashSupport.intercept(HMessage.Direction.TOCLIENT, "FriendListFragment", hMessage -> {
             if (doOncePerConnection[0]) {
                 doOncePerConnection[0] = false;
 
@@ -71,7 +71,7 @@ public class ChatConsole {
             }
         });
 
-        hashSupport.intercept(HMessage.Direction.TOSERVER, "FriendPrivateMessage", hMessage -> {
+        hashSupport.intercept(HMessage.Direction.TOSERVER, "SendMsg", hMessage -> {
             HPacket packet = hMessage.getPacket();
             if (packet.readInteger() == chatid) {
                 hMessage.setBlocked(true);
@@ -87,7 +87,7 @@ public class ChatConsole {
     }
 
     private void createChat() {
-        hashSupport.sendToClient("UpdateFriend",
+        hashSupport.sendToClient("FriendListUpdate",
                 0, 1, 0, chatid, " [G-Earth] - " + name,
                 1, true, false, "ha-1015-64.hd-209-30.cc-260-64.ch-235-64.sh-305-64.lg-285-64",
                 0, "", 0, true, false, true, ""
@@ -100,10 +100,10 @@ public class ChatConsole {
 
     public void writeOutput(String string, boolean asInvite) {
         if (asInvite) {
-            hashSupport.sendToClient("ReceiveInvitation", chatid, string);
+            hashSupport.sendToClient("RoomInvite", chatid, string);
         }
         else {
-            hashSupport.sendToClient("ReceivePrivateMessage", chatid, string, 0, "");
+            hashSupport.sendToClient("NewConsole", chatid, string, 0, "");
         }
     }
 
