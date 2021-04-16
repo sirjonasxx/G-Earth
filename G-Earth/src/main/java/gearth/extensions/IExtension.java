@@ -3,9 +3,6 @@ package gearth.extensions;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 
-/**
- * Created by Jeunez on 17/11/2018.
- */
 public interface IExtension {
 
     boolean sendToClient(HPacket packet);
