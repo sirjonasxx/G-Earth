@@ -28,7 +28,7 @@ import java.util.Set;
 public class Main extends Application {
 
     public static Application main;
-    public static String version = "1.3.3";
+    public static String version = "1.3.4";
     private static String gitApi = "https://api.github.com/repos/sirjonasxx/G-Earth/releases/latest";
 
     @Override
