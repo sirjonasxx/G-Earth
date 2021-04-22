@@ -35,6 +35,8 @@ public class PacketInfoManager {
     }
 
     private void addMessage(PacketInfo packetInfo) {
+        if (packetInfo.getHash() == null && packetInfo.getName() == null) return;
+
         Map<Integer, List<PacketInfo>> headerIdToMessage =
                 packetInfo.getDestination() == HMessage.Direction.TOCLIENT
                         ? headerIdToMessage_incoming :

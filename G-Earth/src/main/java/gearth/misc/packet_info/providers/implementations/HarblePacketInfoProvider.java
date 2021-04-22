@@ -4,9 +4,12 @@ import gearth.misc.Cacher;
 import gearth.misc.packet_info.PacketInfo;
 import gearth.misc.packet_info.providers.PacketInfoProvider;
 import gearth.misc.packet_info.providers.RemotePacketInfoProvider;
+import gearth.protocol.HMessage;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 public class HarblePacketInfoProvider extends RemotePacketInfoProvider {
@@ -28,8 +31,48 @@ public class HarblePacketInfoProvider extends RemotePacketInfoProvider {
         return CACHE_PREFIX + hotelVersion;
     }
 
+    private PacketInfo jsonToPacketInfo(JSONObject object, HMessage.Direction destination) {
+        String name;
+        String hash;
+        String structure;
+        try { name = object.getString("Name"); }
+        catch (Exception e) { name = null; }
+        try { hash = object.getString("Hash"); }
+        catch (Exception e) { hash = null; }
+        try { structure = object.getString("Structure");
+        } catch (Exception e) { structure = null; }
+
+        int headerId;
+        try {headerId = object.getInt("Id"); }
+        catch (Exception e) { headerId = Integer.parseInt(object.getString("Id")); }
+
+        return new PacketInfo(destination, headerId, hash, name, structure);
+    }
+
     @Override
     protected List<PacketInfo> parsePacketInfo(JSONObject jsonObject) {
-        return null;
+        List<PacketInfo> packetInfos = new ArrayList<>();
+
+        try {
+            JSONArray incoming = jsonObject.getJSONArray("Incoming");
+            JSONArray outgoing = jsonObject.getJSONArray("Outgoing");
+
+            if (incoming != null && outgoing != null) {
+                for (int i = 0; i < incoming.length(); i++) {
+                    JSONObject jsonInfo = incoming.getJSONObject(i);
+                    PacketInfo packetInfo = jsonToPacketInfo(jsonInfo, HMessage.Direction.TOCLIENT);
+                    packetInfos.add(packetInfo);
+                }
+                for (int i = 0; i < outgoing.length(); i++) {
+                    JSONObject jsonInfo = outgoing.getJSONObject(i);
+                    PacketInfo packetInfo = jsonToPacketInfo(jsonInfo, HMessage.Direction.TOSERVER);
+                    packetInfos.add(packetInfo);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return packetInfos;
     }
 }

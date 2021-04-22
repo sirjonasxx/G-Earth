@@ -2,8 +2,11 @@ package gearth.misc.packet_info.providers.implementations;
 
 import gearth.misc.packet_info.PacketInfo;
 import gearth.misc.packet_info.providers.RemotePacketInfoProvider;
+import gearth.protocol.HMessage;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SulekPacketInfoProvider extends RemotePacketInfoProvider {
@@ -25,8 +28,36 @@ public class SulekPacketInfoProvider extends RemotePacketInfoProvider {
         return CACHE_PREFIX + hotelVersion;
     }
 
+    private PacketInfo jsonToPacketInfo(JSONObject object, HMessage.Direction destination) {
+        int headerId = object.getInt("id");
+        String name = object.getString("name")
+                .replaceAll("(((Message)?Composer)|((Message)?Event))$", "");
+
+        return new PacketInfo(destination, headerId, null, name, null);
+    }
+
     @Override
     protected List<PacketInfo> parsePacketInfo(JSONObject jsonObject) {
-        return null;
+        List<PacketInfo> packetInfos = new ArrayList<>();
+
+        try {
+            JSONArray incoming = jsonObject.getJSONObject("messages").getJSONArray("incoming");
+            JSONArray outgoing = jsonObject.getJSONObject("messages").getJSONArray("outgoing");
+
+            for (int i = 0; i < incoming.length(); i++) {
+                JSONObject jsonInfo = incoming.getJSONObject(i);
+                PacketInfo packetInfo = jsonToPacketInfo(jsonInfo, HMessage.Direction.TOCLIENT);
+                packetInfos.add(packetInfo);
+            }
+            for (int i = 0; i < outgoing.length(); i++) {
+                JSONObject jsonInfo = outgoing.getJSONObject(i);
+                PacketInfo packetInfo = jsonToPacketInfo(jsonInfo, HMessage.Direction.TOSERVER);
+                packetInfos.add(packetInfo);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return packetInfos;
     }
 }
