@@ -16,7 +16,7 @@ import java.util.Map;
 /**
  * Created by Jonas on 10/11/2018.
  */
-public class HarbleAPI {
+public class PacketInfoManager {
 
     public class HarbleMessage {
         private HMessage.Direction destination;
@@ -78,15 +78,15 @@ public class HarbleAPI {
      * @param hotelversion
      */
 
-    public static HarbleAPI get(String hotelversion) {
-        HarbleAPI wannabe = new HarbleAPI(hotelversion);
+    public static PacketInfoManager get(String hotelversion) {
+        PacketInfoManager wannabe = new PacketInfoManager(hotelversion);
         if (!wannabe.success) {
             return null;
         }
         return wannabe;
     }
 
-    public HarbleAPI(String hotelversion) {
+    public PacketInfoManager(String hotelversion) {
         String possibleCachedMessagesPath = HarbleAPIFetcher.CACHE_PREFIX + hotelversion;
         if (Cacher.cacheFileExists(possibleCachedMessagesPath)) {
             JSONObject object = Cacher.getCacheContents(possibleCachedMessagesPath);
@@ -96,7 +96,7 @@ public class HarbleAPI {
         }
     }
 
-    public HarbleAPI(File f) {
+    public PacketInfoManager(File f) {
         if (f.exists() && !f.isDirectory()) {
             try {
                 String contents = String.join("\n", Files.readAllLines(f.toPath()));

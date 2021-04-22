@@ -1,12 +1,11 @@
 package gearth.protocol;
 
 import gearth.misc.StringifyAble;
-import gearth.misc.harble_api.HarbleAPI;
+import gearth.misc.harble_api.PacketInfoManager;
 import gearth.misc.harble_api.HarbleAPIFetcher;
 import gearth.misc.packetrepresentation.InvalidPacketException;
 import gearth.misc.packetrepresentation.PacketStringUtils;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -581,7 +580,7 @@ public class HPacket implements StringifyAble {
     }
 
     private String getHarbleStructure(HMessage.Direction direction) {
-        HarbleAPI.HarbleMessage msg;
+        PacketInfoManager.HarbleMessage msg;
         if (HarbleAPIFetcher.HARBLEAPI != null &&
                 ((msg = HarbleAPIFetcher.HARBLEAPI.getHarbleMessageFromHeaderId(direction, headerId())) != null)) {
             if (msg.getStructure() != null && structureEquals(msg.getStructure())) {

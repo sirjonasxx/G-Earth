@@ -2,7 +2,7 @@ package gearth.extensions.extra.harble;
 
 import gearth.extensions.Extension;
 import gearth.extensions.IExtension;
-import gearth.misc.harble_api.HarbleAPI;
+import gearth.misc.harble_api.PacketInfoManager;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 
@@ -20,7 +20,7 @@ public class HashSupport {
 
     private final Object lock = new Object();
 
-    private HarbleAPI harbleAPI = new HarbleAPI(""); //empty
+    private PacketInfoManager packetInfoManager = new PacketInfoManager(""); //empty
     private Map<String, List<Extension.MessageListener>> incomingMessageListeners = new HashMap<>();
     private Map<String, List<Extension.MessageListener>> outgoingMessageListeners = new HashMap<>();
 
@@ -31,13 +31,13 @@ public class HashSupport {
 
         extension.onConnect((host, port, hotelversion, clientType, cachePath) -> {
 //            synchronized (lock) {
-            harbleAPI = new HarbleAPI(new File(cachePath));
+            packetInfoManager = new PacketInfoManager(new File(cachePath));
 //            }
         });
 
         extension.intercept(HMessage.Direction.TOSERVER, message -> {
 //            synchronized (lock) {
-                HarbleAPI.HarbleMessage haMessage = harbleAPI.getHarbleMessageFromHeaderId(HMessage.Direction.TOSERVER, message.getPacket().headerId());
+                PacketInfoManager.HarbleMessage haMessage = packetInfoManager.getHarbleMessageFromHeaderId(HMessage.Direction.TOSERVER, message.getPacket().headerId());
                 if (haMessage != null) {
                     List<Extension.MessageListener> listeners_hash = outgoingMessageListeners.get(haMessage.getHash());
                     List<Extension.MessageListener> listeners_name = outgoingMessageListeners.get(haMessage.getName());
@@ -58,7 +58,7 @@ public class HashSupport {
         });
         extension.intercept(HMessage.Direction.TOCLIENT, message -> {
 //            synchronized (lock) {
-                HarbleAPI.HarbleMessage haMessage = harbleAPI.getHarbleMessageFromHeaderId(HMessage.Direction.TOCLIENT, message.getPacket().headerId());
+                PacketInfoManager.HarbleMessage haMessage = packetInfoManager.getHarbleMessageFromHeaderId(HMessage.Direction.TOCLIENT, message.getPacket().headerId());
                 if (haMessage != null) {
                     List<Extension.MessageListener> listeners_hash = incomingMessageListeners.get(haMessage.getHash());
                     List<Extension.MessageListener> listeners_name = incomingMessageListeners.get(haMessage.getName());
@@ -91,12 +91,12 @@ public class HashSupport {
 
     private boolean send(HMessage.Direction direction, String hashOrName, Object... objects) {
         int headerId;
-        HarbleAPI.HarbleMessage fromname = harbleAPI.getHarbleMessageFromName(direction, hashOrName);
+        PacketInfoManager.HarbleMessage fromname = packetInfoManager.getHarbleMessageFromName(direction, hashOrName);
         if (fromname != null) {
             headerId = fromname.getHeaderId();
         }
         else {
-            List<HarbleAPI.HarbleMessage> possibilities = harbleAPI.getHarbleMessagesFromHash(direction, hashOrName);
+            List<PacketInfoManager.HarbleMessage> possibilities = packetInfoManager.getHarbleMessagesFromHash(direction, hashOrName);
             if (possibilities.size() == 0) return false;
             headerId = possibilities.get(0).getHeaderId();
         }
@@ -129,7 +129,7 @@ public class HashSupport {
         return send(HMessage.Direction.TOSERVER, hashOrName, objects);
     }
 
-    public HarbleAPI getHarbleAPI() {
-        return harbleAPI;
+    public PacketInfoManager getPacketInfoManager() {
+        return packetInfoManager;
     }
 }

@@ -1,13 +1,11 @@
 package gearth.ui.logger.loggerdisplays.uilogger;
 
-import gearth.misc.harble_api.HarbleAPI;
+import gearth.misc.harble_api.PacketInfoManager;
 import gearth.misc.harble_api.HarbleAPIFetcher;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 import gearth.ui.logger.loggerdisplays.PacketLogger;
 import javafx.application.Platform;
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
 import javafx.scene.control.CheckMenuItem;
@@ -96,8 +94,8 @@ public class UiLoggerController implements Initializable {
 
         lblHarbleAPI.setText("Messages: " + (HarbleAPIFetcher.HARBLEAPI == null ? "False" : "True"));
         if ((viewMessageName || viewMessageHash) && HarbleAPIFetcher.HARBLEAPI != null) {
-            HarbleAPI api = HarbleAPIFetcher.HARBLEAPI;
-            HarbleAPI.HarbleMessage message = api.getHarbleMessageFromHeaderId(
+            PacketInfoManager api = HarbleAPIFetcher.HARBLEAPI;
+            PacketInfoManager.HarbleMessage message = api.getHarbleMessageFromHeaderId(
                     (isIncoming ? HMessage.Direction.TOCLIENT : HMessage.Direction.TOSERVER),
                     packet.headerId()
             );
