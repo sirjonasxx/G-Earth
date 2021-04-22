@@ -59,12 +59,12 @@ public class UnityCommunicator {
             if (maybe.getBytesLength() > 6 && maybe.headerId() == 4000) {
                 hProxy = new HProxy(HClient.UNITY, "", "", -1, -1, "");
                 String ignore = maybe.readString();
-                String clientType = maybe.readString();
+                String clientIdentifier = maybe.readString();
                 hProxy.verifyProxy(
                         new UnityPacketHandler(hConnection.getExtensionHandler(), hConnection.getTrafficObservables(), session, HMessage.Direction.TOCLIENT),
                         new UnityPacketHandler(hConnection.getExtensionHandler(), hConnection.getTrafficObservables(), session, HMessage.Direction.TOSERVER),
                         revision,
-                        clientType
+                        clientIdentifier
                 );
                 proxySetter.setProxy(hProxy);
                 stateSetter.setState(HState.CONNECTED);

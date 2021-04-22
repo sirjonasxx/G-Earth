@@ -4,6 +4,7 @@ import gearth.misc.listenerpattern.Observable;
 import gearth.misc.listenerpattern.SynchronizedObservable;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
+import gearth.protocol.connection.HClient;
 import gearth.services.extensionhandler.extensions.listeners.OmRemoveClickListener;
 import gearth.services.extensionhandler.extensions.listeners.OnClickListener;
 import gearth.services.extensionhandler.extensions.listeners.OnDeleteListener;
@@ -38,7 +39,7 @@ public abstract class GEarthExtension {
     public abstract void doubleclick();
     public abstract void packetIntercept(HMessage hMessage);
     public abstract void provideFlags(String[] flags);
-    public abstract void connectionStart(String host, int port, String hotelVersion, String clientType, String harbleMessagesPath);
+    public abstract void connectionStart(String host, int port, String hotelVersion, String clientIdentifier, HClient clientType, String harbleMessagesPath);
     public abstract void connectionEnd();
     public abstract void init();
     public abstract void close();

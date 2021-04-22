@@ -26,9 +26,9 @@ public class OutgoingFlashPacketHandler extends FlashPacketHandler {
             HPacket hpacket = new HPacket(buffer);
             isDataStream = (hpacket.getBytesLength() > 6 && hpacket.length() < 100);
             if (isDataStream) {
-                String version = hpacket.readString();
-                String clientType = hpacket.readString();
-                datastreamConfirmedObservable.fireEvent(l -> l.confirm(version, clientType));
+                String hotelVersion = hpacket.readString();
+                String clientIdentifier = hpacket.readString();
+                datastreamConfirmedObservable.fireEvent(l -> l.confirm(hotelVersion, clientIdentifier));
             }
         }
     }

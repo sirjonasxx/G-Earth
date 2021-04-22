@@ -48,13 +48,14 @@ public class ExtensionHandler {
 
         hConnection.getStateObservable().addListener((oldState, newState) -> {
             if (newState == HState.CONNECTED) {
-                HarbleAPIFetcher.fetch(hConnection.getHotelVersion(), hConnection.getClientType());
+                HarbleAPIFetcher.fetch(hConnection.getHotelVersion(), hConnection.getClientIdentifier());
                 synchronized (gEarthExtensions) {
                     for (GEarthExtension extension : gEarthExtensions) {
                         extension.connectionStart(
                                 hConnection.getDomain(),
                                 hConnection.getServerPort(),
                                 hConnection.getHotelVersion(),
+                                hConnection.getClientIdentifier(),
                                 hConnection.getClientType(),
                                 HarbleAPIFetcher.HARBLEAPI == null ? "null" : HarbleAPIFetcher.HARBLEAPI.getPath()
                         );
@@ -244,6 +245,7 @@ public class ExtensionHandler {
                             hConnection.getDomain(),
                             hConnection.getServerPort(),
                             hConnection.getHotelVersion(),
+                            hConnection.getClientIdentifier(),
                             hConnection.getClientType(),
                             HarbleAPIFetcher.HARBLEAPI == null ? "null" : HarbleAPIFetcher.HARBLEAPI.getPath()
                     );

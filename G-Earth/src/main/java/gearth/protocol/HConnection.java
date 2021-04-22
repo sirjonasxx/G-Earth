@@ -1,10 +1,10 @@
 package gearth.protocol;
 
 import gearth.misc.listenerpattern.Observable;
+import gearth.protocol.connection.HClient;
 import gearth.protocol.connection.HProxy;
 import gearth.protocol.connection.HState;
 import gearth.protocol.connection.proxy.ProxyProvider;
-import gearth.protocol.connection.proxy.flash.FlashProxyProvider;
 import gearth.protocol.connection.proxy.ProxyProviderFactory;
 import gearth.protocol.connection.proxy.flash.unix.LinuxRawIpFlashProxyProvider;
 import gearth.protocol.connection.proxy.unity.UnityProxyProvider;
@@ -172,11 +172,18 @@ public class HConnection {
         return proxy.getHotelVersion();
     }
 
-    public String getClientType() {
+    public String getClientIdentifier() {
         if (proxy == null) {
             return "";
         }
-        return proxy.getClientType();
+        return proxy.getClientIdentifier();
+    }
+
+    public HClient getClientType() {
+        if (proxy == null) {
+            return null;
+        }
+        return proxy.gethClient();
     }
 
     public boolean isRawIpMode() {
