@@ -1,6 +1,8 @@
 package gearth.ui.logger.loggerdisplays.uilogger;
 
+import gearth.extensions.parsers.HDirection;
 import gearth.protocol.HConnection;
+import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 import gearth.ui.logger.loggerdisplays.PacketLogger;
 import javafx.event.ActionEvent;
@@ -95,7 +97,7 @@ public class UiLogger implements PacketLogger {
     }
 
     @Override
-    public void appendStructure(HPacket packet) {
+    public void appendStructure(HPacket packet, HMessage.Direction direction) {
 
     }
 }

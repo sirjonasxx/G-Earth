@@ -35,6 +35,7 @@ public class UiLoggerController implements Initializable {
     public CheckMenuItem chkMessageName;
     public CheckMenuItem chkMessageHash;
     public Label lblPacketInfo;
+    public CheckMenuItem chkUseNewStructures;
 
     private StyleClassedTextArea area;
 
@@ -156,8 +157,7 @@ public class UiLoggerController implements Initializable {
         }
 
         if (packet.length() <= 2000) {
-//            String expr = packet.toExpression(isIncoming ? HMessage.Direction.TOCLIENT : HMessage.Direction.TOSERVER);
-            String expr = packet.toExpression();
+            String expr = packet.toExpression(isIncoming ? HMessage.Direction.TOCLIENT : HMessage.Direction.TOSERVER, packetInfoManager, chkUseNewStructures.isSelected());
             String cleaned = cleanTextContent(expr);
             if (cleaned.equals(expr)) {
                 if (!expr.equals("") && displayStructure)

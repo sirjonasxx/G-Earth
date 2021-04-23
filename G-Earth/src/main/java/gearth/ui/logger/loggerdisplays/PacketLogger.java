@@ -1,6 +1,7 @@
 package gearth.ui.logger.loggerdisplays;
 
 import gearth.protocol.HConnection;
+import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 
 /**
@@ -33,6 +34,6 @@ public interface PacketLogger {
 
     void appendSplitLine();
     void appendMessage(HPacket packet, int types);
-    void appendStructure(HPacket packet);
+    void appendStructure(HPacket packet, HMessage.Direction direction);
 
 }

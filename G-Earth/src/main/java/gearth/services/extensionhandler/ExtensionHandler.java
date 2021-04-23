@@ -220,7 +220,7 @@ public class ExtensionHandler {
                         try {
                             s = packet.toString();
                             if (packet.length() < 3000) {
-                                expression = packet.toExpression();
+                                expression = packet.toExpression(hConnection.getPacketInfoManager(), true);
                             }
                         }
                         finally {

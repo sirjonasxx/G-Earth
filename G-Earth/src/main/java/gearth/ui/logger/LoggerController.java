@@ -1,5 +1,6 @@
 package gearth.ui.logger;
 
+import gearth.extensions.parsers.HDirection;
 import gearth.protocol.connection.HState;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -69,7 +70,7 @@ public class LoggerController extends SubForm {
             packetLogger.appendMessage(message.getPacket(), types);
 
             if (cbx_showstruct.isSelected() && message.getPacket().length() < packetLimit) {
-                packetLogger.appendStructure(message.getPacket());
+                packetLogger.appendStructure(message.getPacket(), message.getDestination());
             }
         });
         });

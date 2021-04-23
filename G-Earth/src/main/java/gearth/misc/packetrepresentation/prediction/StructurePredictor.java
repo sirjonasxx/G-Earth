@@ -65,13 +65,6 @@ public class StructurePredictor {
         structure = stringBuilder.reverse().toString();
     }
 
-    public String getExpression() {
-        if (structure == null) {
-            return "";
-        }
-        return PacketStringUtils.toExpressionFromGivenStructure(packet, structure);
-    }
-
     public String getStructure() {
         return structure;
     }

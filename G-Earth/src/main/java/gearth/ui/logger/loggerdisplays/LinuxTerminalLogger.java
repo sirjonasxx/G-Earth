@@ -1,5 +1,6 @@
 package gearth.ui.logger.loggerdisplays;
 
+import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 
 import java.util.HashMap;
@@ -60,8 +61,8 @@ class LinuxTerminalLogger extends SimpleTerminalLogger {
     }
 
     @Override
-    public void appendStructure(HPacket packet) {
-        String expr = packet.toExpression();
+    public void appendStructure(HPacket packet, HMessage.Direction direction) {
+        String expr = packet.toExpression(direction, packetInfoManager, true);
         if (!expr.equals("")) {
             System.out.println(
                     colorizePackets.get("EXPRESSION") +

@@ -139,7 +139,7 @@ public class ToolsController extends SubForm {
 
 
     public void btn_toExpr_clicked(ActionEvent actionEvent) {
-        txt_exprArea.setText(new HPacket(txt_packetArea.getText()).toExpression());
+        txt_exprArea.setText(new HPacket(txt_packetArea.getText()).toExpression(getHConnection().getPacketInfoManager(), true));
     }
 
     public void btn_toPacket_clicked(ActionEvent actionEvent) {

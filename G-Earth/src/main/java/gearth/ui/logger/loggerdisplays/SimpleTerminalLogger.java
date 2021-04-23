@@ -1,14 +1,20 @@
 package gearth.ui.logger.loggerdisplays;
 
+import gearth.misc.packet_info.PacketInfoManager;
 import gearth.protocol.HConnection;
+import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 
 /**
  * Created by Jonas on 04/04/18.
  */
 class SimpleTerminalLogger implements PacketLogger {
+
+    protected PacketInfoManager packetInfoManager = null;
+
     @Override
     public void start(HConnection hConnection) {
+        packetInfoManager = hConnection.getPacketInfoManager();
 //        System.out.println("-- START OF SESSION --");
     }
 
@@ -54,8 +60,8 @@ class SimpleTerminalLogger implements PacketLogger {
     }
 
     @Override
-    public void appendStructure(HPacket packet) {
-        String expr = packet.toExpression();
+    public void appendStructure(HPacket packet, HMessage.Direction direction) {
+        String expr = packet.toExpression(direction, packetInfoManager, true);
         if (!expr.equals("")) {
             System.out.println(expr);
         }

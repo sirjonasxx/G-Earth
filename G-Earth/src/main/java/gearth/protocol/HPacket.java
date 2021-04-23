@@ -1,6 +1,8 @@
 package gearth.protocol;
 
 import gearth.misc.StringifyAble;
+import gearth.misc.packet_info.PacketInfo;
+import gearth.misc.packet_info.PacketInfoManager;
 import gearth.misc.packetrepresentation.InvalidPacketException;
 import gearth.misc.packetrepresentation.PacketStringUtils;
 
@@ -9,8 +11,11 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidParameterException;
 import java.util.Arrays;
+import java.util.Optional;
 
 public class HPacket implements StringifyAble {
+
+
 
     private boolean isEdited = false;
     private byte[] packetInBytes;
@@ -577,50 +582,52 @@ public class HPacket implements StringifyAble {
         isEdited = edited;
     }
 
-//    private String getHarbleStructure(HMessage.Direction direction) {
-//        PacketInfoManager.HarbleMessage msg;
-//        if (HarbleAPIFetcher.HARBLEAPI != null &&
-//                ((msg = HarbleAPIFetcher.HARBLEAPI.getHarbleMessageFromHeaderId(direction, headerId())) != null)) {
-//            if (msg.getStructure() != null && structureEquals(msg.getStructure())) {
-//                return msg.getStructure();
-//            }
-//        }
-//
-//        return null;
-//    }
+    private PacketInfo getPacketInfo(HMessage.Direction direction, PacketInfoManager packetInfoManager) {
+        if (packetInfoManager == null) return null;
 
-//    public String toExpression(HMessage.Direction direction) {
-//        if (isCorrupted()) return "";
-//
-//        String structure = getHarbleStructure(direction);
-//        if (structure != null) {
-//            return PacketStringUtils.toExpressionFromGivenStructure(this, structure);
-//        }
-//
-//        return PacketStringUtils.predictedExpression(this);
-//    }
+        // prefer packetinfo with structure information (not available in at time of writing)
+        Optional<PacketInfo> packetInfoMaybe = packetInfoManager.getAllPacketInfoFromHeaderId(direction, headerId())
+                .stream().filter(packetInfo -> packetInfo.getStructure() != null).findFirst();
+        return packetInfoMaybe.orElseGet(() -> packetInfoManager.getPacketInfoFromHeaderId(direction, headerId()));
+    }
 
-//    /**
-//     * returns "" if not found or not sure enough
-//     */
-//    public String toExpression() {
-//        if (isCorrupted()) return "";
-//
-//        String structure1 = getHarbleStructure(HMessage.Direction.TOCLIENT);
-//        String structure2 = getHarbleStructure(HMessage.Direction.TOSERVER);
-//        if (structure1 != null && structure2 == null) {
-//            return PacketStringUtils.toExpressionFromGivenStructure(this, structure1);
-//        }
-//        else if (structure1 == null && structure2 != null) {
-//            return PacketStringUtils.toExpressionFromGivenStructure(this, structure2);
-//        }
-//
-//        return PacketStringUtils.predictedExpression(this);
-//    }
+    public String toExpression(HMessage.Direction direction, PacketInfoManager packetInfoManager, boolean removeShuffle) {
+        if (isCorrupted()) return "";
+
+        PacketInfo packetInfo = getPacketInfo(direction, packetInfoManager);
+        if (packetInfo.getStructure() != null) {
+            return PacketStringUtils.toExpressionFromGivenStructure(this, packetInfo.getStructure(), removeShuffle ? packetInfo : null);
+        }
+        return PacketStringUtils.predictedExpression(this, removeShuffle ? packetInfo : null);
+    }
+
+    /**
+     * returns "" if not found or not sure enough
+     */
+    public String toExpression(PacketInfoManager packetInfoManager, boolean removeShuffle) {
+        if (isCorrupted()) return "";
+
+        PacketInfo maybe1 = getPacketInfo(HMessage.Direction.TOCLIENT, packetInfoManager);
+        PacketInfo maybe2 = getPacketInfo(HMessage.Direction.TOSERVER, packetInfoManager);
+
+        PacketInfo packetInfo = null;
+
+        if (maybe1 != null && maybe2 == null) {
+            packetInfo = maybe1;
+        }
+        else if (maybe1 == null && maybe2 != null) {
+            packetInfo = maybe2;
+        }
+
+        if (packetInfo != null && packetInfo.getStructure() != null) {
+            return PacketStringUtils.toExpressionFromGivenStructure(this, packetInfo.getStructure(), removeShuffle ? packetInfo : null);
+        }
+        return PacketStringUtils.predictedExpression(this, removeShuffle ? packetInfo : null);
+    }
 
     public String toExpression() {
         if (isCorrupted()) return "";
-        return PacketStringUtils.predictedExpression(this);
+        return PacketStringUtils.predictedExpression(this, null);
     }
 
     @Override

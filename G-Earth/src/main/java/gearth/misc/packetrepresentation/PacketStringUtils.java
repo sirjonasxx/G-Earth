@@ -1,5 +1,6 @@
 package gearth.misc.packetrepresentation;
 
+import gearth.misc.packet_info.PacketInfo;
 import gearth.misc.packetrepresentation.prediction.StructurePredictor;
 import gearth.protocol.HPacket;
 
@@ -178,14 +179,21 @@ public class PacketStringUtils {
     }
 
     // generates an expression for a packet from a packet structure (ex. "i(isi(b))iBd")
-    public static String toExpressionFromGivenStructure(HPacket packet, String struct) {
+    public static String toExpressionFromGivenStructure(HPacket packet, String struct, PacketInfo packetInfo) {
         int oldReadIndex = packet.getReadIndex();
         packet.resetReadIndex();
 
         StringBuilder builder = new StringBuilder();
-        builder.append("{l}{h:").append(packet.headerId()).append("}");
+        if (packetInfo != null) {
+            String identifier = packetInfo.getName() == null ? packetInfo.getHash() : packetInfo.getName();
+            builder.append("{").append(identifier).append("}");
+        }
+        else {
+            builder.append("{l}{h:").append(packet.headerId()).append("}");
+        }
 
         buildExpressionFromGivenStructure(packet, struct, 0, builder);
+
         packet.setReadIndex(oldReadIndex);
         return builder.toString();
     }
@@ -219,9 +227,12 @@ public class PacketStringUtils {
             else return;
         }
     }
-    public static String predictedExpression(HPacket packet) {
+    public static String predictedExpression(HPacket packet, PacketInfo packetInfo) {
         StructurePredictor structurePredictor = new StructurePredictor(packet);
-        return structurePredictor.getExpression();
+        String structure = structurePredictor.getStructure();
+        if (structure == null) return "";
+
+        return PacketStringUtils.toExpressionFromGivenStructure(packet, structure, packetInfo);
     }
 
     public static boolean structureEquals(HPacket packet, String struct) {
