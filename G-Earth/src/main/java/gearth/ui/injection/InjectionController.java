@@ -1,5 +1,7 @@
 package gearth.ui.injection;
 
+import gearth.misc.packet_info.PacketInfoManager;
+import gearth.protocol.HMessage;
 import gearth.protocol.connection.HState;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -12,7 +14,13 @@ import gearth.protocol.HConnection;
 import gearth.protocol.HPacket;
 import gearth.ui.SubForm;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class InjectionController extends SubForm {
     public TextArea inputPacket;
@@ -95,9 +103,38 @@ public class InjectionController extends SubForm {
         }
 
         if (!dirty) {
-            btn_sendToClient.setDisable(getHConnection().getState() != HState.CONNECTED);
-            btn_sendToServer.setDisable(getHConnection().getState() != HState.CONNECTED);
+            PacketInfoManager packetInfoManager = getHConnection().getPacketInfoManager();
+
+            List<String> unIdentifiedPackets = Arrays.stream(packets)
+                    .filter(hPacket -> !hPacket.isPacketComplete())
+                    .map(HPacket::getIdentifier).collect(Collectors.toList());
+
+            boolean canSendToClient = unIdentifiedPackets.stream().allMatch(s -> {
+                if (packetInfoManager == null) return false;
+                return packetInfoManager.getPacketInfoFromHash(HMessage.Direction.TOCLIENT, s) != null ||
+                        packetInfoManager.getPacketInfoFromName(HMessage.Direction.TOCLIENT, s) != null;
+            });
+            boolean canSendToServer = unIdentifiedPackets.stream().allMatch(s -> {
+                if (packetInfoManager == null) return false;
+                return packetInfoManager.getPacketInfoFromHash(HMessage.Direction.TOSERVER, s) != null ||
+                        packetInfoManager.getPacketInfoFromName(HMessage.Direction.TOSERVER, s) != null;
+            });
+
+            btn_sendToClient.setDisable(!canSendToClient || getHConnection().getState() != HState.CONNECTED);
+            btn_sendToServer.setDisable(!canSendToServer || getHConnection().getState() != HState.CONNECTED);
             if (packets.length == 1) {
+
+                // complete packet to show correct headerId
+                if (!packets[0].isPacketComplete()) {
+                    HPacket packet = packets[0];
+                    if (packet.canComplete(HMessage.Direction.TOCLIENT, packetInfoManager) && !packet.canComplete(HMessage.Direction.TOSERVER, packetInfoManager)) {
+                        packet.completePacket(HMessage.Direction.TOCLIENT, packetInfoManager);
+                    }
+                    else if (!packet.canComplete(HMessage.Direction.TOCLIENT, packetInfoManager) && packet.canComplete(HMessage.Direction.TOSERVER, packetInfoManager)) {
+                        packet.completePacket(HMessage.Direction.TOSERVER, packetInfoManager);
+                    }
+                }
+
                 lbl_pcktInfo.setText("header (id:" + packets[0].headerId() + ", length:" +
                         packets[0].length() + ")");
             }

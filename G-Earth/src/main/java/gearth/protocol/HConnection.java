@@ -138,16 +138,28 @@ public class HConnection {
 
 
     public boolean sendToClientAsync(HPacket message) {
-        if (proxy == null) {
-            return false;
+        if (proxy == null) return false;
+
+        if (!message.isPacketComplete()) {
+            PacketInfoManager packetInfoManager = getPacketInfoManager();
+            message.completePacket(HMessage.Direction.TOCLIENT, packetInfoManager);
+
+            if (!message.isPacketComplete()) return false;
         }
+
         proxy.getAsyncPacketSender().sendToClientAsync(message);
         return true;
     }
     public boolean sendToServerAsync(HPacket message) {
-        if (proxy == null) {
-            return false;
+        if (proxy == null) return false;
+
+        if (!message.isPacketComplete()) {
+            PacketInfoManager packetInfoManager = getPacketInfoManager();
+            message.completePacket(HMessage.Direction.TOSERVER, packetInfoManager);
+
+            if (!message.isPacketComplete()) return false;
         }
+
         proxy.getAsyncPacketSender().sendToServerAsync(message);
         return true;
     }

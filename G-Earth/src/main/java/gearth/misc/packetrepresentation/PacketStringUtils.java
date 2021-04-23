@@ -135,6 +135,14 @@ public class PacketStringUtils {
                     packet.substring(end + 2);
         }
 
+        String[] identifier = {null};
+        if (!fixLengthLater && packet.startsWith("{")) {
+            packet = replaceAll(packet, "^\\{([^:{}]*)}", m -> {
+                identifier[0] = m.group(1);
+                return "[255][255]";
+            });
+        }
+        if (identifier[0] != null) fixLengthLater = true;
 
         if (packet.contains("{") || packet.contains("}")) {
             throw new InvalidPacketException();
@@ -163,6 +171,9 @@ public class PacketStringUtils {
         HPacket hPacket = new HPacket(packetInBytes);
         if (fixLengthLater) {
             hPacket.fixLength();
+        }
+        if (identifier[0] != null) {
+            hPacket.setIdentifier(identifier[0]);
         }
         return hPacket;
     }
@@ -255,6 +266,9 @@ public class PacketStringUtils {
     }
 
     public static void main(String[] args) throws InvalidPacketException {
+        HPacket zed = fromString("{test}{s:\"¥\"}{i:0}{i:0}");
+        System.out.println(zed);
+
         HPacket p1 = fromString("{l}{h:1129}{s:\"\\\\\\\\\"}{i:0}{i:0}");
         System.out.println(p1.toExpression());
         HPacket p1_2 = fromString(p1.toExpression());

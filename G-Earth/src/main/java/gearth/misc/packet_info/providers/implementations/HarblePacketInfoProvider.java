@@ -44,6 +44,7 @@ public class HarblePacketInfoProvider extends RemotePacketInfoProvider {
         catch (Exception e) { hash = null; }
         try { structure = object.getString("Structure");
         } catch (Exception e) { structure = null; }
+        structure = (structure == null || structure.equals("")) ? null : structure;
 
         int headerId;
         try {headerId = object.getInt("Id"); }

@@ -15,11 +15,12 @@ import java.util.Optional;
 
 public class HPacket implements StringifyAble {
 
-
-
     private boolean isEdited = false;
     private byte[] packetInBytes;
     private int readIndex = 6;
+
+    // if identifier != null, this is a placeholder name for the type of packet, headerId will be "-1"
+    private String identifier = null;
 
     public HPacket(byte[] packet)	{
         packetInBytes = packet.clone();
@@ -30,11 +31,11 @@ public class HPacket implements StringifyAble {
     }
     public HPacket(String packet)	{
         try {
-            packetInBytes = PacketStringUtils.fromString(packet).packetInBytes;
+            HPacket packetFromString = PacketStringUtils.fromString(packet);
+            packetInBytes = packetFromString.packetInBytes;
+            identifier = packetFromString.identifier;
         } catch (InvalidPacketException e) {
             packetInBytes = new byte[0];
-            // will be corrupted
-            // e.printStackTrace();
         }
     }
     public HPacket(int header) {
@@ -42,6 +43,7 @@ public class HPacket implements StringifyAble {
         replaceShort(4, (short)header);
         isEdited = false;
     }
+
     public HPacket(int header, byte[] bytes) {
         this(header);
         appendBytes(bytes);
@@ -55,13 +57,18 @@ public class HPacket implements StringifyAble {
      */
     public HPacket(int header, Object... objects) throws InvalidParameterException {
         this(header);
-        for (int i = 0; i < objects.length; i++) {
-            Object o = objects[i];
-            appendObject(o);
-        }
-
+        appendObjects(objects);
         isEdited = false;
     }
+
+    public HPacket(String identifier, Object... objects) throws InvalidParameterException {
+        packetInBytes = new byte[]{0,0,0,2,-1,-1};
+        this.identifier = identifier;
+        appendObjects(objects);
+        isEdited = false;
+    }
+
+
 
     public String toString()	{
         return PacketStringUtils.toString(packetInBytes);
@@ -75,6 +82,46 @@ public class HPacket implements StringifyAble {
         if (readIndex < getBytesLength()) return 0;
         if (readIndex == getBytesLength()) return 1;
         return 2;
+    }
+
+    public void setIdentifier(String identifier) {
+        this.identifier = identifier;
+    }
+
+    public String getIdentifier() {
+        return identifier;
+    }
+
+    public void completePacket(HMessage.Direction direction, PacketInfoManager packetInfoManager) {
+        if (isCorrupted() || identifier == null) return;
+
+        PacketInfo packetInfo = packetInfoManager.getPacketInfoFromName(direction, identifier);
+        if (packetInfo == null) {
+            packetInfo = packetInfoManager.getPacketInfoFromHash(direction, identifier);
+            if (packetInfo == null) return;
+        }
+
+        boolean wasEdited = isEdited;
+        replaceShort(4, (short)(packetInfo.getHeaderId()));
+        identifier = null;
+
+        isEdited = wasEdited;
+    }
+
+    public boolean canComplete(HMessage.Direction direction, PacketInfoManager packetInfoManager) {
+        if (isCorrupted() || identifier == null) return false;
+
+        PacketInfo packetInfo = packetInfoManager.getPacketInfoFromName(direction, identifier);
+        if (packetInfo == null) {
+            packetInfo = packetInfoManager.getPacketInfoFromHash(direction, identifier);
+            return packetInfo != null;
+        }
+
+        return true;
+    }
+
+    public boolean isPacketComplete() {
+        return identifier == null;
     }
 
     public byte[] toBytes()		{
@@ -532,6 +579,14 @@ public class HPacket implements StringifyAble {
 
     public HPacket appendLongString(String s) {
         return appendLongString(s, StandardCharsets.ISO_8859_1);
+    }
+
+    public HPacket appendObjects(Object... objects) {
+        for (Object object : objects) {
+            appendObject(object);
+        }
+
+        return this;
     }
 
     public HPacket appendObject(Object o) throws InvalidParameterException {

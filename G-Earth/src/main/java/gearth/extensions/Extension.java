@@ -36,6 +36,8 @@ public abstract class Extension implements IExtension {
     private static final String[] FILE_FLAG = {"--filename", "-f"};
     private static final String[] COOKIE_FLAG = {"--auth-token", "-c"}; // don't add a cookie or filename when debugging
 
+    protected PacketInfoManager packetInfoManager = new PacketInfoManager(new ArrayList<>()); // empty
+
     private OutputStream out = null;
     private final Map<Integer, List<MessageListener>> incomingMessageListeners = new HashMap<>();
     private final Map<Integer, List<MessageListener>> outgoingMessageListeners = new HashMap<>();
@@ -144,7 +146,7 @@ public abstract class Extension implements IExtension {
                     String hotelVersion = packet.readString();
                     String clientIdentifier = packet.readString();
                     HClient clientType = HClient.valueOf(packet.readString());
-                    PacketInfoManager packetInfoManager = PacketInfoManager.readFromPacket(packet);
+                    packetInfoManager = PacketInfoManager.readFromPacket(packet);
 
                     Constants.UNITY_PACKETS = clientType == HClient.UNITY;
                     onConnectionObservable.fireEvent(l -> l.onConnection(
@@ -256,6 +258,11 @@ public abstract class Extension implements IExtension {
         return send(packet, HMessage.Direction.TOSERVER);
     }
     private boolean send(HPacket packet, HMessage.Direction direction) {
+        if (packet.isCorrupted()) return false;
+
+        if (!packet.isPacketComplete()) packet.completePacket(direction, packetInfoManager);
+        if (!packet.isPacketComplete()) return false;
+
         HPacket packet1 = new HPacket(NetworkExtensionInfo.INCOMING_MESSAGES_IDS.SENDMESSAGE);
         packet1.appendByte(direction == HMessage.Direction.TOCLIENT ? (byte)0 : (byte)1);
         packet1.appendInt(packet.getBytesLength());
