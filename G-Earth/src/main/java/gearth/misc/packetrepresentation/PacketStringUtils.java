@@ -124,10 +124,13 @@ public class PacketStringUtils {
                 }
             }
             actualString.append(match);
+
             String latin = new String(actualString.toString().getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1);
+            HPacket temp = new HPacket(0);
+            temp.appendString(latin, StandardCharsets.ISO_8859_1);
 
             packet = packet.substring(0, start) +
-                    toString(new HPacket(0, latin).readBytes(latin.length() + 2, 6)) +
+                    toString(temp.readBytes(latin.length() + 2, 6)) +
                     packet.substring(end + 2);
         }
 
@@ -253,6 +256,9 @@ public class PacketStringUtils {
                 new HPacket("{l}{h:5}{s:\"asdas\"}"),
                 "s"
         ));
+
+        HPacket p3 = fromString("{l}{h:2266}{s:\"¥\"}{i:0}{i:0}");
+        System.out.println(p3);
     }
 
 }
