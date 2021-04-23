@@ -49,8 +49,8 @@ public class PacketStringUtils {
         packet = replaceAll(packet, "\\{u:([0-9]+)}",
                 m -> "[" + (Integer.parseInt(m.group(1))/256) + "][" + (Integer.parseInt(m.group(1)) % 256) + "]");
 
-        packet = replaceAll(packet, "\\{h:([0-9]+)}",
-                m -> "[" + (Integer.parseInt(m.group(1))/256) + "][" + (Integer.parseInt(m.group(1)) % 256) + "]");
+        packet = replaceAll(packet, "\\{h:(-?[0-9]+)}",
+                m -> toString(ByteBuffer.allocate(2).putShort(Short.parseShort(m.group(1))).array()));
 
         packet = replaceAll(packet, "\\{b:([Ff]alse|[Tt]rue)}",
                 m -> m.group(1).toLowerCase().equals("true") ? "[1]" : "[0]");
@@ -266,6 +266,9 @@ public class PacketStringUtils {
     }
 
     public static void main(String[] args) throws InvalidPacketException {
+        HPacket fghdft = fromString("{l}{h:-1}{i:1}{i:0}{i:6}{i:4}{s:\"1.0\"}");
+        System.out.println(fghdft);
+
         HPacket zed = fromString("{test}{s:\"¥\"}{i:0}{i:0}");
         System.out.println(zed);
 

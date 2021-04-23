@@ -1,5 +1,7 @@
 package gearth.ui.tools;
 
+import gearth.misc.packet_info.PacketInfoManager;
+import gearth.protocol.HMessage;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
@@ -138,11 +140,26 @@ public class ToolsController extends SubForm {
     }
 
 
+    private HPacket parseToPacket(String p) {
+        PacketInfoManager packetInfoManager = getHConnection().getPacketInfoManager();
+        HPacket packet = new HPacket(p);
+        if (!packet.isPacketComplete() && packetInfoManager != null) {
+            if (packet.canComplete(HMessage.Direction.TOCLIENT, packetInfoManager) && !packet.canComplete(HMessage.Direction.TOSERVER, packetInfoManager)) {
+                packet.completePacket(HMessage.Direction.TOCLIENT, packetInfoManager);
+            }
+            else if (!packet.canComplete(HMessage.Direction.TOCLIENT, packetInfoManager) && packet.canComplete(HMessage.Direction.TOSERVER, packetInfoManager)) {
+                packet.completePacket(HMessage.Direction.TOSERVER, packetInfoManager);
+            }
+        }
+
+        return packet;
+    }
+
     public void btn_toExpr_clicked(ActionEvent actionEvent) {
-        txt_exprArea.setText(new HPacket(txt_packetArea.getText()).toExpression(getHConnection().getPacketInfoManager(), true));
+        txt_exprArea.setText(parseToPacket(txt_packetArea.getText()).toExpression(getHConnection().getPacketInfoManager(), true));
     }
 
     public void btn_toPacket_clicked(ActionEvent actionEvent) {
-        txt_packetArea.setText(new HPacket(txt_exprArea.getText()).toString());
+        txt_packetArea.setText(parseToPacket(txt_exprArea.getText()).toString());
     }
 }
