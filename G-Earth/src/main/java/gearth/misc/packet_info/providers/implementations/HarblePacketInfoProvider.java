@@ -35,7 +35,10 @@ public class HarblePacketInfoProvider extends RemotePacketInfoProvider {
         String name;
         String hash;
         String structure;
-        try { name = object.getString("Name"); }
+        try {
+            name = object.getString("Name")
+                    .replaceAll("Composer$", "");
+        }
         catch (Exception e) { name = null; }
         try { hash = object.getString("Hash"); }
         catch (Exception e) { hash = null; }

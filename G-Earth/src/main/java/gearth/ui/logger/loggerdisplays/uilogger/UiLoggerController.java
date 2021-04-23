@@ -19,6 +19,7 @@ import org.fxmisc.richtext.model.StyleSpansBuilder;
 
 import java.net.URL;
 import java.util.*;
+ import java.util.stream.Collectors;
 
 public class UiLoggerController implements Initializable {
     public FlowPane flowPane;
@@ -33,7 +34,7 @@ public class UiLoggerController implements Initializable {
     public CheckMenuItem chkSkipBigPackets;
     public CheckMenuItem chkMessageName;
     public CheckMenuItem chkMessageHash;
-    public Label lblHarbleAPI;
+    public Label lblPacketInfo;
 
     private StyleClassedTextArea area;
 
@@ -95,23 +96,32 @@ public class UiLoggerController implements Initializable {
 
 
         boolean packetInfoAvailable = packetInfoManager.getPacketInfoList().size() > 0;
-        lblHarbleAPI.setText("Packet info: " + (packetInfoAvailable ? "True" : "False"));
+        lblPacketInfo.setText("Packet info: " + (packetInfoAvailable ? "True" : "False"));
 
         if ((viewMessageName || viewMessageHash) && packetInfoAvailable) {
-            PacketInfo message = packetInfoManager.getPacketInfoFromHeaderId(
+            List<PacketInfo> messages = packetInfoManager.getAllPacketInfoFromHeaderId(
                     (isIncoming ? HMessage.Direction.TOCLIENT : HMessage.Direction.TOSERVER),
                     packet.headerId()
             );
+            List<String> names = messages.stream().map(PacketInfo::getName)
+                    .filter(Objects::nonNull).distinct().collect(Collectors.toList());
+            List<String> hashes = messages.stream().map(PacketInfo::getHash)
+                    .filter(Objects::nonNull).distinct().collect(Collectors.toList());
 
-            if (message != null && !(viewMessageName && !viewMessageHash && message.getName() == null)) {
-                if (viewMessageName && message.getName() != null) {
-                    elements.add(new Element("["+message.getName()+"]", "messageinfo"));
-                }
-                if (viewMessageHash && message.getHash() != null) {
-                    elements.add(new Element("["+message.getHash()+"]", "messageinfo"));
-                }
+            boolean addedSomething = false;
+            if (viewMessageName && names.size() > 0) {
+                for (String name : names) {elements.add(new Element("["+name+"]", "messageinfo")); }
+                addedSomething = true;
+            }
+            if (viewMessageHash && hashes.size() > 0) {
+                for (String hash : hashes) {elements.add(new Element("["+hash+"]", "messageinfo")); }
+                addedSomething = true;
+            }
+
+            if (addedSomething) {
                 elements.add(new Element("\n", ""));
             }
+
         }
 
         if (isBlocked) elements.add(new Element("[Blocked]\n", "blocked"));
