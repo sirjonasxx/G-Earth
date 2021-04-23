@@ -42,7 +42,7 @@ public class LoggerController extends SubForm {
             }
             if (newState == HState.CONNECTED) {
                 miniLogText(Color.GREEN, "Connected to "+getHConnection().getDomain() + ":" + getHConnection().getServerPort());
-                packetLogger.start();
+                packetLogger.start(getHConnection());
             }
             if (newState == HState.NOT_CONNECTED) {
                 miniLogText(Color.RED, "End of connection");

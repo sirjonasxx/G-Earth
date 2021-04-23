@@ -1,5 +1,6 @@
 package gearth.protocol.connection;
 
+import gearth.misc.packet_info.PacketInfoManager;
 import gearth.protocol.packethandler.PacketHandler;
 
 import java.net.ServerSocket;
@@ -22,6 +23,8 @@ public class HProxy {
 
     private volatile String hotelVersion = "";
     private volatile String clientIdentifier = "";
+    private volatile PacketInfoManager packetInfoManager = null;
+
     private volatile AsyncPacketSender asyncPacketSender = null;
 
     public HProxy(HClient hClient, String input_domain, String actual_domain, int actual_port, int intercept_port, String intercept_host) {
@@ -42,6 +45,7 @@ public class HProxy {
         this.outHandler = outgoingHandler;
         this.hotelVersion = hotelVersion;
         this.clientIdentifier = clientIdentifier;
+        this.packetInfoManager = PacketInfoManager.fromHotelVersion(hotelVersion, hClient);
         this.asyncPacketSender = new AsyncPacketSender(this);
     }
 
@@ -91,5 +95,9 @@ public class HProxy {
 
     public HClient gethClient() {
         return hClient;
+    }
+
+    public PacketInfoManager getPacketInfoManager() {
+        return packetInfoManager;
     }
 }

@@ -1,5 +1,6 @@
 package gearth.ui.logger.loggerdisplays;
 
+import gearth.protocol.HConnection;
 import gearth.protocol.HPacket;
 
 /**
@@ -27,7 +28,7 @@ public interface PacketLogger {
         }
     }
 
-    void start();
+    void start(HConnection hConnection);
     void stop();
 
     void appendSplitLine();

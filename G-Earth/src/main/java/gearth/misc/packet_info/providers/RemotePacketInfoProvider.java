@@ -1,7 +1,6 @@
 package gearth.misc.packet_info.providers;
 
 import gearth.misc.Cacher;
-import gearth.misc.harble_api.PacketInfoManager;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 

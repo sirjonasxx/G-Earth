@@ -1,5 +1,6 @@
 package gearth.ui.logger.loggerdisplays.uilogger;
 
+import gearth.protocol.HConnection;
 import gearth.protocol.HPacket;
 import gearth.ui.logger.loggerdisplays.PacketLogger;
 import javafx.event.ActionEvent;
@@ -18,9 +19,10 @@ import java.util.List;
 public class UiLogger implements PacketLogger {
     private Stage stage;
     private UiLoggerController controller = null;
+    private HConnection hConnection = null;
 
     @Override
-    public void start() {
+    public void start(HConnection hConnection) {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/gearth/ui/logger/uilogger/UiLogger.fxml"));
 
         try {
@@ -41,29 +43,12 @@ public class UiLogger implements PacketLogger {
             Scene scene = new Scene(root);
             scene.getStylesheets().add("/gearth/ui/bootstrap3.css");
             scene.getStylesheets().add("/gearth/ui/logger/uilogger/logger.css");
-            UiLoggerController controller = (UiLoggerController) loader.getController();
+            UiLoggerController controller = loader.getController();
             controller.setStage(stage);
+            controller.setPacketInfoManager(hConnection.getPacketInfoManager());
 
-//            scene.addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
-//                final KeyCombination keyCombIncoming = new KeyCodeCombination(KeyCode.I,
-//                        KeyCombination.CONTROL_DOWN);
-//                final KeyCombination keyCombOutgoing = new KeyCodeCombination(KeyCode.O,
-//                        KeyCombination.CONTROL_DOWN);
-//
-//                public void handle(KeyEvent ke) {
-//                    if (keyCombIncoming.match(ke)) {
-//                        controller.toggleViewIncoming();
-//                        ke.consume();
-//                    } else if (keyCombOutgoing.match(ke)) {
-//                        controller.toggleViewOutgoing();
-//                        ke.consume();
-//                    }
-//                }
-//            });
 
             stage.setScene(scene);
-
-//            ScenicView.show(scene);
 
             // don't let the user close this window on their own
             stage.setOnCloseRequest(Event::consume);

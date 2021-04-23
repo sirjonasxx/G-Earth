@@ -1,13 +1,14 @@
 package gearth.misc.packet_info;
 
 import gearth.misc.Cacher;
-import gearth.misc.harble_api.HarbleAPIFetcher;
 import gearth.misc.packet_info.providers.RemotePacketInfoProvider;
 import gearth.misc.packet_info.providers.implementations.HarblePacketInfoProvider;
 import gearth.misc.packet_info.providers.implementations.SulekPacketInfoProvider;
 import gearth.misc.packet_info.providers.implementations.UnityPacketInfoProvider;
 import gearth.protocol.HMessage;
+import gearth.protocol.HPacket;
 import gearth.protocol.connection.HClient;
+import org.fxmisc.undo.impl.ChangeQueue;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -28,7 +29,10 @@ public class PacketInfoManager {
     private Map<String, List<PacketInfo>> nameToMessage_incoming = new HashMap<>();
     private Map<String, List<PacketInfo>> nameToMessage_outgoing = new HashMap<>();
 
+    private List<PacketInfo> packetInfoList;
+
     public PacketInfoManager(List<PacketInfo> packetInfoList) {
+        this.packetInfoList = packetInfoList;
         for (PacketInfo packetInfo : packetInfoList) {
             addMessage(packetInfo);
         }
@@ -66,37 +70,6 @@ public class PacketInfoManager {
 
     }
 
-    public PacketInfo getPacketInfoFromHeaderId(HMessage.Direction direction, int headerId) {
-        Map<Integer, List<PacketInfo>> headerIdToMessage =
-                (direction == HMessage.Direction.TOSERVER
-                        ? headerIdToMessage_outgoing
-                        : headerIdToMessage_incoming);
-
-        if (headerIdToMessage.get(headerId) == null) return null;
-        return headerIdToMessage.get(headerId).get(0);
-    }
-
-    public PacketInfo getHarbleMessagesFromHash(HMessage.Direction direction, String hash) {
-        Map<String, List<PacketInfo>> hashToMessage =
-                (direction == HMessage.Direction.TOSERVER
-                        ? hashToMessage_outgoing
-                        : hashToMessage_incoming);
-
-        if (hashToMessage.get(hash) == null) return null;
-        return hashToMessage.get(hash).get(0);
-    }
-
-    public PacketInfo getHarbleMessageFromName(HMessage.Direction direction, String name) {
-        Map<String, List<PacketInfo>> nameToMessage =
-                (direction == HMessage.Direction.TOSERVER
-                        ? nameToMessage_outgoing
-                        : nameToMessage_incoming);
-
-        if (nameToMessage.get(name) == null) return null;
-        return nameToMessage.get(name).get(0);
-    }
-
-
     public List<PacketInfo> getAllPacketInfoFromHeaderId(HMessage.Direction direction, int headerId) {
         Map<Integer, List<PacketInfo>> headerIdToMessage =
                 (direction == HMessage.Direction.TOSERVER
@@ -106,7 +79,7 @@ public class PacketInfoManager {
         return headerIdToMessage.get(headerId) == null ? new ArrayList<>() : headerIdToMessage.get(headerId);
     }
 
-    public List<PacketInfo> getAllHarbleMessagesFromHash(HMessage.Direction direction, String hash) {
+    public List<PacketInfo> getAllPacketInfoFromHash(HMessage.Direction direction, String hash) {
         Map<String, List<PacketInfo>> hashToMessage =
                 (direction == HMessage.Direction.TOSERVER
                         ? hashToMessage_outgoing
@@ -115,7 +88,7 @@ public class PacketInfoManager {
         return hashToMessage.get(hash) == null ? new ArrayList<>() : hashToMessage.get(hash);
     }
 
-    public List<PacketInfo> getAllHarbleMessageFromName(HMessage.Direction direction, String name) {
+    public List<PacketInfo> getAllPacketInfoFromName(HMessage.Direction direction, String name) {
         Map<String, List<PacketInfo>> nameToMessage =
                 (direction == HMessage.Direction.TOSERVER
                         ? nameToMessage_outgoing
@@ -124,6 +97,24 @@ public class PacketInfoManager {
         return nameToMessage.get(name) == null ? new ArrayList<>() : nameToMessage.get(name);
     }
 
+    public PacketInfo getPacketInfoFromHeaderId(HMessage.Direction direction, int headerId) {
+        List<PacketInfo> all = getAllPacketInfoFromHeaderId(direction, headerId);
+        return all.size() == 0 ? null : all.get(0);
+    }
+
+    public PacketInfo getPacketInfoFromHash(HMessage.Direction direction, String hash) {
+        List<PacketInfo> all = getAllPacketInfoFromHash(direction, hash);
+        return all.size() == 0 ? null : all.get(0);
+    }
+
+    public PacketInfo getPacketInfoFromName(HMessage.Direction direction, String name) {
+        List<PacketInfo> all = getAllPacketInfoFromName(direction, name);
+        return all.size() == 0 ? null : all.get(0);
+    }
+
+    public List<PacketInfo> getPacketInfoList() {
+        return packetInfoList;
+    }
 
     public static PacketInfoManager fromHotelVersion(String hotelversion, HClient clientType) {
         List<PacketInfo> result = new ArrayList<>();
@@ -157,5 +148,39 @@ public class PacketInfoManager {
 
 
         return new PacketInfoManager(result);
+    }
+
+    public static PacketInfoManager readFromPacket(HPacket hPacket) {
+        List<PacketInfo> packetInfoList = new ArrayList<>();
+        int size = hPacket.readInteger();
+
+        for (int i = 0; i < size; i++) {
+            int headerId = hPacket.readInteger();
+            String hash = hPacket.readString();
+            String name = hPacket.readString();
+            String structure = hPacket.readString();
+            boolean isOutgoing = hPacket.readBoolean();
+
+            packetInfoList.add(new PacketInfo(
+                    isOutgoing ? HMessage.Direction.TOSERVER : HMessage.Direction.TOCLIENT,
+                    headerId,
+                    hash.equals("NULL") ? null : hash,
+                    name.equals("NULL") ? null : name,
+                    structure.equals("NULL") ? null : structure
+            ));
+        }
+
+        return new PacketInfoManager(packetInfoList);
+    }
+
+    public void appendToPacket(HPacket hPacket) {
+        hPacket.appendInt(packetInfoList.size());
+        for (PacketInfo packetInfo : packetInfoList) {
+            hPacket.appendInt(packetInfo.getHeaderId());
+            hPacket.appendString(packetInfo.getHash() == null ? "NULL" : packetInfo.getHash());
+            hPacket.appendString(packetInfo.getName() == null ? "NULL" : packetInfo.getName());
+            hPacket.appendString(packetInfo.getStructure() == null ? "NULL" : packetInfo.getStructure());
+            hPacket.appendBoolean(packetInfo.getDestination() == HMessage.Direction.TOSERVER);
+        }
     }
 }

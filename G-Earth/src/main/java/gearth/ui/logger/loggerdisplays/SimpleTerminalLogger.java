@@ -1,5 +1,6 @@
 package gearth.ui.logger.loggerdisplays;
 
+import gearth.protocol.HConnection;
 import gearth.protocol.HPacket;
 
 /**
@@ -7,7 +8,7 @@ import gearth.protocol.HPacket;
  */
 class SimpleTerminalLogger implements PacketLogger {
     @Override
-    public void start() {
+    public void start(HConnection hConnection) {
 //        System.out.println("-- START OF SESSION --");
     }
 

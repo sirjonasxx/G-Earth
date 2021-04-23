@@ -1,6 +1,7 @@
 package gearth.protocol;
 
 import gearth.misc.listenerpattern.Observable;
+import gearth.misc.packet_info.PacketInfoManager;
 import gearth.protocol.connection.HClient;
 import gearth.protocol.connection.HProxy;
 import gearth.protocol.connection.HState;
@@ -184,6 +185,13 @@ public class HConnection {
             return null;
         }
         return proxy.gethClient();
+    }
+
+    public PacketInfoManager getPacketInfoManager() {
+        if (proxy == null) {
+            return null;
+        }
+        return proxy.getPacketInfoManager();
     }
 
     public boolean isRawIpMode() {

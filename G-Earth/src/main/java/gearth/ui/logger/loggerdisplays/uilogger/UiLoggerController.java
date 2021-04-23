@@ -1,8 +1,8 @@
 package gearth.ui.logger.loggerdisplays.uilogger;
 
-import gearth.misc.harble_api.PacketInfoManager;
-import gearth.misc.harble_api.HarbleAPIFetcher;
-import gearth.protocol.HMessage;
+ import gearth.misc.packet_info.PacketInfo;
+ import gearth.misc.packet_info.PacketInfoManager;
+ import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 import gearth.ui.logger.loggerdisplays.PacketLogger;
 import javafx.application.Platform;
@@ -38,6 +38,7 @@ public class UiLoggerController implements Initializable {
     private StyleClassedTextArea area;
 
     private Stage stage;
+    private PacketInfoManager packetInfoManager;
 
     private boolean viewIncoming = true;
     private boolean viewOutgoing = true;
@@ -92,19 +93,21 @@ public class UiLoggerController implements Initializable {
 
         ArrayList<Element> elements = new ArrayList<>();
 
-        lblHarbleAPI.setText("Messages: " + (HarbleAPIFetcher.HARBLEAPI == null ? "False" : "True"));
-        if ((viewMessageName || viewMessageHash) && HarbleAPIFetcher.HARBLEAPI != null) {
-            PacketInfoManager api = HarbleAPIFetcher.HARBLEAPI;
-            PacketInfoManager.HarbleMessage message = api.getHarbleMessageFromHeaderId(
+
+        boolean packetInfoAvailable = packetInfoManager.getPacketInfoList().size() > 0;
+        lblHarbleAPI.setText("Packet info: " + (packetInfoAvailable ? "True" : "False"));
+
+        if ((viewMessageName || viewMessageHash) && packetInfoAvailable) {
+            PacketInfo message = packetInfoManager.getPacketInfoFromHeaderId(
                     (isIncoming ? HMessage.Direction.TOCLIENT : HMessage.Direction.TOSERVER),
                     packet.headerId()
             );
 
-            if ( message != null && !(viewMessageName && !viewMessageHash && message.getName() == null)) {
+            if (message != null && !(viewMessageName && !viewMessageHash && message.getName() == null)) {
                 if (viewMessageName && message.getName() != null) {
                     elements.add(new Element("["+message.getName()+"]", "messageinfo"));
                 }
-                if (viewMessageHash) {
+                if (viewMessageHash && message.getHash() != null) {
                     elements.add(new Element("["+message.getHash()+"]", "messageinfo"));
                 }
                 elements.add(new Element("\n", ""));
@@ -134,7 +137,7 @@ public class UiLoggerController implements Initializable {
 
             elements.add(new Element(" -> ", ""));
 
-            if (skiphugepackets && packet.length() > 8000) {
+            if (skiphugepackets && packet.length() > 4000) {
                 elements.add(new Element("<packet skipped>", "skipped"));
             }
             else {
@@ -143,7 +146,8 @@ public class UiLoggerController implements Initializable {
         }
 
         if (packet.length() <= 2000) {
-            String expr = packet.toExpression(isIncoming ? HMessage.Direction.TOCLIENT : HMessage.Direction.TOSERVER);
+//            String expr = packet.toExpression(isIncoming ? HMessage.Direction.TOCLIENT : HMessage.Direction.TOSERVER);
+            String expr = packet.toExpression();
             String cleaned = cleanTextContent(expr);
             if (cleaned.equals(expr)) {
                 if (!expr.equals("") && displayStructure)
@@ -190,6 +194,10 @@ public class UiLoggerController implements Initializable {
 
     public void setStage(Stage stage) {
         this.stage = stage;
+    }
+
+    public void setPacketInfoManager(PacketInfoManager packetInfoManager) {
+        this.packetInfoManager = packetInfoManager;
     }
 
     public void toggleViewIncoming() {

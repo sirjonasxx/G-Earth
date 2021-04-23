@@ -1,8 +1,10 @@
 package gearth.extensions;
 
 import gearth.misc.listenerpattern.Observable;
+import gearth.misc.packet_info.PacketInfoManager;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
+import gearth.protocol.connection.HClient;
 import gearth.services.Constants;
 import gearth.services.extensionhandler.extensions.implementations.network.NetworkExtensionInfo;
 
@@ -140,10 +142,15 @@ public abstract class Extension implements IExtension {
                     String host = packet.readString();
                     int connectionPort = packet.readInteger();
                     String hotelVersion = packet.readString();
-                    String harbleMessagesPath = packet.readString();
-                    String clientType = packet.readString();
-                    Constants.UNITY_PACKETS = clientType.toLowerCase().contains("unity");
-                    onConnectionObservable.fireEvent(l -> l.onConnection(host, connectionPort, hotelVersion, clientType, harbleMessagesPath));
+                    String clientIdentifier = packet.readString();
+                    HClient clientType = HClient.valueOf(packet.readString());
+                    PacketInfoManager packetInfoManager = PacketInfoManager.readFromPacket(packet);
+
+                    Constants.UNITY_PACKETS = clientType == HClient.UNITY;
+                    onConnectionObservable.fireEvent(l -> l.onConnection(
+                            host, connectionPort, hotelVersion,
+                            clientIdentifier, clientType, packetInfoManager)
+                    );
                     onStartConnection();
                 }
                 else if (packet.headerId() == NetworkExtensionInfo.OUTGOING_MESSAGES_IDS.CONNECTIONEND) {

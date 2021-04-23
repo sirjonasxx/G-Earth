@@ -1,8 +1,6 @@
 package gearth.protocol;
 
 import gearth.misc.StringifyAble;
-import gearth.misc.harble_api.PacketInfoManager;
-import gearth.misc.harble_api.HarbleAPIFetcher;
 import gearth.misc.packetrepresentation.InvalidPacketException;
 import gearth.misc.packetrepresentation.PacketStringUtils;
 
@@ -579,44 +577,49 @@ public class HPacket implements StringifyAble {
         isEdited = edited;
     }
 
-    private String getHarbleStructure(HMessage.Direction direction) {
-        PacketInfoManager.HarbleMessage msg;
-        if (HarbleAPIFetcher.HARBLEAPI != null &&
-                ((msg = HarbleAPIFetcher.HARBLEAPI.getHarbleMessageFromHeaderId(direction, headerId())) != null)) {
-            if (msg.getStructure() != null && structureEquals(msg.getStructure())) {
-                return msg.getStructure();
-            }
-        }
+//    private String getHarbleStructure(HMessage.Direction direction) {
+//        PacketInfoManager.HarbleMessage msg;
+//        if (HarbleAPIFetcher.HARBLEAPI != null &&
+//                ((msg = HarbleAPIFetcher.HARBLEAPI.getHarbleMessageFromHeaderId(direction, headerId())) != null)) {
+//            if (msg.getStructure() != null && structureEquals(msg.getStructure())) {
+//                return msg.getStructure();
+//            }
+//        }
+//
+//        return null;
+//    }
 
-        return null;
-    }
+//    public String toExpression(HMessage.Direction direction) {
+//        if (isCorrupted()) return "";
+//
+//        String structure = getHarbleStructure(direction);
+//        if (structure != null) {
+//            return PacketStringUtils.toExpressionFromGivenStructure(this, structure);
+//        }
+//
+//        return PacketStringUtils.predictedExpression(this);
+//    }
 
-    public String toExpression(HMessage.Direction direction) {
-        if (isCorrupted()) return "";
+//    /**
+//     * returns "" if not found or not sure enough
+//     */
+//    public String toExpression() {
+//        if (isCorrupted()) return "";
+//
+//        String structure1 = getHarbleStructure(HMessage.Direction.TOCLIENT);
+//        String structure2 = getHarbleStructure(HMessage.Direction.TOSERVER);
+//        if (structure1 != null && structure2 == null) {
+//            return PacketStringUtils.toExpressionFromGivenStructure(this, structure1);
+//        }
+//        else if (structure1 == null && structure2 != null) {
+//            return PacketStringUtils.toExpressionFromGivenStructure(this, structure2);
+//        }
+//
+//        return PacketStringUtils.predictedExpression(this);
+//    }
 
-        String structure = getHarbleStructure(direction);
-        if (structure != null) {
-            return PacketStringUtils.toExpressionFromGivenStructure(this, structure);
-        }
-
-        return PacketStringUtils.predictedExpression(this);
-    }
-
-    /**
-     * returns "" if not found or not sure enough
-     */
     public String toExpression() {
         if (isCorrupted()) return "";
-
-        String structure1 = getHarbleStructure(HMessage.Direction.TOCLIENT);
-        String structure2 = getHarbleStructure(HMessage.Direction.TOSERVER);
-        if (structure1 != null && structure2 == null) {
-            return PacketStringUtils.toExpressionFromGivenStructure(this, structure1);
-        }
-        else if (structure1 == null && structure2 != null) {
-            return PacketStringUtils.toExpressionFromGivenStructure(this, structure2);
-        }
-
         return PacketStringUtils.predictedExpression(this);
     }
 
