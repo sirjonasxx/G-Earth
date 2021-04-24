@@ -132,14 +132,14 @@ public class Main extends Application {
     }
 }
 
-// Hi
-// I'm
-// Lande
-// I want
-// The role
-// Developer
-// Pls
-// You say :
-// Change 10 lines
-// I dit it.
-// https://i.imgur.com/QEHV2NZ.png
+// Hello
+// I am
+// Dippy
+// I request
+// The discord role
+// "Developer"
+// Please
+// I have
+// Change Ten lines
+// I have done it.
+// Pepega
