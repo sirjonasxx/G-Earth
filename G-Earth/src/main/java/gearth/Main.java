@@ -132,14 +132,14 @@ public class Main extends Application {
     }
 }
 
-// Hi
-// I'm
-// Lande
-// I want
-// The role
-// Developer
-// Pls
-// You say :
-// Change 10 lines
-// I dit it.
-// https://i.imgur.com/QEHV2NZ.png
+// Dippy > DarkStar851
+// Lande > Dippy
+// DarkStar851 > Lande
+// Wait
+// That 
+// Illegal
+// sirjonasxx > Lande
+// So sirjonasxx > DarkStar851 & Dippy
+// But
+// If 
+// Dippy > sirjonasxx
