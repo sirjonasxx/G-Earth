@@ -140,6 +140,6 @@ public class Main extends Application {
 // "Developer"
 // Please
 // I have
-// Change Ten lines
+// Changed Ten lines
 // I have done it.
 // Pepega
