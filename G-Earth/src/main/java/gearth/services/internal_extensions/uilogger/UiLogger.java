@@ -19,7 +19,7 @@ import java.util.ArrayList;
 @ExtensionInfo(
         Title = "Packet Logger",
         Description = "",
-        Version = "0.1",
+        Version = "1.0",
         Author = "sirjonasxx & Scott"
 )
 public class UiLogger extends ExtensionForm implements PacketLogger {

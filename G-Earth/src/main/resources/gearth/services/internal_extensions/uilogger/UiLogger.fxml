@@ -38,7 +38,10 @@
                <accelerator>
                   <KeyCodeCombination alt="UP" code="L" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
                </accelerator></CheckMenuItem>
-            <MenuItem mnemonicParsing="false" onAction="#clearText" text="Clear text" />
+            <MenuItem mnemonicParsing="false" onAction="#clearText" text="Clear text">
+               <accelerator>
+                  <KeyCodeCombination alt="UP" code="E" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+               </accelerator></MenuItem>
             </Menu>
          <Menu mnemonicParsing="false" text="Packets">
            <items>
