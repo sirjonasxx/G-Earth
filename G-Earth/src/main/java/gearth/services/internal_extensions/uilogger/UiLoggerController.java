@@ -1,5 +1,7 @@
 package gearth.services.internal_extensions.uilogger;
 
+ import com.sun.org.apache.xpath.internal.operations.Bool;
+ import gearth.misc.Cacher;
  import gearth.misc.packet_info.PacketInfo;
  import gearth.misc.packet_info.PacketInfoManager;
  import gearth.protocol.HMessage;
@@ -7,9 +9,11 @@ import gearth.protocol.HPacket;
 import gearth.ui.logger.loggerdisplays.PacketLogger;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
-import javafx.fxml.Initializable;
+ import javafx.event.EventHandler;
+ import javafx.fxml.Initializable;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.Label;
+ import javafx.scene.control.MenuItem;
  import javafx.scene.control.RadioMenuItem;
  import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
@@ -23,10 +27,14 @@ import java.util.*;
  import java.util.stream.Collectors;
 
 public class UiLoggerController implements Initializable {
+
+    private static final String LOGGER_SETTINGS_CACHE = "LOGGER_SETTINGS";
+
     public FlowPane flowPane;
     public BorderPane borderPane;
     public Label lblViewIncoming;
     public Label lblViewOutgoing;
+
     public CheckMenuItem chkViewIncoming;
     public CheckMenuItem chkViewOutgoing;
     public CheckMenuItem chkDisplayStructure;
@@ -54,6 +62,7 @@ public class UiLoggerController implements Initializable {
     public RadioMenuItem chkAntiSpam_medium;
     public RadioMenuItem chkAntiSpam_high;
     public RadioMenuItem chkAntiSpam_ultra;
+    public Label lblSkipped;
 
     private Map<Integer, LinkedList<Long>> filterTimestamps = new HashMap<>();
 
@@ -71,11 +80,66 @@ public class UiLoggerController implements Initializable {
     private boolean viewMessageHash = false;
     private boolean alwaysOnTop = false;
 
+    private int skipped = 0;
+
     private volatile boolean initialized = false;
     private final List<Element> appendLater = new ArrayList<>();
 
+    private List<MenuItem> allMenuItems = new ArrayList<>();
+
+    private boolean isSelected(MenuItem item) {
+        if (item instanceof CheckMenuItem) {
+            return ((CheckMenuItem)item).isSelected();
+        }
+        if (item instanceof RadioMenuItem) {
+            return ((RadioMenuItem)item).isSelected();
+        }
+        return false;
+    }
+
+    private void setSelected(MenuItem item, boolean selected) {
+        if (item instanceof CheckMenuItem) {
+            ((CheckMenuItem)item).setSelected(selected);
+        }
+        if (item instanceof RadioMenuItem) {
+            ((RadioMenuItem)item).setSelected(selected);
+        }
+    }
+
+
+    private void saveAllMenuItems() {
+        List<Boolean> selection = new ArrayList<>();
+        for (MenuItem menuItem : allMenuItems) {
+            selection.add(isSelected(menuItem));
+        }
+
+        Cacher.put(LOGGER_SETTINGS_CACHE, selection);
+    }
+
+    private void loadAllMenuItems() {
+        List<Object> selectedMenuItems = Cacher.getList(LOGGER_SETTINGS_CACHE);
+        if (selectedMenuItems != null) {
+            for (int i = 0; i < selectedMenuItems.size(); i++) {
+                boolean isSelected = (boolean) selectedMenuItems.get(i);
+                setSelected(allMenuItems.get(i), isSelected);
+            }
+        }
+    }
+
     @Override
     public void initialize(URL arg0, ResourceBundle arg1) {
+        allMenuItems.addAll(Arrays.asList(
+                chkViewIncoming, chkViewOutgoing, chkDisplayStructure, chkAutoscroll,
+                chkSkipBigPackets, chkMessageName, chkMessageHash, chkUseNewStructures,
+                chkOpenOnConnect, chkResetOnConnect, chkHideOnDisconnect, chkResetOnDisconnect,
+                chkAntiSpam_none, chkAntiSpam_low, chkAntiSpam_medium, chkAntiSpam_high, chkAntiSpam_ultra
+        ));
+        loadAllMenuItems();
+
+        for (MenuItem item : allMenuItems) {
+            item.setOnAction(event -> saveAllMenuItems());
+        }
+
         area = new StyleClassedTextArea();
         area.getStyleClass().add("dark");
         area.setWrapText(true);
@@ -138,7 +202,11 @@ public class UiLoggerController implements Initializable {
 
         if (isIncoming && !isBlocked && !isReplaced) {
             boolean filter = checkFilter(packet);
-            if (filter) return;
+            if (filter) {
+                skipped++;
+                lblSkipped.setText("Skipped: " + skipped);
+                return;
+            }
         }
 
         if (isIncoming && !viewIncoming) return;

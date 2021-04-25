@@ -107,6 +107,12 @@
                <Insets right="10.0" />
             </FlowPane.margin>
          </Label>
+           <Label layoutX="270.0" layoutY="11.0" text="|">
+           <FlowPane.margin>
+               <Insets right="10.0" />
+           </FlowPane.margin>
+       </Label>
+         <Label fx:id="lblSkipped" layoutX="389.0" layoutY="11.0" style="-fx-text-fill: black !important" text="Skipped: 0" />
        </FlowPane>
    </bottom>
 </BorderPane>
