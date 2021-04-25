@@ -1,13 +1,10 @@
-package gearth.extensions.extra.harble;
+package gearth.extensions.extra.tools;
 
 import gearth.extensions.ExtensionInfo;
 import gearth.extensions.IExtension;
-import gearth.extensions.OnConnectionListener;
 import gearth.misc.listenerpattern.Observable;
-import gearth.misc.packet_info.PacketInfoManager;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
-import gearth.protocol.connection.HClient;
 
 /**
  * Created by Jonas on 3/12/2018.

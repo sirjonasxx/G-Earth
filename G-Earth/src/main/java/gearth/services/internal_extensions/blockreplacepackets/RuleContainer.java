@@ -1,6 +1,6 @@
-package extensions.blockreplacepackets;
+package gearth.services.internal_extensions.blockreplacepackets;
 
-import extensions.blockreplacepackets.rules.BlockReplaceRule;
+import gearth.services.internal_extensions.blockreplacepackets.rules.BlockReplaceRule;
 import gearth.ui.buttons.DeleteButton;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -13,7 +13,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 
 /**
- * Created by Jeunez on 6/11/2018.
+ * Created by Jonas on 6/11/2018.
  */
 public class RuleContainer extends GridPane {
 

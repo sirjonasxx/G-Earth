@@ -15,7 +15,7 @@ import java.net.URISyntaxException;
 import java.util.*;
 
 /**
- * Created by Jeunez on 27/06/2018.
+ * Created by Jonas on 27/06/2018.
  */
 
 public class WindowsHabboClient extends HabboClient {

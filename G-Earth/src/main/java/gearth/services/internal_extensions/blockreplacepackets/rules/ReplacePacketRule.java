@@ -1,10 +1,10 @@
-package extensions.blockreplacepackets.rules;
+package gearth.services.internal_extensions.blockreplacepackets.rules;
 
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 
 /**
- * Created by Jeunez on 6/11/2018.
+ * Created by Jonas on 6/11/2018.
  */
 public class ReplacePacketRule extends BlockReplaceRule {
 

@@ -1,17 +1,17 @@
-package extensions.blockreplacepackets.rules;
+package gearth.services.internal_extensions.blockreplacepackets.rules;
 
 import gearth.protocol.HMessage;
 
 /**
  * Created by Jonas on 6/11/2018.
  */
-public class ReplaceStringRule extends BlockReplaceRule {
+public class ReplaceSubstringRule extends BlockReplaceRule {
 
     private Side side;
     private String value;
     private String replacement;
 
-    ReplaceStringRule(Side side, String value, String replacement) {
+    ReplaceSubstringRule(Side side, String value, String replacement) {
         this.side = side;
         this.value = value;
         this.replacement = replacement;
@@ -22,7 +22,7 @@ public class ReplaceStringRule extends BlockReplaceRule {
         if (side == Side.ALL
                 || (message.getDestination() == HMessage.Direction.TOSERVER && side == Side.OUTGOING)
                 || (message.getDestination() == HMessage.Direction.TOCLIENT && side ==Side.INCOMING)) {
-            message.getPacket().replaceAllStrings(value, replacement);
+            message.getPacket().replaceAllSubstrings(value, replacement);
         }
     }
 
@@ -33,7 +33,7 @@ public class ReplaceStringRule extends BlockReplaceRule {
 
     @Override
     public Type type() {
-        return Type.STRING;
+        return Type.SUBSTRING;
     }
 
     @Override

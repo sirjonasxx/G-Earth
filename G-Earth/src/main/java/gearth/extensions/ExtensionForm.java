@@ -8,9 +8,9 @@ import gearth.protocol.HPacket;
 /**
  * Created by Jonas on 22/09/18.
  */
-public abstract class ExtensionForm implements IExtension {
+public abstract class ExtensionForm extends ExtensionBase {
 
-    volatile Extension extension;
+    volatile ExtensionBase extension;
     protected volatile Stage primaryStage;
 
     protected static void runExtensionForm(String[] args, Class<? extends ExtensionForm> extension) {
@@ -59,7 +59,7 @@ public abstract class ExtensionForm implements IExtension {
     /**
      * The application got doubleclicked from the G-Earth interface. Doing something here is optional
      */
-    protected void onClick(){
+    public void onClick(){
         Platform.runLater(() -> {
             primaryStage.show();
             primaryStage.requestFocus();

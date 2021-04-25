@@ -1,10 +1,12 @@
-package extensions.blockreplacepackets;
+package gearth.services.internal_extensions.blockreplacepackets;
 
-import extensions.blockreplacepackets.rules.BlockReplaceRule;
-import extensions.blockreplacepackets.rules.RuleFactory;
-import gearth.extensions.Extension;
+import gearth.Main;
+import gearth.extensions.ExtensionForm;
+import gearth.extensions.ExtensionInfo;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
+import gearth.services.internal_extensions.blockreplacepackets.rules.BlockReplaceRule;
+import gearth.services.internal_extensions.blockreplacepackets.rules.RuleFactory;
 import gearth.ui.GEarthController;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -15,11 +17,10 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import gearth.extensions.ExtensionForm;
-import gearth.extensions.ExtensionInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,9 +49,9 @@ public class BlockAndReplacePackets extends ExtensionForm {
 
     List<BlockReplaceRule> rules = new ArrayList<>();
 
-    public static void main(String[] args) {
-        runExtensionForm(args, BlockAndReplacePackets.class);
-    }
+//    public static void main(String[] args) {
+//        runExtensionForm(args, BlockAndReplacePackets.class);
+//    }
 
     //initialize javaFX elements
     public void initialize() {
@@ -177,7 +178,7 @@ public class BlockAndReplacePackets extends ExtensionForm {
 
     @Override
     protected void initExtension() {
-        Extension.MessageListener messageListener = message -> {
+        MessageListener messageListener = message -> {
             for (BlockReplaceRule rule : rules) {
                 rule.appendRuleToMessage(message);
             }
@@ -196,6 +197,7 @@ public class BlockAndReplacePackets extends ExtensionForm {
         primaryStage.setScene(new Scene(root));
         primaryStage.setResizable(false);
         primaryStage.getScene().getStylesheets().add(GEarthController.class.getResource("/gearth/ui/bootstrap3.css").toExternalForm());
+        primaryStage.getIcons().add(new Image(Main.class.getResourceAsStream("G-EarthLogoSmaller.png")));
 
         return loader.getController();
     }
@@ -213,6 +215,11 @@ public class BlockAndReplacePackets extends ExtensionForm {
 
 
         clearInput();
+    }
+
+    @Override
+    protected boolean canLeave() {
+        return false;
     }
 
     @Override

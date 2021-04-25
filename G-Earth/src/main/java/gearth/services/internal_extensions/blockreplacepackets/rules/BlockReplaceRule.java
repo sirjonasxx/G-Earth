@@ -1,4 +1,4 @@
-package extensions.blockreplacepackets.rules;
+package gearth.services.internal_extensions.blockreplacepackets.rules;
 
 import gearth.protocol.HMessage;
 import javafx.beans.InvalidationListener;

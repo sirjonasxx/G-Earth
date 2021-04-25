@@ -1,5 +1,9 @@
 package gearth.extensions;
 
+import gearth.extensions.ExtensionBase;
+import gearth.extensions.ExtensionInfo;
+import gearth.extensions.IExtension;
+import gearth.extensions.OnConnectionListener;
 import gearth.misc.listenerpattern.Observable;
 import gearth.misc.packet_info.PacketInfoManager;
 import gearth.protocol.HMessage;
@@ -18,17 +22,9 @@ import java.util.Map;
 /**
  * Created by Jonas on 23/06/18.
  */
-public abstract class Extension implements IExtension {
+public abstract class Extension extends ExtensionBase {
 
-    public interface MessageListener {
-        void act(HMessage message);
-    }
-    public interface FlagsCheckListener {
-        void act(String[] args);
-    }
-
-    protected boolean canLeave;     // can you disconnect the ext
-    protected boolean canDelete;    // can you delete the ext (will be false for some built-in extensions)
+    protected FlagsCheckListener flagRequestCallback = null;
 
     private String[] args;
     private boolean isCorrupted = false;
@@ -39,9 +35,6 @@ public abstract class Extension implements IExtension {
     protected PacketInfoManager packetInfoManager = new PacketInfoManager(new ArrayList<>()); // empty
 
     private OutputStream out = null;
-    private final Map<Integer, List<MessageListener>> incomingMessageListeners = new HashMap<>();
-    private final Map<Integer, List<MessageListener>> outgoingMessageListeners = new HashMap<>();
-    private FlagsCheckListener flagRequestCallback = null;
 
     private String getArgument(String[] args, String... arg) {
         for (int i = 0; i < args.length - 1; i++) {
@@ -59,8 +52,7 @@ public abstract class Extension implements IExtension {
      * @param args arguments
      */
     public Extension(String[] args) {
-        canLeave = canLeave();
-        canDelete = canDelete();
+        super();
 
         //obtain port
         this.args = args;
@@ -136,8 +128,8 @@ public abstract class Extension implements IExtension {
                             .appendBoolean(file != null)
                             .appendString(file == null ? "": file)
                             .appendString(cookie == null ? "" : cookie)
-                            .appendBoolean(canLeave)
-                            .appendBoolean(canDelete);
+                            .appendBoolean(canLeave())
+                            .appendBoolean(canDelete());
                     writeToStream(response.toBytes());
                 }
                 else if (packet.headerId() == NetworkExtensionInfo.OUTGOING_MESSAGES_IDS.CONNECTIONSTART) {
@@ -149,7 +141,7 @@ public abstract class Extension implements IExtension {
                     packetInfoManager = PacketInfoManager.readFromPacket(packet);
 
                     Constants.UNITY_PACKETS = clientType == HClient.UNITY;
-                    onConnectionObservable.fireEvent(l -> l.onConnection(
+                    getOnConnectionObservable().fireEvent(l -> l.onConnection(
                             host, connectionPort, hotelVersion,
                             clientIdentifier, clientType, packetInfoManager)
                     );
@@ -180,36 +172,8 @@ public abstract class Extension implements IExtension {
                 else if (packet.headerId() == NetworkExtensionInfo.OUTGOING_MESSAGES_IDS.PACKETINTERCEPT) {
                     String stringifiedMessage = packet.readLongString();
                     HMessage habboMessage = new HMessage(stringifiedMessage);
-                    HPacket habboPacket = habboMessage.getPacket();
 
-                    Map<Integer, List<MessageListener>> listeners =
-                            habboMessage.getDestination() == HMessage.Direction.TOCLIENT ?
-                                    incomingMessageListeners :
-                                    outgoingMessageListeners;
-
-                    List<MessageListener> correctListeners = new ArrayList<>();
-
-                    synchronized (incomingMessageListeners) {
-                        synchronized (outgoingMessageListeners) {
-                            if (listeners.containsKey(-1)) { // registered on all packets
-                                for (int i = listeners.get(-1).size() - 1; i >= 0; i--) {
-                                    correctListeners.add(listeners.get(-1).get(i));
-                                }
-                            }
-
-                            if (listeners.containsKey(habboPacket.headerId())) {
-                                for (int i = listeners.get(habboPacket.headerId()).size() - 1; i >= 0; i--) {
-                                    correctListeners.add(listeners.get(habboPacket.headerId()).get(i));
-                                }
-                            }
-                        }
-                    }
-
-                    for(MessageListener listener : correctListeners) {
-                        habboMessage.getPacket().resetReadIndex();
-                        listener.act(habboMessage);
-                    }
-                    habboMessage.getPacket().resetReadIndex();
+                    modifyMessage(habboMessage);
 
                     HPacket response = new HPacket(NetworkExtensionInfo.INCOMING_MESSAGES_IDS.MANIPULATEDPACKET);
                     response.appendLongString(habboMessage.stringify());
@@ -276,37 +240,6 @@ public abstract class Extension implements IExtension {
     }
 
     /**
-     * Register a listener on a specific packet Type
-     * @param direction ToClient or ToServer
-     * @param headerId the packet header ID
-     * @param messageListener the callback
-     */
-    public void intercept(HMessage.Direction direction, int headerId, MessageListener messageListener) {
-        Map<Integer, List<MessageListener>> listeners =
-                direction == HMessage.Direction.TOCLIENT ?
-                        incomingMessageListeners :
-                        outgoingMessageListeners;
-
-        synchronized (listeners) {
-            if (!listeners.containsKey(headerId)) {
-                listeners.put(headerId, new ArrayList<>());
-            }
-        }
-
-
-        listeners.get(headerId).add(messageListener);
-    }
-
-    /**
-     * Register a listener on all packets
-     * @param direction ToClient or ToServer
-     * @param messageListener the callback
-     */
-    public void intercept(HMessage.Direction direction, MessageListener messageListener) {
-        intercept(direction, -1, messageListener);
-    }
-
-    /**
      * Requests the flags which have been given to G-Earth when it got executed
      * For example, you might want this extension to do a specific thing if the flag "-e" was given
      * @param flagRequestCallback callback
@@ -322,15 +255,6 @@ public abstract class Extension implements IExtension {
             e.printStackTrace();
             return false;
         }
-    }
-
-
-    /**
-     * Write to the console in G-Earth
-     * @param s the text to be written
-     */
-    public void writeToConsole(String s) {
-        writeToConsole("black", s, true);
     }
 
     /**
@@ -360,36 +284,11 @@ public abstract class Extension implements IExtension {
         }
     }
 
-
-    private boolean isOnClickMethodUsed() {
-
-        Class<? extends Extension> c = getClass();
-
-        while (c != Extension.class) {
-            try {
-                c.getDeclaredMethod("onClick");
-                // if it didnt error, onClick exists
-                return true;
-            } catch (NoSuchMethodException e) {
-//                e.printStackTrace();
-            }
-
-            c = (Class<? extends Extension>) c.getSuperclass();
-        }
-
-        return false;
-    }
-
     /**
      * Gets called when a connection has been established with G-Earth.
      * This does not imply a connection with Habbo is setup.
      */
     protected void initExtension(){}
-
-    /**
-     * The application got doubleclicked from the G-Earth interface. Doing something here is optional
-     */
-    protected void onClick(){}
 
     /**
      * A connection with Habbo has been started
@@ -407,16 +306,6 @@ public abstract class Extension implements IExtension {
 
     protected boolean canDelete() {
         return true;
-    }
-
-    ExtensionInfo getInfoAnnotations() {
-        return getClass().getAnnotation(ExtensionInfo.class);
-    }
-
-
-    private Observable<OnConnectionListener> onConnectionObservable = new Observable<>();
-    public void onConnect(OnConnectionListener listener){
-        onConnectionObservable.addListener(listener);
     }
 
 }
