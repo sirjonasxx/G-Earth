@@ -43,15 +43,17 @@ public class UiLoggerController implements Initializable {
     public CheckMenuItem chkHideOnDisconnect;
     public CheckMenuItem chkResetOnDisconnect;
 
-    private final static int FILTER_AMOUNT_THRESHOLD_S = 15;
+    private final static int FILTER_AMOUNT_THRESHOLD_L = 15;
     private final static int FILTER_AMOUNT_THRESHOLD_M = 9;
     private final static int FILTER_AMOUNT_THRESHOLD_H = 4;
+    private final static int FILTER_AMOUNT_THRESHOLD_U = 2;
     private final static int FILTER_TIME_THRESHOLD = 5000;
 
     public RadioMenuItem chkAntiSpam_none;
     public RadioMenuItem chkAntiSpam_low;
     public RadioMenuItem chkAntiSpam_medium;
     public RadioMenuItem chkAntiSpam_high;
+    public RadioMenuItem chkAntiSpam_ultra;
 
     private Map<Integer, LinkedList<Long>> filterTimestamps = new HashMap<>();
 
@@ -108,8 +110,10 @@ public class UiLoggerController implements Initializable {
         int headerId = packet.headerId();
 
         int threshold = chkAntiSpam_none.isSelected() ? 100000000 : (
-                chkAntiSpam_low.isSelected() ? FILTER_AMOUNT_THRESHOLD_S : (
-                        chkAntiSpam_medium.isSelected() ? FILTER_AMOUNT_THRESHOLD_M : FILTER_AMOUNT_THRESHOLD_H
+                chkAntiSpam_low.isSelected() ? FILTER_AMOUNT_THRESHOLD_L : (
+                        chkAntiSpam_medium.isSelected() ? FILTER_AMOUNT_THRESHOLD_M : (
+                                chkAntiSpam_high.isSelected() ? FILTER_AMOUNT_THRESHOLD_H : FILTER_AMOUNT_THRESHOLD_U
+                        )
                 )
         );
 

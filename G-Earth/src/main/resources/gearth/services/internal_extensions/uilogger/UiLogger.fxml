@@ -60,6 +60,7 @@
                      <RadioMenuItem fx:id="chkAntiSpam_low" mnemonicParsing="false" text="Low" toggleGroup="$antispam" />
                      <RadioMenuItem fx:id="chkAntiSpam_medium" mnemonicParsing="false" text="Medium" toggleGroup="$antispam" />
                      <RadioMenuItem fx:id="chkAntiSpam_high" mnemonicParsing="false" text="High" toggleGroup="$antispam" />
+                     <RadioMenuItem fx:id="chkAntiSpam_ultra" mnemonicParsing="false" text="Ultra" toggleGroup="$antispam" />
                  </items>
                </Menu>
                <CheckMenuItem fx:id="chkSkipBigPackets" mnemonicParsing="false" onAction="#toggleSkipPackets" selected="true" text="Skip big packets" />
