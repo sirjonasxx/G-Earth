@@ -3,8 +3,12 @@ package gearth.services.internal_extensions.blockreplacepackets;
 import gearth.Main;
 import gearth.extensions.ExtensionForm;
 import gearth.extensions.ExtensionInfo;
+import gearth.extensions.OnConnectionListener;
+import gearth.misc.packet_info.PacketInfo;
+import gearth.misc.packet_info.PacketInfoManager;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
+import gearth.protocol.connection.HClient;
 import gearth.services.internal_extensions.blockreplacepackets.rules.BlockReplaceRule;
 import gearth.services.internal_extensions.blockreplacepackets.rules.RuleFactory;
 import gearth.ui.GEarthController;
@@ -49,6 +53,8 @@ public class BlockAndReplacePackets extends ExtensionForm {
 
     List<BlockReplaceRule> rules = new ArrayList<>();
 
+    private PacketInfoManager packetInfoManager = PacketInfoManager.EMPTY;
+
 //    public static void main(String[] args) {
 //        runExtensionForm(args, BlockAndReplacePackets.class);
 //    }
@@ -71,6 +77,26 @@ public class BlockAndReplacePackets extends ExtensionForm {
 
     }
 
+    private String getVal() {
+        String val = txt_value.getText();
+        String type = cmb_type.getSelectionModel().getSelectedItem();
+        String side = cmb_side.getSelectionModel().getSelectedItem();
+
+        if (type.endsWith("packet")) {
+            HMessage.Direction dir = side.equals("Outgoing") ? HMessage.Direction.TOSERVER : HMessage.Direction.TOCLIENT;
+            PacketInfo fromName = packetInfoManager.getPacketInfoFromName(dir, val);
+            PacketInfo fromHash = packetInfoManager.getPacketInfoFromHash(dir, val);
+            if (fromName != null) {
+                val = fromName.getHeaderId() +"";
+            }
+            else if (fromHash != null) {
+                val = fromHash.getHeaderId() +"";
+            }
+        }
+
+        return val;
+    }
+
     private void refreshOptions() {
         txt_replacement.setDisable(cmb_type.getSelectionModel().getSelectedItem().startsWith("Block"));
         if (cmb_side.getItems().size() == 2 && !cmb_type.getSelectionModel().getSelectedItem().endsWith("packet")) {
@@ -84,7 +110,7 @@ public class BlockAndReplacePackets extends ExtensionForm {
         }
 
         boolean isValid = false;
-        String val = txt_value.getText();
+        String val = getVal();
         String repl = txt_replacement.getText();
         String type = cmb_type.getSelectionModel().getSelectedItem();
         String side = cmb_side.getSelectionModel().getSelectedItem();
@@ -155,7 +181,7 @@ public class BlockAndReplacePackets extends ExtensionForm {
 
         if (val.equals("")) {
             if (spl[1].equals("packet")) {
-                txt_value.setPromptText("Enter the headerID");
+                txt_value.setPromptText("Enter headerID/name");
             }
             else if (spl[1].equals("integer")) {
                 txt_value.setPromptText("Enter an integer");
@@ -186,6 +212,10 @@ public class BlockAndReplacePackets extends ExtensionForm {
 
         intercept(HMessage.Direction.TOSERVER, messageListener);
         intercept(HMessage.Direction.TOCLIENT, messageListener);
+
+        onConnect((host, port, hotelversion, clientIdentifier, clientType, packetInfoManager) -> {
+            this.packetInfoManager = packetInfoManager;
+        });
     }
 
     @Override
@@ -208,7 +238,8 @@ public class BlockAndReplacePackets extends ExtensionForm {
     }
 
     public void click_btnAddRule(ActionEvent actionEvent) {
-        BlockReplaceRule rule = RuleFactory.getRule(cmb_type.getSelectionModel().getSelectedItem(), cmb_side.getSelectionModel().getSelectedItem(), txt_value.getText(), txt_replacement.getText());
+        BlockReplaceRule rule = RuleFactory.getRule(cmb_type.getSelectionModel().getSelectedItem(),
+                cmb_side.getSelectionModel().getSelectedItem(), getVal(), txt_replacement.getText(), packetInfoManager);
         rules.add(rule);
         rule.onDelete(observable -> rules.remove(rule));
         new RuleContainer(rule, vbox);

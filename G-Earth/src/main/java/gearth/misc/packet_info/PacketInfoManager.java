@@ -183,4 +183,7 @@ public class PacketInfoManager {
             hPacket.appendBoolean(packetInfo.getDestination() == HMessage.Direction.TOSERVER);
         }
     }
+
+
+    public static PacketInfoManager EMPTY = new PacketInfoManager(new ArrayList<>());
 }

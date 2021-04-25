@@ -1,5 +1,7 @@
 package gearth.services.internal_extensions.blockreplacepackets.rules;
 
+import gearth.misc.packet_info.PacketInfoManager;
+import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 
 /**
@@ -7,7 +9,7 @@ import gearth.protocol.HPacket;
  */
 public class RuleFactory {
 
-    public static BlockReplaceRule getRule(String type, String side, String value, String replacement) {
+    public static BlockReplaceRule getRule(String type, String side, String value, String replacement, PacketInfoManager packetInfoManager) {
         BlockReplaceRule.Option rOption = BlockReplaceRule.Option.valueOf(type.split(" ")[0].toUpperCase());
         BlockReplaceRule.Type rType = BlockReplaceRule.Type.valueOf(type.split(" ")[1].toUpperCase());
         BlockReplaceRule.Side rSide = BlockReplaceRule.Side.valueOf(side.toUpperCase());
@@ -24,7 +26,11 @@ public class RuleFactory {
                 return new ReplaceIntegerRule(rSide, Integer.parseInt(value), Integer.parseInt(replacement));
             }
             if (rType == BlockReplaceRule.Type.PACKET) {
-                return new ReplacePacketRule(rSide, Integer.parseInt(value), new HPacket(replacement));
+                HPacket packet = new HPacket(replacement);
+                if (!packet.isPacketComplete()) {
+                    packet.completePacket(rSide == BlockReplaceRule.Side.INCOMING ? HMessage.Direction.TOCLIENT : HMessage.Direction.TOSERVER, packetInfoManager);
+                }
+                return new ReplacePacketRule(rSide, Integer.parseInt(value), packet);
             }
             if (rType == BlockReplaceRule.Type.STRING) {
                 return new ReplaceStringRule(rSide, value, replacement);
