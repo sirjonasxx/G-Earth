@@ -33,7 +33,7 @@ public class SulekPacketInfoProvider extends RemotePacketInfoProvider {
         String name = object.getString("name")
                 .replaceAll("(((Message)?Composer)|((Message)?Event))$", "");
 
-        return new PacketInfo(destination, headerId, null, name, null);
+        return new PacketInfo(destination, headerId, null, name, null, "Sulek");
     }
 
     @Override

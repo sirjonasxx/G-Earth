@@ -1,6 +1,5 @@
 package gearth.misc.packet_info;
 
-import gearth.misc.Cacher;
 import gearth.misc.packet_info.providers.RemotePacketInfoProvider;
 import gearth.misc.packet_info.providers.implementations.HarblePacketInfoProvider;
 import gearth.misc.packet_info.providers.implementations.SulekPacketInfoProvider;
@@ -8,13 +7,7 @@ import gearth.misc.packet_info.providers.implementations.UnityPacketInfoProvider
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 import gearth.protocol.connection.HClient;
-import org.fxmisc.undo.impl.ChangeQueue;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.Semaphore;
 
@@ -160,14 +153,15 @@ public class PacketInfoManager {
             String name = hPacket.readString();
             String structure = hPacket.readString();
             boolean isOutgoing = hPacket.readBoolean();
+            String source = hPacket.readString();
 
             packetInfoList.add(new PacketInfo(
                     isOutgoing ? HMessage.Direction.TOSERVER : HMessage.Direction.TOCLIENT,
                     headerId,
                     hash.equals("NULL") ? null : hash,
                     name.equals("NULL") ? null : name,
-                    structure.equals("NULL") ? null : structure
-            ));
+                    structure.equals("NULL") ? null : structure,
+                    source));
         }
 
         return new PacketInfoManager(packetInfoList);
@@ -181,6 +175,7 @@ public class PacketInfoManager {
             hPacket.appendString(packetInfo.getName() == null ? "NULL" : packetInfo.getName());
             hPacket.appendString(packetInfo.getStructure() == null ? "NULL" : packetInfo.getStructure());
             hPacket.appendBoolean(packetInfo.getDestination() == HMessage.Direction.TOSERVER);
+            hPacket.appendString(packetInfo.getSource());
         }
     }
 

@@ -9,12 +9,15 @@ public class PacketInfo {
     private final String name;
     private final String structure;
 
-    public PacketInfo(HMessage.Direction destination, int headerId, String hash, String name, String structure) {
+    private final String source;
+
+    public PacketInfo(HMessage.Direction destination, int headerId, String hash, String name, String structure, String source) {
         this.destination = destination;
         this.headerId = headerId;
         this.hash = hash;
         this.name = name;
         this.structure = structure;
+        this.source = source;
     }
 
     public String getName() {
@@ -35,6 +38,10 @@ public class PacketInfo {
 
     public String getStructure() {
         return structure;
+    }
+
+    public String getSource() {
+        return source;
     }
 
     public String toString() {

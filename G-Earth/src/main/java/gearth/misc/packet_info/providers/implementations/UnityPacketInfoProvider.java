@@ -32,7 +32,7 @@ public class UnityPacketInfoProvider extends PacketInfoProvider {
     private PacketInfo jsonToPacketInfo(JSONObject object, HMessage.Direction destination) {
         String name = object.getString("Name");
         int headerId = object.getInt("Id");
-        return new PacketInfo(destination, headerId, null, name, null);
+        return new PacketInfo(destination, headerId, null, name, null, "Unity_local");
     }
 
     @Override

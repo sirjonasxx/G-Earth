@@ -1,14 +1,11 @@
 package gearth.misc.packet_info.providers.implementations;
 
-import gearth.misc.Cacher;
 import gearth.misc.packet_info.PacketInfo;
-import gearth.misc.packet_info.providers.PacketInfoProvider;
 import gearth.misc.packet_info.providers.RemotePacketInfoProvider;
 import gearth.protocol.HMessage;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,7 +47,7 @@ public class HarblePacketInfoProvider extends RemotePacketInfoProvider {
         try {headerId = object.getInt("Id"); }
         catch (Exception e) { headerId = Integer.parseInt(object.getString("Id")); }
 
-        return new PacketInfo(destination, headerId, hash, name, structure);
+        return new PacketInfo(destination, headerId, hash, name, structure, "Harble");
     }
 
     @Override
