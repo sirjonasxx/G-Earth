@@ -5,18 +5,27 @@
 <?import javafx.scene.input.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane fx:id="borderPane" prefHeight="560.0" prefWidth="820.0" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gearth.ui.logger.loggerdisplays.uilogger.UiLoggerController">
+<BorderPane fx:id="borderPane" prefHeight="560.0" prefWidth="820.0" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gearth.services.internal_extensions.uilogger.UiLoggerController">
     <top>
         <MenuBar BorderPane.alignment="CENTER">
+         <Menu mnemonicParsing="false" text="Window">
+           <items>
+               <CheckMenuItem fx:id="chkAlwaysOnTop" mnemonicParsing="false" onAction="#toggleAlwaysOnTop" text="Always on top" />
+               <Menu mnemonicParsing="false" text="On connect">
+                 <items>
+                     <CheckMenuItem fx:id="chkOpenOnConnect" mnemonicParsing="false" selected="true" text="Open window" />
+                     <CheckMenuItem fx:id="chkResetOnConnect" mnemonicParsing="false" selected="true" text="Reset packetlogger" />
+                 </items>
+               </Menu>
+               <Menu mnemonicParsing="false" text="On disconnect">
+                 <items>
+                     <CheckMenuItem fx:id="chkHideOnDisconnect" mnemonicParsing="false" selected="true" text="Hide window" />
+                     <CheckMenuItem fx:id="chkResetOnDisconnect" mnemonicParsing="false" text="Reset packetlogger" />
+                 </items>
+               </Menu>
+           </items>
+         </Menu>
             <Menu mnemonicParsing="false" text="View">
-            <Menu mnemonicParsing="false" text="Display Details">
-              <items>
-                  <CheckMenuItem fx:id="chkDisplayStructure" mnemonicParsing="false" onAction="#toggleDisplayStructure" selected="true" text="Structure" />
-                  <CheckMenuItem fx:id="chkMessageName" mnemonicParsing="false" onAction="#toggleMessageName" selected="true" text="Message Name" />
-                  <CheckMenuItem fx:id="chkMessageHash" mnemonicParsing="false" onAction="#toggleMessageHash" text="Message Hash" />
-                  <CheckMenuItem fx:id="chkUseNewStructures" mnemonicParsing="false" onAction="#toggleMessageHash" selected="true" text="New structures" />
-              </items>
-            </Menu>
             <CheckMenuItem fx:id="chkViewIncoming" mnemonicParsing="false" onAction="#toggleViewIncoming" selected="true" text="View Incoming">
                <accelerator>
                   <KeyCodeCombination alt="UP" code="I" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
@@ -29,13 +38,24 @@
                <accelerator>
                   <KeyCodeCombination alt="UP" code="L" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
                </accelerator></CheckMenuItem>
-            <CheckMenuItem fx:id="chkSkipBigPackets" mnemonicParsing="false" onAction="#toggleSkipPackets" selected="true" text="Skip big packets" />
-            <CheckMenuItem fx:id="chkAlwaysOnTop" mnemonicParsing="false" onAction="#toggleAlwaysOnTop" text="Always on top" />
             <CheckMenuItem fx:id="chkClearText" mnemonicParsing="false" onAction="#clearText" text="Clear text">
                <accelerator>
                   <KeyCodeCombination alt="UP" code="E" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
                </accelerator></CheckMenuItem>
             </Menu>
+         <Menu mnemonicParsing="false" text="Packets">
+           <items>
+               <Menu mnemonicParsing="false" text="Display Details">
+                 <items>
+                     <CheckMenuItem fx:id="chkDisplayStructure" mnemonicParsing="false" onAction="#toggleDisplayStructure" selected="true" text="Structure" />
+                     <CheckMenuItem fx:id="chkMessageName" mnemonicParsing="false" onAction="#toggleMessageName" selected="true" text="Message Name" />
+                     <CheckMenuItem fx:id="chkMessageHash" mnemonicParsing="false" onAction="#toggleMessageHash" text="Message Hash" />
+                     <CheckMenuItem fx:id="chkUseNewStructures" mnemonicParsing="false" onAction="#toggleMessageHash" selected="true" text="New structures" />
+                 </items>
+               </Menu>
+               <CheckMenuItem fx:id="chkSkipBigPackets" mnemonicParsing="false" onAction="#toggleSkipPackets" selected="true" text="Skip big packets" />
+           </items>
+         </Menu>
         </MenuBar>
     </top>
    <bottom>

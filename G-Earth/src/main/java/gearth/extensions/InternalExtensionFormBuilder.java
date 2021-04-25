@@ -5,15 +5,15 @@ import gearth.services.extensionhandler.extensions.extensionproducers.ExtensionP
 import javafx.application.Platform;
 import javafx.stage.Stage;
 
-public class InternalExtensionFormBuilder {
+public class InternalExtensionFormBuilder<T extends ExtensionForm> {
 
-    public static void launch(Class<? extends ExtensionForm> extension, ExtensionProducerObserver observer) {
+    public T launch(Class<T> extensionClass, ExtensionProducerObserver observer) {
         try {
-            ExtensionInfo extInfo = extension.getAnnotation(ExtensionInfo.class);
-            ExtensionForm creator = extension.newInstance();
+            ExtensionInfo extInfo = extensionClass.getAnnotation(ExtensionInfo.class);
+            T creator = extensionClass.newInstance();
 
             Stage stage = new Stage();
-            ExtensionForm extensionForm = creator.launchForm(stage);
+            T extensionForm = (T)(creator.launchForm(stage));
 
             InternalExtension internalExtension = new InternalExtension() {
                 @Override
@@ -67,8 +67,12 @@ public class InternalExtensionFormBuilder {
                     extensionForm.onHide();
                 });
             });
+
+            return extensionForm;
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        return null;
     }
 }

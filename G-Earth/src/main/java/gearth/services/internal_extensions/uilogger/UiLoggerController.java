@@ -1,4 +1,4 @@
-package gearth.ui.logger.loggerdisplays.uilogger;
+package gearth.services.internal_extensions.uilogger;
 
  import gearth.misc.packet_info.PacketInfo;
  import gearth.misc.packet_info.PacketInfoManager;
@@ -37,10 +37,15 @@ public class UiLoggerController implements Initializable {
     public Label lblPacketInfo;
     public CheckMenuItem chkUseNewStructures;
 
+    public CheckMenuItem chkOpenOnConnect;
+    public CheckMenuItem chkResetOnConnect;
+    public CheckMenuItem chkHideOnDisconnect;
+    public CheckMenuItem chkResetOnDisconnect;
+
     private StyleClassedTextArea area;
 
     private Stage stage;
-    private PacketInfoManager packetInfoManager;
+    private PacketInfoManager packetInfoManager = null;
 
     private boolean viewIncoming = true;
     private boolean viewOutgoing = true;
@@ -97,7 +102,6 @@ public class UiLoggerController implements Initializable {
 
 
         boolean packetInfoAvailable = packetInfoManager.getPacketInfoList().size() > 0;
-        lblPacketInfo.setText("Packet info: " + (packetInfoAvailable ? "True" : "False"));
 
         if ((viewMessageName || viewMessageHash) && packetInfoAvailable) {
             List<PacketInfo> messages = packetInfoManager.getAllPacketInfoFromHeaderId(
@@ -208,6 +212,10 @@ public class UiLoggerController implements Initializable {
 
     public void setPacketInfoManager(PacketInfoManager packetInfoManager) {
         this.packetInfoManager = packetInfoManager;
+        Platform.runLater(() -> {
+            boolean packetInfoAvailable = packetInfoManager.getPacketInfoList().size() > 0;
+            lblPacketInfo.setText("Packet info: " + (packetInfoAvailable ? "True" : "False"));
+        });
     }
 
     public void toggleViewIncoming() {
@@ -251,5 +259,23 @@ public class UiLoggerController implements Initializable {
 
     public void clearText(ActionEvent actionEvent) {
         area.clear();
+    }
+
+    public void onDisconnect() {
+        if (chkHideOnDisconnect.isSelected()) {
+            stage.hide();
+        }
+        if (chkResetOnDisconnect.isSelected()) {
+            clearText(null);
+        }
+    }
+
+    public void onConnect() {
+        if (chkResetOnConnect.isSelected()) {
+            clearText(null);
+        }
+        if (chkOpenOnConnect.isSelected()) {
+            stage.show();
+        }
     }
 }

@@ -1,4 +1,4 @@
-package gearth.ui.logger.loggerdisplays.uilogger;
+package gearth.services.internal_extensions.uilogger;
 
 /**
  * Created by Jonas on 17/11/2018.

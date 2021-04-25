@@ -650,7 +650,7 @@ public class HPacket implements StringifyAble {
         if (isCorrupted()) return "";
 
         PacketInfo packetInfo = getPacketInfo(direction, packetInfoManager);
-        if (packetInfo.getStructure() != null) {
+        if (packetInfo != null && packetInfo.getStructure() != null) {
             return PacketStringUtils.toExpressionFromGivenStructure(this, packetInfo.getStructure(), removeShuffle ? packetInfo : null);
         }
         return PacketStringUtils.predictedExpression(this, removeShuffle ? packetInfo : null);

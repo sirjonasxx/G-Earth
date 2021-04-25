@@ -13,6 +13,7 @@ public class SimpleExtensionProducer implements ExtensionProducer {
         // uncomment the next line if you want to see an embedded example extension in G-Earth
 //         observer.onExtensionProduced(new ExampleExtension());
 
-        InternalExtensionFormBuilder.launch(BlockAndReplacePackets.class, observer);
+        new InternalExtensionFormBuilder<BlockAndReplacePackets>()
+                .launch(BlockAndReplacePackets.class, observer);
     }
 }

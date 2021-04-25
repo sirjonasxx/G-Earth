@@ -44,7 +44,6 @@ public class ExtensionHandler {
     }
 
     private void initialize() {
-
         hConnection.getStateObservable().addListener((oldState, newState) -> {
             if (newState == HState.CONNECTED) {
                 synchronized (gEarthExtensions) {
@@ -70,7 +69,7 @@ public class ExtensionHandler {
         });
 
         extensionProducers = ExtensionProducerFactory.getAll();
-        extensionProducers.forEach(this::initializeExtensionProducer);
+        extensionProducers.forEach(extensionProducer -> extensionProducer.startProducing(createExtensionProducerObserver()));
     }
 
 
@@ -173,8 +172,8 @@ public class ExtensionHandler {
 
 
 
-    private void initializeExtensionProducer(ExtensionProducer producer) {
-        producer.startProducing(new ExtensionProducerObserver() {
+    private ExtensionProducerObserver createExtensionProducerObserver() {
+        return new ExtensionProducerObserver() {
             @Override
             public void onExtensionProduced(GEarthExtension extension) {
                 synchronized (gEarthExtensions) {
@@ -254,7 +253,7 @@ public class ExtensionHandler {
 
                 observable.fireEvent(l -> l.onExtensionConnect(extension));
             }
-        });
+        };
     }
 
     public List<ExtensionProducer> getExtensionProducers() {
@@ -262,6 +261,11 @@ public class ExtensionHandler {
     }
     public Observable<ExtensionConnectedListener> getObservable() {
         return observable;
+    }
+
+    public void addExtensionProducer(ExtensionProducer producer) {
+        producer.startProducing(createExtensionProducerObserver());
+        extensionProducers.add(producer);
     }
 
 
