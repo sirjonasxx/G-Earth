@@ -123,4 +123,7 @@ public abstract class GEarthExtension {
     }
     // ----------------------------------------------------------------------------------------
 
+
+
+    public abstract ExtensionType extensionType();
 }

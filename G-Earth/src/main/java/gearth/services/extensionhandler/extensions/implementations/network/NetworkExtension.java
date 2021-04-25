@@ -3,6 +3,7 @@ package gearth.services.extensionhandler.extensions.implementations.network;
 import gearth.misc.packet_info.PacketInfoManager;
 import gearth.protocol.HMessage;
 import gearth.protocol.connection.HClient;
+import gearth.services.extensionhandler.extensions.ExtensionType;
 import gearth.services.extensionhandler.extensions.GEarthExtension;
 import gearth.protocol.HPacket;
 
@@ -238,5 +239,10 @@ public class NetworkExtension extends GEarthExtension {
         HPacket packet = new HPacket(NetworkExtensionInfo.OUTGOING_MESSAGES_IDS.STRINGTOPACKET_RESPONSE);
         packet.appendLongString(packetFromString.stringify());
         sendMessage(packet);
+    }
+
+    @Override
+    public ExtensionType extensionType() {
+        return ExtensionType.EXTERNAL;
     }
 }

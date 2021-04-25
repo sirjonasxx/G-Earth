@@ -5,6 +5,7 @@ import gearth.misc.packet_info.PacketInfoManager;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 import gearth.protocol.connection.HClient;
+import gearth.services.extensionhandler.extensions.ExtensionType;
 import gearth.services.extensionhandler.extensions.GEarthExtension;
 
 // wraps internal GEarthExtension class to IExtension interface
@@ -134,6 +135,11 @@ public class InternalExtensionBuilder extends GEarthExtension {
     @Override
     public void stringToPacketResponse(HPacket packet) {
         // no need in java ext
+    }
+
+    @Override
+    public ExtensionType extensionType() {
+        return ExtensionType.INTERNAL;
     }
 
 }

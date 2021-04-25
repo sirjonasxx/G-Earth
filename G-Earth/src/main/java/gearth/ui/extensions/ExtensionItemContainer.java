@@ -1,5 +1,6 @@
 package gearth.ui.extensions;
 
+import gearth.services.extensionhandler.extensions.ExtensionType;
 import gearth.services.extensionhandler.extensions.GEarthExtension;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
@@ -141,6 +142,11 @@ public class ExtensionItemContainer extends GridPane {
         add(buttonsBox, 4, 0);
 
         parent.getChildren().add(this);
+
+        if (item.extensionType() == ExtensionType.INTERNAL) {
+            setBackground(new Background(new BackgroundFill(Paint.valueOf("F0FFFF"), CornerRadii.EMPTY, Insets.EMPTY)));
+        }
+
 
         initExtension();
     }

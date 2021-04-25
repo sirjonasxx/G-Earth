@@ -4,6 +4,7 @@ import gearth.misc.packet_info.PacketInfoManager;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 import gearth.protocol.connection.HClient;
+import gearth.services.extensionhandler.extensions.ExtensionType;
 import gearth.services.extensionhandler.extensions.GEarthExtension;
 
 public class ExampleExtension extends GEarthExtension {
@@ -121,5 +122,10 @@ public class ExampleExtension extends GEarthExtension {
     @Override
     public void stringToPacketResponse(HPacket packet) {
 
+    }
+
+    @Override
+    public ExtensionType extensionType() {
+        return ExtensionType.INTERNAL;
     }
 }
