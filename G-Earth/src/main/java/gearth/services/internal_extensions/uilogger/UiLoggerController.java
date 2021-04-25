@@ -10,7 +10,8 @@ import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.Label;
-import javafx.scene.layout.BorderPane;
+ import javafx.scene.control.RadioMenuItem;
+ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.stage.Stage;
 import org.fxmisc.flowless.VirtualizedScrollPane;
@@ -41,6 +42,18 @@ public class UiLoggerController implements Initializable {
     public CheckMenuItem chkResetOnConnect;
     public CheckMenuItem chkHideOnDisconnect;
     public CheckMenuItem chkResetOnDisconnect;
+
+    private final static int FILTER_AMOUNT_THRESHOLD_S = 15;
+    private final static int FILTER_AMOUNT_THRESHOLD_M = 9;
+    private final static int FILTER_AMOUNT_THRESHOLD_H = 4;
+    private final static int FILTER_TIME_THRESHOLD = 5000;
+
+    public RadioMenuItem chkAntiSpam_none;
+    public RadioMenuItem chkAntiSpam_low;
+    public RadioMenuItem chkAntiSpam_medium;
+    public RadioMenuItem chkAntiSpam_high;
+
+    private Map<Integer, LinkedList<Long>> filterTimestamps = new HashMap<>();
 
     private StyleClassedTextArea area;
 
@@ -90,10 +103,39 @@ public class UiLoggerController implements Initializable {
         return text.trim();
     }
 
+
+    private boolean checkFilter(HPacket packet) {
+        int headerId = packet.headerId();
+
+        int threshold = chkAntiSpam_none.isSelected() ? 100000000 : (
+                chkAntiSpam_low.isSelected() ? FILTER_AMOUNT_THRESHOLD_S : (
+                        chkAntiSpam_medium.isSelected() ? FILTER_AMOUNT_THRESHOLD_M : FILTER_AMOUNT_THRESHOLD_H
+                )
+        );
+
+        if (!filterTimestamps.containsKey(headerId)) {
+            filterTimestamps.put(headerId, new LinkedList<>());
+        }
+
+        long queueRemoveThreshold = System.currentTimeMillis() - FILTER_TIME_THRESHOLD;
+        LinkedList<Long> list = filterTimestamps.get(headerId);
+        while (!list.isEmpty() && list.get(0) < queueRemoveThreshold) list.removeFirst();
+
+        if (list.size() == threshold) list.removeFirst();
+        list.add(System.currentTimeMillis());
+
+        return list.size() >= threshold;
+    }
+
     public void appendMessage(HPacket packet, int types) {
         boolean isBlocked = (types & PacketLogger.MESSAGE_TYPE.BLOCKED.getValue()) != 0;
         boolean isReplaced = (types & PacketLogger.MESSAGE_TYPE.REPLACED.getValue()) != 0;
         boolean isIncoming = (types & PacketLogger.MESSAGE_TYPE.INCOMING.getValue()) != 0;
+
+        if (isIncoming && !isBlocked && !isReplaced) {
+            boolean filter = checkFilter(packet);
+            if (filter) return;
+        }
 
         if (isIncoming && !viewIncoming) return;
         if (!isIncoming && !viewOutgoing) return;

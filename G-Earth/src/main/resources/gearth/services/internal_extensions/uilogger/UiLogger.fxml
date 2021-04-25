@@ -50,6 +50,18 @@
                      <CheckMenuItem fx:id="chkUseNewStructures" mnemonicParsing="false" onAction="#toggleMessageHash" selected="true" text="New structures" />
                  </items>
                </Menu>
+               <Menu mnemonicParsing="false" text="Anti-spam filter">
+                 <items>
+                     <RadioMenuItem fx:id="chkAntiSpam_none" mnemonicParsing="false" selected="true" text="None">
+                        <toggleGroup>
+                           <ToggleGroup fx:id="antispam" />
+                        </toggleGroup>
+                     </RadioMenuItem>
+                     <RadioMenuItem fx:id="chkAntiSpam_low" mnemonicParsing="false" text="Low" toggleGroup="$antispam" />
+                     <RadioMenuItem fx:id="chkAntiSpam_medium" mnemonicParsing="false" text="Medium" toggleGroup="$antispam" />
+                     <RadioMenuItem fx:id="chkAntiSpam_high" mnemonicParsing="false" text="High" toggleGroup="$antispam" />
+                 </items>
+               </Menu>
                <CheckMenuItem fx:id="chkSkipBigPackets" mnemonicParsing="false" onAction="#toggleSkipPackets" selected="true" text="Skip big packets" />
            </items>
          </Menu>
