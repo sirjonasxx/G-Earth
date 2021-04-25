@@ -262,20 +262,24 @@ public class UiLoggerController implements Initializable {
     }
 
     public void onDisconnect() {
-        if (chkHideOnDisconnect.isSelected()) {
-            stage.hide();
-        }
-        if (chkResetOnDisconnect.isSelected()) {
-            clearText(null);
-        }
+        Platform.runLater(() -> {
+            if (chkHideOnDisconnect.isSelected()) {
+                stage.hide();
+            }
+            if (chkResetOnDisconnect.isSelected()) {
+                clearText(null);
+            }
+        });
     }
 
     public void onConnect() {
-        if (chkResetOnConnect.isSelected()) {
-            clearText(null);
-        }
-        if (chkOpenOnConnect.isSelected()) {
-            stage.show();
-        }
+        Platform.runLater(() -> {
+            if (chkResetOnConnect.isSelected()) {
+                clearText(null);
+            }
+            if (chkOpenOnConnect.isSelected()) {
+                stage.show();
+            }
+        });
     }
 }
