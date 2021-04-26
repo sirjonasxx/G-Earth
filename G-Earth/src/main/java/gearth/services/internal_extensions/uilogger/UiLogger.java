@@ -57,7 +57,7 @@ public class UiLogger extends ExtensionForm implements PacketLogger {
     @Override
     protected void onEndConnection() {
         controller.onDisconnect();
-        controller.setPacketInfoManager(new PacketInfoManager(new ArrayList<>()));
+        controller.setPacketInfoManager(PacketInfoManager.EMPTY);
     }
 
     @Override

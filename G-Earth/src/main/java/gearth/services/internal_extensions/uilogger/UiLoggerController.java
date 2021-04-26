@@ -45,6 +45,7 @@ public class UiLoggerController implements Initializable {
     public CheckMenuItem chkMessageHash;
     public Label lblPacketInfo;
     public CheckMenuItem chkUseNewStructures;
+    public CheckMenuItem chkAlwaysOnTop;
 
     public CheckMenuItem chkOpenOnConnect;
     public CheckMenuItem chkResetOnConnect;
@@ -70,15 +71,6 @@ public class UiLoggerController implements Initializable {
 
     private Stage stage;
     private PacketInfoManager packetInfoManager = null;
-
-    private boolean viewIncoming = true;
-    private boolean viewOutgoing = true;
-    private boolean displayStructure = true;
-    private boolean autoScroll = true;
-    private boolean skiphugepackets = true;
-    private boolean viewMessageName = true;
-    private boolean viewMessageHash = false;
-    private boolean alwaysOnTop = false;
 
     private int skipped = 0;
 
@@ -137,7 +129,10 @@ public class UiLoggerController implements Initializable {
         loadAllMenuItems();
 
         for (MenuItem item : allMenuItems) {
-            item.setOnAction(event -> saveAllMenuItems());
+            item.setOnAction(event -> {
+                saveAllMenuItems();
+                updateLoggerInfo();
+            });
         }
 
         area = new StyleClassedTextArea();
@@ -204,20 +199,20 @@ public class UiLoggerController implements Initializable {
             boolean filter = checkFilter(packet);
             if (filter) {
                 skipped++;
-                lblSkipped.setText("Skipped: " + skipped);
+                updateLoggerInfo();
                 return;
             }
         }
 
-        if (isIncoming && !viewIncoming) return;
-        if (!isIncoming && !viewOutgoing) return;
+        if (isIncoming && !chkViewIncoming.isSelected()) return;
+        if (!isIncoming && !chkViewOutgoing.isSelected()) return;
 
         ArrayList<Element> elements = new ArrayList<>();
 
 
         boolean packetInfoAvailable = packetInfoManager.getPacketInfoList().size() > 0;
 
-        if ((viewMessageName || viewMessageHash) && packetInfoAvailable) {
+        if ((chkMessageName.isSelected() || chkMessageHash.isSelected()) && packetInfoAvailable) {
             List<PacketInfo> messages = packetInfoManager.getAllPacketInfoFromHeaderId(
                     (isIncoming ? HMessage.Direction.TOCLIENT : HMessage.Direction.TOSERVER),
                     packet.headerId()
@@ -228,11 +223,11 @@ public class UiLoggerController implements Initializable {
                     .filter(Objects::nonNull).distinct().collect(Collectors.toList());
 
             boolean addedSomething = false;
-            if (viewMessageName && names.size() > 0) {
+            if (chkMessageName.isSelected() && names.size() > 0) {
                 for (String name : names) {elements.add(new Element("["+name+"]", "messageinfo")); }
                 addedSomething = true;
             }
-            if (viewMessageHash && hashes.size() > 0) {
+            if (chkMessageHash.isSelected() && hashes.size() > 0) {
                 for (String hash : hashes) {elements.add(new Element("["+hash+"]", "messageinfo")); }
                 addedSomething = true;
             }
@@ -253,7 +248,7 @@ public class UiLoggerController implements Initializable {
             elements.add(new Element("]", "incoming"));
 
             elements.add(new Element(" <- ", ""));
-            if (skiphugepackets && packet.length() > 4000) {
+            if (chkSkipBigPackets.isSelected() && packet.length() > 4000) {
                 elements.add(new Element("<packet skipped>", "skipped"));
             }
             else {
@@ -266,7 +261,7 @@ public class UiLoggerController implements Initializable {
 
             elements.add(new Element(" -> ", ""));
 
-            if (skiphugepackets && packet.length() > 4000) {
+            if (chkSkipBigPackets.isSelected() && packet.length() > 4000) {
                 elements.add(new Element("<packet skipped>", "skipped"));
             }
             else {
@@ -278,7 +273,7 @@ public class UiLoggerController implements Initializable {
             String expr = packet.toExpression(isIncoming ? HMessage.Direction.TOCLIENT : HMessage.Direction.TOSERVER, packetInfoManager, chkUseNewStructures.isSelected());
             String cleaned = cleanTextContent(expr);
             if (cleaned.equals(expr)) {
-                if (!expr.equals("") && displayStructure)
+                if (!expr.equals("") && chkDisplayStructure.isSelected())
                     elements.add(new Element("\n" + cleanTextContent(expr), "structure"));
             }
         }
@@ -313,7 +308,7 @@ public class UiLoggerController implements Initializable {
 //            System.out.println(sb.toString());
             area.setStyleSpans(oldLen, styleSpansBuilder.create());
 
-            if (autoScroll) {
+            if (chkAutoscroll.isSelected()) {
 //                area.moveTo(area.getLength());
                 area.requestFollowCaret();
             }
@@ -324,51 +319,25 @@ public class UiLoggerController implements Initializable {
         this.stage = stage;
     }
 
-    public void setPacketInfoManager(PacketInfoManager packetInfoManager) {
-        this.packetInfoManager = packetInfoManager;
+    public void updateLoggerInfo() {
         Platform.runLater(() -> {
+            lblViewIncoming.setText("View Incoming: " + (chkViewIncoming.isSelected() ? "True" : "False"));
+            lblViewOutgoing.setText("View Outgoing: " + (chkViewOutgoing.isSelected() ? "True" : "False"));
+            lblAutoScrolll.setText("Autoscroll: " + (chkAutoscroll.isSelected() ? "True" : "False"));
+            lblSkipped.setText("Skipped: " + skipped);
+
             boolean packetInfoAvailable = packetInfoManager.getPacketInfoList().size() > 0;
             lblPacketInfo.setText("Packet info: " + (packetInfoAvailable ? "True" : "False"));
         });
     }
 
-    public void toggleViewIncoming() {
-        viewIncoming = !viewIncoming;
-        lblViewIncoming.setText("View Incoming: " + (viewIncoming ? "True" : "False"));
-//        chkViewIncoming.setSelected(viewIncoming);
-    }
-
-    public void toggleViewOutgoing() {
-        viewOutgoing = !viewOutgoing;
-        lblViewOutgoing.setText("View Outgoing: " + (viewOutgoing ? "True" : "False"));
-//        chkViewOutgoing.setSelected(viewOutgoing);
-    }
-
-    public void toggleDisplayStructure() {
-        displayStructure = !displayStructure;
-//        chkDisplayStructure.setSelected(displayStructure);
-    }
-
-    public void toggleAutoscroll(ActionEvent actionEvent) {
-        autoScroll = !autoScroll;
-        lblAutoScrolll.setText("Autoscroll: " + (autoScroll ? "True" : "False"));
-    }
-
-    public void toggleSkipPackets(ActionEvent actionEvent) {
-        skiphugepackets = !skiphugepackets;
-    }
-
-    public void toggleMessageName(ActionEvent actionEvent) {
-        viewMessageName = !viewMessageName;
-    }
-
-    public void toggleMessageHash(ActionEvent actionEvent) {
-        viewMessageHash = !viewMessageHash;
+    public void setPacketInfoManager(PacketInfoManager packetInfoManager) {
+        this.packetInfoManager = packetInfoManager;
+        Platform.runLater(this::updateLoggerInfo);
     }
 
     public void toggleAlwaysOnTop(ActionEvent actionEvent) {
-        stage.setAlwaysOnTop(!alwaysOnTop);
-        alwaysOnTop = !alwaysOnTop;
+        stage.setAlwaysOnTop(chkAlwaysOnTop.isSelected());
     }
 
     public void clearText(ActionEvent actionEvent) {
