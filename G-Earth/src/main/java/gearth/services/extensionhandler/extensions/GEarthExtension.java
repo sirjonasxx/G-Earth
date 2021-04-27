@@ -51,7 +51,6 @@ public abstract class GEarthExtension {
 
 
     // ----------------- listen to the extension ---------------------
-
     protected final Observable<ExtensionListener> extensionObservable = new SynchronizedObservable<>();
     public Observable<ExtensionListener> getExtensionObservable() {
         return extensionObservable;

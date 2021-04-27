@@ -11,6 +11,7 @@ import gearth.services.extensionhandler.extensions.GEarthExtension;
 import gearth.services.extensionhandler.extensions.extensionproducers.ExtensionProducer;
 import gearth.services.extensionhandler.extensions.extensionproducers.ExtensionProducerFactory;
 import gearth.services.extensionhandler.extensions.extensionproducers.ExtensionProducerObserver;
+import gearth.services.packet_info.PacketInfoManager;
 import javafx.util.Pair;
 
 import java.io.IOException;
@@ -230,6 +231,13 @@ public class ExtensionHandler {
                     @Override
                     protected void stringToPacketRequest(String string) {
                         HPacket packet = new HPacket(string);
+                        PacketInfoManager packetInfoManager = hConnection.getPacketInfoManager();
+                        if (packet.canComplete(HMessage.Direction.TOCLIENT, packetInfoManager) && !packet.canComplete(HMessage.Direction.TOSERVER, packetInfoManager)) {
+                            packet.completePacket(HMessage.Direction.TOCLIENT, packetInfoManager);
+                        }
+                        else if (!packet.canComplete(HMessage.Direction.TOCLIENT, packetInfoManager) && packet.canComplete(HMessage.Direction.TOSERVER, packetInfoManager)) {
+                            packet.completePacket(HMessage.Direction.TOSERVER, packetInfoManager);
+                        }
                         extension.stringToPacketResponse(packet);
                     }
                 };
