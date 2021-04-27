@@ -1,5 +1,6 @@
 package gearth.protocol.connection;
 
+import gearth.services.packet_info.PacketInfoManager;
 import gearth.protocol.packethandler.PacketHandler;
 
 import java.net.ServerSocket;
@@ -21,7 +22,9 @@ public class HProxy {
     private volatile PacketHandler outHandler = null;    //connection with server (only initialized when verified habbo connection)
 
     private volatile String hotelVersion = "";
-    private volatile String clientType = "";
+    private volatile String clientIdentifier = "";
+    private volatile PacketInfoManager packetInfoManager = null;
+
     private volatile AsyncPacketSender asyncPacketSender = null;
 
     public HProxy(HClient hClient, String input_domain, String actual_domain, int actual_port, int intercept_port, String intercept_host) {
@@ -37,16 +40,17 @@ public class HProxy {
         this.proxy_server = socket;
     }
 
-    public void verifyProxy(PacketHandler incomingHandler, PacketHandler outgoingHandler, String hotelVersion, String clientType) {
+    public void verifyProxy(PacketHandler incomingHandler, PacketHandler outgoingHandler, String hotelVersion, String clientIdentifier) {
         this.inHandler = incomingHandler;
         this.outHandler = outgoingHandler;
         this.hotelVersion = hotelVersion;
-        this.clientType = clientType;
+        this.clientIdentifier = clientIdentifier;
+        this.packetInfoManager = PacketInfoManager.fromHotelVersion(hotelVersion, hClient);
         this.asyncPacketSender = new AsyncPacketSender(this);
     }
 
-    public String getClientType() {
-        return clientType;
+    public String getClientIdentifier() {
+        return clientIdentifier;
     }
 
     public int getActual_port() {
@@ -91,5 +95,9 @@ public class HProxy {
 
     public HClient gethClient() {
         return hClient;
+    }
+
+    public PacketInfoManager getPacketInfoManager() {
+        return packetInfoManager;
     }
 }

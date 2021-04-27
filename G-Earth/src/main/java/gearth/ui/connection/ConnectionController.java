@@ -116,7 +116,11 @@ public class ConnectionController extends SubForm {
         }
     }
 
+
+
     private void updateInputUI() {
+        if (parentController == null) return;
+
         grd_clientSelection.setDisable(getHConnection().getState() != HState.NOT_CONNECTED);
         txtfield_hotelversion.setText(getHConnection().getHotelVersion());
 
@@ -184,6 +188,8 @@ public class ConnectionController extends SubForm {
             }
 
         }));
+
+        Platform.runLater(this::updateInputUI);
     }
 
     public void btnConnect_clicked(ActionEvent actionEvent) {

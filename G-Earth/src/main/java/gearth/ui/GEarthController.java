@@ -87,7 +87,11 @@ public class GEarthController {
     private void trySetController() {
         if (++initcount == 2) {
             GEarthController self = this;
-            tabs.forEach(subForm -> subForm.setParentController(self));
+
+            extensionsController.setParentController(self);
+            tabs.forEach(subForm -> {
+                if (subForm != extensionsController) subForm.setParentController(self);
+            });
         }
     }
 

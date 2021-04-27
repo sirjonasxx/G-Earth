@@ -133,4 +133,8 @@ public class ExtensionsController extends SubForm {
             Platform.runLater(this::updateGPythonStatus);
         });
     }
+
+    public ExtensionHandler getExtensionHandler() {
+        return extensionHandler;
+    }
 }

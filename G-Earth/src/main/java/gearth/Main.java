@@ -28,7 +28,7 @@ import java.util.Set;
 public class Main extends Application {
 
     public static Application main;
-    public static String version = "1.3.4";
+    public static String version = "1.4";
     private static String gitApi = "https://api.github.com/repos/sirjonasxx/G-Earth/releases/latest";
 
     @Override
@@ -45,7 +45,7 @@ public class Main extends Application {
         primaryStage.setResizable(false);
 
         primaryStage.setTitle("G-Earth " + version);
-        primaryStage.setScene(new Scene(root, 650, 295));
+        primaryStage.setScene(new Scene(root, 650, 290));
         primaryStage.show();
         primaryStage.getScene().getStylesheets().add(getClass().getResource("ui/bootstrap3.css").toExternalForm());
 

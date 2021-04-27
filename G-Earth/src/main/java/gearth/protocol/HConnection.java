@@ -1,10 +1,11 @@
 package gearth.protocol;
 
 import gearth.misc.listenerpattern.Observable;
+import gearth.services.packet_info.PacketInfoManager;
+import gearth.protocol.connection.HClient;
 import gearth.protocol.connection.HProxy;
 import gearth.protocol.connection.HState;
 import gearth.protocol.connection.proxy.ProxyProvider;
-import gearth.protocol.connection.proxy.flash.FlashProxyProvider;
 import gearth.protocol.connection.proxy.ProxyProviderFactory;
 import gearth.protocol.connection.proxy.flash.unix.LinuxRawIpFlashProxyProvider;
 import gearth.protocol.connection.proxy.unity.UnityProxyProvider;
@@ -137,16 +138,28 @@ public class HConnection {
 
 
     public boolean sendToClientAsync(HPacket message) {
-        if (proxy == null) {
-            return false;
+        if (proxy == null) return false;
+
+        if (!message.isPacketComplete()) {
+            PacketInfoManager packetInfoManager = getPacketInfoManager();
+            message.completePacket(HMessage.Direction.TOCLIENT, packetInfoManager);
+
+            if (!message.isPacketComplete()) return false;
         }
+
         proxy.getAsyncPacketSender().sendToClientAsync(message);
         return true;
     }
     public boolean sendToServerAsync(HPacket message) {
-        if (proxy == null) {
-            return false;
+        if (proxy == null) return false;
+
+        if (!message.isPacketComplete()) {
+            PacketInfoManager packetInfoManager = getPacketInfoManager();
+            message.completePacket(HMessage.Direction.TOSERVER, packetInfoManager);
+
+            if (!message.isPacketComplete()) return false;
         }
+
         proxy.getAsyncPacketSender().sendToServerAsync(message);
         return true;
     }
@@ -172,11 +185,25 @@ public class HConnection {
         return proxy.getHotelVersion();
     }
 
-    public String getClientType() {
+    public String getClientIdentifier() {
         if (proxy == null) {
             return "";
         }
-        return proxy.getClientType();
+        return proxy.getClientIdentifier();
+    }
+
+    public HClient getClientType() {
+        if (proxy == null) {
+            return null;
+        }
+        return proxy.gethClient();
+    }
+
+    public PacketInfoManager getPacketInfoManager() {
+        if (proxy == null) {
+            return null;
+        }
+        return proxy.getPacketInfoManager();
     }
 
     public boolean isRawIpMode() {

@@ -216,7 +216,6 @@ public class SchedulerController extends SubForm {
         File file = fileChooser.showSaveDialog(parentController.getStage());
 
         if(file != null){
-
             try {
                 FileWriter fileWriter = new FileWriter(file);
                 BufferedWriter out = new BufferedWriter(fileWriter);

@@ -7,7 +7,7 @@
     <groupId>G-Earth</groupId>
     <artifactId>G-Earth-Parent</artifactId>
     <packaging>pom</packaging>
-    <version>1.3.4</version>
+    <version>1.4</version>
 
     <name>G-Earth-Parent</name>
     <url>https://github.com/sirjonasxx/G-Earth</url>
@@ -18,7 +18,6 @@
 
         <!-- Compile our extensions too please! -->
         <module>Extensions/AdminOnConnect</module>
-        <module>Extensions/BlockReplacePackets</module>
     </modules>
 
     <build>

@@ -1,7 +1,6 @@
 package gearth.services.extensionhandler;
 
 import gearth.Main;
-import gearth.misc.harble_api.HarbleAPIFetcher;
 import gearth.misc.listenerpattern.Observable;
 import gearth.protocol.HConnection;
 import gearth.protocol.HMessage;
@@ -12,6 +11,7 @@ import gearth.services.extensionhandler.extensions.GEarthExtension;
 import gearth.services.extensionhandler.extensions.extensionproducers.ExtensionProducer;
 import gearth.services.extensionhandler.extensions.extensionproducers.ExtensionProducerFactory;
 import gearth.services.extensionhandler.extensions.extensionproducers.ExtensionProducerObserver;
+import gearth.services.packet_info.PacketInfoManager;
 import javafx.util.Pair;
 
 import java.io.IOException;
@@ -45,18 +45,17 @@ public class ExtensionHandler {
     }
 
     private void initialize() {
-
         hConnection.getStateObservable().addListener((oldState, newState) -> {
             if (newState == HState.CONNECTED) {
-                HarbleAPIFetcher.fetch(hConnection.getHotelVersion(), hConnection.getClientType());
                 synchronized (gEarthExtensions) {
                     for (GEarthExtension extension : gEarthExtensions) {
                         extension.connectionStart(
                                 hConnection.getDomain(),
                                 hConnection.getServerPort(),
                                 hConnection.getHotelVersion(),
+                                hConnection.getClientIdentifier(),
                                 hConnection.getClientType(),
-                                HarbleAPIFetcher.HARBLEAPI == null ? "null" : HarbleAPIFetcher.HARBLEAPI.getPath()
+                                hConnection.getPacketInfoManager()
                         );
                     }
                 }
@@ -71,7 +70,7 @@ public class ExtensionHandler {
         });
 
         extensionProducers = ExtensionProducerFactory.getAll();
-        extensionProducers.forEach(this::initializeExtensionProducer);
+        extensionProducers.forEach(extensionProducer -> extensionProducer.startProducing(createExtensionProducerObserver()));
     }
 
 
@@ -174,8 +173,8 @@ public class ExtensionHandler {
 
 
 
-    private void initializeExtensionProducer(ExtensionProducer producer) {
-        producer.startProducing(new ExtensionProducerObserver() {
+    private ExtensionProducerObserver createExtensionProducerObserver() {
+        return new ExtensionProducerObserver() {
             @Override
             public void onExtensionProduced(GEarthExtension extension) {
                 synchronized (gEarthExtensions) {
@@ -221,7 +220,7 @@ public class ExtensionHandler {
                         try {
                             s = packet.toString();
                             if (packet.length() < 3000) {
-                                expression = packet.toExpression();
+                                expression = packet.toExpression(hConnection.getPacketInfoManager(), true);
                             }
                         }
                         finally {
@@ -232,6 +231,13 @@ public class ExtensionHandler {
                     @Override
                     protected void stringToPacketRequest(String string) {
                         HPacket packet = new HPacket(string);
+                        PacketInfoManager packetInfoManager = hConnection.getPacketInfoManager();
+                        if (packet.canComplete(HMessage.Direction.TOCLIENT, packetInfoManager) && !packet.canComplete(HMessage.Direction.TOSERVER, packetInfoManager)) {
+                            packet.completePacket(HMessage.Direction.TOCLIENT, packetInfoManager);
+                        }
+                        else if (!packet.canComplete(HMessage.Direction.TOCLIENT, packetInfoManager) && packet.canComplete(HMessage.Direction.TOSERVER, packetInfoManager)) {
+                            packet.completePacket(HMessage.Direction.TOSERVER, packetInfoManager);
+                        }
                         extension.stringToPacketResponse(packet);
                     }
                 };
@@ -244,8 +250,9 @@ public class ExtensionHandler {
                             hConnection.getDomain(),
                             hConnection.getServerPort(),
                             hConnection.getHotelVersion(),
+                            hConnection.getClientIdentifier(),
                             hConnection.getClientType(),
-                            HarbleAPIFetcher.HARBLEAPI == null ? "null" : HarbleAPIFetcher.HARBLEAPI.getPath()
+                            hConnection.getPacketInfoManager()
                     );
                 }
 
@@ -254,7 +261,7 @@ public class ExtensionHandler {
 
                 observable.fireEvent(l -> l.onExtensionConnect(extension));
             }
-        });
+        };
     }
 
     public List<ExtensionProducer> getExtensionProducers() {
@@ -262,6 +269,11 @@ public class ExtensionHandler {
     }
     public Observable<ExtensionConnectedListener> getObservable() {
         return observable;
+    }
+
+    public void addExtensionProducer(ExtensionProducer producer) {
+        producer.startProducing(createExtensionProducerObserver());
+        extensionProducers.add(producer);
     }
 
 

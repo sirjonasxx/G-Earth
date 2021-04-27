@@ -1,7 +1,10 @@
 package gearth.services.extensionhandler.extensions.implementations.simple;
 
+import gearth.services.packet_info.PacketInfoManager;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
+import gearth.protocol.connection.HClient;
+import gearth.services.extensionhandler.extensions.ExtensionType;
 import gearth.services.extensionhandler.extensions.GEarthExtension;
 
 public class ExampleExtension extends GEarthExtension {
@@ -83,7 +86,7 @@ public class ExampleExtension extends GEarthExtension {
     }
 
     @Override
-    public void connectionStart(String host, int port, String hotelVersion, String clientType, String harbleMessagesPath) {
+    public void connectionStart(String host, int port, String hotelVersion, String clientIdentifier, HClient clientType, PacketInfoManager packetInfoManager) {
         // a new habbo client has connected
         System.out.println("Connected to " + host);
     }
@@ -119,5 +122,10 @@ public class ExampleExtension extends GEarthExtension {
     @Override
     public void stringToPacketResponse(HPacket packet) {
 
+    }
+
+    @Override
+    public ExtensionType extensionType() {
+        return ExtensionType.INTERNAL;
     }
 }

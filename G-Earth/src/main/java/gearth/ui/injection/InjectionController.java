@@ -1,30 +1,70 @@
 package gearth.ui.injection;
 
+import gearth.misc.Cacher;
+import gearth.services.packet_info.PacketInfoManager;
+import gearth.protocol.HMessage;
 import gearth.protocol.connection.HState;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
-import javafx.scene.control.Button;
-import javafx.scene.control.TextArea;
+import javafx.event.EventHandler;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Text;
-import gearth.protocol.HConnection;
 import gearth.protocol.HPacket;
 import gearth.ui.SubForm;
+import sun.misc.Cache;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class InjectionController extends SubForm {
+
+    private static final String HISTORY_CACHE_KEY = "INJECTED_HISTORY";
+    private static final int historylimit = 69;
+
     public TextArea inputPacket;
     public Text lbl_corrruption;
     public Text lbl_pcktInfo;
     public Button btn_sendToServer;
     public Button btn_sendToClient;
+    public ListView<InjectedPackets> history;
+    public Label lblHistory;
 
     protected void onParentSet() {
         getHConnection().getStateObservable().addListener((oldState, newState) -> Platform.runLater(this::updateUI));
 
         inputPacket.textProperty().addListener(event -> Platform.runLater(this::updateUI));
+    }
+
+    public void initialize() {
+        history.setOnMouseClicked(event -> {
+            if(event.getButton().equals(MouseButton.PRIMARY) && event.getClickCount() == 2) {
+                InjectedPackets injectedPackets = history.getSelectionModel().getSelectedItem();
+                if (injectedPackets != null) {
+                    Platform.runLater(() -> {
+                        inputPacket.setText(injectedPackets.getPacketsAsString());
+                        updateUI();
+                    });
+                }
+            }
+        });
+
+        lblHistory.setTooltip(new Tooltip("Double click a packet to restore it"));
+
+        List<Object> rawHistory = Cacher.getList(HISTORY_CACHE_KEY);
+        if (rawHistory != null) {
+            List<InjectedPackets> history = rawHistory.stream()
+                    .map(o -> (String)o).limit(historylimit - 1).map(InjectedPackets::new).collect(Collectors.toList());
+            updateHistoryView(history);
+        }
     }
 
     private static boolean isPacketIncomplete(String line) {
@@ -95,9 +135,38 @@ public class InjectionController extends SubForm {
         }
 
         if (!dirty) {
-            btn_sendToClient.setDisable(getHConnection().getState() != HState.CONNECTED);
-            btn_sendToServer.setDisable(getHConnection().getState() != HState.CONNECTED);
+            PacketInfoManager packetInfoManager = getHConnection().getPacketInfoManager();
+
+            List<String> unIdentifiedPackets = Arrays.stream(packets)
+                    .filter(hPacket -> !hPacket.isPacketComplete())
+                    .map(HPacket::getIdentifier).collect(Collectors.toList());
+
+            boolean canSendToClient = unIdentifiedPackets.stream().allMatch(s -> {
+                if (packetInfoManager == null) return false;
+                return packetInfoManager.getPacketInfoFromHash(HMessage.Direction.TOCLIENT, s) != null ||
+                        packetInfoManager.getPacketInfoFromName(HMessage.Direction.TOCLIENT, s) != null;
+            });
+            boolean canSendToServer = unIdentifiedPackets.stream().allMatch(s -> {
+                if (packetInfoManager == null) return false;
+                return packetInfoManager.getPacketInfoFromHash(HMessage.Direction.TOSERVER, s) != null ||
+                        packetInfoManager.getPacketInfoFromName(HMessage.Direction.TOSERVER, s) != null;
+            });
+
+            btn_sendToClient.setDisable(!canSendToClient || getHConnection().getState() != HState.CONNECTED);
+            btn_sendToServer.setDisable(!canSendToServer || getHConnection().getState() != HState.CONNECTED);
             if (packets.length == 1) {
+
+                // complete packet to show correct headerId
+                if (!packets[0].isPacketComplete()) {
+                    HPacket packet = packets[0];
+                    if (packet.canComplete(HMessage.Direction.TOCLIENT, packetInfoManager) && !packet.canComplete(HMessage.Direction.TOSERVER, packetInfoManager)) {
+                        packet.completePacket(HMessage.Direction.TOCLIENT, packetInfoManager);
+                    }
+                    else if (!packet.canComplete(HMessage.Direction.TOCLIENT, packetInfoManager) && packet.canComplete(HMessage.Direction.TOSERVER, packetInfoManager)) {
+                        packet.completePacket(HMessage.Direction.TOSERVER, packetInfoManager);
+                    }
+                }
+
                 lbl_pcktInfo.setText("header (id:" + packets[0].headerId() + ", length:" +
                         packets[0].length() + ")");
             }
@@ -124,6 +193,8 @@ public class InjectionController extends SubForm {
             getHConnection().sendToServerAsync(packet);
             writeToLog(Color.BLUE, "SS -> packet with id: " + packet.headerId());
         }
+
+        addToHistory(packets, inputPacket.getText(), HMessage.Direction.TOSERVER);
     }
 
     public void sendToClient_clicked(ActionEvent actionEvent) {
@@ -132,6 +203,40 @@ public class InjectionController extends SubForm {
             getHConnection().sendToClientAsync(packet);
             writeToLog(Color.RED, "CS -> packet with id: " + packet.headerId());
         }
+
+        addToHistory(packets, inputPacket.getText(), HMessage.Direction.TOCLIENT);
+    }
+
+    private void addToHistory(HPacket[] packets, String packetsAsString, HMessage.Direction direction) {
+        InjectedPackets injectedPackets = new InjectedPackets(packetsAsString, packets.length, getHConnection().getPacketInfoManager(), direction);
+
+        List<InjectedPackets> newHistory = new ArrayList<>();
+        newHistory.add(injectedPackets);
+
+        List<Object> rawOldHistory = Cacher.getList(HISTORY_CACHE_KEY);
+        if (rawOldHistory != null) {
+            List<InjectedPackets> history = rawOldHistory.stream()
+                    .map(o -> (String)o).limit(historylimit - 1).map(InjectedPackets::new).collect(Collectors.toList());
+
+            // dont add to history if its equal to the latest added packet
+            if (history.size() != 0 && history.get(0).getPacketsAsString().equals(injectedPackets.getPacketsAsString())) {
+                return;
+            }
+
+            newHistory.addAll(history);
+        }
+
+        List<String> historyAsStrings = newHistory.stream().map(InjectedPackets::stringify).collect(Collectors.toList());
+        Cacher.put(HISTORY_CACHE_KEY, historyAsStrings);
+
+        updateHistoryView(newHistory);
+    }
+
+    private void updateHistoryView(List<InjectedPackets> allHistoryItems) {
+        Platform.runLater(() -> {
+            history.getItems().clear();
+            history.getItems().addAll(allHistoryItems);
+        });
     }
 
 

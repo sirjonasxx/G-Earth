@@ -1,6 +1,8 @@
 package gearth.ui.logger;
 
+import gearth.extensions.parsers.HDirection;
 import gearth.protocol.connection.HState;
+import gearth.services.extensionhandler.extensions.extensionproducers.ExtensionProducer;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
@@ -17,6 +19,7 @@ import gearth.ui.logger.loggerdisplays.PacketLogger;
 import gearth.ui.logger.loggerdisplays.PacketLoggerFactory;
 
 import java.util.Calendar;
+import java.util.function.Predicate;
 
 public class LoggerController extends SubForm {
 
@@ -33,16 +36,20 @@ public class LoggerController extends SubForm {
 
     private int packetLimit = 8000;
 
-    private PacketLogger packetLogger = PacketLoggerFactory.get();
+    private PacketLoggerFactory packetLoggerFactory;
+    private PacketLogger packetLogger;
 
     public void onParentSet(){
+        packetLoggerFactory = new PacketLoggerFactory(parentController.extensionsController.getExtensionHandler());
+        packetLogger = packetLoggerFactory.get();
+
         getHConnection().getStateObservable().addListener((oldState, newState) -> Platform.runLater(() -> {
             if (newState == HState.PREPARING) {
                 miniLogText(Color.ORANGE, "Connecting to "+getHConnection().getDomain() + ":" + getHConnection().getServerPort());
             }
             if (newState == HState.CONNECTED) {
                 miniLogText(Color.GREEN, "Connected to "+getHConnection().getDomain() + ":" + getHConnection().getServerPort());
-                packetLogger.start();
+                packetLogger.start(getHConnection());
             }
             if (newState == HState.NOT_CONNECTED) {
                 miniLogText(Color.RED, "End of connection");
@@ -69,7 +76,7 @@ public class LoggerController extends SubForm {
             packetLogger.appendMessage(message.getPacket(), types);
 
             if (cbx_showstruct.isSelected() && message.getPacket().length() < packetLimit) {
-                packetLogger.appendStructure(message.getPacket());
+                packetLogger.appendStructure(message.getPacket(), message.getDestination());
             }
         });
         });

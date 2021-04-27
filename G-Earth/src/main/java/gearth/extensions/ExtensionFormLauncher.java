@@ -5,7 +5,7 @@ import javafx.application.Platform;
 import javafx.stage.Stage;
 
 /**
- * Created by Jeunez on 6/11/2018.
+ * Created by Jonas on 6/11/2018.
  */
 public class ExtensionFormLauncher extends Application {
 
@@ -19,7 +19,7 @@ public class ExtensionFormLauncher extends Application {
         ExtensionForm creator = extension.newInstance();
         ExtensionForm extensionForm = creator.launchForm(primaryStage);
 
-        extensionForm.extension = new Extension(args) {
+        Extension extension = new Extension(args) {
             @Override
             protected void initExtension() {
                 extensionForm.initExtension();
@@ -41,7 +41,7 @@ public class ExtensionFormLauncher extends Application {
             }
 
             @Override
-            ExtensionInfo getInfoAnnotations() {
+            protected ExtensionInfo getInfoAnnotations() {
                 return extInfo;
             }
 
@@ -55,9 +55,11 @@ public class ExtensionFormLauncher extends Application {
                 return extensionForm.canDelete();
             }
         };
+        extensionForm.extension = extension;
+
         extensionForm.primaryStage = primaryStage;
         Thread t = new Thread(() -> {
-            extensionForm.extension.run();
+            extension.run();
             //when the extension has ended, close this process
             System.exit(0);
         });

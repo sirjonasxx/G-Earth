@@ -1,23 +1,26 @@
 package gearth.protocol;
 
 import gearth.misc.StringifyAble;
-import gearth.misc.harble_api.HarbleAPI;
-import gearth.misc.harble_api.HarbleAPIFetcher;
-import gearth.misc.packetrepresentation.InvalidPacketException;
-import gearth.misc.packetrepresentation.PacketStringUtils;
+import gearth.services.packet_info.PacketInfo;
+import gearth.services.packet_info.PacketInfoManager;
+import gearth.services.packetrepresentation.InvalidPacketException;
+import gearth.services.packetrepresentation.PacketStringUtils;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidParameterException;
 import java.util.Arrays;
+import java.util.Optional;
 
 public class HPacket implements StringifyAble {
 
     private boolean isEdited = false;
     private byte[] packetInBytes;
     private int readIndex = 6;
+
+    // if identifier != null, this is a placeholder name for the type of packet, headerId will be "-1"
+    private String identifier = null;
 
     public HPacket(byte[] packet)	{
         packetInBytes = packet.clone();
@@ -28,11 +31,11 @@ public class HPacket implements StringifyAble {
     }
     public HPacket(String packet)	{
         try {
-            packetInBytes = PacketStringUtils.fromString(packet).packetInBytes;
+            HPacket packetFromString = PacketStringUtils.fromString(packet);
+            packetInBytes = packetFromString.packetInBytes;
+            identifier = packetFromString.identifier;
         } catch (InvalidPacketException e) {
             packetInBytes = new byte[0];
-            // will be corrupted
-            // e.printStackTrace();
         }
     }
     public HPacket(int header) {
@@ -40,6 +43,7 @@ public class HPacket implements StringifyAble {
         replaceShort(4, (short)header);
         isEdited = false;
     }
+
     public HPacket(int header, byte[] bytes) {
         this(header);
         appendBytes(bytes);
@@ -53,13 +57,18 @@ public class HPacket implements StringifyAble {
      */
     public HPacket(int header, Object... objects) throws InvalidParameterException {
         this(header);
-        for (int i = 0; i < objects.length; i++) {
-            Object o = objects[i];
-            appendObject(o);
-        }
-
+        appendObjects(objects);
         isEdited = false;
     }
+
+    public HPacket(String identifier, Object... objects) throws InvalidParameterException {
+        packetInBytes = new byte[]{0,0,0,2,-1,-1};
+        this.identifier = identifier;
+        appendObjects(objects);
+        isEdited = false;
+    }
+
+
 
     public String toString()	{
         return PacketStringUtils.toString(packetInBytes);
@@ -73,6 +82,46 @@ public class HPacket implements StringifyAble {
         if (readIndex < getBytesLength()) return 0;
         if (readIndex == getBytesLength()) return 1;
         return 2;
+    }
+
+    public void setIdentifier(String identifier) {
+        this.identifier = identifier;
+    }
+
+    public String getIdentifier() {
+        return identifier;
+    }
+
+    public void completePacket(HMessage.Direction direction, PacketInfoManager packetInfoManager) {
+        if (isCorrupted() || identifier == null) return;
+
+        PacketInfo packetInfo = packetInfoManager.getPacketInfoFromName(direction, identifier);
+        if (packetInfo == null) {
+            packetInfo = packetInfoManager.getPacketInfoFromHash(direction, identifier);
+            if (packetInfo == null) return;
+        }
+
+        boolean wasEdited = isEdited;
+        replaceShort(4, (short)(packetInfo.getHeaderId()));
+        identifier = null;
+
+        isEdited = wasEdited;
+    }
+
+    public boolean canComplete(HMessage.Direction direction, PacketInfoManager packetInfoManager) {
+        if (isCorrupted() || identifier == null) return false;
+
+        PacketInfo packetInfo = packetInfoManager.getPacketInfoFromName(direction, identifier);
+        if (packetInfo == null) {
+            packetInfo = packetInfoManager.getPacketInfoFromHash(direction, identifier);
+            return packetInfo != null;
+        }
+
+        return true;
+    }
+
+    public boolean isPacketComplete() {
+        return identifier == null;
     }
 
     public byte[] toBytes()		{
@@ -532,6 +581,14 @@ public class HPacket implements StringifyAble {
         return appendLongString(s, StandardCharsets.ISO_8859_1);
     }
 
+    public HPacket appendObjects(Object... objects) {
+        for (Object object : objects) {
+            appendObject(object);
+        }
+
+        return this;
+    }
+
     public HPacket appendObject(Object o) throws InvalidParameterException {
         isEdited = true;
 
@@ -580,45 +637,52 @@ public class HPacket implements StringifyAble {
         isEdited = edited;
     }
 
-    private String getHarbleStructure(HMessage.Direction direction) {
-        HarbleAPI.HarbleMessage msg;
-        if (HarbleAPIFetcher.HARBLEAPI != null &&
-                ((msg = HarbleAPIFetcher.HARBLEAPI.getHarbleMessageFromHeaderId(direction, headerId())) != null)) {
-            if (msg.getStructure() != null && structureEquals(msg.getStructure())) {
-                return msg.getStructure();
-            }
-        }
+    private PacketInfo getPacketInfo(HMessage.Direction direction, PacketInfoManager packetInfoManager) {
+        if (packetInfoManager == null) return null;
 
-        return null;
+        // prefer packetinfo with structure information (not available in at time of writing)
+        Optional<PacketInfo> packetInfoMaybe = packetInfoManager.getAllPacketInfoFromHeaderId(direction, headerId())
+                .stream().filter(packetInfo -> packetInfo.getStructure() != null).findFirst();
+        return packetInfoMaybe.orElseGet(() -> packetInfoManager.getPacketInfoFromHeaderId(direction, headerId()));
     }
 
-    public String toExpression(HMessage.Direction direction) {
+    public String toExpression(HMessage.Direction direction, PacketInfoManager packetInfoManager, boolean removeShuffle) {
         if (isCorrupted()) return "";
 
-        String structure = getHarbleStructure(direction);
-        if (structure != null) {
-            return PacketStringUtils.toExpressionFromGivenStructure(this, structure);
+        PacketInfo packetInfo = getPacketInfo(direction, packetInfoManager);
+        if (packetInfo != null && packetInfo.getStructure() != null) {
+            return PacketStringUtils.toExpressionFromGivenStructure(this, packetInfo.getStructure(), removeShuffle ? packetInfo : null);
         }
-
-        return PacketStringUtils.predictedExpression(this);
+        return PacketStringUtils.predictedExpression(this, removeShuffle ? packetInfo : null);
     }
 
     /**
      * returns "" if not found or not sure enough
      */
-    public String toExpression() {
+    public String toExpression(PacketInfoManager packetInfoManager, boolean removeShuffle) {
         if (isCorrupted()) return "";
 
-        String structure1 = getHarbleStructure(HMessage.Direction.TOCLIENT);
-        String structure2 = getHarbleStructure(HMessage.Direction.TOSERVER);
-        if (structure1 != null && structure2 == null) {
-            return PacketStringUtils.toExpressionFromGivenStructure(this, structure1);
+        PacketInfo maybe1 = getPacketInfo(HMessage.Direction.TOCLIENT, packetInfoManager);
+        PacketInfo maybe2 = getPacketInfo(HMessage.Direction.TOSERVER, packetInfoManager);
+
+        PacketInfo packetInfo = null;
+
+        if (maybe1 != null && maybe2 == null) {
+            packetInfo = maybe1;
         }
-        else if (structure1 == null && structure2 != null) {
-            return PacketStringUtils.toExpressionFromGivenStructure(this, structure2);
+        else if (maybe1 == null && maybe2 != null) {
+            packetInfo = maybe2;
         }
 
-        return PacketStringUtils.predictedExpression(this);
+        if (packetInfo != null && packetInfo.getStructure() != null) {
+            return PacketStringUtils.toExpressionFromGivenStructure(this, packetInfo.getStructure(), removeShuffle ? packetInfo : null);
+        }
+        return PacketStringUtils.predictedExpression(this, removeShuffle ? packetInfo : null);
+    }
+
+    public String toExpression() {
+        if (isCorrupted()) return "";
+        return PacketStringUtils.predictedExpression(this, null);
     }
 
     @Override

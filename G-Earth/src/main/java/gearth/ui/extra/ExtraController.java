@@ -2,12 +2,10 @@ package gearth.ui.extra;
 
 import gearth.Main;
 import gearth.misc.Cacher;
-import gearth.misc.packetrepresentation.prediction.checkers.TypeCheckerProducer;
 import gearth.protocol.HConnection;
 import gearth.protocol.connection.HState;
 import gearth.protocol.connection.proxy.ProxyProviderFactory;
 import gearth.protocol.connection.proxy.SocksConfiguration;
-import gearth.services.Constants;
 import gearth.services.gpython.GPythonVersionUtils;
 import gearth.ui.SubForm;
 import gearth.ui.info.InfoController;

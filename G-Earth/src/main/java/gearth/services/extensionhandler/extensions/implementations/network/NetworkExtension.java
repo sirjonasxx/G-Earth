@@ -1,6 +1,9 @@
 package gearth.services.extensionhandler.extensions.implementations.network;
 
+import gearth.services.packet_info.PacketInfoManager;
 import gearth.protocol.HMessage;
+import gearth.protocol.connection.HClient;
+import gearth.services.extensionhandler.extensions.ExtensionType;
 import gearth.services.extensionhandler.extensions.GEarthExtension;
 import gearth.protocol.HPacket;
 
@@ -190,15 +193,16 @@ public class NetworkExtension extends GEarthExtension {
     }
 
     @Override
-    public void connectionStart(String host, int port, String hotelVersion, String clientType, String harbleMessagesPath) {
-        sendMessage(
-                new HPacket(NetworkExtensionInfo.OUTGOING_MESSAGES_IDS.CONNECTIONSTART)
-                        .appendString(host)
-                        .appendInt(port)
-                        .appendString(hotelVersion)
-                        .appendString(harbleMessagesPath)
-                        .appendString(clientType)
-        );
+    public void connectionStart(String host, int port, String hotelVersion, String clientIdentifier, HClient clientType, PacketInfoManager packetInfoManager) {
+        HPacket connectionStartPacket = new HPacket(NetworkExtensionInfo.OUTGOING_MESSAGES_IDS.CONNECTIONSTART)
+                .appendString(host)
+                .appendInt(port)
+                .appendString(hotelVersion)
+                .appendString(clientIdentifier)
+                .appendString(clientType.name());
+
+        packetInfoManager.appendToPacket(connectionStartPacket);
+        sendMessage(connectionStartPacket);
     }
 
     @Override
@@ -235,5 +239,10 @@ public class NetworkExtension extends GEarthExtension {
         HPacket packet = new HPacket(NetworkExtensionInfo.OUTGOING_MESSAGES_IDS.STRINGTOPACKET_RESPONSE);
         packet.appendLongString(packetFromString.stringify());
         sendMessage(packet);
+    }
+
+    @Override
+    public ExtensionType extensionType() {
+        return ExtensionType.EXTERNAL;
     }
 }
