@@ -4,6 +4,7 @@ import gearth.extensions.InternalExtensionFormBuilder;
 import gearth.services.extensionhandler.extensions.extensionproducers.ExtensionProducer;
 import gearth.services.extensionhandler.extensions.extensionproducers.ExtensionProducerObserver;
 import gearth.services.internal_extensions.blockreplacepackets.BlockAndReplacePackets;
+import gearth.services.internal_extensions.packetinfoexplorer.PacketInfoExplorer;
 
 public class SimpleExtensionProducer implements ExtensionProducer {
 
@@ -15,5 +16,8 @@ public class SimpleExtensionProducer implements ExtensionProducer {
 
         new InternalExtensionFormBuilder<BlockAndReplacePackets>()
                 .launch(BlockAndReplacePackets.class, observer);
+
+        new InternalExtensionFormBuilder<PacketInfoExplorer>()
+                .launch(PacketInfoExplorer.class, observer);
     }
 }
