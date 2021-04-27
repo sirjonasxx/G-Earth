@@ -37,7 +37,7 @@ public class Scheduler<T extends ScheduleItem> {
                         Interval cur = item.getDelayProperty().get();
                         for (int i = 0; i < changed; i++) {
                             if ((t - i) % cur.getDelay() == cur.getOffset()) {
-                                HPacket hPacket = new HPacket(item.getPacketAsStringProperty().getName());
+                                HPacket hPacket = new HPacket(item.getPacketAsStringProperty().get());
 
                                 if (item.getDestinationProperty().get() == HMessage.Direction.TOSERVER) {
                                     connection.sendToServer(hPacket);
