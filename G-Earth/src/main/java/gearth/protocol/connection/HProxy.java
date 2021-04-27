@@ -1,6 +1,6 @@
 package gearth.protocol.connection;
 
-import gearth.misc.packet_info.PacketInfoManager;
+import gearth.services.packet_info.PacketInfoManager;
 import gearth.protocol.packethandler.PacketHandler;
 
 import java.net.ServerSocket;

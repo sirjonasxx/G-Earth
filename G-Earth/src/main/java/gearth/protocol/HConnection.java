@@ -1,7 +1,7 @@
 package gearth.protocol;
 
 import gearth.misc.listenerpattern.Observable;
-import gearth.misc.packet_info.PacketInfoManager;
+import gearth.services.packet_info.PacketInfoManager;
 import gearth.protocol.connection.HClient;
 import gearth.protocol.connection.HProxy;
 import gearth.protocol.connection.HState;

@@ -1,6 +1,6 @@
 package gearth.ui.logger.loggerdisplays;
 
-import gearth.misc.packet_info.PacketInfoManager;
+import gearth.services.packet_info.PacketInfoManager;
 import gearth.protocol.HConnection;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;

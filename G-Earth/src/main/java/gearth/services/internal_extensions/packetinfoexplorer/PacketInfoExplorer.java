@@ -3,13 +3,12 @@ package gearth.services.internal_extensions.packetinfoexplorer;
 import gearth.Main;
 import gearth.extensions.ExtensionForm;
 import gearth.extensions.ExtensionInfo;
-import gearth.misc.packet_info.PacketInfo;
-import gearth.misc.packet_info.PacketInfoManager;
+import gearth.services.packet_info.PacketInfo;
+import gearth.services.packet_info.PacketInfoManager;
 import gearth.protocol.HMessage;
 import gearth.ui.GEarthController;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.fxml.FXMLLoader;
@@ -22,10 +21,8 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
-import java.awt.*;
 import java.util.*;
 import java.util.List;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @ExtensionInfo(

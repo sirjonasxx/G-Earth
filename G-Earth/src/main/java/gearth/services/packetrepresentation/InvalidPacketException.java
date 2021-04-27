@@ -1,4 +1,4 @@
-package gearth.misc.packetrepresentation;
+package gearth.services.packetrepresentation;
 
 public class InvalidPacketException extends Exception {
 }

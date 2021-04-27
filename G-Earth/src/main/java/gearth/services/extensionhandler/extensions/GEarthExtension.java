@@ -2,15 +2,13 @@ package gearth.services.extensionhandler.extensions;
 
 import gearth.misc.listenerpattern.Observable;
 import gearth.misc.listenerpattern.SynchronizedObservable;
-import gearth.misc.packet_info.PacketInfoManager;
+import gearth.services.packet_info.PacketInfoManager;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 import gearth.protocol.connection.HClient;
 import gearth.services.extensionhandler.extensions.listeners.OmRemoveClickListener;
 import gearth.services.extensionhandler.extensions.listeners.OnClickListener;
 import gearth.services.extensionhandler.extensions.listeners.OnDeleteListener;
-
-import java.util.function.Consumer;
 
 public abstract class GEarthExtension {
 

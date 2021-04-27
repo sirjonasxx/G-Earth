@@ -1,6 +1,6 @@
 package gearth.services.extensionhandler.extensions.implementations.simple;
 
-import gearth.misc.packet_info.PacketInfoManager;
+import gearth.services.packet_info.PacketInfoManager;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 import gearth.protocol.connection.HClient;

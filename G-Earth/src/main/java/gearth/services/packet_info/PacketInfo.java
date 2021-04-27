@@ -1,4 +1,4 @@
-package gearth.misc.packet_info;
+package gearth.services.packet_info;
 
 import gearth.protocol.HMessage;
 

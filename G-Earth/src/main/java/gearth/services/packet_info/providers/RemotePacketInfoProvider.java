@@ -1,4 +1,4 @@
-package gearth.misc.packet_info.providers;
+package gearth.services.packet_info.providers;
 
 import gearth.misc.Cacher;
 import org.jsoup.Connection;

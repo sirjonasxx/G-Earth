@@ -1,6 +1,6 @@
 package gearth.ui.tools;
 
-import gearth.misc.packet_info.PacketInfoManager;
+import gearth.services.packet_info.PacketInfoManager;
 import gearth.protocol.HMessage;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;

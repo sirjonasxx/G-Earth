@@ -1,7 +1,7 @@
-package gearth.misc.packetrepresentation;
+package gearth.services.packetrepresentation;
 
-import gearth.misc.packet_info.PacketInfo;
-import gearth.misc.packetrepresentation.prediction.StructurePredictor;
+import gearth.services.packet_info.PacketInfo;
+import gearth.services.packetrepresentation.prediction.StructurePredictor;
 import gearth.protocol.HPacket;
 
 import java.nio.ByteBuffer;

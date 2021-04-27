@@ -1,11 +1,6 @@
 package gearth.extensions;
 
-import gearth.extensions.ExtensionBase;
-import gearth.extensions.ExtensionInfo;
-import gearth.extensions.IExtension;
-import gearth.extensions.OnConnectionListener;
-import gearth.misc.listenerpattern.Observable;
-import gearth.misc.packet_info.PacketInfoManager;
+import gearth.services.packet_info.PacketInfoManager;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 import gearth.protocol.connection.HClient;
@@ -15,9 +10,6 @@ import gearth.services.extensionhandler.extensions.implementations.network.Netwo
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created by Jonas on 23/06/18.

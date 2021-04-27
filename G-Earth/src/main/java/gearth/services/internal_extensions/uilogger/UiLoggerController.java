@@ -1,15 +1,13 @@
 package gearth.services.internal_extensions.uilogger;
 
- import com.sun.org.apache.xpath.internal.operations.Bool;
  import gearth.misc.Cacher;
- import gearth.misc.packet_info.PacketInfo;
- import gearth.misc.packet_info.PacketInfoManager;
+ import gearth.services.packet_info.PacketInfo;
+ import gearth.services.packet_info.PacketInfoManager;
  import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 import gearth.ui.logger.loggerdisplays.PacketLogger;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
- import javafx.event.EventHandler;
  import javafx.fxml.Initializable;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.Label;

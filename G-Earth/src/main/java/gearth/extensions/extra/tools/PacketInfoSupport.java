@@ -2,8 +2,8 @@ package gearth.extensions.extra.tools;
 
 import gearth.extensions.Extension;
 import gearth.extensions.IExtension;
-import gearth.misc.packet_info.PacketInfo;
-import gearth.misc.packet_info.PacketInfoManager;
+import gearth.services.packet_info.PacketInfo;
+import gearth.services.packet_info.PacketInfoManager;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 

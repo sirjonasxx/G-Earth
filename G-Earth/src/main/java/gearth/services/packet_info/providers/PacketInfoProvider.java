@@ -1,7 +1,6 @@
-package gearth.misc.packet_info.providers;
+package gearth.services.packet_info.providers;
 
-import gearth.misc.Cacher;
-import gearth.misc.packet_info.PacketInfo;
+import gearth.services.packet_info.PacketInfo;
 import org.json.JSONObject;
 
 import java.io.File;

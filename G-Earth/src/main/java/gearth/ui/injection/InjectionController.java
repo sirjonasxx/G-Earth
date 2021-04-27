@@ -1,6 +1,6 @@
 package gearth.ui.injection;
 
-import gearth.misc.packet_info.PacketInfoManager;
+import gearth.services.packet_info.PacketInfoManager;
 import gearth.protocol.HMessage;
 import gearth.protocol.connection.HState;
 import javafx.application.Platform;
@@ -10,16 +10,12 @@ import javafx.scene.control.TextArea;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Text;
-import gearth.protocol.HConnection;
 import gearth.protocol.HPacket;
 import gearth.ui.SubForm;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class InjectionController extends SubForm {

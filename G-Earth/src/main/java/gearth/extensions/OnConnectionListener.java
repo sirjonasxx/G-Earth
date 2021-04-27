@@ -1,6 +1,6 @@
 package gearth.extensions;
 
-import gearth.misc.packet_info.PacketInfoManager;
+import gearth.services.packet_info.PacketInfoManager;
 import gearth.protocol.connection.HClient;
 
 public interface OnConnectionListener {

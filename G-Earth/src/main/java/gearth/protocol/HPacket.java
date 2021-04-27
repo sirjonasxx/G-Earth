@@ -1,10 +1,10 @@
 package gearth.protocol;
 
 import gearth.misc.StringifyAble;
-import gearth.misc.packet_info.PacketInfo;
-import gearth.misc.packet_info.PacketInfoManager;
-import gearth.misc.packetrepresentation.InvalidPacketException;
-import gearth.misc.packetrepresentation.PacketStringUtils;
+import gearth.services.packet_info.PacketInfo;
+import gearth.services.packet_info.PacketInfoManager;
+import gearth.services.packetrepresentation.InvalidPacketException;
+import gearth.services.packetrepresentation.PacketStringUtils;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;

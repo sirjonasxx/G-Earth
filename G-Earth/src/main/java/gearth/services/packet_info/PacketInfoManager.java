@@ -1,9 +1,9 @@
-package gearth.misc.packet_info;
+package gearth.services.packet_info;
 
-import gearth.misc.packet_info.providers.RemotePacketInfoProvider;
-import gearth.misc.packet_info.providers.implementations.HarblePacketInfoProvider;
-import gearth.misc.packet_info.providers.implementations.SulekPacketInfoProvider;
-import gearth.misc.packet_info.providers.implementations.UnityPacketInfoProvider;
+import gearth.services.packet_info.providers.RemotePacketInfoProvider;
+import gearth.services.packet_info.providers.implementations.HarblePacketInfoProvider;
+import gearth.services.packet_info.providers.implementations.SulekPacketInfoProvider;
+import gearth.services.packet_info.providers.implementations.UnityPacketInfoProvider;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 import gearth.protocol.connection.HClient;

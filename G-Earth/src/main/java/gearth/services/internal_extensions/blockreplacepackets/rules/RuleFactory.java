@@ -1,6 +1,6 @@
 package gearth.services.internal_extensions.blockreplacepackets.rules;
 
-import gearth.misc.packet_info.PacketInfoManager;
+import gearth.services.packet_info.PacketInfoManager;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 

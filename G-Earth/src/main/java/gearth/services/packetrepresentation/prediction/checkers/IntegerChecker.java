@@ -1,7 +1,6 @@
-package gearth.misc.packetrepresentation.prediction.checkers;
+package gearth.services.packetrepresentation.prediction.checkers;
 
 import gearth.protocol.HPacket;
-import gearth.services.Constants;
 
 import java.nio.charset.StandardCharsets;
 

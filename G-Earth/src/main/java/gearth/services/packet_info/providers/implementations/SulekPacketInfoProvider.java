@@ -1,7 +1,7 @@
-package gearth.misc.packet_info.providers.implementations;
+package gearth.services.packet_info.providers.implementations;
 
-import gearth.misc.packet_info.PacketInfo;
-import gearth.misc.packet_info.providers.RemotePacketInfoProvider;
+import gearth.services.packet_info.PacketInfo;
+import gearth.services.packet_info.providers.RemotePacketInfoProvider;
 import gearth.protocol.HMessage;
 import org.json.JSONArray;
 import org.json.JSONObject;

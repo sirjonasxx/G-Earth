@@ -1,4 +1,4 @@
-package gearth.misc.packetrepresentation.prediction.checkers;
+package gearth.services.packetrepresentation.prediction.checkers;
 
 import gearth.protocol.HPacket;
 
