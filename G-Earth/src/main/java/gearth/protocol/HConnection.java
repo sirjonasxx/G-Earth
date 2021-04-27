@@ -137,7 +137,7 @@ public class HConnection {
     }
 
 
-    public boolean sendToClientAsync(HPacket message) {
+    public boolean sendToClient(HPacket message) {
         if (proxy == null) return false;
 
         if (!message.isPacketComplete()) {
@@ -147,10 +147,10 @@ public class HConnection {
             if (!message.isPacketComplete()) return false;
         }
 
-        proxy.getAsyncPacketSender().sendToClientAsync(message);
+        proxy.getPacketSenderQueue().queueToClient(message);
         return true;
     }
-    public boolean sendToServerAsync(HPacket message) {
+    public boolean sendToServer(HPacket message) {
         if (proxy == null) return false;
 
         if (!message.isPacketComplete()) {
@@ -160,7 +160,7 @@ public class HConnection {
             if (!message.isPacketComplete()) return false;
         }
 
-        proxy.getAsyncPacketSender().sendToServerAsync(message);
+        proxy.getPacketSenderQueue().queueToServer(message);
         return true;
     }
 

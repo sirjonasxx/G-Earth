@@ -115,7 +115,6 @@ public class SchedulerController extends SubForm {
                     scheduler.size(),
                     false,
                     new Interval(txt_delay.getText()),
-                    new HPacket(txt_packet.getText()),
                     txt_packet.getText(),
                     rb_incoming.isSelected() ? HMessage.Direction.TOCLIENT : HMessage.Direction.TOSERVER);
 
@@ -123,7 +122,6 @@ public class SchedulerController extends SubForm {
         }
         else {
 
-            isBeingEdited.getPacketProperty().set(new HPacket(txt_packet.getText()));
             isBeingEdited.getPacketAsStringProperty().set(txt_packet.getText());
             isBeingEdited.getDelayProperty().set(new Interval(txt_delay.getText()));
             isBeingEdited.getDestinationProperty().set(rb_incoming.isSelected() ? HMessage.Direction.TOCLIENT : HMessage.Direction.TOSERVER);

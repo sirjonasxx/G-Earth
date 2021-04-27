@@ -5,19 +5,19 @@ import gearth.protocol.HPacket;
 import java.util.LinkedList;
 import java.util.Queue;
 
-public class AsyncPacketSender {
+public class PacketSenderQueue {
 
     private final HProxy proxy;
-    private final Queue<HPacket> sendToClientAsyncQueue = new LinkedList<>();
-    private final Queue<HPacket> sendToServerAsyncQueue = new LinkedList<>();
+    private final Queue<HPacket> sendToClientQueue = new LinkedList<>();
+    private final Queue<HPacket> sendToServerQueue = new LinkedList<>();
 
-    AsyncPacketSender(HProxy proxy) {
+    PacketSenderQueue(HProxy proxy) {
         this.proxy = proxy;
         new Thread(() -> {
             while (true) {
                 HPacket packet;
-                synchronized (sendToClientAsyncQueue) {
-                    while ((packet = sendToClientAsyncQueue.poll()) != null) {
+                synchronized (sendToClientQueue) {
+                    while ((packet = sendToClientQueue.poll()) != null) {
                         sendToClient(packet);
                     }
                 }
@@ -32,8 +32,8 @@ public class AsyncPacketSender {
         new Thread(() -> {
             while (true) {
                 HPacket packet;
-                synchronized (sendToServerAsyncQueue) {
-                    while ((packet = sendToServerAsyncQueue.poll()) != null) {
+                synchronized (sendToServerQueue) {
+                    while ((packet = sendToServerQueue.poll()) != null) {
                         sendToServer(packet);
                     }
                 }
@@ -55,24 +55,24 @@ public class AsyncPacketSender {
         proxy.getOutHandler().sendToStream(message.toBytes());
     }
 
-    public void sendToClientAsync(HPacket message) {
-        synchronized (sendToClientAsyncQueue) {
-            sendToClientAsyncQueue.add(message);
+    public void queueToClient(HPacket message) {
+        synchronized (sendToClientQueue) {
+            sendToClientQueue.add(message);
         }
 
     }
-    public void sendToServerAsync(HPacket message) {
-        synchronized (sendToServerAsyncQueue) {
-            sendToServerAsyncQueue.add(message);
+    public void queueToServer(HPacket message) {
+        synchronized (sendToServerQueue) {
+            sendToServerQueue.add(message);
         }
     }
 
     public void clear() {
-        synchronized (sendToClientAsyncQueue) {
-            sendToClientAsyncQueue.clear();
+        synchronized (sendToClientQueue) {
+            sendToClientQueue.clear();
         }
-        synchronized (sendToServerAsyncQueue) {
-            sendToServerAsyncQueue.clear();
+        synchronized (sendToServerQueue) {
+            sendToServerQueue.clear();
         }
     }
 }

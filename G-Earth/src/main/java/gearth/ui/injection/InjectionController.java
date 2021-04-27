@@ -6,23 +6,18 @@ import gearth.protocol.HMessage;
 import gearth.protocol.connection.HState;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Text;
 import gearth.protocol.HPacket;
 import gearth.ui.SubForm;
-import sun.misc.Cache;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class InjectionController extends SubForm {
@@ -190,7 +185,7 @@ public class InjectionController extends SubForm {
     public void sendToServer_clicked(ActionEvent actionEvent) {
         HPacket[] packets = parsePackets(inputPacket.getText());
         for (HPacket packet : packets) {
-            getHConnection().sendToServerAsync(packet);
+            getHConnection().sendToServer(packet);
             writeToLog(Color.BLUE, "SS -> packet with id: " + packet.headerId());
         }
 
@@ -200,7 +195,7 @@ public class InjectionController extends SubForm {
     public void sendToClient_clicked(ActionEvent actionEvent) {
         HPacket[] packets = parsePackets(inputPacket.getText());
         for (HPacket packet : packets) {
-            getHConnection().sendToClientAsync(packet);
+            getHConnection().sendToClient(packet);
             writeToLog(Color.RED, "CS -> packet with id: " + packet.headerId());
         }
 

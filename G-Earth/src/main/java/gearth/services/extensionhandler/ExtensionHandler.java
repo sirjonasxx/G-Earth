@@ -191,10 +191,10 @@ public class ExtensionHandler {
                     @Override
                     public void sendMessage(HMessage.Direction direction, HPacket packet) {
                         if (direction == HMessage.Direction.TOCLIENT) {
-                            hConnection.sendToClientAsync(packet);
+                            hConnection.sendToClient(packet);
                         }
                         else {
-                            hConnection.sendToServerAsync(packet);
+                            hConnection.sendToServer(packet);
                         }
                     }
 

@@ -25,7 +25,7 @@ public class HProxy {
     private volatile String clientIdentifier = "";
     private volatile PacketInfoManager packetInfoManager = null;
 
-    private volatile AsyncPacketSender asyncPacketSender = null;
+    private volatile PacketSenderQueue packetSenderQueue = null;
 
     public HProxy(HClient hClient, String input_domain, String actual_domain, int actual_port, int intercept_port, String intercept_host) {
         this.hClient = hClient;
@@ -46,7 +46,7 @@ public class HProxy {
         this.hotelVersion = hotelVersion;
         this.clientIdentifier = clientIdentifier;
         this.packetInfoManager = PacketInfoManager.fromHotelVersion(hotelVersion, hClient);
-        this.asyncPacketSender = new AsyncPacketSender(this);
+        this.packetSenderQueue = new PacketSenderQueue(this);
     }
 
     public String getClientIdentifier() {
@@ -89,8 +89,8 @@ public class HProxy {
         return hotelVersion;
     }
 
-    public AsyncPacketSender getAsyncPacketSender() {
-        return asyncPacketSender;
+    public PacketSenderQueue getPacketSenderQueue() {
+        return packetSenderQueue;
     }
 
     public HClient gethClient() {
