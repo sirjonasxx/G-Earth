@@ -45,7 +45,7 @@ public class Main extends Application {
         primaryStage.setResizable(false);
 
         primaryStage.setTitle("G-Earth " + version);
-        primaryStage.setScene(new Scene(root, 650, 290));
+        primaryStage.setScene(new Scene(root, 650, 295));
         primaryStage.show();
         primaryStage.getScene().getStylesheets().add(getClass().getResource("ui/bootstrap3.css").toExternalForm());
 
