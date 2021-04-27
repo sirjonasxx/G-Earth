@@ -3,7 +3,7 @@ package gearth.services.packet_info;
 import gearth.services.packet_info.providers.RemotePacketInfoProvider;
 import gearth.services.packet_info.providers.implementations.HarblePacketInfoProvider;
 import gearth.services.packet_info.providers.implementations.SulekPacketInfoProvider;
-import gearth.services.packet_info.providers.implementations.UnityPacketInfoProvider;
+import gearth.services.packet_info.providers.implementations.GEarthUnityPacketInfoProvider;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 import gearth.protocol.connection.HClient;
@@ -113,7 +113,7 @@ public class PacketInfoManager {
         List<PacketInfo> result = new ArrayList<>();
 
         if (clientType == HClient.UNITY) {
-            result.addAll(new UnityPacketInfoProvider(hotelversion).provide());
+            result.addAll(new GEarthUnityPacketInfoProvider(hotelversion).provide());
         }
         else if (clientType == HClient.FLASH) {
             try {

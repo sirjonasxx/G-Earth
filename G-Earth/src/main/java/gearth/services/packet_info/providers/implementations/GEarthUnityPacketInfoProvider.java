@@ -12,9 +12,9 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UnityPacketInfoProvider extends PacketInfoProvider {
+public class GEarthUnityPacketInfoProvider extends PacketInfoProvider {
 
-    public UnityPacketInfoProvider(String hotelVersion) {
+    public GEarthUnityPacketInfoProvider(String hotelVersion) {
         super(hotelVersion);
     }
 
@@ -32,7 +32,7 @@ public class UnityPacketInfoProvider extends PacketInfoProvider {
     private PacketInfo jsonToPacketInfo(JSONObject object, HMessage.Direction destination) {
         String name = object.getString("Name");
         int headerId = object.getInt("Id");
-        return new PacketInfo(destination, headerId, null, name, null, "Unity_local");
+        return new PacketInfo(destination, headerId, null, name, null, "G-Earth");
     }
 
     @Override
