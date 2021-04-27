@@ -67,6 +67,7 @@
                  </items>
                </Menu>
                <CheckMenuItem fx:id="chkSkipBigPackets" mnemonicParsing="false" selected="true" text="Skip big packets" />
+               <MenuItem mnemonicParsing="false" onAction="#exportAll" text="Export all" />
            </items>
          </Menu>
         </MenuBar>
@@ -115,7 +116,7 @@
                <Insets right="10.0" />
            </FlowPane.margin>
        </Label>
-         <Label fx:id="lblSkipped" layoutX="389.0" layoutY="11.0" style="-fx-text-fill: black !important" text="Skipped: 0" />
+         <Label fx:id="lblFiltered" layoutX="389.0" layoutY="11.0" style="-fx-text-fill: black !important" text="Filtered: 0" />
        </FlowPane>
    </bottom>
 </BorderPane>

@@ -15,12 +15,17 @@ import javafx.scene.control.Label;
  import javafx.scene.control.RadioMenuItem;
  import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
-import javafx.stage.Stage;
+ import javafx.stage.FileChooser;
+ import javafx.stage.Stage;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.StyleClassedTextArea;
 import org.fxmisc.richtext.model.StyleSpansBuilder;
 
-import java.net.URL;
+ import java.io.BufferedWriter;
+ import java.io.File;
+ import java.io.FileWriter;
+ import java.io.IOException;
+ import java.net.URL;
 import java.util.*;
  import java.util.stream.Collectors;
 
@@ -61,7 +66,7 @@ public class UiLoggerController implements Initializable {
     public RadioMenuItem chkAntiSpam_medium;
     public RadioMenuItem chkAntiSpam_high;
     public RadioMenuItem chkAntiSpam_ultra;
-    public Label lblSkipped;
+    public Label lblFiltered;
 
     private Map<Integer, LinkedList<Long>> filterTimestamps = new HashMap<>();
 
@@ -70,7 +75,7 @@ public class UiLoggerController implements Initializable {
     private Stage stage;
     private PacketInfoManager packetInfoManager = null;
 
-    private int skipped = 0;
+    private int filteredAmount = 0;
 
     private volatile boolean initialized = false;
     private final List<Element> appendLater = new ArrayList<>();
@@ -196,7 +201,7 @@ public class UiLoggerController implements Initializable {
         if (isIncoming && !isBlocked && !isReplaced) {
             boolean filter = checkFilter(packet);
             if (filter) {
-                skipped++;
+                filteredAmount++;
                 updateLoggerInfo();
                 return;
             }
@@ -322,7 +327,7 @@ public class UiLoggerController implements Initializable {
             lblViewIncoming.setText("View Incoming: " + (chkViewIncoming.isSelected() ? "True" : "False"));
             lblViewOutgoing.setText("View Outgoing: " + (chkViewOutgoing.isSelected() ? "True" : "False"));
             lblAutoScrolll.setText("Autoscroll: " + (chkAutoscroll.isSelected() ? "True" : "False"));
-            lblSkipped.setText("Skipped: " + skipped);
+            lblFiltered.setText("Filtered: " + filteredAmount);
 
             boolean packetInfoAvailable = packetInfoManager.getPacketInfoList().size() > 0;
             lblPacketInfo.setText("Packet info: " + (packetInfoAvailable ? "True" : "False"));
@@ -362,5 +367,34 @@ public class UiLoggerController implements Initializable {
                 stage.show();
             }
         });
+    }
+
+    public void exportAll(ActionEvent actionEvent) {
+        FileChooser fileChooser = new FileChooser();
+
+        //Set extension filter
+        FileChooser.ExtensionFilter extFilter =
+                new FileChooser.ExtensionFilter("TXT files (*.txt)", "*.txt");
+        fileChooser.getExtensionFilters().add(extFilter);
+        fileChooser.setTitle("Save Packets");
+
+        //Show save file dialog
+        File file = fileChooser.showSaveDialog(stage);
+
+        if(file != null){
+            try {
+                FileWriter fileWriter = new FileWriter(file);
+                BufferedWriter out = new BufferedWriter(fileWriter);
+
+                out.write(area.getText());
+
+                out.flush();
+                out.close();
+                fileWriter.close();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+
+        }
     }
 }
