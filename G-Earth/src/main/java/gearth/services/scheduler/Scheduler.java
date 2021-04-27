@@ -2,6 +2,7 @@ package gearth.services.scheduler;
 
 import gearth.protocol.HConnection;
 import gearth.protocol.HMessage;
+import gearth.protocol.HPacket;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -36,11 +37,13 @@ public class Scheduler<T extends ScheduleItem> {
                         Interval cur = item.getDelayProperty().get();
                         for (int i = 0; i < changed; i++) {
                             if ((t - i) % cur.getDelay() == cur.getOffset()) {
+                                HPacket hPacket = new HPacket(item.getPacketAsStringProperty().getName());
+
                                 if (item.getDestinationProperty().get() == HMessage.Direction.TOSERVER) {
-                                    connection.sendToServerAsync(item.getPacketProperty().get());
+                                    connection.sendToServer(hPacket);
                                 }
                                 else {
-                                    connection.sendToClientAsync(item.getPacketProperty().get());
+                                    connection.sendToClient(hPacket);
                                 }
                             }
                         }

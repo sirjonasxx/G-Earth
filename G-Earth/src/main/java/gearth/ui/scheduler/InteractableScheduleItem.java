@@ -15,19 +15,13 @@ import javafx.beans.property.SimpleStringProperty;
 
 public class InteractableScheduleItem extends ScheduleItem implements StringifyAble {
 
-    private SimpleStringProperty packetAsStringProperty;
 
-    public InteractableScheduleItem(int index, boolean paused, Interval delay, HPacket packet, String inputPacket, HMessage.Direction destination) {
-        super(index, paused, delay, packet, destination);
-        this.packetAsStringProperty = new SimpleStringProperty(inputPacket);
+    public InteractableScheduleItem(int index, boolean paused, Interval delay, String inputPacket, HMessage.Direction destination) {
+        super(index, paused, delay, inputPacket, destination);
     }
 
     public InteractableScheduleItem(String stringifyAbleRepresentation) {
         constructFromString(stringifyAbleRepresentation);
-    }
-
-    public SimpleStringProperty getPacketAsStringProperty() {
-        return packetAsStringProperty;
     }
 
     private Observable<OnDeleteListener> onDeleteObservable = new Observable<>(OnDeleteListener::onDelete);
@@ -72,8 +66,6 @@ public class InteractableScheduleItem extends ScheduleItem implements StringifyA
                 .append("\t")
                 .append(getDelayProperty().get().toString())
                 .append("\t")
-//                .append(getPacketProperty().get().toString())
-//                .append("\t")
                 .append(getDestinationProperty().get().name())
                 .append("\t")
                 .append(getPacketAsStringProperty().get());
@@ -87,13 +79,10 @@ public class InteractableScheduleItem extends ScheduleItem implements StringifyA
             int index = Integer.parseInt(parts[0]);
             boolean paused = parts[1].equals("true");
             Interval delay = new Interval(parts[2]);
-//            HPacket packet = new HPacket(parts[3]);
             HMessage.Direction direction = parts[3].equals(HMessage.Direction.TOSERVER.name()) ? HMessage.Direction.TOSERVER : HMessage.Direction.TOCLIENT;
             String packetAsString = parts[4];
-            HPacket packet = new HPacket(packetAsString);
 
-            construct(index, paused, delay, packet, direction);
-            this.packetAsStringProperty = new SimpleStringProperty(packetAsString);
+            construct(index, paused, delay, packetAsString, direction);
         }
     }
 
