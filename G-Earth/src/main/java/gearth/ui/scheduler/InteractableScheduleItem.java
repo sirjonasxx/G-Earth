@@ -75,7 +75,7 @@ public class InteractableScheduleItem extends ScheduleItem implements StringifyA
     @Override
     public void constructFromString(String str) {
         String[] parts = str.split("\t");
-        if (parts.length == 6) {
+        if (parts.length == 5) {
             int index = Integer.parseInt(parts[0]);
             boolean paused = parts[1].equals("true");
             Interval delay = new Interval(parts[2]);
