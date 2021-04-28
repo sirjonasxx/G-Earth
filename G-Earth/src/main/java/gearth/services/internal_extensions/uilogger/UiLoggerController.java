@@ -67,6 +67,7 @@ public class UiLoggerController implements Initializable {
     public RadioMenuItem chkAntiSpam_high;
     public RadioMenuItem chkAntiSpam_ultra;
     public Label lblFiltered;
+    public CheckMenuItem chkTimestamp;
 
     private Map<Integer, LinkedList<Long>> filterTimestamps = new HashMap<>();
 
@@ -127,7 +128,8 @@ public class UiLoggerController implements Initializable {
                 chkViewIncoming, chkViewOutgoing, chkDisplayStructure, chkAutoscroll,
                 chkSkipBigPackets, chkMessageName, chkMessageHash, chkUseNewStructures,
                 chkOpenOnConnect, chkResetOnConnect, chkHideOnDisconnect, chkResetOnDisconnect,
-                chkAntiSpam_none, chkAntiSpam_low, chkAntiSpam_medium, chkAntiSpam_high, chkAntiSpam_ultra
+                chkAntiSpam_none, chkAntiSpam_low, chkAntiSpam_medium, chkAntiSpam_high, chkAntiSpam_ultra,
+                chkTimestamp
         ));
         loadAllMenuItems();
 
@@ -212,6 +214,10 @@ public class UiLoggerController implements Initializable {
 
         ArrayList<Element> elements = new ArrayList<>();
 
+
+        if (chkTimestamp.isSelected()) {
+            elements.add(new Element(String.format("(timestamp: %d)\n", System.currentTimeMillis()), "timestamp"));
+        }
 
         boolean packetInfoAvailable = packetInfoManager.getPacketInfoList().size() > 0;
 

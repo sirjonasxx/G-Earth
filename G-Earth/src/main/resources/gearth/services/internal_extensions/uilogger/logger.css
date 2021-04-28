@@ -11,6 +11,10 @@
     -fx-fill: #ffff00;
 }
 
+.timestamp {
+    -fx-fill: #ffffff;
+}
+
 .incoming {
     -fx-fill: #b22222;
 }

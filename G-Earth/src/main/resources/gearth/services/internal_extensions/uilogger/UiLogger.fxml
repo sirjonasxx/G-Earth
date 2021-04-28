@@ -51,6 +51,7 @@
                      <CheckMenuItem fx:id="chkMessageName" mnemonicParsing="false" selected="true" text="Message Name" />
                      <CheckMenuItem fx:id="chkMessageHash" mnemonicParsing="false" text="Message Hash" />
                      <CheckMenuItem fx:id="chkUseNewStructures" mnemonicParsing="false" selected="true" text="New structures" />
+                     <CheckMenuItem fx:id="chkTimestamp" mnemonicParsing="false" text="Timestamp" />
                  </items>
                </Menu>
                <Menu mnemonicParsing="false" text="Anti-spam filter">
