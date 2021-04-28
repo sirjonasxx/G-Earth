@@ -36,6 +36,7 @@ public class HPacket implements StringifyAble {
             HPacket packetFromString = PacketStringUtils.fromString(packet);
             packetInBytes = packetFromString.packetInBytes;
             identifier = packetFromString.identifier;
+            identifierDirection = packetFromString.identifierDirection;
         } catch (InvalidPacketException e) {
             packetInBytes = new byte[0];
         }
