@@ -162,7 +162,7 @@ public class ExtensionHandler {
                 awaitManipulation.put(hMessage, new HashSet<>(gEarthExtensions));
 
                 for (GEarthExtension extension : gEarthExtensions) {
-                    extension.packetIntercept(hMessage);
+                    extension.packetIntercept(new HMessage(hMessage));
                 }
             }
         }

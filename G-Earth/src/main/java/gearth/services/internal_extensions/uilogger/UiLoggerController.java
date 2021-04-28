@@ -9,10 +9,7 @@ import gearth.ui.logger.loggerdisplays.PacketLogger;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
  import javafx.fxml.Initializable;
-import javafx.scene.control.CheckMenuItem;
-import javafx.scene.control.Label;
- import javafx.scene.control.MenuItem;
- import javafx.scene.control.RadioMenuItem;
+ import javafx.scene.control.*;
  import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
  import javafx.stage.FileChooser;
@@ -279,12 +276,19 @@ public class UiLoggerController implements Initializable {
         }
 
         if (packet.length() <= 2000) {
-            String expr = packet.toExpression(isIncoming ? HMessage.Direction.TOCLIENT : HMessage.Direction.TOSERVER, packetInfoManager, chkUseNewStructures.isSelected());
-            String cleaned = cleanTextContent(expr);
-            if (cleaned.equals(expr)) {
-                if (!expr.equals("") && chkDisplayStructure.isSelected())
-                    elements.add(new Element("\n" + cleanTextContent(expr), "structure"));
+            try {
+                String expr = packet.toExpression(isIncoming ? HMessage.Direction.TOCLIENT : HMessage.Direction.TOSERVER, packetInfoManager, chkUseNewStructures.isSelected());
+                String cleaned = cleanTextContent(expr);
+                if (cleaned.equals(expr)) {
+                    if (!expr.equals("") && chkDisplayStructure.isSelected())
+                        elements.add(new Element("\n" + cleanTextContent(expr), "structure"));
+                }
             }
+            catch (Exception e) {
+                System.out.println(packet.toString());
+                System.out.println("if you see this message pls report it");
+            }
+
         }
 
 
@@ -313,12 +317,11 @@ public class UiLoggerController implements Initializable {
             }
 
             int oldLen = area.getLength();
+
             area.appendText(sb.toString());
-//            System.out.println(sb.toString());
             area.setStyleSpans(oldLen, styleSpansBuilder.create());
 
             if (chkAutoscroll.isSelected()) {
-//                area.moveTo(area.getLength());
                 area.requestFollowCaret();
             }
         });
