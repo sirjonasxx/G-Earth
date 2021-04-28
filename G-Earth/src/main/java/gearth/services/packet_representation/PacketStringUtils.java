@@ -1,7 +1,7 @@
-package gearth.services.packetrepresentation;
+package gearth.services.packet_representation;
 
 import gearth.services.packet_info.PacketInfo;
-import gearth.services.packetrepresentation.prediction.StructurePredictor;
+import gearth.services.packet_representation.prediction.StructurePredictor;
 import gearth.protocol.HPacket;
 
 import java.nio.ByteBuffer;
@@ -231,7 +231,7 @@ public class PacketStringUtils {
             ).append("\"}");
             else if (c == 'd') builder.append("{d:").append(p.readDouble()).append('}');
             else if (c == 'f') builder.append("{f:").append(p.readFloat()).append('}');
-            else if (c == 'b') builder.append("{b:").append(p.readByte()).append('}');
+            else if (c == 'b') builder.append("{b:").append((((int)(p.readByte())) + 256) % 256).append('}');
             else if (c == 'B') builder.append("{b:").append(p.readBoolean()).append('}');
             else if (c == 'l') builder.append("{l:").append(p.readLong()).append('}');
             else if (c == 'u') builder.append("{u:").append(p.readShort()).append('}');
@@ -279,6 +279,9 @@ public class PacketStringUtils {
 
         HPacket p2 = fromString("{l}{h:4564}{i:3}{i:0}{s:\"hi\"}{i:0}{i:1}{s:\"how\"}{i:3}{b:1}{b:2}{b:3}{i:2}{s:\"r u\"}{i:1}{b:120}{i:2}{b:true}");
         System.out.println(p2);
+        System.out.println(p2.toExpression());
+
+        System.out.println(new HPacket("{l}{h:4564}{b:180}").toExpression());
 
         System.out.println(structureEquals(
                 new HPacket("{l}{h:5}{s:\"asdas\"}"),

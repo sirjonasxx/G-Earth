@@ -3,8 +3,8 @@ package gearth.protocol;
 import gearth.misc.StringifyAble;
 import gearth.services.packet_info.PacketInfo;
 import gearth.services.packet_info.PacketInfoManager;
-import gearth.services.packetrepresentation.InvalidPacketException;
-import gearth.services.packetrepresentation.PacketStringUtils;
+import gearth.services.packet_representation.InvalidPacketException;
+import gearth.services.packet_representation.PacketStringUtils;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;

@@ -1,7 +1,7 @@
-package gearth.services.packetrepresentation.prediction;
+package gearth.services.packet_representation.prediction;
 
-import gearth.services.packetrepresentation.prediction.checkers.TypeChecker;
-import gearth.services.packetrepresentation.prediction.checkers.TypeCheckerProducer;
+import gearth.services.packet_representation.prediction.checkers.TypeChecker;
+import gearth.services.packet_representation.prediction.checkers.TypeCheckerProducer;
 import gearth.protocol.HPacket;
 
 import java.util.List;
