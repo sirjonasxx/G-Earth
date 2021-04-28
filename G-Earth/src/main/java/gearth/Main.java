@@ -130,6 +130,17 @@ public class Main extends Application {
         }
         return false;
     }
+
+    public static String getArgument(String... arg) {
+        for (int i = 0; i < args.length - 1; i++) {
+            for (String str : arg) {
+                if (args[i].toLowerCase().equals(str.toLowerCase())) {
+                    return args[i+1];
+                }
+            }
+        }
+        return null;
+    }
 }
 
 // Hi

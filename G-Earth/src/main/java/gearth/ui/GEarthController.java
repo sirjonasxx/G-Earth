@@ -1,5 +1,7 @@
 package gearth.ui;
 
+import gearth.protocol.connection.proxy.ProxyProviderFactory;
+import gearth.protocol.connection.proxy.SocksConfiguration;
 import gearth.ui.logger.loggerdisplays.PacketLoggerFactory;
 import javafx.event.Event;
 import javafx.event.EventHandler;
@@ -41,6 +43,15 @@ public class GEarthController {
 
     public Pane mover;
     public GEarthController() {
+        SocksConfiguration temporary_socks = new SocksConfiguration() {
+            public boolean useSocks() { return false; }
+            public int getSocksPort() { return 0; }
+            public String getSocksHost() { return null; }
+            public boolean onlyUseIfNeeded() { return true; }
+        };
+
+        ProxyProviderFactory.setSocksConfig(temporary_socks);
+
         hConnection = new HConnection();
     }
 

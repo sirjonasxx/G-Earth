@@ -1,5 +1,6 @@
 package gearth.ui.connection;
 
+import gearth.Main;
 import gearth.misc.Cacher;
 import gearth.protocol.connection.HState;
 import gearth.protocol.connection.proxy.ProxyProviderFactory;
@@ -12,7 +13,6 @@ import gearth.ui.SubForm;
 import javafx.scene.layout.GridPane;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -43,6 +43,8 @@ public class ConnectionController extends SubForm {
     public RadioButton rd_unity;
     public RadioButton rd_flash;
     public GridPane grd_clientSelection;
+
+    private volatile int initcount = 0;
 
     public void initialize() {
 
@@ -113,6 +115,10 @@ public class ConnectionController extends SubForm {
             if (fullyInitialized == 2) {
                 Platform.runLater(this::updateInputUI);
             }
+        }
+
+        synchronized (this) {
+            tryMaybeConnectOnInit();
         }
     }
 
@@ -190,6 +196,47 @@ public class ConnectionController extends SubForm {
         }));
 
         Platform.runLater(this::updateInputUI);
+
+        synchronized (this) {
+            tryMaybeConnectOnInit();
+        }
+    }
+
+
+    private void tryMaybeConnectOnInit() {
+        if (++initcount == 2) {
+            maybeConnectOnInit();
+        }
+    }
+
+    private void maybeConnectOnInit() {
+        String connectMode = Main.getArgument("--connect", "-c");
+        if (connectMode != null) {
+            if (connectMode.equals("flash")) {
+                Platform.runLater(() -> rd_flash.setSelected(true));
+                String host = Main.getArgument("--host");
+                String port = Main.getArgument("--port");
+                if (host != null && port != null) {
+                    Platform.runLater(() -> {
+                        if (!inpHost.getItems().contains(host)) inpHost.getItems().add(host);
+                        inpHost.getSelectionModel().select(host);
+                        if (!inpPort.getItems().contains(port)) inpPort.getItems().add(port);
+                        inpPort.getSelectionModel().select(port);
+                        cbx_autodetect.setSelected(false);
+                    });
+                    getHConnection().start(host, Integer.parseInt(port));
+                }
+                else {
+                    Platform.runLater(() -> cbx_autodetect.setSelected(true));
+                    getHConnection().start();
+                }
+            }
+            else if (connectMode.equals("unity")) {
+                Platform.runLater(() -> rd_unity.setSelected(true));
+                getHConnection().startUnity();
+            }
+            Platform.runLater(this::updateInputUI);
+        }
     }
 
     public void btnConnect_clicked(ActionEvent actionEvent) {
