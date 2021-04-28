@@ -231,13 +231,7 @@ public class ExtensionHandler {
                     @Override
                     protected void stringToPacketRequest(String string) {
                         HPacket packet = new HPacket(string);
-                        PacketInfoManager packetInfoManager = hConnection.getPacketInfoManager();
-                        if (packet.canComplete(HMessage.Direction.TOCLIENT, packetInfoManager) && !packet.canComplete(HMessage.Direction.TOSERVER, packetInfoManager)) {
-                            packet.completePacket(HMessage.Direction.TOCLIENT, packetInfoManager);
-                        }
-                        else if (!packet.canComplete(HMessage.Direction.TOCLIENT, packetInfoManager) && packet.canComplete(HMessage.Direction.TOSERVER, packetInfoManager)) {
-                            packet.completePacket(HMessage.Direction.TOSERVER, packetInfoManager);
-                        }
+                        packet.maybeCompletePacket(hConnection.getPacketInfoManager());
                         extension.stringToPacketResponse(packet);
                     }
                 };

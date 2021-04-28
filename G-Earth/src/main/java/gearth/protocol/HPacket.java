@@ -108,6 +108,15 @@ public class HPacket implements StringifyAble {
         isEdited = wasEdited;
     }
 
+    public void maybeCompletePacket(PacketInfoManager packetInfoManager) {
+        if (canComplete(HMessage.Direction.TOCLIENT, packetInfoManager) && !canComplete(HMessage.Direction.TOSERVER, packetInfoManager)) {
+            completePacket(HMessage.Direction.TOCLIENT, packetInfoManager);
+        }
+        else if (!canComplete(HMessage.Direction.TOCLIENT, packetInfoManager) && canComplete(HMessage.Direction.TOSERVER, packetInfoManager)) {
+            completePacket(HMessage.Direction.TOSERVER, packetInfoManager);
+        }
+    }
+
     public boolean canComplete(HMessage.Direction direction, PacketInfoManager packetInfoManager) {
         if (isCorrupted() || identifier == null) return false;
 

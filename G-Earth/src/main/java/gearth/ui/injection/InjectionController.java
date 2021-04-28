@@ -153,13 +153,7 @@ public class InjectionController extends SubForm {
 
                 // complete packet to show correct headerId
                 if (!packets[0].isPacketComplete()) {
-                    HPacket packet = packets[0];
-                    if (packet.canComplete(HMessage.Direction.TOCLIENT, packetInfoManager) && !packet.canComplete(HMessage.Direction.TOSERVER, packetInfoManager)) {
-                        packet.completePacket(HMessage.Direction.TOCLIENT, packetInfoManager);
-                    }
-                    else if (!packet.canComplete(HMessage.Direction.TOCLIENT, packetInfoManager) && packet.canComplete(HMessage.Direction.TOSERVER, packetInfoManager)) {
-                        packet.completePacket(HMessage.Direction.TOSERVER, packetInfoManager);
-                    }
+                    packets[0].maybeCompletePacket(packetInfoManager);
                 }
 
                 lbl_pcktInfo.setText("header (id:" + packets[0].headerId() + ", length:" +
