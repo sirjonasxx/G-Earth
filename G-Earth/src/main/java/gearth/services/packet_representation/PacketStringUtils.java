@@ -1,5 +1,6 @@
 package gearth.services.packet_representation;
 
+import gearth.protocol.HMessage;
 import gearth.services.packet_info.PacketInfo;
 import gearth.services.packet_representation.prediction.StructurePredictor;
 import gearth.protocol.HPacket;
@@ -137,7 +138,7 @@ public class PacketStringUtils {
 
         String[] identifier = {null};
         if (!fixLengthLater && packet.startsWith("{")) {
-            packet = replaceAll(packet, "^\\{([^:{}]*)}", m -> {
+            packet = replaceAll(packet, "^\\{((in|out):[^:{}]*)}", m -> {
                 identifier[0] = m.group(1);
                 return "[255][255]";
             });
@@ -173,7 +174,9 @@ public class PacketStringUtils {
             hPacket.fixLength();
         }
         if (identifier[0] != null) {
-            hPacket.setIdentifier(identifier[0]);
+            String[] split = identifier[0].split(":");
+            hPacket.setIdentifierDirection(split[0].equals("in") ? HMessage.Direction.TOCLIENT : HMessage.Direction.TOSERVER);
+            hPacket.setIdentifier(split[1]);
         }
         return hPacket;
     }
@@ -197,7 +200,7 @@ public class PacketStringUtils {
         StringBuilder builder = new StringBuilder();
         if (packetInfo != null) {
             String identifier = packetInfo.getName() == null ? packetInfo.getHash() : packetInfo.getName();
-            builder.append("{").append(identifier).append("}");
+            builder.append("{").append(packetInfo.getDestination() == HMessage.Direction.TOCLIENT ? "in:" : "out:").append(identifier).append("}");
         }
         else {
             builder.append("{l}{h:").append(packet.headerId()).append("}");
@@ -269,7 +272,7 @@ public class PacketStringUtils {
         HPacket fghdft = fromString("{l}{h:-1}{i:1}{i:0}{i:6}{i:4}{s:\"1.0\"}");
         System.out.println(fghdft);
 
-        HPacket zed = fromString("{test}{s:\"¥\"}{i:0}{i:0}");
+        HPacket zed = fromString("{out:test}{s:\"¥\"}{i:0}{i:0}");
         System.out.println(zed);
 
         HPacket p1 = fromString("{l}{h:1129}{s:\"\\\\\\\\\"}{i:0}{i:0}");

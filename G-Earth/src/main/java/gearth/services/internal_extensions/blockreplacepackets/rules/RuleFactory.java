@@ -28,7 +28,7 @@ public class RuleFactory {
             if (rType == BlockReplaceRule.Type.PACKET) {
                 HPacket packet = new HPacket(replacement);
                 if (!packet.isPacketComplete()) {
-                    packet.completePacket(rSide == BlockReplaceRule.Side.INCOMING ? HMessage.Direction.TOCLIENT : HMessage.Direction.TOSERVER, packetInfoManager);
+                    packet.completePacket(packetInfoManager);
                 }
                 return new ReplacePacketRule(rSide, Integer.parseInt(value), packet);
             }

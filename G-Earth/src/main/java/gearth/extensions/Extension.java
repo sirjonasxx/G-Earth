@@ -216,7 +216,7 @@ public abstract class Extension extends ExtensionBase {
     private boolean send(HPacket packet, HMessage.Direction direction) {
         if (packet.isCorrupted()) return false;
 
-        if (!packet.isPacketComplete()) packet.completePacket(direction, packetInfoManager);
+        if (!packet.isPacketComplete()) packet.completePacket(packetInfoManager);
         if (!packet.isPacketComplete()) return false;
 
         HPacket packet1 = new HPacket(NetworkExtensionInfo.INCOMING_MESSAGES_IDS.SENDMESSAGE);

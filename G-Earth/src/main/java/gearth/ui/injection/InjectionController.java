@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class InjectionController extends SubForm {
@@ -132,30 +133,18 @@ public class InjectionController extends SubForm {
         if (!dirty) {
             PacketInfoManager packetInfoManager = getHConnection().getPacketInfoManager();
 
-            List<String> unIdentifiedPackets = Arrays.stream(packets)
-                    .filter(hPacket -> !hPacket.isPacketComplete())
-                    .map(HPacket::getIdentifier).collect(Collectors.toList());
+            for (HPacket packet : packets) {
+                packet.completePacket(packetInfoManager);
+            }
 
-            boolean canSendToClient = unIdentifiedPackets.stream().allMatch(s -> {
-                if (packetInfoManager == null) return false;
-                return packetInfoManager.getPacketInfoFromHash(HMessage.Direction.TOCLIENT, s) != null ||
-                        packetInfoManager.getPacketInfoFromName(HMessage.Direction.TOCLIENT, s) != null;
-            });
-            boolean canSendToServer = unIdentifiedPackets.stream().allMatch(s -> {
-                if (packetInfoManager == null) return false;
-                return packetInfoManager.getPacketInfoFromHash(HMessage.Direction.TOSERVER, s) != null ||
-                        packetInfoManager.getPacketInfoFromName(HMessage.Direction.TOSERVER, s) != null;
-            });
+            boolean canSendToClient = Arrays.stream(packets).allMatch(packet ->
+                    packet.isPacketComplete() && packet.canSendToClient());
+            boolean canSendToServer = Arrays.stream(packets).allMatch(packet ->
+                    packet.isPacketComplete() && packet.canSendToServer());
 
             btn_sendToClient.setDisable(!canSendToClient || getHConnection().getState() != HState.CONNECTED);
             btn_sendToServer.setDisable(!canSendToServer || getHConnection().getState() != HState.CONNECTED);
             if (packets.length == 1) {
-
-                // complete packet to show correct headerId
-                if (!packets[0].isPacketComplete()) {
-                    packets[0].maybeCompletePacket(packetInfoManager);
-                }
-
                 lbl_pcktInfo.setText("header (id:" + packets[0].headerId() + ", length:" +
                         packets[0].length() + ")");
             }

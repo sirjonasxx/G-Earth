@@ -144,12 +144,7 @@ public class ToolsController extends SubForm {
         PacketInfoManager packetInfoManager = getHConnection().getPacketInfoManager();
         HPacket packet = new HPacket(p);
         if (!packet.isPacketComplete() && packetInfoManager != null) {
-            if (packet.canComplete(HMessage.Direction.TOCLIENT, packetInfoManager) && !packet.canComplete(HMessage.Direction.TOSERVER, packetInfoManager)) {
-                packet.completePacket(HMessage.Direction.TOCLIENT, packetInfoManager);
-            }
-            else if (!packet.canComplete(HMessage.Direction.TOCLIENT, packetInfoManager) && packet.canComplete(HMessage.Direction.TOSERVER, packetInfoManager)) {
-                packet.completePacket(HMessage.Direction.TOSERVER, packetInfoManager);
-            }
+            packet.completePacket(packetInfoManager);
         }
 
         return packet;

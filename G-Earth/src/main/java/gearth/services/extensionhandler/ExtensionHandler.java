@@ -231,7 +231,7 @@ public class ExtensionHandler {
                     @Override
                     protected void stringToPacketRequest(String string) {
                         HPacket packet = new HPacket(string);
-                        packet.maybeCompletePacket(hConnection.getPacketInfoManager());
+                        if (!packet.isPacketComplete()) packet.completePacket(hConnection.getPacketInfoManager());
                         extension.stringToPacketResponse(packet);
                     }
                 };

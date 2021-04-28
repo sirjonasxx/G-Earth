@@ -137,30 +137,30 @@ public class HConnection {
     }
 
 
-    public boolean sendToClient(HPacket message) {
+    public boolean sendToClient(HPacket packet) {
         if (proxy == null) return false;
 
-        if (!message.isPacketComplete()) {
+        if (!packet.isPacketComplete()) {
             PacketInfoManager packetInfoManager = getPacketInfoManager();
-            message.completePacket(HMessage.Direction.TOCLIENT, packetInfoManager);
+            packet.completePacket(packetInfoManager);
 
-            if (!message.isPacketComplete()) return false;
+            if (!packet.isPacketComplete() || !packet.canSendToClient()) return false;
         }
 
-        proxy.getPacketSenderQueue().queueToClient(message);
+        proxy.getPacketSenderQueue().queueToClient(packet);
         return true;
     }
-    public boolean sendToServer(HPacket message) {
+    public boolean sendToServer(HPacket packet) {
         if (proxy == null) return false;
 
-        if (!message.isPacketComplete()) {
+        if (!packet.isPacketComplete()) {
             PacketInfoManager packetInfoManager = getPacketInfoManager();
-            message.completePacket(HMessage.Direction.TOSERVER, packetInfoManager);
+            packet.completePacket(packetInfoManager);
 
-            if (!message.isPacketComplete()) return false;
+            if (!packet.isPacketComplete() || !packet.canSendToServer()) return false;
         }
 
-        proxy.getPacketSenderQueue().queueToServer(message);
+        proxy.getPacketSenderQueue().queueToServer(packet);
         return true;
     }
 

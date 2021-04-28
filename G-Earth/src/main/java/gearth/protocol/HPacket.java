@@ -1,5 +1,6 @@
 package gearth.protocol;
 
+import gearth.extensions.parsers.HDirection;
 import gearth.misc.StringifyAble;
 import gearth.services.packet_info.PacketInfo;
 import gearth.services.packet_info.PacketInfoManager;
@@ -21,6 +22,7 @@ public class HPacket implements StringifyAble {
 
     // if identifier != null, this is a placeholder name for the type of packet, headerId will be "-1"
     private String identifier = null;
+    private HMessage.Direction identifierDirection = null;
 
     public HPacket(byte[] packet)	{
         packetInBytes = packet.clone();
@@ -61,9 +63,14 @@ public class HPacket implements StringifyAble {
         isEdited = false;
     }
 
-    public HPacket(String identifier, Object... objects) throws InvalidParameterException {
+    public HPacket(String identifier, HMessage.Direction direction) throws InvalidParameterException {
         packetInBytes = new byte[]{0,0,0,2,-1,-1};
         this.identifier = identifier;
+        this.identifierDirection = direction;
+    }
+
+    public HPacket(String identifier, HMessage.Direction direction, Object... objects) throws InvalidParameterException {
+        this(identifier, direction);
         appendObjects(objects);
         isEdited = false;
     }
@@ -88,16 +95,20 @@ public class HPacket implements StringifyAble {
         this.identifier = identifier;
     }
 
+    public void setIdentifierDirection(HMessage.Direction identifierDirection) {
+        this.identifierDirection = identifierDirection;
+    }
+
     public String getIdentifier() {
         return identifier;
     }
 
-    public void completePacket(HMessage.Direction direction, PacketInfoManager packetInfoManager) {
+    public void completePacket(PacketInfoManager packetInfoManager) {
         if (isCorrupted() || identifier == null) return;
 
-        PacketInfo packetInfo = packetInfoManager.getPacketInfoFromName(direction, identifier);
+        PacketInfo packetInfo = packetInfoManager.getPacketInfoFromName(identifierDirection, identifier);
         if (packetInfo == null) {
-            packetInfo = packetInfoManager.getPacketInfoFromHash(direction, identifier);
+            packetInfo = packetInfoManager.getPacketInfoFromHash(identifierDirection, identifier);
             if (packetInfo == null) return;
         }
 
@@ -108,21 +119,20 @@ public class HPacket implements StringifyAble {
         isEdited = wasEdited;
     }
 
-    public void maybeCompletePacket(PacketInfoManager packetInfoManager) {
-        if (canComplete(HMessage.Direction.TOCLIENT, packetInfoManager) && !canComplete(HMessage.Direction.TOSERVER, packetInfoManager)) {
-            completePacket(HMessage.Direction.TOCLIENT, packetInfoManager);
-        }
-        else if (!canComplete(HMessage.Direction.TOCLIENT, packetInfoManager) && canComplete(HMessage.Direction.TOSERVER, packetInfoManager)) {
-            completePacket(HMessage.Direction.TOSERVER, packetInfoManager);
-        }
+    public boolean canSendToClient() {
+        return identifierDirection == null || identifierDirection == HMessage.Direction.TOCLIENT;
     }
 
-    public boolean canComplete(HMessage.Direction direction, PacketInfoManager packetInfoManager) {
+    public boolean canSendToServer() {
+        return identifierDirection == null || identifierDirection == HMessage.Direction.TOSERVER;
+    }
+
+    public boolean canComplete(PacketInfoManager packetInfoManager) {
         if (isCorrupted() || identifier == null) return false;
 
-        PacketInfo packetInfo = packetInfoManager.getPacketInfoFromName(direction, identifier);
+        PacketInfo packetInfo = packetInfoManager.getPacketInfoFromName(identifierDirection, identifier);
         if (packetInfo == null) {
-            packetInfo = packetInfoManager.getPacketInfoFromHash(direction, identifier);
+            packetInfo = packetInfoManager.getPacketInfoFromHash(identifierDirection, identifier);
             return packetInfo != null;
         }
 
