@@ -97,7 +97,7 @@ public class ExampleExtension extends GEarthExtension {
     }
 
     @Override
-    public void init() {
+    public void init(boolean isConnected) {
         System.out.println("Example extension is connected to G-Earth");
         // the extension is now connected with G-Earth
     }

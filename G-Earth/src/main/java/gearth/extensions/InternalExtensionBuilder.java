@@ -118,9 +118,9 @@ public class InternalExtensionBuilder extends GEarthExtension {
     }
 
     @Override
-    public void init() {
+    public void init(boolean isConnected) {
         extension.initExtension();
-    }
+    } // not implementing isConnected, only relevant for g-python
 
     @Override
     public void close() {

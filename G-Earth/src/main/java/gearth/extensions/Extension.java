@@ -155,6 +155,7 @@ public abstract class Extension extends ExtensionBase {
                     flagRequestCallback = null;
                 }
                 else if (packet.headerId() == NetworkExtensionInfo.OUTGOING_MESSAGES_IDS.INIT) {
+//                    boolean isConnected = packet.readBoolean(); - don't read since not relevant here
                     initExtension();
                     writeToConsole("green","Extension \"" + getInfoAnnotations().Title() + "\" successfully initialized", false);
                 }

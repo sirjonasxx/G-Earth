@@ -213,9 +213,9 @@ public class NetworkExtension extends GEarthExtension {
     }
 
     @Override
-    public void init() {
+    public void init(boolean isConnected) {
         sendMessage(
-                new HPacket(NetworkExtensionInfo.OUTGOING_MESSAGES_IDS.INIT)
+                new HPacket(NetworkExtensionInfo.OUTGOING_MESSAGES_IDS.INIT, isConnected)
         );
     }
 

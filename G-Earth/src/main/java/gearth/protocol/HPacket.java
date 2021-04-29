@@ -37,10 +37,10 @@ public class HPacket implements StringifyAble {
             packetInBytes = packetFromString.packetInBytes;
             identifier = packetFromString.identifier;
             identifierDirection = packetFromString.identifierDirection;
-        } catch (InvalidPacketException e) {
-            packetInBytes = new byte[0];
-        }
+    } catch (InvalidPacketException e) {
+        packetInBytes = new byte[0];
     }
+}
     public HPacket(int header) {
         packetInBytes = new byte[]{0,0,0,2,0,0};
         replaceShort(4, (short)header);

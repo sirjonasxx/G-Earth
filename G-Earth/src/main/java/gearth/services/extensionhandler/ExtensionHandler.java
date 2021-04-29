@@ -237,7 +237,7 @@ public class ExtensionHandler {
                 };
 
                 extension.getExtensionObservable().addListener(listener);
-                extension.init();
+                extension.init(hConnection.getState() == HState.CONNECTED);
 
                 if (hConnection.getState() == HState.CONNECTED) {
                     extension.connectionStart(

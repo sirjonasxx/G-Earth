@@ -40,7 +40,7 @@ public abstract class GEarthExtension {
     public abstract void provideFlags(String[] flags);
     public abstract void connectionStart(String host, int port, String hotelVersion, String clientIdentifier, HClient clientType, PacketInfoManager packetInfoManager);
     public abstract void connectionEnd();
-    public abstract void init();
+    public abstract void init(boolean isConnected);
     public abstract void close();
     public abstract void packetToStringResponse(String string, String expression);
     public abstract void stringToPacketResponse(HPacket packet);
