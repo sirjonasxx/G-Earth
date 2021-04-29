@@ -237,8 +237,12 @@ public class ExtensionHandler {
                 };
 
                 extension.getExtensionObservable().addListener(listener);
-                extension.init(hConnection.getState() == HState.CONNECTED);
 
+                extension.getRemoveClickObservable().addListener(extension::close);
+                extension.getClickedObservable().addListener(extension::doubleclick);
+                observable.fireEvent(l -> l.onExtensionConnect(extension));
+
+                extension.init(hConnection.getState() == HState.CONNECTED);
                 if (hConnection.getState() == HState.CONNECTED) {
                     extension.connectionStart(
                             hConnection.getDomain(),
@@ -249,11 +253,6 @@ public class ExtensionHandler {
                             hConnection.getPacketInfoManager()
                     );
                 }
-
-                extension.getRemoveClickObservable().addListener(extension::close);
-                extension.getClickedObservable().addListener(extension::doubleclick);
-
-                observable.fireEvent(l -> l.onExtensionConnect(extension));
             }
         };
     }
