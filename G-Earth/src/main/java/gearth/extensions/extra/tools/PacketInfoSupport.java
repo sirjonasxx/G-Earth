@@ -41,7 +41,7 @@ public class PacketInfoSupport {
                         ? outgoingMessageListeners
                         : incomingMessageListeners);
 
-        List<PacketInfo> packetInfos = packetInfoManager.getAllPacketInfoFromHeaderId(HMessage.Direction.TOCLIENT, message.getPacket().headerId());
+        List<PacketInfo> packetInfos = packetInfoManager.getAllPacketInfoFromHeaderId(direction, message.getPacket().headerId());
 
         for (PacketInfo packetInfo : packetInfos) {
             List<Extension.MessageListener> listeners_hash = messageListeners.get(packetInfo.getHash());
