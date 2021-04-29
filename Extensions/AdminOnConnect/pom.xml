@@ -13,7 +13,7 @@
     <parent>
         <groupId>G-Earth</groupId>
         <artifactId>G-Earth-Parent</artifactId>
-        <version>1.4</version>
+        <version>1.4.1</version>
         <relativePath>../../</relativePath>
     </parent>
 
@@ -106,7 +106,7 @@
         <dependency>
             <groupId>G-Earth</groupId>
             <artifactId>G-Earth</artifactId>
-            <version>1.4</version>
+            <version>1.4.1</version>
             <!--<scope>provided</scope>-->
         </dependency>
     </dependencies>
