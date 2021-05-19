@@ -1,5 +1,7 @@
 **NOTE: Currently supported browsers: ONLY Firefox and Chromium**
 
+**NOTE 2: AIR is currently not supported for Mac. The unity version works, and doesn't require the steps below to get it to work**
+
 In order to run G-Earth on macOs, you'll need to sign G-Mem (our memory searcher). This wiki page will cover that process.
 
 First we'll create a certificate in order to sign it:
