@@ -12,7 +12,7 @@
 
     <properties>
         <javafx.version>1.8</javafx.version>
-        <jettyVersion>9.4.35.v20201120</jettyVersion>
+        <jettyVersion>9.4.41.v20210516</jettyVersion>
     </properties>
 
     <parent>
