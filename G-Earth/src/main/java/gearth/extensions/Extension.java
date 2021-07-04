@@ -133,14 +133,14 @@ public abstract class Extension extends ExtensionBase {
                     setPacketInfoManager(PacketInfoManager.readFromPacket(packet));
 
                     Constants.UNITY_PACKETS = clientType == HClient.UNITY;
-                    getOnConnectionObservable().fireEvent(l -> l.onConnection(
-                            host, connectionPort, hotelVersion,
-                            clientIdentifier, clientType)
-                    );
                     if (delayed_init) {
                         initExtension();
                         delayed_init = false;
                     }
+                    getOnConnectionObservable().fireEvent(l -> l.onConnection(
+                            host, connectionPort, hotelVersion,
+                            clientIdentifier, clientType)
+                    );
                     onStartConnection();
                 }
                 else if (packet.headerId() == NetworkExtensionInfo.OUTGOING_MESSAGES_IDS.CONNECTIONEND) {
