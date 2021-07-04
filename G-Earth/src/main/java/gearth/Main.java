@@ -16,12 +16,12 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Region;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
+import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
-import org.jsoup.Jsoup;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 // run as root issue Invalid MIT-MAGIC-COOKIE-1 key fix: https://stackoverflow.com/questions/48139447/invalid-mit-magic-cookie-1-key
 
@@ -71,9 +71,9 @@ public class Main extends Application {
 
         new Thread(() -> {
             try {
-                String s = Jsoup.connect(gitApi).ignoreContentType(true).get().body().toString();
-                s = s.substring(6, s.length() - 7);
-                JSONObject object = new JSONObject(s);
+                JSONObject object = new JSONObject(IOUtils.toString(
+                        new URL(gitApi).openStream(), StandardCharsets.UTF_8));
+
                 String gitv = (String)object.get("tag_name");
                 if (!gitv.equals(version)) {
                     Platform.runLater(() -> {
