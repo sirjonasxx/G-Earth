@@ -110,17 +110,17 @@ public class PacketInfoExplorer extends ExtensionForm {
 
     @Override
     protected void initExtension() {
-        onConnect((host, port, hotelversion, clientIdentifier, clientType, packetInfoManager) -> {
-            setPacketInfoManager(packetInfoManager);
+        onConnect((host, port, hotelversion, clientIdentifier, clientType) -> {
+            init(packetInfoManager);
         });
     }
 
     @Override
     protected void onEndConnection() {
-        setPacketInfoManager(PacketInfoManager.EMPTY);
+        init(PacketInfoManager.EMPTY);
     }
 
-    private void setPacketInfoManager(PacketInfoManager packetInfoManager) {
+    private void init(PacketInfoManager packetInfoManager) {
         packetInfoList = packetInfoManager.getPacketInfoList();
         packetInfoList.sort(Comparator.comparingInt(PacketInfo::getHeaderId));
 

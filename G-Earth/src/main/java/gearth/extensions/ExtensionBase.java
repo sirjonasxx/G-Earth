@@ -3,6 +3,7 @@ package gearth.extensions;
 import gearth.misc.listenerpattern.Observable;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
+import gearth.services.packet_info.PacketInfoManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,6 +21,8 @@ public abstract class ExtensionBase extends IExtension {
 
     protected final Map<Integer, List<MessageListener>> incomingMessageListeners = new HashMap<>();
     protected final Map<Integer, List<MessageListener>> outgoingMessageListeners = new HashMap<>();
+
+    protected PacketInfoManager packetInfoManager = new PacketInfoManager(new ArrayList<>()); // empty
 
     /**
      * Register a listener on a specific packet Type
@@ -126,5 +129,14 @@ public abstract class ExtensionBase extends IExtension {
 
     Observable<OnConnectionListener> getOnConnectionObservable() {
         return onConnectionObservable;
+    }
+
+    protected void setPacketInfoManager(PacketInfoManager packetInfoManager) {
+        this.packetInfoManager = packetInfoManager;
+    }
+
+    @Override
+    public PacketInfoManager getPacketInfoManager() {
+        return packetInfoManager;
     }
 }

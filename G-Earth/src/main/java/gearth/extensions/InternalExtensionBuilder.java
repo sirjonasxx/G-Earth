@@ -105,9 +105,10 @@ public class InternalExtensionBuilder extends GEarthExtension {
 
     @Override
     public void connectionStart(String host, int port, String hotelVersion, String clientIdentifier, HClient clientType, PacketInfoManager packetInfoManager) {
+        extension.setPacketInfoManager(packetInfoManager);
         extension.getOnConnectionObservable().fireEvent(l -> l.onConnection(
                 host, port, hotelVersion,
-                clientIdentifier, clientType, packetInfoManager)
+                clientIdentifier, clientType)
         );
         extension.onStartConnection();
     }

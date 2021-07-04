@@ -41,7 +41,7 @@ public class ChatConsole {
         this.infoMessage = infoMessage;
 
         final boolean[] doOncePerConnection = {false};
-        extension.onConnect((host, port, hotelversion, clientIdentifier, clientType, packetInfoManager) ->
+        extension.onConnect((host, port, hotelversion, clientIdentifier, clientType) ->
                 doOncePerConnection[0] = true
         );
 

@@ -46,8 +46,8 @@ public class UiLogger extends ExtensionForm implements PacketLogger {
 
     @Override
     protected void initExtension() {
-        onConnect((host, port, hotelversion, clientIdentifier, clientType, packetInfoManager) -> {
-            controller.setPacketInfoManager(packetInfoManager);
+        controller.init(this);
+        onConnect((host, port, hotelversion, clientIdentifier, clientType) -> {
             controller.onConnect();
         });
     }
@@ -55,7 +55,6 @@ public class UiLogger extends ExtensionForm implements PacketLogger {
     @Override
     protected void onEndConnection() {
         controller.onDisconnect();
-        controller.setPacketInfoManager(PacketInfoManager.EMPTY);
     }
 
     @Override

@@ -19,12 +19,12 @@ public abstract class Extension extends ExtensionBase {
     protected FlagsCheckListener flagRequestCallback = null;
 
     private String[] args;
-    private boolean isCorrupted = false;
+    private volatile boolean isCorrupted = false;
     private static final String[] PORT_FLAG = {"--port", "-p"};
     private static final String[] FILE_FLAG = {"--filename", "-f"};
     private static final String[] COOKIE_FLAG = {"--auth-token", "-c"}; // don't add a cookie or filename when debugging
 
-    protected PacketInfoManager packetInfoManager = new PacketInfoManager(new ArrayList<>()); // empty
+    private volatile boolean delayed_init = false;
 
     private OutputStream out = null;
 
@@ -130,13 +130,17 @@ public abstract class Extension extends ExtensionBase {
                     String hotelVersion = packet.readString();
                     String clientIdentifier = packet.readString();
                     HClient clientType = HClient.valueOf(packet.readString());
-                    packetInfoManager = PacketInfoManager.readFromPacket(packet);
+                    setPacketInfoManager(PacketInfoManager.readFromPacket(packet));
 
                     Constants.UNITY_PACKETS = clientType == HClient.UNITY;
                     getOnConnectionObservable().fireEvent(l -> l.onConnection(
                             host, connectionPort, hotelVersion,
-                            clientIdentifier, clientType, packetInfoManager)
+                            clientIdentifier, clientType)
                     );
+                    if (delayed_init) {
+                        initExtension();
+                        delayed_init = false;
+                    }
                     onStartConnection();
                 }
                 else if (packet.headerId() == NetworkExtensionInfo.OUTGOING_MESSAGES_IDS.CONNECTIONEND) {
@@ -155,8 +159,10 @@ public abstract class Extension extends ExtensionBase {
                     flagRequestCallback = null;
                 }
                 else if (packet.headerId() == NetworkExtensionInfo.OUTGOING_MESSAGES_IDS.INIT) {
-//                    boolean isConnected = packet.readBoolean(); - don't read since not relevant here
-                    initExtension();
+                    delayed_init = packet.readBoolean();
+                    if (!delayed_init) {
+                        initExtension();
+                    }
                     writeToConsole("green","Extension \"" + getInfoAnnotations().Title() + "\" successfully initialized", false);
                 }
                 else if (packet.headerId() == NetworkExtensionInfo.OUTGOING_MESSAGES_IDS.ONDOUBLECLICK) {
@@ -300,5 +306,4 @@ public abstract class Extension extends ExtensionBase {
     protected boolean canDelete() {
         return true;
     }
-
 }

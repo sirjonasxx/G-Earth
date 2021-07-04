@@ -71,7 +71,6 @@ public class UiLoggerController implements Initializable {
     private StyleClassedTextArea area;
 
     private Stage stage;
-    private PacketInfoManager packetInfoManager = null;
 
     private int filteredAmount = 0;
 
@@ -79,6 +78,7 @@ public class UiLoggerController implements Initializable {
     private final List<Element> appendLater = new ArrayList<>();
 
     private List<MenuItem> allMenuItems = new ArrayList<>();
+    private UiLogger uiLogger;
 
     private boolean isSelected(MenuItem item) {
         if (item instanceof CheckMenuItem) {
@@ -216,10 +216,10 @@ public class UiLoggerController implements Initializable {
             elements.add(new Element(String.format("(timestamp: %d)\n", System.currentTimeMillis()), "timestamp"));
         }
 
-        boolean packetInfoAvailable = packetInfoManager.getPacketInfoList().size() > 0;
+        boolean packetInfoAvailable = uiLogger.getPacketInfoManager().getPacketInfoList().size() > 0;
 
         if ((chkMessageName.isSelected() || chkMessageHash.isSelected()) && packetInfoAvailable) {
-            List<PacketInfo> messages = packetInfoManager.getAllPacketInfoFromHeaderId(
+            List<PacketInfo> messages = uiLogger.getPacketInfoManager().getAllPacketInfoFromHeaderId(
                     (isIncoming ? HMessage.Direction.TOCLIENT : HMessage.Direction.TOSERVER),
                     packet.headerId()
             );
@@ -277,7 +277,7 @@ public class UiLoggerController implements Initializable {
 
         if (packet.length() <= 2000) {
             try {
-                String expr = packet.toExpression(isIncoming ? HMessage.Direction.TOCLIENT : HMessage.Direction.TOSERVER, packetInfoManager, chkUseNewStructures.isSelected());
+                String expr = packet.toExpression(isIncoming ? HMessage.Direction.TOCLIENT : HMessage.Direction.TOSERVER, uiLogger.getPacketInfoManager(), chkUseNewStructures.isSelected());
                 String cleaned = cleanTextContent(expr);
                 if (cleaned.equals(expr)) {
                     if (!expr.equals("") && chkDisplayStructure.isSelected())
@@ -338,14 +338,9 @@ public class UiLoggerController implements Initializable {
             lblAutoScrolll.setText("Autoscroll: " + (chkAutoscroll.isSelected() ? "True" : "False"));
             lblFiltered.setText("Filtered: " + filteredAmount);
 
-            boolean packetInfoAvailable = packetInfoManager.getPacketInfoList().size() > 0;
+            boolean packetInfoAvailable = uiLogger.getPacketInfoManager().getPacketInfoList().size() > 0;
             lblPacketInfo.setText("Packet info: " + (packetInfoAvailable ? "True" : "False"));
         });
-    }
-
-    public void setPacketInfoManager(PacketInfoManager packetInfoManager) {
-        this.packetInfoManager = packetInfoManager;
-        Platform.runLater(this::updateLoggerInfo);
     }
 
     public void toggleAlwaysOnTop(ActionEvent actionEvent) {
@@ -376,6 +371,7 @@ public class UiLoggerController implements Initializable {
                 stage.show();
             }
         });
+        Platform.runLater(this::updateLoggerInfo);
     }
 
     public void exportAll(ActionEvent actionEvent) {
@@ -405,5 +401,9 @@ public class UiLoggerController implements Initializable {
             }
 
         }
+    }
+
+    public void init(UiLogger uiLogger) {
+        this.uiLogger = uiLogger;
     }
 }

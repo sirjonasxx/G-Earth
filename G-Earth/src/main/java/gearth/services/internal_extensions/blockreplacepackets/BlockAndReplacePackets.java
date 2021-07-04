@@ -51,8 +51,6 @@ public class BlockAndReplacePackets extends ExtensionForm {
 
     List<BlockReplaceRule> rules = new ArrayList<>();
 
-    private PacketInfoManager packetInfoManager = PacketInfoManager.EMPTY;
-
 //    public static void main(String[] args) {
 //        runExtensionForm(args, BlockAndReplacePackets.class);
 //    }
@@ -210,10 +208,6 @@ public class BlockAndReplacePackets extends ExtensionForm {
 
         intercept(HMessage.Direction.TOSERVER, messageListener);
         intercept(HMessage.Direction.TOCLIENT, messageListener);
-
-        onConnect((host, port, hotelversion, clientIdentifier, clientType, packetInfoManager) -> {
-            this.packetInfoManager = packetInfoManager;
-        });
     }
 
     @Override

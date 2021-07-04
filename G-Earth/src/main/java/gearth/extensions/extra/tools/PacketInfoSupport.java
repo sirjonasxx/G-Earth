@@ -17,7 +17,6 @@ public class PacketInfoSupport {
 
     private final Object lock = new Object();
 
-    private PacketInfoManager packetInfoManager = new PacketInfoManager(new ArrayList<>()); //empty
     private Map<String, List<Extension.MessageListener>> incomingMessageListeners = new HashMap<>();
     private Map<String, List<Extension.MessageListener>> outgoingMessageListeners = new HashMap<>();
 
@@ -25,10 +24,6 @@ public class PacketInfoSupport {
 
     public PacketInfoSupport(IExtension extension) {
         this.extension = extension;
-
-        extension.onConnect((host, port, hotelversion, clientIdentifier, clientType, packetInfoManager) ->
-                this.packetInfoManager = packetInfoManager
-        );
 
         extension.intercept(HMessage.Direction.TOSERVER, message -> onReceivePacket(HMessage.Direction.TOSERVER, message));
         extension.intercept(HMessage.Direction.TOCLIENT, message -> onReceivePacket(HMessage.Direction.TOCLIENT, message));
@@ -41,7 +36,7 @@ public class PacketInfoSupport {
                         ? outgoingMessageListeners
                         : incomingMessageListeners);
 
-        List<PacketInfo> packetInfos = packetInfoManager.getAllPacketInfoFromHeaderId(direction, message.getPacket().headerId());
+        List<PacketInfo> packetInfos = extension.getPacketInfoManager().getAllPacketInfoFromHeaderId(direction, message.getPacket().headerId());
 
         for (PacketInfo packetInfo : packetInfos) {
             List<Extension.MessageListener> listeners_hash = messageListeners.get(packetInfo.getHash());
@@ -72,12 +67,12 @@ public class PacketInfoSupport {
 
     private boolean send(HMessage.Direction direction, String hashOrName, Object... objects) {
         int headerId;
-        PacketInfo fromname = packetInfoManager.getPacketInfoFromName(direction, hashOrName);
+        PacketInfo fromname = extension.getPacketInfoManager().getPacketInfoFromName(direction, hashOrName);
         if (fromname != null) {
             headerId = fromname.getHeaderId();
         }
         else {
-            PacketInfo fromHash = packetInfoManager.getPacketInfoFromHash(direction, hashOrName);
+            PacketInfo fromHash = extension.getPacketInfoManager().getPacketInfoFromHash(direction, hashOrName);
             if (fromHash == null) return false;
             headerId = fromHash.getHeaderId();
         }
@@ -108,9 +103,5 @@ public class PacketInfoSupport {
      */
     public boolean sendToServer(String hashOrName, Object... objects) {
         return send(HMessage.Direction.TOSERVER, hashOrName, objects);
-    }
-
-    public PacketInfoManager getPacketInfoManager() {
-        return packetInfoManager;
     }
 }

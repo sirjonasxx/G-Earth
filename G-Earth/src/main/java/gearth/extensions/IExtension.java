@@ -2,6 +2,7 @@ package gearth.extensions;
 
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
+import gearth.services.packet_info.PacketInfoManager;
 
 public abstract class IExtension {
 
@@ -21,4 +22,6 @@ public abstract class IExtension {
     abstract ExtensionInfo getInfoAnnotations();
     abstract boolean canLeave();
     abstract boolean canDelete();
+
+    public abstract PacketInfoManager getPacketInfoManager();
 }
