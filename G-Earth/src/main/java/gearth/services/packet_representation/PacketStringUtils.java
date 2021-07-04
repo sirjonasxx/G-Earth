@@ -42,7 +42,7 @@ public class PacketStringUtils {
                 m -> toString(ByteBuffer.allocate(4).putInt(Integer.parseInt(m.group(1))).array()));
 
         packet = replaceAll(packet, "\\{l:(-?[0-9]+)}",
-                m -> toString(ByteBuffer.allocate(8).putLong(Integer.parseInt(m.group(1))).array()));
+                m -> toString(ByteBuffer.allocate(8).putLong(Long.parseLong(m.group(1))).array()));
 
         packet = replaceAll(packet, "\\{d:(-?[0-9]*\\.[0-9]*)}",
                 m -> toString(ByteBuffer.allocate(8).putDouble(Double.parseDouble(m.group(1))).array()));
