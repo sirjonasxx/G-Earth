@@ -105,14 +105,13 @@ public class PacketInfoExplorer extends ExtensionForm {
         txt_filterHeaderId.textProperty().addListener(filterValues);
         txt_filterNameHash.textProperty().addListener(filterValues);
         chk_toClient.selectedProperty().addListener(filterValues);
-        chk_toClient.selectedProperty().addListener(filterValues);
+        chk_toServer.selectedProperty().addListener(filterValues);
     }
 
     @Override
     protected void initExtension() {
-        onConnect((host, port, hotelversion, clientIdentifier, clientType) -> {
-            init(getPacketInfoManager());
-        });
+        init(getPacketInfoManager());
+        onConnect((host, port, hotelversion, clientIdentifier, clientType) -> init(getPacketInfoManager()));
     }
 
     @Override
