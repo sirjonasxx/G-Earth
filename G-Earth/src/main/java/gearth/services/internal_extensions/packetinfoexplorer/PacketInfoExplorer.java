@@ -111,7 +111,7 @@ public class PacketInfoExplorer extends ExtensionForm {
     @Override
     protected void initExtension() {
         onConnect((host, port, hotelversion, clientIdentifier, clientType) -> {
-            init(packetInfoManager);
+            init(getPacketInfoManager());
         });
     }
 

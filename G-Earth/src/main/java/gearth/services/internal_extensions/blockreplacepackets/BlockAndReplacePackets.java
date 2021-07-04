@@ -68,9 +68,7 @@ public class BlockAndReplacePackets extends ExtensionForm {
         txt_replacement.textProperty().addListener(event -> Platform.runLater(this::refreshOptions));
         txt_value.textProperty().addListener(event -> Platform.runLater(this::refreshOptions));
 
-        refreshOptions();
         cmb_type.requestFocus();
-
     }
 
     private String getVal() {
@@ -80,8 +78,8 @@ public class BlockAndReplacePackets extends ExtensionForm {
 
         if (type.endsWith("packet")) {
             HMessage.Direction dir = side.equals("Outgoing") ? HMessage.Direction.TOSERVER : HMessage.Direction.TOCLIENT;
-            PacketInfo fromName = packetInfoManager.getPacketInfoFromName(dir, val);
-            PacketInfo fromHash = packetInfoManager.getPacketInfoFromHash(dir, val);
+            PacketInfo fromName = getPacketInfoManager().getPacketInfoFromName(dir, val);
+            PacketInfo fromHash = getPacketInfoManager().getPacketInfoFromHash(dir, val);
             if (fromName != null) {
                 val = fromName.getHeaderId() +"";
             }
@@ -208,6 +206,8 @@ public class BlockAndReplacePackets extends ExtensionForm {
 
         intercept(HMessage.Direction.TOSERVER, messageListener);
         intercept(HMessage.Direction.TOCLIENT, messageListener);
+
+        refreshOptions();
     }
 
     @Override
@@ -231,7 +231,7 @@ public class BlockAndReplacePackets extends ExtensionForm {
 
     public void click_btnAddRule(ActionEvent actionEvent) {
         BlockReplaceRule rule = RuleFactory.getRule(cmb_type.getSelectionModel().getSelectedItem(),
-                cmb_side.getSelectionModel().getSelectedItem(), getVal(), txt_replacement.getText(), packetInfoManager);
+                cmb_side.getSelectionModel().getSelectedItem(), getVal(), txt_replacement.getText(), getPacketInfoManager());
         rules.add(rule);
         rule.onDelete(observable -> rules.remove(rule));
         new RuleContainer(rule, vbox);

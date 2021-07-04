@@ -1,5 +1,6 @@
 package gearth.extensions;
 
+import gearth.services.packet_info.PacketInfoManager;
 import javafx.application.Platform;
 import javafx.stage.Stage;
 import gearth.protocol.HMessage;
@@ -45,6 +46,11 @@ public abstract class ExtensionForm extends ExtensionBase {
     }
     public void onConnect(OnConnectionListener listener) {
         extension.onConnect(listener);
+    }
+
+    @Override
+    public PacketInfoManager getPacketInfoManager() {
+        return extension.getPacketInfoManager();
     }
 
     protected void onShow(){};

@@ -22,7 +22,7 @@ public abstract class ExtensionBase extends IExtension {
     protected final Map<Integer, List<MessageListener>> incomingMessageListeners = new HashMap<>();
     protected final Map<Integer, List<MessageListener>> outgoingMessageListeners = new HashMap<>();
 
-    protected PacketInfoManager packetInfoManager = new PacketInfoManager(new ArrayList<>()); // empty
+    volatile PacketInfoManager packetInfoManager = PacketInfoManager.EMPTY;
 
     /**
      * Register a listener on a specific packet Type
@@ -131,7 +131,7 @@ public abstract class ExtensionBase extends IExtension {
         return onConnectionObservable;
     }
 
-    protected void setPacketInfoManager(PacketInfoManager packetInfoManager) {
+    void setPacketInfoManager(PacketInfoManager packetInfoManager) {
         this.packetInfoManager = packetInfoManager;
     }
 
