@@ -705,6 +705,11 @@ public class HPacket implements StringifyAble {
         return PacketStringUtils.predictedExpression(this, null);
     }
 
+    public void setBytes(byte[] bytes) {
+        this.isEdited = true;
+        this.packetInBytes = bytes;
+    }
+
     @Override
     public String stringify() {
         String st = null;
