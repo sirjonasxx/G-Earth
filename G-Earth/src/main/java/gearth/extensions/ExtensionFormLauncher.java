@@ -55,6 +55,7 @@ public class ExtensionFormLauncher extends Application {
                 return extensionForm.canDelete();
             }
         };
+        extensionForm.hostServices = getHostServices();
         extensionForm.extension = extension;
 
         extensionForm.primaryStage = primaryStage;

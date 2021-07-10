@@ -1,6 +1,7 @@
 package gearth.extensions;
 
 import gearth.services.packet_info.PacketInfoManager;
+import javafx.application.HostServices;
 import javafx.application.Platform;
 import javafx.stage.Stage;
 import gearth.protocol.HMessage;
@@ -13,6 +14,7 @@ public abstract class ExtensionForm extends ExtensionBase {
 
     volatile ExtensionBase extension;
     protected volatile Stage primaryStage;
+    volatile HostServices hostServices;
 
     protected static void runExtensionForm(String[] args, Class<? extends ExtensionForm> extension) {
         ExtensionFormLauncher launcher = new ExtensionFormLauncher();
@@ -90,5 +92,9 @@ public abstract class ExtensionForm extends ExtensionBase {
 
     protected boolean canDelete() {
         return true;
+    }
+
+    public HostServices getHostServices() {
+        return hostServices;
     }
 }
