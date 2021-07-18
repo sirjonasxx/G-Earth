@@ -121,6 +121,8 @@ That would be a bare minimum to get it loaded into G-Earth, now let's have a loo
 
 ## A quick look to the extensions API
 
+**!!!Warning: since G-Earth 1.4, HashSupport has been renamed to PacketInfoSupport!!!**
+
 In this section we'll build upon the previous example with the functionality provided by G-Earth's API
 
 ### Initializing our extension
