@@ -7,6 +7,11 @@ import gearth.protocol.connection.proxy.ProxyProviderFactory;
 import gearth.protocol.connection.proxy.SocksConfiguration;
 import gearth.protocol.hostreplacer.hostsfile.HostReplacer;
 import gearth.protocol.hostreplacer.hostsfile.HostReplacerFactory;
+import gearth.protocol.portchecker.PortChecker;
+import gearth.protocol.portchecker.PortCheckerFactory;
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 
 import java.io.IOException;
 import java.net.*;
@@ -92,7 +97,19 @@ public class NormalFlashProxyProvider extends FlashProxyProvider {
         for (int c = 0; c < potentialProxies.size(); c++) {
             HProxy potentialProxy = potentialProxies.get(c);
 
-            ServerSocket proxy_server = new ServerSocket(potentialProxy.getIntercept_port(), 10, InetAddress.getByName(potentialProxy.getIntercept_host()));
+            ServerSocket proxy_server;
+            try {
+                proxy_server = new ServerSocket(potentialProxy.getIntercept_port(), 10, InetAddress.getByName(potentialProxy.getIntercept_host()));
+            } catch (BindException e) {
+                PortChecker portChecker = PortCheckerFactory.getPortChecker();
+                String processName = portChecker.getProcessUsingPort(potentialProxy.getIntercept_port());
+                Platform.runLater(() -> {
+                    Alert a = new Alert(Alert.AlertType.ERROR, "The port is in use by " + processName,
+                            ButtonType.OK);
+                    a.showAndWait();
+                });
+                throw new IOException(e);
+            }
             potentialProxy.initProxy(proxy_server);
 
             new Thread(() -> {
