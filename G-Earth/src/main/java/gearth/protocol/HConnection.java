@@ -80,6 +80,8 @@ public class HConnection {
             }
         } catch (IOException e) {
             e.printStackTrace();
+            setState(HState.ABORTING);
+            setState(HState.NOT_CONNECTED);
         }
     }
 
