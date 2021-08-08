@@ -36,7 +36,7 @@ Additionally, you can add the -t flag to log the packets in your terminal instea
 * 2 included extensions on-release
 
 Interested in creating an extension?
-* If you're not experienced with Java but have written extensions before in C#, you could have a look at [Geode](https://github.com/LilithRainbows/Geode) or [Xabbo.Gearth](https://github.com/b7c/Xabbo.GEarth).
+* If you're not experienced with Java but have written extensions before in C#, you could have a look at [Geode](https://github.com/LilithRainbows/Geode) or [Xabbo.GEarth](https://github.com/b7c/Xabbo.GEarth).
 * If you are experienced with Java, read this [wiki page](https://github.com/sirjonasxx/G-Earth/wiki/Extensions) carefully.
 * The easiest way to create extensions is using [G-Python](https://github.com/sirjonasxx/G-Python). (can also be done inside G-Earth with a [live scripting console](https://github.com/sirjonasxx/G-Earth/wiki/G-Python-qtConsole))
 
