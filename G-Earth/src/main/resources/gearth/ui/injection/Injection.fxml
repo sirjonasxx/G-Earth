@@ -83,11 +83,29 @@
         </rowConstraints>
          <children>
             <ListView fx:id="history" prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="1" />
-            <Label fx:id="lblHistory" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="History:" textFill="#000000cc">
+            <GridPane>
+              <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+              </rowConstraints>
+               <children>
+                  <Hyperlink alignment="CENTER_RIGHT" onAction="#clearHistoryClick" text="Clear" GridPane.columnIndex="1">
+                     <GridPane.margin>
+                        <Insets right="6.0" />
+                     </GridPane.margin></Hyperlink>
+                  <Label fx:id="lblHistory" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="History:" textFill="#000000cc">
+                     <GridPane.margin>
+                        <Insets />
+                     </GridPane.margin>
+                  </Label>
+               </children>
                <GridPane.margin>
                   <Insets top="4.0" />
                </GridPane.margin>
-            </Label>
+            </GridPane>
          </children>
          <GridPane.margin>
             <Insets bottom="5.0" left="6.0" right="10.0" />
