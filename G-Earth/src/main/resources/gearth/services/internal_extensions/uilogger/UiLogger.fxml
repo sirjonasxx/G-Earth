@@ -86,11 +86,6 @@
                </Menu>
                <CheckMenuItem fx:id="chkSkipBigPackets" mnemonicParsing="false" selected="true" text="Skip big packets" />
                <MenuItem mnemonicParsing="false" onAction="#exportAll" text="Export all" />
-               <Menu mnemonicParsing="false" text="Unspecified Menu">
-                 <items>
-                   <MenuItem mnemonicParsing="false" text="Action 1" />
-                 </items>
-               </Menu>
            </items>
          </Menu>
         </MenuBar>
