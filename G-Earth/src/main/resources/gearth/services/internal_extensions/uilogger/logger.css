@@ -19,8 +19,18 @@
     -fx-fill: #b22222;
 }
 
+.incomingHex {
+    -fx-fill: #f06262;
+    -fx-font-family: monospace;
+}
+
 .outgoing {
     -fx-fill: #0066cc;
+}
+
+.outgoingHex {
+    -fx-fill: #4fb7f7;
+    -fx-font-family: monospace;
 }
 
 .structure, .skipped {

@@ -47,9 +47,26 @@
            <items>
                <Menu mnemonicParsing="false" text="Display Details">
                  <items>
+                     <Menu mnemonicParsing="false" text="Byte representation">
+                       <items>
+                           <RadioMenuItem fx:id="chkReprLegacy" mnemonicParsing="false" selected="true" text="Legacy">
+                              <toggleGroup>
+                                 <ToggleGroup fx:id="byterepr" />
+                              </toggleGroup>
+                           </RadioMenuItem>
+                           <RadioMenuItem fx:id="chkReprHex" mnemonicParsing="false" text="Hexdump" toggleGroup="$byterepr" />
+                           <RadioMenuItem fx:id="chkReprRawHex" mnemonicParsing="false" text="Raw hex" toggleGroup="$byterepr" />
+                           <RadioMenuItem fx:id="chkReprNone" mnemonicParsing="false" text="None" toggleGroup="$byterepr" />
+                       </items>
+                     </Menu>
+                     <Menu mnemonicParsing="false" text="Message">
+                       <items>
+                           <CheckMenuItem fx:id="chkMessageName" mnemonicParsing="false" selected="true" text="Name" />
+                           <CheckMenuItem fx:id="chkMessageHash" mnemonicParsing="false" text="Hash" />
+                           <CheckMenuItem fx:id="chkMessageId" mnemonicParsing="false" text="Id" />
+                       </items>
+                     </Menu>
                      <CheckMenuItem fx:id="chkDisplayStructure" mnemonicParsing="false" selected="true" text="Structure" />
-                     <CheckMenuItem fx:id="chkMessageName" mnemonicParsing="false" selected="true" text="Message Name" />
-                     <CheckMenuItem fx:id="chkMessageHash" mnemonicParsing="false" text="Message Hash" />
                      <CheckMenuItem fx:id="chkUseNewStructures" mnemonicParsing="false" selected="true" text="New structures" />
                      <CheckMenuItem fx:id="chkTimestamp" mnemonicParsing="false" text="Timestamp" />
                  </items>
@@ -69,6 +86,11 @@
                </Menu>
                <CheckMenuItem fx:id="chkSkipBigPackets" mnemonicParsing="false" selected="true" text="Skip big packets" />
                <MenuItem mnemonicParsing="false" onAction="#exportAll" text="Export all" />
+               <Menu mnemonicParsing="false" text="Unspecified Menu">
+                 <items>
+                   <MenuItem mnemonicParsing="false" text="Action 1" />
+                 </items>
+               </Menu>
            </items>
          </Menu>
         </MenuBar>

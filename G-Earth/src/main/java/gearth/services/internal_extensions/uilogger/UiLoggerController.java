@@ -1,6 +1,8 @@
 package gearth.services.internal_extensions.uilogger;
 
+ import at.favre.lib.bytes.Bytes;
  import gearth.misc.Cacher;
+ import gearth.services.internal_extensions.uilogger.hexdumper.Hexdump;
  import gearth.services.packet_info.PacketInfo;
  import gearth.services.packet_info.PacketInfoManager;
  import gearth.protocol.HMessage;
@@ -16,7 +18,8 @@ import javafx.scene.layout.FlowPane;
  import javafx.stage.Stage;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.StyleClassedTextArea;
-import org.fxmisc.richtext.model.StyleSpansBuilder;
+ import org.fxmisc.richtext.StyledTextArea;
+ import org.fxmisc.richtext.model.StyleSpansBuilder;
 
  import java.io.BufferedWriter;
  import java.io.File;
@@ -43,6 +46,7 @@ public class UiLoggerController implements Initializable {
     public CheckMenuItem chkSkipBigPackets;
     public CheckMenuItem chkMessageName;
     public CheckMenuItem chkMessageHash;
+    public CheckMenuItem chkMessageId;
     public Label lblPacketInfo;
     public CheckMenuItem chkUseNewStructures;
     public CheckMenuItem chkAlwaysOnTop;
@@ -65,6 +69,11 @@ public class UiLoggerController implements Initializable {
     public RadioMenuItem chkAntiSpam_ultra;
     public Label lblFiltered;
     public CheckMenuItem chkTimestamp;
+
+    public RadioMenuItem chkReprLegacy;
+    public RadioMenuItem chkReprHex;
+    public RadioMenuItem chkReprRawHex;
+    public RadioMenuItem chkReprNone;
 
     private Map<Integer, LinkedList<Long>> filterTimestamps = new HashMap<>();
 
@@ -123,10 +132,10 @@ public class UiLoggerController implements Initializable {
     public void initialize(URL arg0, ResourceBundle arg1) {
         allMenuItems.addAll(Arrays.asList(
                 chkViewIncoming, chkViewOutgoing, chkDisplayStructure, chkAutoscroll,
-                chkSkipBigPackets, chkMessageName, chkMessageHash, chkUseNewStructures,
+                chkSkipBigPackets, chkMessageName, chkMessageHash, chkMessageId, chkUseNewStructures,
                 chkOpenOnConnect, chkResetOnConnect, chkHideOnDisconnect, chkResetOnDisconnect,
                 chkAntiSpam_none, chkAntiSpam_low, chkAntiSpam_medium, chkAntiSpam_high, chkAntiSpam_ultra,
-                chkTimestamp
+                chkTimestamp, chkReprHex, chkReprLegacy, chkReprRawHex, chkReprNone
         ));
         loadAllMenuItems();
 
@@ -218,6 +227,9 @@ public class UiLoggerController implements Initializable {
 
         boolean packetInfoAvailable = uiLogger.getPacketInfoManager().getPacketInfoList().size() > 0;
 
+
+        boolean addedSomeMessageInfo = false;
+
         if ((chkMessageName.isSelected() || chkMessageHash.isSelected()) && packetInfoAvailable) {
             List<PacketInfo> messages = uiLogger.getPacketInfoManager().getAllPacketInfoFromHeaderId(
                     (isIncoming ? HMessage.Direction.TOCLIENT : HMessage.Direction.TOSERVER),
@@ -228,60 +240,61 @@ public class UiLoggerController implements Initializable {
             List<String> hashes = messages.stream().map(PacketInfo::getHash)
                     .filter(Objects::nonNull).distinct().collect(Collectors.toList());
 
-            boolean addedSomething = false;
             if (chkMessageName.isSelected() && names.size() > 0) {
                 for (String name : names) {elements.add(new Element("["+name+"]", "messageinfo")); }
-                addedSomething = true;
+                addedSomeMessageInfo = true;
             }
             if (chkMessageHash.isSelected() && hashes.size() > 0) {
                 for (String hash : hashes) {elements.add(new Element("["+hash+"]", "messageinfo")); }
-                addedSomething = true;
+                addedSomeMessageInfo = true;
             }
+        }
 
-            if (addedSomething) {
-                elements.add(new Element("\n", ""));
-            }
+        if (chkMessageId.isSelected()) {
+            elements.add(new Element(String.format("[%d]", packet.headerId()), "messageinfo"));
+            addedSomeMessageInfo = true;
+        }
 
+        if (addedSomeMessageInfo) {
+            elements.add(new Element("\n", ""));
         }
 
         if (isBlocked) elements.add(new Element("[Blocked]\n", "blocked"));
         else if (isReplaced) elements.add(new Element("[Replaced]\n", "replaced"));
 
-        if (isIncoming) {
-            // handle skipped eventually
-            elements.add(new Element("Incoming[", "incoming"));
-            elements.add(new Element(String.valueOf(packet.headerId()), ""));
-            elements.add(new Element("]", "incoming"));
+        if (!chkReprNone.isSelected()) {
+            boolean isSkipped = chkSkipBigPackets.isSelected() && (packet.length() > 4000 || (packet.length() > 1000 && chkReprHex.isSelected()));
+            String packetRepresentation = chkReprHex.isSelected() ?
+                    Hexdump.hexdump(packet.toBytes()) :
+                    (chkReprRawHex.isSelected() ? Bytes.wrap(packet.toBytes()).encodeHex() : packet.toString());
 
-            elements.add(new Element(" <- ", ""));
-            if (chkSkipBigPackets.isSelected() && packet.length() > 4000) {
+            String type = isIncoming ? "Incoming" : "Outgoing";
+
+            if (!chkReprHex.isSelected()) {
+                elements.add(new Element(String.format("%s[", type), type.toLowerCase()));
+                elements.add(new Element(String.valueOf(packet.headerId()), ""));
+                elements.add(new Element("]", type.toLowerCase()));
+
+                elements.add(new Element(" -> ", ""));
+            }
+
+            if (isSkipped) {
                 elements.add(new Element("<packet skipped>", "skipped"));
-            }
-            else {
-                elements.add(new Element(packet.toString(), "incoming"));
-            }
-        } else {
-            elements.add(new Element("Outgoing[", "outgoing"));
-            elements.add(new Element(String.valueOf(packet.headerId()), ""));
-            elements.add(new Element("]", "outgoing"));
-
-            elements.add(new Element(" -> ", ""));
-
-            if (chkSkipBigPackets.isSelected() && packet.length() > 4000) {
-                elements.add(new Element("<packet skipped>", "skipped"));
-            }
-            else {
-                elements.add(new Element(packet.toString(), "outgoing"));
-            }
+            } else
+                elements.add(new Element(packetRepresentation, String.format(chkReprHex.isSelected() ? "%sHex": "%s", type.toLowerCase())));
+            elements.add(new Element("\n", ""));
         }
+
 
         if (packet.length() <= 2000) {
             try {
                 String expr = packet.toExpression(isIncoming ? HMessage.Direction.TOCLIENT : HMessage.Direction.TOSERVER, uiLogger.getPacketInfoManager(), chkUseNewStructures.isSelected());
                 String cleaned = cleanTextContent(expr);
                 if (cleaned.equals(expr)) {
-                    if (!expr.equals("") && chkDisplayStructure.isSelected())
-                        elements.add(new Element("\n" + cleanTextContent(expr), "structure"));
+                    if (!expr.equals("") && chkDisplayStructure.isSelected()) {
+                        elements.add(new Element(cleanTextContent(expr), "structure"));
+                        elements.add(new Element("\n", ""));
+                    }
                 }
             }
             catch (Exception e) {
@@ -292,7 +305,7 @@ public class UiLoggerController implements Initializable {
         }
 
 
-        elements.add(new Element("\n--------------------\n", ""));
+        elements.add(new Element("--------------------\n", ""));
 
         synchronized (appendLater) {
             if (initialized) {
