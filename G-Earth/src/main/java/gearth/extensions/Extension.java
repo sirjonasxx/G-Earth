@@ -5,11 +5,10 @@ import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 import gearth.protocol.connection.HClient;
 import gearth.services.Constants;
-import gearth.services.extensionhandler.extensions.implementations.network.NetworkExtensionInfo;
+import gearth.services.extension_handler.extensions.implementations.network.NetworkExtensionInfo;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.ArrayList;
 
 /**
  * Created by Jonas on 23/06/18.

@@ -3,7 +3,7 @@ package gearth.protocol.packethandler;
 import gearth.misc.listenerpattern.Observable;
 import gearth.protocol.HMessage;
 import gearth.protocol.TrafficListener;
-import gearth.services.extensionhandler.ExtensionHandler;
+import gearth.services.extension_handler.ExtensionHandler;
 
 import java.io.IOException;
 

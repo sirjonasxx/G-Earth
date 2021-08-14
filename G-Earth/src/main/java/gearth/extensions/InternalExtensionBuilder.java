@@ -5,8 +5,8 @@ import gearth.services.packet_info.PacketInfoManager;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 import gearth.protocol.connection.HClient;
-import gearth.services.extensionhandler.extensions.ExtensionType;
-import gearth.services.extensionhandler.extensions.GEarthExtension;
+import gearth.services.extension_handler.extensions.ExtensionType;
+import gearth.services.extension_handler.extensions.GEarthExtension;
 
 // wraps internal GEarthExtension class to IExtension interface
 // to allow internal extensions that follow the same remote-extensions interface

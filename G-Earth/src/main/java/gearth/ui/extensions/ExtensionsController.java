@@ -1,31 +1,23 @@
 package gearth.ui.extensions;
 
-import gearth.Main;
-import gearth.services.extensionhandler.ExtensionConnectedListener;
-import gearth.services.extensionhandler.ExtensionHandler;
-import gearth.services.extensionhandler.extensions.ExtensionListener;
-import gearth.services.extensionhandler.extensions.GEarthExtension;
-import gearth.services.extensionhandler.extensions.implementations.network.NetworkExtensionsProducer;
-import gearth.services.extensionhandler.extensions.implementations.network.authentication.Authenticator;
-import gearth.services.extensionhandler.extensions.implementations.network.executer.ExecutionInfo;
-import gearth.services.extensionhandler.extensions.implementations.network.executer.ExtensionRunner;
-import gearth.services.extensionhandler.extensions.implementations.network.executer.ExtensionRunnerFactory;
-import gearth.services.gpython.GPythonShell;
-import gearth.services.gpython.OnQtConsoleLaunch;
+import gearth.services.extension_handler.ExtensionHandler;
+import gearth.services.extension_handler.extensions.ExtensionListener;
+import gearth.services.extension_handler.extensions.implementations.network.NetworkExtensionsProducer;
+import gearth.services.extension_handler.extensions.implementations.network.authentication.Authenticator;
+import gearth.services.extension_handler.extensions.implementations.network.executer.ExecutionInfo;
+import gearth.services.extension_handler.extensions.implementations.network.executer.ExtensionRunner;
+import gearth.services.extension_handler.extensions.implementations.network.executer.ExtensionRunnerFactory;
+import gearth.services.g_python.GPythonShell;
 import gearth.ui.SubForm;
 import gearth.ui.extensions.logger.ExtensionLogger;
-import gearth.ui.extra.ExtraController;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.scene.control.*;
-import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 
 import java.io.File;
-import java.io.IOException;
 
 /**
  * Created by Jonas on 06/04/18.

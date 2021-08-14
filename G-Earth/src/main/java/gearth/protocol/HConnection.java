@@ -9,7 +9,7 @@ import gearth.protocol.connection.proxy.ProxyProvider;
 import gearth.protocol.connection.proxy.ProxyProviderFactory;
 import gearth.protocol.connection.proxy.flash.unix.LinuxRawIpFlashProxyProvider;
 import gearth.protocol.connection.proxy.unity.UnityProxyProvider;
-import gearth.services.extensionhandler.ExtensionHandler;
+import gearth.services.extension_handler.ExtensionHandler;
 
 import java.io.IOException;
 

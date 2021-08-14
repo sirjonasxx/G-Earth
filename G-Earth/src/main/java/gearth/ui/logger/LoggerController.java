@@ -1,8 +1,6 @@
 package gearth.ui.logger;
 
-import gearth.extensions.parsers.HDirection;
 import gearth.protocol.connection.HState;
-import gearth.services.extensionhandler.extensions.extensionproducers.ExtensionProducer;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
@@ -12,14 +10,12 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
-import gearth.protocol.HConnection;
 import gearth.protocol.HMessage;
 import gearth.ui.SubForm;
 import gearth.ui.logger.loggerdisplays.PacketLogger;
 import gearth.ui.logger.loggerdisplays.PacketLoggerFactory;
 
 import java.util.Calendar;
-import java.util.function.Predicate;
 
 public class LoggerController extends SubForm {
 

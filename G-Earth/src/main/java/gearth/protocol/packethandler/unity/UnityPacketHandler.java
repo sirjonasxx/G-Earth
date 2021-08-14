@@ -4,9 +4,8 @@ import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 import gearth.protocol.packethandler.ByteArrayUtils;
 import gearth.protocol.packethandler.PacketHandler;
-import gearth.protocol.packethandler.PayloadBuffer;
-import gearth.services.extensionhandler.ExtensionHandler;
-import gearth.services.extensionhandler.OnHMessageHandled;
+import gearth.services.extension_handler.ExtensionHandler;
+import gearth.services.extension_handler.OnHMessageHandled;
 
 import javax.websocket.Session;
 import java.io.IOException;

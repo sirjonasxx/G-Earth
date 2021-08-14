@@ -3,9 +3,9 @@ package gearth.ui.logger.loggerdisplays;
 import gearth.Main;
 import gearth.extensions.InternalExtensionFormBuilder;
 import gearth.misc.OSValidator;
-import gearth.services.extensionhandler.ExtensionHandler;
-import gearth.services.extensionhandler.extensions.extensionproducers.ExtensionProducer;
-import gearth.services.extensionhandler.extensions.extensionproducers.ExtensionProducerObserver;
+import gearth.services.extension_handler.ExtensionHandler;
+import gearth.services.extension_handler.extensions.extensionproducers.ExtensionProducer;
+import gearth.services.extension_handler.extensions.extensionproducers.ExtensionProducerObserver;
 import gearth.services.internal_extensions.uilogger.UiLogger;
 
 /**

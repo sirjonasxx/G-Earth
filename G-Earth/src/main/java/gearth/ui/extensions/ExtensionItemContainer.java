@@ -1,7 +1,7 @@
 package gearth.ui.extensions;
 
-import gearth.services.extensionhandler.extensions.ExtensionType;
-import gearth.services.extensionhandler.extensions.GEarthExtension;
+import gearth.services.extension_handler.extensions.ExtensionType;
+import gearth.services.extension_handler.extensions.GEarthExtension;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -13,10 +13,10 @@ import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import gearth.misc.ConfirmationDialog;
 import gearth.ui.buttons.*;
-import gearth.services.extensionhandler.extensions.implementations.network.executer.ExecutionInfo;
-import gearth.services.extensionhandler.extensions.implementations.network.executer.ExtensionRunner;
-import gearth.services.extensionhandler.extensions.implementations.network.executer.ExtensionRunnerFactory;
-import gearth.services.extensionhandler.extensions.implementations.network.executer.NormalExtensionRunner;
+import gearth.services.extension_handler.extensions.implementations.network.executer.ExecutionInfo;
+import gearth.services.extension_handler.extensions.implementations.network.executer.ExtensionRunner;
+import gearth.services.extension_handler.extensions.implementations.network.executer.ExtensionRunnerFactory;
+import gearth.services.extension_handler.extensions.implementations.network.executer.NormalExtensionRunner;
 
 import java.nio.file.Paths;
 

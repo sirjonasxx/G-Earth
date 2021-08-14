@@ -1,6 +1,6 @@
 package gearth.ui.extensions;
 
-import gearth.services.extensionhandler.extensions.GEarthExtension;
+import gearth.services.extension_handler.extensions.GEarthExtension;
 import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;

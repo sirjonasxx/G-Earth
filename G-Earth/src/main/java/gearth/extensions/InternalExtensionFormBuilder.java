@@ -1,8 +1,8 @@
 package gearth.extensions;
 
 import gearth.Main;
-import gearth.services.extensionhandler.extensions.GEarthExtension;
-import gearth.services.extensionhandler.extensions.extensionproducers.ExtensionProducerObserver;
+import gearth.services.extension_handler.extensions.GEarthExtension;
+import gearth.services.extension_handler.extensions.extensionproducers.ExtensionProducerObserver;
 import javafx.application.Platform;
 import javafx.stage.Stage;
 

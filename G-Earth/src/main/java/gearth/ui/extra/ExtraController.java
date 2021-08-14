@@ -6,7 +6,7 @@ import gearth.protocol.HConnection;
 import gearth.protocol.connection.HState;
 import gearth.protocol.connection.proxy.ProxyProviderFactory;
 import gearth.protocol.connection.proxy.SocksConfiguration;
-import gearth.services.gpython.GPythonVersionUtils;
+import gearth.services.g_python.GPythonVersionUtils;
 import gearth.ui.SubForm;
 import gearth.ui.info.InfoController;
 import javafx.application.Platform;

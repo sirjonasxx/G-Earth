@@ -4,7 +4,7 @@ import gearth.misc.listenerpattern.Observable;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 import gearth.protocol.TrafficListener;
-import gearth.services.extensionhandler.ExtensionHandler;
+import gearth.services.extension_handler.ExtensionHandler;
 
 import java.io.OutputStream;
 

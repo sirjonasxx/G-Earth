@@ -4,12 +4,11 @@ import gearth.misc.listenerpattern.Observable;
 import gearth.protocol.HConnection;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
-import gearth.protocol.TrafficListener;
 import gearth.protocol.crypto.RC4;
 import gearth.protocol.packethandler.PacketHandler;
 import gearth.protocol.packethandler.PayloadBuffer;
-import gearth.services.extensionhandler.ExtensionHandler;
-import gearth.services.extensionhandler.OnHMessageHandled;
+import gearth.services.extension_handler.ExtensionHandler;
+import gearth.services.extension_handler.OnHMessageHandled;
 
 import java.io.IOException;
 import java.io.OutputStream;
