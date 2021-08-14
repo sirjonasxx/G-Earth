@@ -17,25 +17,25 @@ public class ChatConsole {
 
     private volatile int chatid;
     private volatile String name;
-    private volatile PacketInfoSupport packetInfoSupport;
     private volatile String infoMessage;
 
     private volatile boolean firstTime = true;
     private volatile Observable<ChatInputListener> chatInputObservable = new Observable<>();
 
+    private final IExtension extension;
 
-    public ChatConsole(final PacketInfoSupport packetInfoSupport, IExtension extension) {
-       this(packetInfoSupport, extension, null);
+
+    public ChatConsole(IExtension extension) {
+       this(extension, null);
     }
 
     /**
      * infomessage will be used as response for :info and for initialize
-     * @param packetInfoSupport
      * @param extension
      * @param infoMessage
      */
-    public ChatConsole(final PacketInfoSupport packetInfoSupport, IExtension extension, String infoMessage) {
-        this.packetInfoSupport = packetInfoSupport;
+    public ChatConsole(IExtension extension, String infoMessage) {
+        this.extension = extension;
         this.name = extension.getClass().getAnnotation(ExtensionInfo.class).Title();
         chatid = (this.name.hashCode() % 300000000) + 300000000;
         this.infoMessage = infoMessage;
@@ -56,7 +56,7 @@ public class ChatConsole {
             }
         });
 
-        packetInfoSupport.intercept(HMessage.Direction.TOCLIENT, "FriendListFragment", hMessage -> {
+        extension.intercept(HMessage.Direction.TOCLIENT, "FriendListFragment", hMessage -> {
             if (doOncePerConnection[0]) {
                 doOncePerConnection[0] = false;
 
@@ -72,7 +72,7 @@ public class ChatConsole {
             }
         });
 
-        packetInfoSupport.intercept(HMessage.Direction.TOSERVER, "SendMsg", hMessage -> {
+        extension.intercept(HMessage.Direction.TOSERVER, "SendMsg", hMessage -> {
             HPacket packet = hMessage.getPacket();
             if (packet.readInteger() == chatid) {
                 hMessage.setBlocked(true);
@@ -88,11 +88,12 @@ public class ChatConsole {
     }
 
     private void createChat() {
-        packetInfoSupport.sendToClient("FriendListUpdate",
+        HPacket packet = new HPacket("FriendListUpdate", HMessage.Direction.TOCLIENT,
                 0, 1, 0, chatid, " [G-Earth] - " + name,
                 1, true, false, "ha-1015-64.hd-209-30.cc-260-64.ch-235-64.sh-305-64.lg-285-64",
-                0, "", 0, true, false, true, ""
-        );
+                0, "", 0, true, false, true, "");
+
+        extension.sendToClient(packet);
 
         if (infoMessage != null) {
             writeOutput(infoMessage, false);
@@ -101,10 +102,10 @@ public class ChatConsole {
 
     public void writeOutput(String string, boolean asInvite) {
         if (asInvite) {
-            packetInfoSupport.sendToClient("RoomInvite", chatid, string);
+            extension.sendToClient(new HPacket("RoomInvite", HMessage.Direction.TOCLIENT, chatid, string));
         }
         else {
-            packetInfoSupport.sendToClient("NewConsole", chatid, string, 0, "");
+            extension.sendToClient(new HPacket("NewConsole", HMessage.Direction.TOCLIENT, chatid, string, 0, ""));
         }
     }
 

@@ -3,12 +3,18 @@ package gearth.extensions;
 import gearth.misc.listenerpattern.Observable;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
+import gearth.services.packet_info.PacketInfo;
 import gearth.services.packet_info.PacketInfoManager;
+import org.reactfx.util.Lists;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 public abstract class ExtensionBase extends IExtension {
 
@@ -21,6 +27,10 @@ public abstract class ExtensionBase extends IExtension {
 
     protected final Map<Integer, List<MessageListener>> incomingMessageListeners = new HashMap<>();
     protected final Map<Integer, List<MessageListener>> outgoingMessageListeners = new HashMap<>();
+
+    protected final Map<String, List<MessageListener>> hashOrNameIncomingListeners = new HashMap<>();
+    protected final Map<String, List<MessageListener>> hashOrNameOutgoingListeners = new HashMap<>();
+
 
     volatile PacketInfoManager packetInfoManager = PacketInfoManager.EMPTY;
 
@@ -44,6 +54,28 @@ public abstract class ExtensionBase extends IExtension {
 
 
         listeners.get(headerId).add(messageListener);
+    }
+
+    /**
+     * Register a listener on a specific packet Type
+     * @param direction ToClient or ToServer
+     * @param hashOrName the packet hash or name
+     * @param messageListener the callback
+     */
+    public void intercept(HMessage.Direction direction, String hashOrName, MessageListener messageListener) {
+        Map<String, List<MessageListener>> listeners =
+                direction == HMessage.Direction.TOCLIENT ?
+                        hashOrNameIncomingListeners :
+                        hashOrNameOutgoingListeners;
+
+        synchronized (listeners) {
+            if (!listeners.containsKey(hashOrName)) {
+                listeners.put(hashOrName, new ArrayList<>());
+            }
+        }
+
+
+        listeners.get(hashOrName).add(messageListener);
     }
 
     /**
@@ -84,20 +116,41 @@ public abstract class ExtensionBase extends IExtension {
                         incomingMessageListeners :
                         outgoingMessageListeners;
 
+        Map<String, List<MessageListener>> hashOrNameListeners =
+                habboMessage.getDestination() == HMessage.Direction.TOCLIENT ?
+                        hashOrNameIncomingListeners :
+                        hashOrNameOutgoingListeners ;
+
         List<MessageListener> correctListeners = new ArrayList<>();
 
-        synchronized (incomingMessageListeners) {
-            synchronized (outgoingMessageListeners) {
-                if (listeners.containsKey(-1)) { // registered on all packets
-                    for (int i = listeners.get(-1).size() - 1; i >= 0; i--) {
-                        correctListeners.add(listeners.get(-1).get(i));
-                    }
+        synchronized (listeners) {
+            if (listeners.containsKey(-1)) { // registered on all packets
+                for (int i = listeners.get(-1).size() - 1; i >= 0; i--) {
+                    correctListeners.add(listeners.get(-1).get(i));
                 }
+            }
 
-                if (listeners.containsKey(habboPacket.headerId())) {
-                    for (int i = listeners.get(habboPacket.headerId()).size() - 1; i >= 0; i--) {
-                        correctListeners.add(listeners.get(habboPacket.headerId()).get(i));
-                    }
+            if (listeners.containsKey(habboPacket.headerId())) {
+                for (int i = listeners.get(habboPacket.headerId()).size() - 1; i >= 0; i--) {
+                    correctListeners.add(listeners.get(habboPacket.headerId()).get(i));
+                }
+            }
+        }
+
+        synchronized (hashOrNameListeners) {
+            List<PacketInfo> packetInfos = packetInfoManager.getAllPacketInfoFromHeaderId(habboMessage.getDestination(), habboPacket.headerId());
+
+            List<String> identifiers = new ArrayList<>();
+            packetInfos.forEach(packetInfo -> {
+                String name = packetInfo.getName();
+                String hash = packetInfo.getHash();
+                if (name != null && hashOrNameListeners.containsKey(name)) identifiers.add(name);
+                if (hash != null && hashOrNameListeners.containsKey(hash)) identifiers.add(hash);
+            });
+
+            for (String identifier : identifiers) {
+                for (int i = hashOrNameListeners.get(identifier).size() - 1; i >= 0; i--) {
+                    correctListeners.add(hashOrNameListeners.get(identifier).get(i));
                 }
             }
         }

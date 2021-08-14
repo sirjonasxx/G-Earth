@@ -100,7 +100,7 @@ public class HPacket implements StringifyAble {
         this.identifierDirection = identifierDirection;
     }
 
-    public String getIdentifier() {
+    public String packetIncompleteIdentifier() {
         return identifier;
     }
 

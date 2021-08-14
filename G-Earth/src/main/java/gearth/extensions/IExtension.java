@@ -9,6 +9,7 @@ public abstract class IExtension {
     public abstract boolean sendToClient(HPacket packet);
     public abstract boolean sendToServer(HPacket packet);
     public abstract void intercept(HMessage.Direction direction, int headerId, Extension.MessageListener messageListener);
+    public abstract void intercept(HMessage.Direction direction, String hashOrName, Extension.MessageListener messageListener);
     public abstract void intercept(HMessage.Direction direction, Extension.MessageListener messageListener);
     public abstract boolean requestFlags(Extension.FlagsCheckListener flagRequestCallback);
     public abstract void writeToConsole(String colorClass, String s);

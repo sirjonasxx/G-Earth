@@ -8,10 +8,8 @@ import gearth.services.packet_info.PacketInfoManager;
 import org.json.JSONObject;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Predicate;
 
 public class InjectedPackets implements StringifyAble {
 
@@ -27,7 +25,7 @@ public class InjectedPackets implements StringifyAble {
             HPacket packet = new HPacket(packetsAsString);
             String identifier = null;
             if (!packet.isPacketComplete()) {
-                identifier = packet.getIdentifier();
+                identifier = packet.packetIncompleteIdentifier();
             }
             else {
                 Optional<PacketInfo> maybeInfo = packetInfoManager.getAllPacketInfoFromHeaderId(direction, packet.headerId())
