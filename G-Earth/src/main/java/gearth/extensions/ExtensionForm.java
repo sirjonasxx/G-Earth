@@ -16,14 +16,6 @@ public abstract class ExtensionForm extends ExtensionBase {
     protected volatile Stage primaryStage;
     volatile HostServices hostServices;
 
-    protected static void runExtensionForm(String[] args, Class<? extends ExtensionForm> extension) {
-        ExtensionFormLauncher launcher = new ExtensionFormLauncher();
-        launcher.trigger(extension, args);
-    }
-
-
-    public abstract ExtensionForm launchForm(Stage primaryStage) throws Exception;
-
     //wrap extension methods
     public boolean requestFlags(Extension.FlagsCheckListener flagRequestCallback){
         return extension.requestFlags(flagRequestCallback);
@@ -36,6 +28,9 @@ public abstract class ExtensionForm extends ExtensionBase {
     }
     public void intercept(HMessage.Direction direction, Extension.MessageListener messageListener) {
         extension.intercept(direction, messageListener);
+    }
+    public void intercept(HMessage.Direction direction, String hashOrName, Extension.MessageListener messageListener){
+        extension.intercept(direction, hashOrName, messageListener);
     }
     public void intercept(HMessage.Direction direction, int headerId, Extension.MessageListener messageListener){
         extension.intercept(direction, headerId, messageListener);

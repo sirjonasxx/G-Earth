@@ -1,8 +1,6 @@
 package gearth.extensions;
 
 import gearth.Main;
-import gearth.extensions.ExtensionBase;
-import gearth.extensions.IExtension;
 import gearth.protocol.HPacket;
 
 

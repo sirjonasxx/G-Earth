@@ -50,10 +50,9 @@ public abstract class ExtensionBase extends IExtension {
             if (!listeners.containsKey(headerId)) {
                 listeners.put(headerId, new ArrayList<>());
             }
+
+            listeners.get(headerId).add(messageListener);
         }
-
-
-        listeners.get(headerId).add(messageListener);
     }
 
     /**
@@ -72,10 +71,9 @@ public abstract class ExtensionBase extends IExtension {
             if (!listeners.containsKey(hashOrName)) {
                 listeners.put(hashOrName, new ArrayList<>());
             }
+
+            listeners.get(hashOrName).add(messageListener);
         }
-
-
-        listeners.get(hashOrName).add(messageListener);
     }
 
     /**

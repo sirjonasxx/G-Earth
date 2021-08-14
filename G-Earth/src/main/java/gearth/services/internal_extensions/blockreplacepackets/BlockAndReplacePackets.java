@@ -1,28 +1,20 @@
 package gearth.services.internal_extensions.blockreplacepackets;
 
-import gearth.Main;
 import gearth.extensions.ExtensionForm;
 import gearth.extensions.ExtensionInfo;
-import gearth.services.packet_info.PacketInfo;
-import gearth.services.packet_info.PacketInfoManager;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 import gearth.services.internal_extensions.blockreplacepackets.rules.BlockReplaceRule;
 import gearth.services.internal_extensions.blockreplacepackets.rules.RuleFactory;
-import gearth.ui.GEarthController;
+import gearth.services.packet_info.PacketInfo;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -208,20 +200,6 @@ public class BlockAndReplacePackets extends ExtensionForm {
         intercept(HMessage.Direction.TOCLIENT, messageListener);
 
         refreshOptions();
-    }
-
-    @Override
-    public ExtensionForm launchForm(Stage primaryStage) throws Exception {
-        FXMLLoader loader = new FXMLLoader(BlockAndReplacePackets.class.getResource("blockreplace.fxml"));
-        Parent root = loader.load();
-
-        primaryStage.setTitle("Packet blocker &/ replacer");
-        primaryStage.setScene(new Scene(root));
-        primaryStage.setResizable(false);
-        primaryStage.getScene().getStylesheets().add(GEarthController.class.getResource("/gearth/ui/bootstrap3.css").toExternalForm());
-        primaryStage.getIcons().add(new Image(Main.class.getResourceAsStream("G-EarthLogoSmaller.png")));
-
-        return loader.getController();
     }
 
     @Override

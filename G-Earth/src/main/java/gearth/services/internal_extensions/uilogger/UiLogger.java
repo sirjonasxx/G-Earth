@@ -57,25 +57,6 @@ public class UiLogger extends ExtensionForm implements PacketLogger {
         controller.onDisconnect();
     }
 
-    @Override
-    public ExtensionForm launchForm(Stage stage) throws Exception {
-        FXMLLoader loader = new FXMLLoader(UiLogger.class.getResource("UiLogger.fxml"));
-
-        Parent root = loader.load();
-        stage.setTitle("G-Earth | Packet Logger");
-        stage.initModality(Modality.NONE);
-        stage.getIcons().add(new Image(getClass().getResourceAsStream("/gearth/G-EarthLogoSmaller.png")));
-
-        Scene scene = new Scene(root);
-        scene.getStylesheets().add("/gearth/ui/bootstrap3.css");
-        scene.getStylesheets().add("/gearth/services/internal_extensions/uilogger/logger.css");
-        controller = loader.getController();
-        controller.setStage(stage);
-
-        stage.setScene(scene);
-        return this;
-    }
-
     private class Elem {
         HPacket packet;
         int types;
@@ -103,5 +84,9 @@ public class UiLogger extends ExtensionForm implements PacketLogger {
     @Override
     protected boolean canDelete() {
         return false;
+    }
+
+    public void setController(UiLoggerController controller) {
+        this.controller = controller;
     }
 }

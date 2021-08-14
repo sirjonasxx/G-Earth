@@ -9,15 +9,16 @@ import javafx.stage.Stage;
  */
 public class ExtensionFormLauncher extends Application {
 
-    private static Class<? extends ExtensionForm> extension;
+    private static Class<? extends ExtensionFormCreator> extensionFormCreator;
     private static String[] args;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        ExtensionInfo extInfo = extension.getAnnotation(ExtensionInfo.class);
+//        ExtensionInfo extInfo = extensionFormCreator.getAnnotation(ExtensionInfo.class);
 
-        ExtensionForm creator = extension.newInstance();
-        ExtensionForm extensionForm = creator.launchForm(primaryStage);
+        ExtensionFormCreator creator = extensionFormCreator.newInstance();
+        ExtensionForm extensionForm = creator.createForm(primaryStage);
+        ExtensionInfo extInfo = extensionForm.getClass().getAnnotation(ExtensionInfo.class);
 
         Extension extension = new Extension(args) {
             @Override
@@ -77,8 +78,8 @@ public class ExtensionFormLauncher extends Application {
         });
     }
 
-    public static void trigger( Class<? extends ExtensionForm> extension, String[] args) {
-        ExtensionFormLauncher.extension = extension;
+    public static void trigger(Class<? extends ExtensionFormCreator> creator, String[] args) {
+        ExtensionFormLauncher.extensionFormCreator = creator;
         ExtensionFormLauncher.args = args;
         launch(args);
     }

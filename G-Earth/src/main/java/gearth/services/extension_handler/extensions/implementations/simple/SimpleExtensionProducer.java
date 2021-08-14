@@ -4,7 +4,9 @@ import gearth.extensions.InternalExtensionFormBuilder;
 import gearth.services.extension_handler.extensions.extensionproducers.ExtensionProducer;
 import gearth.services.extension_handler.extensions.extensionproducers.ExtensionProducerObserver;
 import gearth.services.internal_extensions.blockreplacepackets.BlockAndReplacePackets;
+import gearth.services.internal_extensions.blockreplacepackets.BlockAndReplacePacketsLauncher;
 import gearth.services.internal_extensions.packetinfoexplorer.PacketInfoExplorer;
+import gearth.services.internal_extensions.packetinfoexplorer.PacketInfoExplorerLauncher;
 
 public class SimpleExtensionProducer implements ExtensionProducer {
 
@@ -14,10 +16,10 @@ public class SimpleExtensionProducer implements ExtensionProducer {
         // uncomment the next line if you want to see an embedded example extension in G-Earth
 //         observer.onExtensionProduced(new ExampleExtension());
 
-        new InternalExtensionFormBuilder<BlockAndReplacePackets>()
-                .launch(BlockAndReplacePackets.class, observer);
+        new InternalExtensionFormBuilder<BlockAndReplacePacketsLauncher, BlockAndReplacePackets>()
+                .launch(new BlockAndReplacePacketsLauncher(), observer);
 
-        new InternalExtensionFormBuilder<PacketInfoExplorer>()
-                .launch(PacketInfoExplorer.class, observer);
+        new InternalExtensionFormBuilder<PacketInfoExplorerLauncher, PacketInfoExplorer>()
+                .launch(new PacketInfoExplorerLauncher(), observer);
     }
 }

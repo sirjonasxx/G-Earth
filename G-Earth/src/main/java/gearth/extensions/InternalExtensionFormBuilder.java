@@ -6,15 +6,14 @@ import gearth.services.extension_handler.extensions.extensionproducers.Extension
 import javafx.application.Platform;
 import javafx.stage.Stage;
 
-public class InternalExtensionFormBuilder<T extends ExtensionForm> {
+public class InternalExtensionFormBuilder<L extends InternalExtensionFormLauncher<T>, T extends ExtensionForm> {
 
-    public T launch(Class<T> extensionClass, ExtensionProducerObserver observer) {
+    public T launch(L launcher, ExtensionProducerObserver observer) {
         try {
-            ExtensionInfo extInfo = extensionClass.getAnnotation(ExtensionInfo.class);
-            T creator = extensionClass.newInstance();
-
             Stage stage = new Stage();
-            T extensionForm = (T)(creator.launchForm(stage));
+            T extensionForm = launcher.createForm(stage);
+
+            ExtensionInfo extInfo = extensionForm.getClass().getAnnotation(ExtensionInfo.class);
 
             InternalExtension internalExtension = new InternalExtension() {
                 @Override
