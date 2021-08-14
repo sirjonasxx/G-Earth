@@ -3,9 +3,12 @@ package gearth.ui.extra;
 import gearth.Main;
 import gearth.misc.Cacher;
 import gearth.protocol.HConnection;
+import gearth.protocol.HMessage;
+import gearth.protocol.TrafficListener;
 import gearth.protocol.connection.HState;
 import gearth.protocol.connection.proxy.ProxyProviderFactory;
 import gearth.protocol.connection.proxy.SocksConfiguration;
+import gearth.services.always_admin.AdminService;
 import gearth.services.g_python.GPythonVersionUtils;
 import gearth.ui.SubForm;
 import gearth.ui.info.InfoController;
@@ -25,6 +28,7 @@ public class ExtraController extends SubForm implements SocksConfiguration {
     public static final String INFO_URL_GPYTHON = "https://github.com/sirjonasxx/G-Earth/wiki/G-Python-qtConsole";
 
     public static final String NOTEPAD_CACHE_KEY = "notepad_text";
+    public static final String ALWAYS_ADMIN_KEY = "always_admin";
     public static final String SOCKS_CACHE_KEY = "socks_config";
     public static final String GPYTHON_CACHE_KEY = "use_gpython";
 
@@ -51,6 +55,9 @@ public class ExtraController extends SubForm implements SocksConfiguration {
     public GridPane grd_socksInfo;
     public TextField txt_socksPort;
     public TextField txt_socksIp;
+    public CheckBox cbx_admin;
+
+    private AdminService adminService;
 
     public void initialize() {
         url_troubleshooting.setTooltip(new Tooltip("https://github.com/sirjonasxx/G-Earth/wiki/Troubleshooting"));
@@ -72,6 +79,10 @@ public class ExtraController extends SubForm implements SocksConfiguration {
             cbx_gpython.setSelected(Cacher.getCacheContents().getBoolean(GPYTHON_CACHE_KEY));
         }
 
+        if (Cacher.getCacheContents().has(ALWAYS_ADMIN_KEY)) {
+            cbx_admin.setSelected(Cacher.getCacheContents().getBoolean(ALWAYS_ADMIN_KEY));
+        }
+
         cbx_debug.selectedProperty().addListener(observable -> HConnection.DEBUG = cbx_debug.isSelected());
         cbx_disableDecryption.selectedProperty().addListener(observable -> HConnection.DECRYPTPACKETS = !cbx_disableDecryption.isSelected());
 
@@ -82,6 +93,10 @@ public class ExtraController extends SubForm implements SocksConfiguration {
 
     @Override
     protected void onParentSet() {
+        adminService = new AdminService(cbx_admin.isSelected(), getHConnection());
+        getHConnection().addTrafficListener(1, message -> adminService.onMessage(message));
+        getHConnection().getStateObservable().addListener((oldState, newState) -> {if (newState == HState.CONNECTED) adminService.onConnect();});
+
         parentController.getStage().setAlwaysOnTop(cbx_alwaysOnTop.isSelected());
         cbx_alwaysOnTop.selectedProperty().addListener(observable -> parentController.getStage().setAlwaysOnTop(cbx_alwaysOnTop.isSelected()));
 
@@ -99,6 +114,7 @@ public class ExtraController extends SubForm implements SocksConfiguration {
     protected void onExit() {
         Cacher.put(NOTEPAD_CACHE_KEY, txtarea_notepad.getText());
         Cacher.put(GPYTHON_CACHE_KEY, cbx_gpython.isSelected());
+        Cacher.put(ALWAYS_ADMIN_KEY, cbx_admin.isSelected());
         saveSocksConfig();
     }
 
@@ -189,6 +205,11 @@ public class ExtraController extends SubForm implements SocksConfiguration {
 
 
         }
+
+    }
+
+    public void adminCbxClick(ActionEvent actionEvent) {
+        adminService.setEnabled(cbx_admin.isSelected());
 
     }
 }

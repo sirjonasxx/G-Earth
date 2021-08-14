@@ -15,9 +15,6 @@
 
     <modules>
         <module>G-Earth</module>
-
-        <!-- Compile our extensions too please! -->
-        <module>Extensions/AdminOnConnect</module>
     </modules>
 
     <build>
