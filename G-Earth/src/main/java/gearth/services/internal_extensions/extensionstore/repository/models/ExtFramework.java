@@ -1,6 +1,9 @@
 package gearth.services.internal_extensions.extensionstore.repository.models;
 
+import org.json.JSONObject;
+
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ExtFramework {
 
@@ -19,6 +22,16 @@ public class ExtFramework {
         this.source = source;
         this.installationRequired = installationRequired;
         this.installationInstructions = installationInstructions;
+    }
+
+    public ExtFramework(JSONObject object) {
+        this.name = object.getString("name");
+        this.developers = object.getJSONArray("developers").toList().stream().map(s -> (String)s).collect(Collectors.toList());
+        this.languages = object.getJSONArray("languages").toList().stream().map(s -> (String)s).collect(Collectors.toList());
+        this.source = object.getString("source");
+        this.installationRequired = object.getJSONObject("installation").getBoolean("required");
+        this.installationInstructions = object.getJSONObject("installation").has("instructions") ?
+                object.getJSONObject("installation").getString("instructions") : null;
     }
 
     public String getName() {

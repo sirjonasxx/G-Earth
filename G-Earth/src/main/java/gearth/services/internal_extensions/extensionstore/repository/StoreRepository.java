@@ -1,9 +1,6 @@
 package gearth.services.internal_extensions.extensionstore.repository;
 
-import gearth.services.internal_extensions.extensionstore.repository.models.ExtCategory;
-import gearth.services.internal_extensions.extensionstore.repository.models.ExtFramework;
-import gearth.services.internal_extensions.extensionstore.repository.models.StoreData;
-import gearth.services.internal_extensions.extensionstore.repository.models.StoreExtension;
+import gearth.services.internal_extensions.extensionstore.repository.models.*;
 import gearth.services.internal_extensions.extensionstore.repository.querying.ExtensionOrdering;
 
 import java.util.*;
@@ -11,18 +8,22 @@ import java.util.stream.Collectors;
 
 public class StoreRepository {
 
+    public static StoreRepository EMPTY = new StoreRepository(new StoreData(new StoreConfig(new ArrayList<>(), new ArrayList<>()), new ArrayList<>()), "0.0");
+
+    private final String repoVersion;
     private final StoreData storeData;
 
-    public StoreRepository(StoreData storeData) {
+    public StoreRepository(StoreData storeData, String repoVersion) {
+        this.repoVersion = repoVersion;
         this.storeData = storeData;
     }
 
     public List<ExtCategory> getCategories() {
-        return storeData.getCategories();
+        return storeData.getConfig().getCategories();
     }
 
     public List<ExtFramework> getFrameworks() {
-        return storeData.getFrameworks();
+        return storeData.getConfig().getFrameworks();
     }
 
     public List<StoreExtension> getExtensions() {
@@ -72,7 +73,7 @@ public class StoreRepository {
 
     public List<String> getLanguages() {
         Set<String> languages = new HashSet<>();
-        storeData.getFrameworks().forEach(extFramework -> languages.addAll(extFramework.getLanguages()));
+        getFrameworks().forEach(extFramework -> languages.addAll(extFramework.getLanguages()));
         return new ArrayList<>(languages);
     }
 
@@ -98,6 +99,10 @@ public class StoreRepository {
 
     public List<ExtensionOrdering> getOrderings() {
         return Arrays.asList(ExtensionOrdering.values());
+    }
+
+    public String getRepoVersion() {
+        return repoVersion;
     }
 }
 

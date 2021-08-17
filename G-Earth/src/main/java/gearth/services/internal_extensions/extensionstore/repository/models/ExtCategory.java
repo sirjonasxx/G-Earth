@@ -1,5 +1,7 @@
 package gearth.services.internal_extensions.extensionstore.repository.models;
 
+import org.json.JSONObject;
+
 public class ExtCategory {
 
     private final String name;
@@ -10,6 +12,12 @@ public class ExtCategory {
         this.name = name;
         this.description = description;
         this.icon = icon;
+    }
+
+    public ExtCategory(JSONObject object) {
+        this.name = object.getString("name");
+        this.description = object.getString("description");
+        this.icon = object.getString("icon");
     }
 
     public String getName() {

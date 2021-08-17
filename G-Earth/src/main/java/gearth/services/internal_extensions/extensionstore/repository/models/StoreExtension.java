@@ -1,7 +1,12 @@
 package gearth.services.internal_extensions.extensionstore.repository.models;
 
+import org.json.JSONObject;
+
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class StoreExtension {
 
@@ -24,6 +29,26 @@ public class StoreExtension {
         this.rating = rating;
     }
 
+    public StoreExtension(JSONObject object, StoreConfig storeConfig) {
+        this.title = object.getString("title");
+        this.description = object.getString("title");
+        this.authors = object.getJSONArray("authors").toList().stream().map(o -> new Author(new JSONObject((Map)o))).collect(Collectors.toList());
+        this.version = object.getString("version");
+        this.categories = storeConfig.getCategories().stream().filter(c -> object.getJSONArray("categories")
+                .toList().stream().anyMatch(j -> j.equals(c.getName()))).collect(Collectors.toList());
+        this.source = object.getString("source");
+        this.readme = object.has("readme") ? object.getString("readme") : null;
+        this.stable = object.getBoolean("stable");
+        this.framework = new Framework(object.getJSONObject("framework"), storeConfig);
+        this.language = object.getString("language");
+        this.commands = new Commands(object.getJSONObject("commands"));
+        this.compatibility = new Compatibility(object.getJSONObject("compatibility"));
+        this.submissionDate = LocalDateTime.parse(object.getString("submissionDate"), DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"));
+        this.updateDate = LocalDateTime.parse(object.getString("updateDate"), DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"));
+        this.isOutdated = object.getBoolean("isOutdated");
+        this.rating = object.getInt("rating");
+    }
+
     public static class Author {
 
         private final String name;
@@ -41,6 +66,15 @@ public class StoreExtension {
             this.username = username;
             this.extensionsCount = extensionsCount;
             this.reputation = reputation;
+        }
+
+        public Author(JSONObject object) {
+            this.name = object.getString("name");
+            this.discord = object.has("discord") ? object.getString("discord") : null;
+            this.hotel = object.has("hotel") ? object.getString("hotel") : null;
+            this.username = object.has("username") ? object.getString("username") : null;
+            this.extensionsCount = object.getInt("extensionsCount");
+            this.reputation = object.getInt("reputation");
         }
 
         public String getName() {
@@ -78,6 +112,11 @@ public class StoreExtension {
             this.version = version;
         }
 
+        public Framework(JSONObject object, StoreConfig storeConfig) {
+            this.framework = storeConfig.getFrameworks().stream().filter(e -> e.getName().equals(object.getString("name"))).findFirst().get();
+            this.version = object.getString("version");
+        }
+
         public ExtFramework getFramework() {
             return framework;
         }
@@ -98,6 +137,13 @@ public class StoreExtension {
             this.linux = linux;
             this.windows = windows;
             this.mac = mac;
+        }
+
+        public Commands(JSONObject object) {
+            this.defaultCommand = object.getString("default");
+            this.linux = object.has("linux") ? object.getString("linux") : null;
+            this.windows = object.has("windows") ? object.getString("windows") : null;
+            this.mac = object.has("mac") ? object.getString("mac") : null;
         }
 
         public String getDefault() {
@@ -124,6 +170,11 @@ public class StoreExtension {
         public Compatibility(List<String> systems, List<String> clients) {
             this.systems = systems;
             this.clients = clients;
+        }
+
+        public Compatibility(JSONObject object) {
+            this.systems = object.getJSONArray("systems").toList().stream().map(s -> (String)s).collect(Collectors.toList());
+            this.clients = object.getJSONArray("clients").toList().stream().map(s -> (String)s).collect(Collectors.toList());
         }
 
         public List<String> getSystems() {
