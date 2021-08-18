@@ -2,6 +2,7 @@ package gearth.services.extension_handler.extensions.implementations.network.exe
 
 import gearth.Main;
 import gearth.services.extension_handler.extensions.implementations.network.authentication.Authenticator;
+import gearth.services.internal_extensions.extensionstore.tools.StoreExtensionTools;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -72,7 +73,7 @@ public class NormalExtensionRunner implements ExtensionRunner {
                     newPath
             );
 
-            addExecPermission(newPath.toString());
+//            addExecPermission(newPath.toString());
             tryRunExtension(newPath.toString(), port);
 
         } catch (IOException e) {
@@ -84,7 +85,15 @@ public class NormalExtensionRunner implements ExtensionRunner {
 
     public void tryRunExtension(String path, int port) {
         try {
+            if (new File(path).isDirectory()) {
+                // this extension is installed from the extension store and requires
+                // different behavior
+                StoreExtensionTools.executeExtension(path, port);
+                return;
+            }
+
             String filename = Paths.get(path).getFileName().toString();
+
             String[] execCommand = ExecutionInfo.getExecutionCommand(getFileExtension(path));
             execCommand = Arrays.copyOf(execCommand, execCommand.length);
             String cookie = Authenticator.generateCookieForExtension(filename);
@@ -99,66 +108,74 @@ public class NormalExtensionRunner implements ExtensionRunner {
 //            Process proc = Runtime.getRuntime().exec(execCommand);
             Process proc = pb.start();
 
-            if (Main.hasFlag(ExtensionRunner.SHOW_EXTENSIONS_LOG)) {
-                String sep = "" + System.lineSeparator();
-                synchronized (System.out) {
-                    System.out.println(path + sep + "Launching" + sep + "----------" + sep);
-                }
-
-                BufferedReader stdInput = new BufferedReader(new
-                        InputStreamReader(proc.getInputStream()));
-
-                new Thread(() -> {
-                    try {
-                        String line;
-                        while((line = stdInput.readLine()) != null) {
-                            synchronized (System.out) {
-                                System.out.println(path + sep + "Output" + sep + line + sep + "----------" + sep);
-                            }
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }).start();
-
-                BufferedReader stdError = new BufferedReader(new
-                        InputStreamReader(proc.getErrorStream()));
-
-                new Thread(() -> {
-                    try {
-                        String line;
-                        while((line = stdError.readLine()) != null) {
-                            synchronized (System.out) {
-                                System.out.println(path + sep + "Error" + sep + line + sep + "----------" + sep);
-                            }
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }).start();
-
-            }
+            maybeLogExtension(path, proc);
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public static void maybeLogExtension(String path, Process proc) {
+        if (Main.hasFlag(ExtensionRunner.SHOW_EXTENSIONS_LOG)) {
+            String sep = "" + System.lineSeparator();
+            synchronized (System.out) {
+                System.out.println(path + sep + "Launching" + sep + "----------" + sep);
+            }
+
+            BufferedReader stdInput = new BufferedReader(new
+                    InputStreamReader(proc.getInputStream()));
+
+            new Thread(() -> {
+                try {
+                    String line;
+                    while((line = stdInput.readLine()) != null) {
+                        synchronized (System.out) {
+                            System.out.println(path + sep + "Output" + sep + line + sep + "----------" + sep);
+                        }
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }).start();
+
+            BufferedReader stdError = new BufferedReader(new
+                    InputStreamReader(proc.getErrorStream()));
+
+            new Thread(() -> {
+                try {
+                    String line;
+                    while((line = stdError.readLine()) != null) {
+                        synchronized (System.out) {
+                            System.out.println(path + sep + "Error" + sep + line + sep + "----------" + sep);
+                        }
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }).start();
+
         }
     }
 
     @Override
     public void uninstallExtension(String filename) {
         try {
-            Files.delete(Paths.get(
-                    JARPATH,
-                    ExecutionInfo.EXTENSIONSDIRECTORY,
-                    filename
-            ));
+            Path path = Paths.get(JARPATH, ExecutionInfo.EXTENSIONSDIRECTORY, filename);
+            if (new File(path.toString()).isDirectory()) {
+                // is installed through extension store
+                StoreExtensionTools.removeExtension(path.toString());
+            }
+            else {
+                Files.delete(path);
+            }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private void addExecPermission(String path) {
-        //not needed at first sight
-    }
+//    private void addExecPermission(String path) {
+//        //not needed at first sight
+//    }
 
     private String getFileExtension(String path) {
         String name = Paths.get(path).getFileName().toString();

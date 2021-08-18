@@ -21,6 +21,7 @@ public class ExecutionInfo {
         extensionTypeToExecutionCommand.put("*.py3", new String[]{"python3", "{path}"});
         extensionTypeToExecutionCommand.put("*.sh", new String[]{"{path}"});
         extensionTypeToExecutionCommand.put("*.exe", new String[]{"{path}"});
+        extensionTypeToExecutionCommand.put("*.js", new String[]{"node", "{path}"});
 
         String[] extraArgs = {"-p", "{port}", "-f", "{filename}", "-c", "{cookie}"};
         for(String type : extensionTypeToExecutionCommand.keySet()) {

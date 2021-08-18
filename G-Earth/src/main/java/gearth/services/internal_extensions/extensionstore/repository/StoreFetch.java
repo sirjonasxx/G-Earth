@@ -1,6 +1,5 @@
 package gearth.services.internal_extensions.extensionstore.repository;
 
-import gearth.services.internal_extensions.extensionstore.repository.models.StoreConfig;
 import gearth.services.internal_extensions.extensionstore.repository.models.StoreData;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
@@ -8,7 +7,6 @@ import org.json.JSONObject;
 
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 
 public class StoreFetch {
 
@@ -42,7 +40,7 @@ public class StoreFetch {
 
 
     public static void main(String[] args) {
-//        get("1.4.1");
+//        fetch("1.4.1");
     }
 
 }

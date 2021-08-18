@@ -127,12 +127,12 @@ public class StoreExtension {
     }
 
     public static class Commands {
-        private final String defaultCommand;
-        private final String linux;
-        private final String windows;
-        private final String mac;
+        private final List<String> defaultCommand;
+        private final List<String> linux;
+        private final List<String> windows;
+        private final List<String> mac;
 
-        public Commands(String defaultCommand, String linux, String windows, String mac) {
+        public Commands(List<String> defaultCommand, List<String> linux, List<String> windows, List<String> mac) {
             this.defaultCommand = defaultCommand;
             this.linux = linux;
             this.windows = windows;
@@ -140,25 +140,29 @@ public class StoreExtension {
         }
 
         public Commands(JSONObject object) {
-            this.defaultCommand = object.getString("default");
-            this.linux = object.has("linux") ? object.getString("linux") : null;
-            this.windows = object.has("windows") ? object.getString("windows") : null;
-            this.mac = object.has("mac") ? object.getString("mac") : null;
+            this.defaultCommand = object.getJSONArray("default").toList().stream()
+                    .map(s -> (String)s).collect(Collectors.toList());
+            this.linux = object.has("linux") ?object.getJSONArray("linux").toList().stream()
+                    .map(s -> (String)s).collect(Collectors.toList()) : null;
+            this.windows = object.has("windows") ? object.getJSONArray("windows").toList().stream()
+                    .map(s -> (String)s).collect(Collectors.toList()) : null;
+            this.mac = object.has("mac") ? object.getJSONArray("mac").toList().stream()
+                    .map(s -> (String)s).collect(Collectors.toList()) : null;
         }
 
-        public String getDefault() {
+        public List<String> getDefault() {
             return defaultCommand;
         }
 
-        public String getLinux() {
+        public List<String> getLinux() {
             return linux;
         }
 
-        public String getWindows() {
+        public List<String> getWindows() {
             return windows;
         }
 
-        public String getMac() {
+        public List<String> getMac() {
             return mac;
         }
     }
