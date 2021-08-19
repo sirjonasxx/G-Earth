@@ -29,7 +29,7 @@ import java.nio.charset.StandardCharsets;
 public class Main extends Application {
 
     public static Application main;
-    public static String version = "1.4.1";
+    public static String version = "1.5";
     private static String gitApi = "https://api.github.com/repos/sirjonasxx/G-Earth/releases/latest";
 
     @Override

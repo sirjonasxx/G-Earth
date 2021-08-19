@@ -49,7 +49,7 @@ public class StoreFetch {
 
 
     public static void main(String[] args) {
-//        fetch("1.4.1");
+//        fetch("1.5");
     }
 
 }

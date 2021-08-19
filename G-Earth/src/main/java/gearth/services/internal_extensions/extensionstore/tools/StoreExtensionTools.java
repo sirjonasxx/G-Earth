@@ -227,7 +227,7 @@ public class StoreExtensionTools {
     }
 
     public static void main(String[] args) {
-        StoreFetch.fetch("1.4.1", new StoreFetch.StoreFetchListener() {
+        StoreFetch.fetch("1.5", new StoreFetch.StoreFetchListener() {
             @Override
             public void success(StoreRepository storeRepository) {
                 installExtension("G-BuildTools", storeRepository, new InstallExtListener() {
