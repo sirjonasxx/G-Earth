@@ -32,6 +32,8 @@ public class StoreExtensionTools {
 
     }
 
+    public final static String EXTENSIONS_PATH = Paths.get(NormalExtensionRunner.JARPATH, ExecutionInfo.EXTENSIONSDIRECTORY).toString();
+
 
     public static void executeExtension(String extensionPath, int port) {
         try {
@@ -107,7 +109,7 @@ public class StoreExtensionTools {
                 String version = ext.getVersion();
 
                 String folderName = name + "_" + version;
-                String path = Paths.get(NormalExtensionRunner.JARPATH, ExecutionInfo.EXTENSIONSDIRECTORY, folderName).toString();
+                String path = Paths.get(EXTENSIONS_PATH, folderName).toString();
 
                 File dir = new File(path);
                 File extensionPath = new File(Paths.get(path, "extension").toString());
@@ -156,9 +158,7 @@ public class StoreExtensionTools {
     public static List<InstalledExtension> getInstalledExtension() {
         List<InstalledExtension> installedExtensions = new ArrayList<>();
 
-        String path = Paths.get(NormalExtensionRunner.JARPATH, ExecutionInfo.EXTENSIONSDIRECTORY).toString();
-
-        File extensionsDir = new File(path);
+        File extensionsDir = new File(EXTENSIONS_PATH);
 
         File[] existingExtensions = extensionsDir.listFiles();
         if (existingExtensions != null) {
@@ -168,9 +168,9 @@ public class StoreExtensionTools {
                     // installed through extensions store
                     if (extension.getName().contains("_")) {
                         List<String> parts = new ArrayList<>(Arrays.asList(extension.getName().split("_")));
-                        parts.remove(parts.size() - 1);
+                        String version = parts.remove(parts.size() - 1);
                         String extensionName = String.join("_", parts);
-                        installedExtensions.add(new InstalledExtension(extensionName, parts.get(parts.size() - 1)));
+                        installedExtensions.add(new InstalledExtension(extensionName, version));
                     }
 
                 }
@@ -194,9 +194,8 @@ public class StoreExtensionTools {
 
     public static void updateExtension(String name, StoreRepository storeRepository, InstallExtListener listener) {
         // remove old occurences
-        String path = Paths.get(NormalExtensionRunner.JARPATH, ExecutionInfo.EXTENSIONSDIRECTORY).toString();
 
-        File extensionsDir = new File(path);
+        File extensionsDir = new File(EXTENSIONS_PATH);
 
         try {
             File[] existingExtensions = extensionsDir.listFiles();
@@ -219,7 +218,8 @@ public class StoreExtensionTools {
                 }
             }
         } catch (Exception e) {
-            listener.fail("Something went wrong with uninstalling the extension");
+            listener.fail("Something went wrong with uninstalling the extension, make sure to disconnect" +
+                    " the extension if it was still running.");
             return;
         }
 

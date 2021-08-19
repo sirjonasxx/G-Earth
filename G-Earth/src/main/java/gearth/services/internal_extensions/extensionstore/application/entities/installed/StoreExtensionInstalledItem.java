@@ -19,12 +19,23 @@ public class StoreExtensionInstalledItem extends StoreExtensionItem {
     }
 
     @Override
+    protected String displayColor(int i) {
+        return super.displayColor(i);
+        // todo color depending on if it needs an update
+    }
+
+    @Override
+    protected String displayVersion() {
+        return installedExtension.getVersion();
+    }
+
+
+    @Override
     public void addHtml(int i, GExtensionStore gExtensionStore) {
         if (this.storeExtension != null) {
             super.addHtml(i, gExtensionStore /* add custom color here */);
         }
 
-
-        //todo
+        //todo html when extension isn't in store
     }
 }

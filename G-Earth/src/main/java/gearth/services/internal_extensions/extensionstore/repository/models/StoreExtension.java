@@ -31,7 +31,7 @@ public class StoreExtension {
 
     public StoreExtension(JSONObject object, StoreConfig storeConfig) {
         this.title = object.getString("title");
-        this.description = object.getString("title");
+        this.description = object.getString("description");
         this.authors = object.getJSONArray("authors").toList().stream().map(o -> new Author(new JSONObject((Map)o))).collect(Collectors.toList());
         this.version = object.getString("version");
         this.categories = storeConfig.getCategories().stream().filter(c -> object.getJSONArray("categories")

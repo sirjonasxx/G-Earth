@@ -16,6 +16,9 @@ import java.net.Socket;
  */
 public class NetworkExtensionsProducer implements ExtensionProducer {
 
+    public static int extensionPort = -1;
+
+
     private ServerSocket serverSocket;
 
     @Override
@@ -84,6 +87,7 @@ public class NetworkExtensionsProducer implements ExtensionProducer {
     private boolean createServer(int port) {
         try {
             serverSocket = new ServerSocket(port);
+            extensionPort = port;
             return true;
         } catch (IOException e) {
             return false;

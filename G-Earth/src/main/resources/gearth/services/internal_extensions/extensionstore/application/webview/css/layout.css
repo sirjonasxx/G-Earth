@@ -48,8 +48,8 @@
 }
 
 #logo > img {
-    max-height: 50px;
-    max-width: 50px;
+    height: 50px;
+    width: 50px;
 }
 
 
@@ -93,6 +93,19 @@
 
 .quick_links_right {
     margin-left: auto;
+}
+
+.quick_links_item > a {
+    text-decoration: none;
+
+    /*border-bottom: 1px solid #1b79ab;*/
+    /*box-sizing: border-box;*/
+    /*padding-bottom: -1px;*/
+    box-shadow: 0 -1px 0 #218ac2 inset;
+
+
+    color: #218ac2
+;
 }
 
 

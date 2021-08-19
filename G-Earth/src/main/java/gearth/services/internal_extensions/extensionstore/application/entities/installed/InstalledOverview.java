@@ -7,7 +7,12 @@ import gearth.services.internal_extensions.extensionstore.repository.StoreReposi
 import gearth.services.internal_extensions.extensionstore.repository.models.StoreExtension;
 import gearth.services.internal_extensions.extensionstore.tools.InstalledExtension;
 import gearth.services.internal_extensions.extensionstore.tools.StoreExtensionTools;
+import org.apache.maven.artifact.versioning.ComparableVersion;
 
+import java.awt.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +41,8 @@ public class InstalledOverview extends HOverview {
     @Override
     public List<? extends ContentItem> getContentItems() {
         List<InstalledExtension> installed = StoreExtensionTools.getInstalledExtension();
+        installed.sort(Comparator.comparing(o -> new ComparableVersion(o.getVersion())));
+
         installed = installed.subList(startIndex, Math.min(startIndex + limit, installed.size()));
         Map<String, StoreExtension> nameToExt = new HashMap<>();
         storeRepository.getExtensions().forEach(e -> nameToExt.put(e.getTitle(), e));
@@ -50,7 +57,11 @@ public class InstalledOverview extends HOverview {
 
     @Override
     public void buttonClick(GExtensionStore gExtensionStore) {
-        // todo open installation folder
+        try {
+            Desktop.getDesktop().open(new File(StoreExtensionTools.EXTENSIONS_PATH));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -63,7 +74,7 @@ public class InstalledOverview extends HOverview {
 
             @Override
             public String title() {
-                return "Installed extensions";
+                return "Installed Extensions";
             }
 
             @Override

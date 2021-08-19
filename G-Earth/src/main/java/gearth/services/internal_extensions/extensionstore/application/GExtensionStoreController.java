@@ -205,7 +205,7 @@ public class GExtensionStoreController implements Initializable {
 
     private void onFullInitialize() {
         initialized = true;
-        pushOverview(new ByDateOverview(null, 0, GExtensionStore.PAGESIZE, getStoreRepository()));
+        setRootOverview(new ByDateOverview(null, 0, GExtensionStore.PAGESIZE, getStoreRepository()));
     }
 
     public void gExtensionStore(GExtensionStore gExtensionStore) {
@@ -228,4 +228,7 @@ public class GExtensionStoreController implements Initializable {
         return currentOverviews.getLast();
     }
 
+    public String getContentItemsContainer() {
+        return contentItemsContainer;
+    }
 }

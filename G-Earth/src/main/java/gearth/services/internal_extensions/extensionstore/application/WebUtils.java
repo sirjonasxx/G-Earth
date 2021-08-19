@@ -2,6 +2,9 @@ package gearth.services.internal_extensions.extensionstore.application;
 
 import org.w3c.dom.Element;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -35,19 +38,23 @@ public class WebUtils {
         return s;
     }
 
-    public static String elapsedTime(int time) {
+    public static String elapsedSince(LocalDateTime time) {
+        return elapsedTime(System.currentTimeMillis()/1000 - time.atZone(ZoneId.systemDefault()).toEpochSecond());
+    }
+
+    public static String elapsedTime(long time) {
         if (time < 60) return time + (time == 1 ? " second" : " seconds");
         time = time/60;
         if (time < 60) return time + (time == 1 ? " minute" : " minutes");
         time = time/60;
         if (time < 24) return time + (time == 1 ? " hour" : " hours");
-        int days = time/24;
+        long days = time/24;
         if (days < 7) return days + (days == 1 ? " day" : " days");
-        int weeks = days/7;
+        long weeks = days/7;
         if (weeks < 6) return weeks + (weeks == 1 ? " week" : " weeks");
-        int months = days/31;
+        long months = days/31;
         if (months < 12) return months + (months == 1 ? " month" : " months");
-        int years = days/365;
+        long years = days/365;
         return years + (years == 1 ? " year" : " years");
     }
 

@@ -19,13 +19,16 @@
     min-width: 41px;
 }
 
+.overview_item_logo > img {
+    max-width: 40px;
+    max-height: 40px;
+}
+
 .overview_item_info {
     flex: 1 1 auto;
     min-width: 0;
 
-    margin-left: 3px;
-
-    margin-top: 0;
+    margin-left: 5px;
 }
 
 .overview_item_msgs {
@@ -33,31 +36,34 @@
 
     width: 103px;
     min-width: 103px;
-    margin-left: 4px;
+    padding-left: 4px;
 
-    margin-top: 2px;
+    border: 0 solid #bab8b4;
+    border-left-width: 1px;
+
 }
 
 .oii_name {
+
     font-size: 13px;
     width: 100%;
 
     overflow: hidden;
     max-height: 14px;
     min-height: 14px;
-    padding-top: 3px;
+    padding-top: 4px;
 }
 .oii_desc {
     font-size: 11px;
-    margin-top: 2px;
+    margin-top: 3px;
     overflow: hidden;
 }
 
-.oim_msgs {
+.oim_top {
     font-size: 11px;
-    margin-top: 3px;
+    margin-top: 6px;
 }
-.oim_unread {
+.oim_bottom {
     font-size: 11px;
-    margin-top: 3px;
+    margin-top: 4px;
 }

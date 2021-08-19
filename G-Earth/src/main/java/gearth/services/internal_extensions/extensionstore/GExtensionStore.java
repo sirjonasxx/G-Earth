@@ -44,7 +44,7 @@ public class GExtensionStore extends ExtensionForm {
         gExtensionStoreController.maybeInitialized();
     }
 
-    public GExtensionStoreController getExtensionStoreController() {
+    public GExtensionStoreController getController() {
         return extensionStoreController;
     }
 
