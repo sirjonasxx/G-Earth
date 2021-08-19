@@ -96,8 +96,8 @@ public class StoreExtensionDetailsOverview extends HOverview {
 
     private void successPopup(String mode) {
         popup(Alert.AlertType.INFORMATION,
-                String.format("%s extension", mode),
-                String.format("%s extension [%s]", mode, extension.getTitle()),
+                String.format("%s completed", mode),
+                String.format("%s completed [%s]", mode, extension.getTitle()),
                 String.format("Extension %s completed successfully", mode.toLowerCase()));
     }
 
