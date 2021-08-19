@@ -22,7 +22,7 @@ public class GExtensionStoreLauncher extends InternalExtensionFormLauncher<GExte
         stage.setMinWidth(420);
         stage.setMinHeight(500);
 
-        stage.setWidth(550);
+        stage.setWidth(530);
         stage.setHeight(530);
 
         stage.setScene(new Scene(root));

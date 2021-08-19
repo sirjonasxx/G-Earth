@@ -59,8 +59,8 @@ public class StoreExtensionDetailsOverview extends HOverview {
     @Override
     public String buttonText() {
         int mode = mode();
-        return mode == 2 ? "Update" : "Install";
-//        return mode == 0 ? "Install" : (mode == 1 ? "Remove" : "Update");
+//        return mode == 2 ? "Update" : "Install";
+        return mode == 0 ? "Install" : (mode == 1 ? "Installed" : "Update");
     }
 
     @Override
@@ -70,7 +70,7 @@ public class StoreExtensionDetailsOverview extends HOverview {
 
     @Override
     public List<? extends ContentItem> getContentItems() {
-        return Collections.singletonList(new StoreExtensionDetailsItem(extension));
+        return Collections.singletonList(new StoreExtensionDetailsItem(extension, this));
     }
 
     @Override

@@ -122,9 +122,9 @@ public class GExtensionStoreController implements Initializable {
         setOverview(true);
     }
 
-//    private void reloadOverview(HOverview overview) {
-//        setOverview(true);
-//    }
+    public void reloadOverview() {
+        setOverview(false);
+    }
 
     private void popOverview() {
         if (currentOverviews.size() > 1) {

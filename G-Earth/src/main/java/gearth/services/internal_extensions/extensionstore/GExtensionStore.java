@@ -6,6 +6,7 @@ import gearth.services.internal_extensions.extensionstore.application.GExtension
 import gearth.services.internal_extensions.extensionstore.application.entities.queriedoverviews.ByDateOverview;
 import gearth.services.internal_extensions.extensionstore.repository.StoreFetch;
 import gearth.services.internal_extensions.extensionstore.repository.StoreRepository;
+import javafx.application.HostServices;
 
 @ExtensionInfo(
         Title = "G-ExtensionStore",
@@ -55,5 +56,10 @@ public class GExtensionStore extends ExtensionForm {
     @Override
     protected boolean canLeave() {
         return false;
+    }
+
+    @Override
+    public HostServices getHostServices() {
+        return super.getHostServices();
     }
 }
