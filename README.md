@@ -1,5 +1,5 @@
 # G-Earth
-Habbo packet logger & manipulator for Windows, Linux and Mac.
+Feature-rich habbo packet logger & manipulator for Windows, Linux and Mac.
 
 - Requires Java 8
 
@@ -9,35 +9,41 @@ Join the G-Earth [Discord server](https://discord.gg/AVkcF8y)
 
 **Download the [chrome extension](https://chrome.google.com/webstore/detail/g-chrome/cdjgbghobmfmfcenhoahgfnfpcadddag) if you're using Unity**
 
-# Windows execution
-Double click G-Earth.exe, which will be delivered in the release. Double clicking the .jar file might work as well.
-
-# Linux execution
-Execution command:
-> $ java -jar G-Earth.jar 
-
-Additionally, you can add the -t flag to log the packets in your terminal instead of opening a new window for it.
-
-# Mac execution
-[MacOs Installation guide](https://github.com/sirjonasxx/G-Earth/wiki/macOs-Installation-guide) (flash only)
+# Execution
+* **Windows:** Double click G-Earth.exe, which will be delivered in the release. Double clicking the .jar file might work as well.
+* **Linux** Execute `sudo java -jar G-Earth.jar` on the command line. You can include the `t` flag to log packets in your terminal
+* **Mac** Follow the [MacOs Installation guide](https://github.com/sirjonasxx/G-Earth/wiki/macOs-Installation-guide) (flash only)
 
 # Features
 * Log outgoing and incoming packets
-* Injection, both directions
-* Blocking & replacing packets functionality
-* Packet expressions
-* Encoding/decoding
+* Inject, block & replace packets on the fly
+* Automatic packet expression prediction
 * Auto detect hotel
 * Retro support - enter game host & port manually (only the first time)
 * Advanced scheduler
 * Advanced extension support
 * Python scripting on the fly
 * SOCKS proxy
-* 2 included extensions on-release
+* Identify packets through [Harble API](https://api.harble.net/messages/) and [sulek.dev](https://www.sulek.dev)
+* Supports both Unity (browser) and Flash
 
-Interested in creating an extension?
-* If you're not experienced with Java but have written extensions before in C#/VB, you could have a look at [Geode](https://github.com/LilithRainbows/Geode) or [Xabbo.GEarth](https://github.com/b7c/Xabbo.GEarth).
-* If you are experienced with Java, read this [wiki page](https://github.com/sirjonasxx/G-Earth/wiki/Extensions) carefully.
-* The easiest way to create extensions is using [G-Python](https://github.com/sirjonasxx/G-Python). (can also be done inside G-Earth with a [live scripting console](https://github.com/sirjonasxx/G-Earth/wiki/G-Python-qtConsole))
+
+# Extensions
+
+Interested in creating your own extension? Check one of the frameworks: 
+
+Name | Language | Developers | Github
+--- | --- | --- | --- |
+G-Earth (Native) | Java | sirjonasxx | https://github.com/sirjonasxx/G-Earth
+G-Python<sup>1</sup> | Python | sirjonasxx | https://github.com/sirjonasxx/G-Python
+Geode | C# & Visual Basic | ArachisH, LilithRainbows | https://github.com/LilithRainbows/Geode
+Xabbo | C# | b7 | https://github.com/b7c/Xabbo.Scripter
+G-Node | Node.js | WiredSpast | https://github.com/WiredSpast/G-Node
+GProgrammer<sup>2</sup> | Node.js | at15four2020 | https://github.com/at15four2020/GProgrammer/wiki
+
+<sub>1: built-in in G-Earth through the [live scripting console](https://github.com/sirjonasxx/G-Earth/wiki/G-Python-qtConsole) </sub>  
+<sub>2: not an implementation of the extension API, but allows for Node.js scripting, also check [G-WiredFly](https://github.com/at15four2020/G-Wiredfy) </sub>
+
+Release your extensions in the [G-ExtensionStore](https://github.com/sirjonasxx/G-ExtensionStore)
 
 For the memorysearcher that extracts the RC4 table, go to [G-Mem](https://github.com/sirjonasxx/G-Mem).
