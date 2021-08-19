@@ -17,6 +17,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import org.apache.commons.io.IOUtils;
+import org.apache.maven.artifact.versioning.ComparableVersion;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -78,7 +79,7 @@ public class Main extends Application {
                         new URL(gitApi).openStream(), StandardCharsets.UTF_8));
 
                 String gitv = (String)object.get("tag_name");
-                if (!gitv.equals(version)) {
+                if (new ComparableVersion(version).compareTo(new ComparableVersion(gitv)) < 0) {
                     Platform.runLater(() -> {
                         String body = (String)object.get("body");
                         boolean isForcedUpdate = body.contains("(!)");
