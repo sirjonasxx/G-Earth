@@ -1,4 +1,4 @@
-# Warning - this wiki page is outdated
+# Warning - this wiki page is outdated - will be updated soon. In the meanwhile, ask any questions in the Discord server.
 
 G-Earth supports console & GUI extensions, this page is focused on extension structure and development.
 
