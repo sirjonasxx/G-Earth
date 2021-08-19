@@ -8,21 +8,17 @@ import gearth.services.internal_extensions.extensionstore.repository.StoreFetch;
 import gearth.services.internal_extensions.extensionstore.repository.StoreRepository;
 import gearth.services.internal_extensions.extensionstore.repository.models.StoreExtension;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
+import org.apache.maven.artifact.versioning.ComparableVersion;
 import org.json.JSONArray;
 
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -157,6 +153,44 @@ public class StoreExtensionTools {
         FileUtils.deleteDirectory(new File(extensionPath));
     }
 
+    public static List<InstalledExtension> getInstalledExtension() {
+        List<InstalledExtension> installedExtensions = new ArrayList<>();
+
+        String path = Paths.get(NormalExtensionRunner.JARPATH, ExecutionInfo.EXTENSIONSDIRECTORY).toString();
+
+        File extensionsDir = new File(path);
+
+        File[] existingExtensions = extensionsDir.listFiles();
+        if (existingExtensions != null) {
+            for (File extension : existingExtensions) {
+
+                if (extension.isDirectory()) {
+                    // installed through extensions store
+                    if (extension.getName().contains("_")) {
+                        List<String> parts = new ArrayList<>(Arrays.asList(extension.getName().split("_")));
+                        parts.remove(parts.size() - 1);
+                        String extensionName = String.join("_", parts);
+                        installedExtensions.add(new InstalledExtension(extensionName, parts.get(parts.size() - 1)));
+                    }
+
+                }
+            }
+        }
+
+        return installedExtensions;
+    }
+
+    // 0 = not installed
+    // 1 = installed
+    // 2 = version mismatch
+    public static int isExtensionInstalled(String name, String version) {
+        List<InstalledExtension> installedExtensions = getInstalledExtension();
+        if (installedExtensions.stream().anyMatch(p -> p.getName().equals(name)
+                && new ComparableVersion(p.getVersion()).compareTo(new ComparableVersion(version)) >= 0))
+            return 1;
+        if (installedExtensions.stream().anyMatch(p -> p.getName().equals(name))) return 2;
+        return 0;
+    }
 
     public static void updateExtension(String name, StoreRepository storeRepository, InstallExtListener listener) {
         // remove old occurences
@@ -173,7 +207,7 @@ public class StoreExtensionTools {
                         // installed through extensions store
                         if (extension.getName().contains("_")) {
                             List<String> parts = new ArrayList<>(Arrays.asList(extension.getName().split("_")));
-                            parts.remove(path.length() - 1);
+                            parts.remove(parts.size() - 1);
                             String extensionName = String.join("_", parts);
                             if (name.equals(extensionName)) {
                                 removeExtension(extension.getPath());

@@ -1,0 +1,50 @@
+/*@font-face {*/
+/*    font-family:"Ubuntu-C";*/
+/*    src: url("https://github.com/sirjonasxx/test/blob/main/Ubuntu-C.ttf?raw=true") format("truetype");*/
+/*}*/
+
+/*@font-face {*/
+/*    font-family:"Ubuntu-Habbo";*/
+/*    src:url("https://github.com/sirjonasxx/test/blob/main/UbuntuHabbo.woff2?raw=true") format("woff2"),*/
+/*    url("https://github.com/sirjonasxx/test/blob/main/UbuntuHabbo.woff?raw=true") format("woff")*/
+/*}*/
+
+/*@import url(//db.onlinewebfonts.com/c/3549b18f20fd1f535e2e9810c957c3c7?family=Ubuntu+Habbo);*/
+/*@font-face {*/
+/*    font-family: "Ubuntu Habbo";*/
+/*    src: url("//db.onlinewebfonts.com/t/3549b18f20fd1f535e2e9810c957c3c7.eot");*/
+/*    src: url("//db.onlinewebfonts.com/t/3549b18f20fd1f535e2e9810c957c3c7.eot?#iefix") format("embedded-opentype"),*/
+/*    url("//db.onlinewebfonts.com/t/3549b18f20fd1f535e2e9810c957c3c7.woff2") format("woff2"),*/
+/*    url("//db.onlinewebfonts.com/t/3549b18f20fd1f535e2e9810c957c3c7.woff") format("woff"),*/
+/*    url("//db.onlinewebfonts.com/t/3549b18f20fd1f535e2e9810c957c3c7.ttf") format("truetype"),*/
+/*    url("//db.onlinewebfonts.com/t/3549b18f20fd1f535e2e9810c957c3c7.svg#Ubuntu Habbo") format("svg");*/
+/*}*/
+
+@font-face {
+    font-family:"Ubuntu Habbo";
+    src: url("../fonts/UbuntuHabbo.woff2") format("woff2"),
+    url("../fonts/UbuntuHabbo.woff") format("woff");
+}
+
+
+html, body, textarea {
+    height: 100%;
+    font-family: "Ubuntu Habbo", Ubuntu, sans-serif;
+    /*font-family: "Ubuntu-Habbo", sans-serif;*/
+    margin: 0;
+    overflow-x: hidden;
+}
+
+a, a:visited, a:hover, a:focus, a:hover, a:active { cursor: pointer; color: #3691cf; text-decoration-line: underline; text-decoration-color: #2c78aa; }
+
+.invisible {
+    display: none; !important;
+}
+
+.clickable:hover:not(.gdisabled) {
+    cursor: pointer;
+}
+
+.clickable:active:not(.gdisabled) {
+    cursor: default;
+}

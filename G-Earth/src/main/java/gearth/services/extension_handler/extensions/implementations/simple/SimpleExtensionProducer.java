@@ -5,6 +5,8 @@ import gearth.services.extension_handler.extensions.extensionproducers.Extension
 import gearth.services.extension_handler.extensions.extensionproducers.ExtensionProducerObserver;
 import gearth.services.internal_extensions.blockreplacepackets.BlockAndReplacePackets;
 import gearth.services.internal_extensions.blockreplacepackets.BlockAndReplacePacketsLauncher;
+import gearth.services.internal_extensions.extensionstore.GExtensionStore;
+import gearth.services.internal_extensions.extensionstore.GExtensionStoreLauncher;
 import gearth.services.internal_extensions.packetinfoexplorer.PacketInfoExplorer;
 import gearth.services.internal_extensions.packetinfoexplorer.PacketInfoExplorerLauncher;
 
@@ -15,6 +17,9 @@ public class SimpleExtensionProducer implements ExtensionProducer {
 
         // uncomment the next line if you want to see an embedded example extension in G-Earth
 //         observer.onExtensionProduced(new ExampleExtension());
+
+        new InternalExtensionFormBuilder<GExtensionStoreLauncher, GExtensionStore>()
+                .launch(new GExtensionStoreLauncher(), observer);
 
         new InternalExtensionFormBuilder<BlockAndReplacePacketsLauncher, BlockAndReplacePackets>()
                 .launch(new BlockAndReplacePacketsLauncher(), observer);

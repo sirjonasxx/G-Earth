@@ -1,0 +1,43 @@
+
+#content_items_container {
+    flex: 1 1 auto;
+    background-color: #bab8b4;
+    border-color: white;
+    border-radius: 4px;
+    border-style: solid;
+    border-width: 1px;
+
+    width: 100%;
+    min-height: 0;
+
+    overflow-y: auto;
+
+    display: flex;
+    flex-flow: column;
+    /*overflow: scroll;*/
+}
+
+.content_item {
+    flex: 0 1 auto;
+
+    border-style: solid;
+    border-width: 1px 0 0 0;
+    border-color: #bab8b4;
+}
+
+.item_lightblue {
+    background-color: #effeff;
+}
+
+.item_darkblue {
+    background-color: #b5e6f9;
+}
+
+.item_grey {
+    background-color: #aaaaaa;
+}
+
+.item_red {
+    background-color: #fcb0a6;
+}
+

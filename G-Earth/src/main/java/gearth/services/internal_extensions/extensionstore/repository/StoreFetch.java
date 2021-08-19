@@ -38,7 +38,7 @@ public class StoreFetch {
                         new URL(String.format("https://raw.githubusercontent.com/%s/repo/%s/.auto-generated/extensions.json", source, version))
                                 .openStream(), StandardCharsets.UTF_8));
 
-                storeFetchListener.success(new StoreRepository(new StoreData(config, exensions), version));
+                storeFetchListener.success(new StoreRepository(new StoreData(config, exensions), version, source));
 
             } catch (Exception e) {
                 storeFetchListener.fail(e.getLocalizedMessage());

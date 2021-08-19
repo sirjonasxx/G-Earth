@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>G-Forum</title>
+
+    <link rel="stylesheet" href="css/general.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/buttons.css">
+    <link rel="stylesheet" href="css/content.css">
+
+    <link rel="stylesheet" href="css/category_overview.css">
+    <link rel="stylesheet" href="css/extension_overview.css">
+    <link rel="stylesheet" href="css/comments_overview.css">
+
+    <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Ubuntu:regular,bold&subset=Latin">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="js/script.js"></script>
+</head>
+<body>
+
+<div class="box">
+
+    <div class="header">
+        <div class="header_logo_container">
+            <div id="logo"></div>
+        </div>
+        <div class="header_banner">
+            <div id="info">
+                <div id="info_title_container"></div>
+                <div id="info_desc_container"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="quick_links_container">
+        <div class="quick_links_item"><b>Quick Links:</b></div>
+        <div class="quick_links_item"><a id="overview_by_date">New Releases</a></div>
+        <div class="quick_links_item"><a id="overview_by_rating">Popular</a></div>
+        <div class="quick_links_item"><a id="overview_by_category">Categories</a></div>
+        <div class="quick_links_item"><a id="overview_installed">Installed</a></div>
+        <div class="quick_links_item quick_links_right"><a id="search_page">Search</a></div>
+    </div>
+
+    <div class="content_container">
+        <div id="content_title"></div>
+
+        <div id="content_items">
+            <div id="content_items_container">
+                Initializing..
+            </div>
+        </div>
+
+
+        <div id="content_buttons">
+            <div class="invisible forumbtn largebtn greybtn">
+                <div id="return_btn" class="innerbtn">Return</div>
+            </div>
+            <div class="btnspacing"></div>
+            <div class="invisible forumbtn largebtn bluebtn gdisabled">
+                <div id="generic_btn" class="innerbtn">Generic button</div>
+            </div>
+            <div id="first_btn" class="gdisabled forumbtn smallbtn whitebtn"><div class="innerbtn">&#60;&#60;</div></div>
+            <div id="prev_btn" class="gdisabled forumbtn smallbtn whitebtn"><div class="innerbtn">&#60;</div></div>
+            <div id="paging_lbl">1 / 1</div>
+            <div id="next_btn" class="gdisabled forumbtn smallbtn whitebtn"><div class="innerbtn">&#62;</div></div>
+            <div id="last_btn" class="gdisabled forumbtn smallbtn whitebtn"><div class="innerbtn">&#62;&#62;</div></div>
+        </div>
+
+    </div>
+
+</div>
+
+
+
+
+
+<script>
+    // setOverview("by_date")
+</script>
+
+
+</body>
+</html>

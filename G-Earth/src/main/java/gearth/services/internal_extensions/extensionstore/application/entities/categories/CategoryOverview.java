@@ -1,0 +1,80 @@
+package gearth.services.internal_extensions.extensionstore.application.entities.categories;
+
+import gearth.services.internal_extensions.extensionstore.GExtensionStore;
+import gearth.services.internal_extensions.extensionstore.application.entities.ContentItem;
+import gearth.services.internal_extensions.extensionstore.application.entities.HOverview;
+import gearth.services.internal_extensions.extensionstore.repository.StoreRepository;
+import gearth.services.internal_extensions.extensionstore.repository.models.ExtCategory;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class CategoryOverview extends HOverview {
+
+    protected final StoreRepository storeRepository;
+
+    public CategoryOverview(HOverview parent, int startIndex, int size, StoreRepository storeRepository) {
+        super(parent, startIndex, size);
+        this.storeRepository = storeRepository;
+    }
+
+
+    @Override
+    public String buttonText() {
+        return null;
+    }
+
+    @Override
+    public boolean buttonEnabled() {
+        return false;
+    }
+
+    @Override
+    public List<? extends ContentItem> getContentItems() {
+        List<ExtCategory> categories = storeRepository.getCategories();
+
+        return categories.subList(startIndex, Math.min(startIndex + limit, categories.size())).stream()
+                .map(CategoryItem::new).collect(Collectors.toList());
+    }
+
+    @Override
+    public int getMaxAmount() {
+        return storeRepository.getCategories().size();
+    }
+
+    @Override
+    public void buttonClick(GExtensionStore gExtensionStore) {
+        // button is disabled
+    }
+
+    @Override
+    public Header header() {
+        return new Header() {
+            @Override
+            public String iconUrl() {
+                return "images/overviews/idea.png";
+            }
+
+            @Override
+            public String title() {
+                return "Categories";
+            }
+
+            @Override
+            public String description() {
+                return "Explore the different kinds of extensions G-Earth has to offer";
+            }
+
+            @Override
+            public String contentTitle() {
+                return "Categories";
+            }
+        };
+    }
+
+    @Override
+    public HOverview getNewPage(int startIndex, int size) {
+        return new CategoryOverview(parent, startIndex, size, storeRepository);
+    }
+
+}

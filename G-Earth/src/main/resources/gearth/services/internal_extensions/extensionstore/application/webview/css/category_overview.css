@@ -1,0 +1,51 @@
+
+.thread_item {
+    -webkit-user-select: none;
+
+    min-height: 41px;
+    display: flex;
+
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.thread_item > div {
+    border-style: solid;
+    border-color: #bab8b4;
+    border-width: 0 0 0 1px;
+}
+
+.thread_settings {
+    flex: 0 1 auto;
+    display: flex;
+    flex-flow: column;
+
+    width: 20px;
+    min-width: 20px;
+}
+
+.thread_info {
+    flex: 1 1 auto;
+    min-width: 0;
+
+    padding-left: 3px;
+    padding-top: 2px;
+}
+
+.thread_msgs {
+    flex: 0 1 auto;
+
+    width: 140px;
+    min-width: 140px;
+    padding-left: 4px;
+
+    padding-top: 2px;
+}
+
+.thread_delete_report {
+    flex: 0 1 auto;
+
+    width: 50px;
+    min-width: 50px;
+    display: flex;
+}

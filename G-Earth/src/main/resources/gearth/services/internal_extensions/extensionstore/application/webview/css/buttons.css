@@ -1,0 +1,169 @@
+
+.forumbtn:not(.invisible) {
+    -webkit-user-select: none;
+    display: inline-flex;
+
+    border-style: solid;
+    height: 25px;
+    border-color: black;
+    border-width: 2px 2px 3px 2px;
+    border-radius: 5px;
+}
+
+
+.innerbtn {
+    flex: 0 1 auto;
+
+    width: 100%;
+
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    white-space: nowrap;
+
+    font-size: 13px;
+    line-height: 25px;
+
+    border-style: solid;
+    border-width: 2px 2px 12px 2px;
+    border-color: red;
+    border-radius: 2px;
+}
+
+.forumbtn:hover:not(.gdisabled) {
+    cursor: pointer;
+}
+
+.forumbtn:hover:not(.gdisabled) > .innerbtn {
+    border-width: 0 0 12px 0;
+    padding-top: 2px;
+}
+
+.forumbtn:active:not(.gdisabled) {
+    cursor: default;
+    border-width: 2px;
+    height: 26px;
+}
+
+.forumbtn:active:not(.gdisabled) > .innerbtn {
+    border-width: 2px 2px 13px 2px;
+    padding-top: 0;
+}
+
+.forumbtn.gdisabled {
+    border-width: 2px;
+    height: 26px;
+}
+
+#paging_lbl {
+    font-size: 13px;
+    line-height: 26px;
+
+    overflow: hidden;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+
+    color: #9a9a96;
+    width: 50px;
+}
+
+.largebtn {
+    width: 98px;
+    min-width: 98px;
+    margin: 0 8px;
+}
+.smallbtn {
+    width: 21px;
+    min-width: 21px;
+    margin: 0 3px 0 2px;
+}
+
+
+
+.greybtn:not(.gdisabled) > .innerbtn {
+    background-color: #d1d1d1;
+    border-color: #bbbbbb;
+}
+
+.greybtn:hover:not(.gdisabled) > .innerbtn {
+    background-color: #dcdcdc;
+    border-color: #cacaca;
+}
+
+.greybtn:active:not(.gdisabled) > .innerbtn {
+    background-color: #c2c2c2;
+    border-color: #8c8c8c;
+}
+
+.greybtn.gdisabled > .innerbtn {
+    /*color: #;*/
+    /*background-color: #;*/
+    /*border-color: #;*/
+}
+
+.greybtn.gdisabled {
+    /*border-color: #;*/
+}
+
+
+.bluebtn:not(.gdisabled) > .innerbtn {
+    color: white;
+    background-color: #2792b9;
+    border-color: #2282a5;
+}
+
+.bluebtn:hover:not(.gdisabled) > .innerbtn {
+    background-color: #2999c2;
+    border-color: #268db3;
+}
+
+.bluebtn:active:not(.gdisabled) > .innerbtn {
+    background-color: #2487ac;
+    border-color: #18617c;
+}
+
+.bluebtn.gdisabled > .innerbtn {
+    color: #feffff;
+    background-color: #3d889d;
+    border-color: #3d889d;
+}
+
+.bluebtn.gdisabled {
+    border-color: #355b64;
+}
+
+
+
+.whitebtn:not(.gdisabled) > .innerbtn {
+    background-color: #f3f3f3;
+    border-color: #d9d9d9;
+}
+
+.whitebtn:hover:not(.gdisabled) > .innerbtn {
+    background-color: #ffffff;
+    border-color: #ebebeb;
+}
+
+.whitebtn:active:not(.gdisabled) > .innerbtn {
+    background-color: #e1e1e1;
+    border-color: #a3a3a3;
+}
+
+.whitebtn.gdisabled > .innerbtn {
+    color: #020202;
+    background-color: #c3c3c1;
+    border-color: #c3c3c1;
+}
+
+.whitebtn.gdisabled {
+    border-color: #7a7a7a;
+}
+
+
+
+.btnspacing {
+    flex: 1 1 auto;
+}

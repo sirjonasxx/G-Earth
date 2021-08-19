@@ -51,4 +51,16 @@ public class OSValidator {
         }
     }
 
+    public static String getOSFull() {
+        if (isWindows()) {
+            return "Windows";
+        } else if (isMac()) {
+            return "Max";
+        } else if (isUnix()) {
+            return "Linux";
+        } else {
+            return "err";
+        }
+    }
+
 }

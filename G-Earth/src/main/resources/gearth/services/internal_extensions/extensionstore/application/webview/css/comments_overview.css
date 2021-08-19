@@ -1,0 +1,131 @@
+.comment_item {
+    flex: 0 0 auto;
+    background-color: #bab8b4;
+
+    width: 100%;
+
+
+    display: flex;
+    flex-flow: column;
+    /*overflow: scroll;*/
+}
+
+.comment_header {
+    flex: 0 0 auto;
+
+    min-height: 26px;
+    background-color: #3179ac;
+
+    display: flex;
+}
+
+.comment_body {
+    display: flex;
+    min-height: 100px;
+}
+
+
+
+
+.ch_timeago {
+    flex: 1 1 auto;
+    color: white;
+    font-size: 13px;
+    margin: 7px 0 0 3px;
+}
+.ch_index {
+    flex: 0 0 auto;
+    color: white;
+    font-size: 13px;
+    margin: 7px 4px 0 0;
+}
+.ch_buttons {
+    flex: 0 0 auto;
+    display: flex;
+}
+
+
+
+
+.cb_author {
+    flex: 0 1 auto;
+    min-width: 130px;
+    max-width: 130px;
+
+    display: flex;
+    flex-flow: column;
+    overflow: hidden;
+}
+
+.cb_content {
+    flex: 1 1 auto;
+
+    padding: 5px 10px;
+    font-size: 13px;
+    overflow-wrap: break-word;
+    min-width: 0;
+}
+
+.cbc_quote {
+    background-color: #cccccc;
+    margin: 3px 10px 3px 16px;
+    padding: 5px;
+
+    font-size: 13px;
+    overflow-wrap: break-word;
+    min-width: 0;
+}
+
+
+
+.cba_name {
+    flex: 0 0 auto;
+
+    min-height: 16px;
+    font-size: 13px;
+    font-weight: bold;
+    margin: 8px 0 0 5px;
+
+}
+.cba_messages {
+    flex: 0 0 auto;
+
+    min-height: 15px;
+    font-size: 13px;
+    margin: 2px 0 0 5px;
+
+}
+.cba_look {
+    margin: -17px 0 0 -7px;
+    height: 0;
+}
+
+
+
+.comment_open > .cb_author {
+    background-color: #c8eff8;
+}
+.comment_open > .cb_content {
+    background-color: #ffffff;
+}
+
+.comment_unread > .cb_author {
+    background-color: #c8eff8;
+}
+.comment_unread > .cb_content {
+    background-color: #fef4da;
+}
+
+.comment_hidden > .cb_author {
+    background-color: #d7d7cf;
+}
+.comment_hidden > .cb_content {
+    background-color: #e9e9e0;
+}
+
+.comment_staffhidden > .cb_author {
+    background-color: #fedfd3;
+}
+.comment_staffhidden > .cb_content {
+    background-color: #fdc6bb;
+}
