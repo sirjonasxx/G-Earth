@@ -45,6 +45,7 @@ public class InstalledOverview extends HOverview {
 
         installed = installed.subList(startIndex, Math.min(startIndex + limit, installed.size()));
         Map<String, StoreExtension> nameToExt = new HashMap<>();
+        // getExtensions() with no filtering includes outdated extensions
         storeRepository.getExtensions().forEach(e -> nameToExt.put(e.getTitle(), e));
 
         return installed.stream().map(i -> new StoreExtensionInstalledItem(nameToExt.get(i.getName()), i)).collect(Collectors.toList());
@@ -59,8 +60,8 @@ public class InstalledOverview extends HOverview {
     public void buttonClick(GExtensionStore gExtensionStore) {
         try {
             Desktop.getDesktop().open(new File(StoreExtensionTools.EXTENSIONS_PATH));
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+//            e.printStackTrace(); // no extensions installed yet, directory isnt created
         }
     }
 

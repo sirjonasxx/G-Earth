@@ -6,7 +6,6 @@ import gearth.services.internal_extensions.extensionstore.application.WebUtils;
 import gearth.services.internal_extensions.extensionstore.application.entities.StoreExtensionItem;
 import gearth.services.internal_extensions.extensionstore.repository.models.StoreExtension;
 import gearth.services.internal_extensions.extensionstore.tools.InstalledExtension;
-import netscape.javascript.JSObject;
 import org.apache.maven.artifact.versioning.ComparableVersion;
 
 public class StoreExtensionInstalledItem extends StoreExtensionItem {
