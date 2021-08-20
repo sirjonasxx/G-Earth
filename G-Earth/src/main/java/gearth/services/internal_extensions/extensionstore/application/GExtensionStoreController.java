@@ -187,11 +187,11 @@ public class GExtensionStoreController implements Initializable {
 
                 webView.getEngine().executeScript(String.format("setHeading(\"%s\", \"%s\", \"%s\")",
                         WebUtils.escapeHtmlNoBackslash(overview.header().iconUrl()),
-                        WebUtils.escapeMessage(overview.header().title()),
-                        WebUtils.escapeMessage(overview.header().description())
+                        WebUtils.escapeMessageAndQuotes(overview.header().title()),
+                        WebUtils.escapeMessageAndQuotes(overview.header().description())
                 ));
                 webView.getEngine().executeScript(String.format("setContentTitle(\"%s\")",
-                        WebUtils.escapeMessage(overview.header().contentTitle())
+                        WebUtils.escapeMessageAndQuotes(overview.header().contentTitle())
                 ));
             });
         }

@@ -66,6 +66,11 @@ public class WebUtils {
                 .replace("\r", "<br>");
     }
 
+    public static String escapeMessageAndQuotes(String text) {
+        text = escapeMessage(text);
+        return text.replace("\"", "&quot;");
+    }
+
     public static void clearElement(Element node) {
         while (node.hasChildNodes())
             node.removeChild(node.getFirstChild());
