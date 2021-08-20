@@ -94,8 +94,7 @@ public class StoreExtensionTools {
         }
         zipInputStream.closeEntry();
         zipInputStream.close();
-
-
+        inputStream.close();
 
     }
 
@@ -126,10 +125,17 @@ public class StoreExtensionTools {
                             List<String> command = OSValidator.isMac() ? ext.getCommands().getMac() : (OSValidator.isUnix() ? ext.getCommands().getLinux() :
                                             (OSValidator.isWindows() ? ext.getCommands().getWindows() : ext.getCommands().getDefault()));
                             command = command == null ? ext.getCommands().getDefault() : command;
+
+//                            String commandRaw = new JSONArray(command).toString();
+//                            PrintWriter out = new PrintWriter(Paths.get(path, "command.txt").toString());
+//                            out.println(commandRaw);
+//                            out.close();
+
                             FileUtils.writeStringToFile(commandFile, new JSONArray(command).toString(), "UTF-8");
                             listener.success(path);
 
                         } catch (IOException e) {
+                            e.printStackTrace();
                             listener.fail("Error while unzipping");
                             removeExtension(path);
                         }
