@@ -21,56 +21,17 @@ import java.util.stream.Collectors;
 
 public class StoreExtensionDetailsItem implements ContentItem {
 
-    private final static String HABBO_API_URL = "https://www.habbo{hotel}/api/public/users?name={user}";
-    private static final String OUTFIT_URL = "https://www.habbo.com/habbo-imaging/avatarimage?&figure={figureString}&direction=2&head_direction=2";
-    private static final Map<String, String> userToFigure = new HashMap<>();
+    private static final String OUTFIT_URL = "https://www.habbo{hotel}/habbo-imaging/avatarimage?&user={user}&direction=2&head_direction=2";
 
-    private final HOverview parent;
     private final StoreExtension storeExtension;
     private GExtensionStore gExtensionStore = null;
 
-    private String avatarImageUrl = "";
     private String id;
 
-    public StoreExtensionDetailsItem(StoreExtension storeExtension, HOverview parent) {
+    public StoreExtensionDetailsItem(StoreExtension storeExtension) {
         this.storeExtension = storeExtension;
-        this.parent = parent;
     }
 
-    private void fetchLooks() {
-        StoreExtension.Author mainAuthor = storeExtension.getAuthors().get(0);
-        if (mainAuthor.getUsername() != null && mainAuthor.getHotel() != null) {
-            String key = mainAuthor.getName() + "\t" + mainAuthor.getHotel();
-            synchronized (userToFigure) {
-                if (userToFigure.containsKey(key)) {
-                    avatarImageUrl = userToFigure.get(key);
-                }
-                else {
-                    new Thread(() -> {
-                        try {
-                            JSONObject habboData = new JSONObject(IOUtils.toString(
-                                    new URL(HABBO_API_URL.replace("{hotel}", mainAuthor.getHotel()).replace("{user}",
-                                            EncodingUtil.encodeURIComponent(mainAuthor.getUsername()))).openStream(), StandardCharsets.UTF_8));
-
-                            if (habboData.has("figureString")) {
-                                avatarImageUrl = OUTFIT_URL.replace("{figureString}", habboData.getString("figureString"));
-                                synchronized (userToFigure) {
-                                    userToFigure.put(key, avatarImageUrl);
-                                }
-                                if (gExtensionStore != null && gExtensionStore.getController().getCurrentOverview() == parent) {
-                                    gExtensionStore.getController().reloadOverview();
-                                }
-                            }
-
-                        } catch (IOException ignore) {
-
-                        }
-
-                    }).start();
-                }
-            }
-        }
-    }
 
     private String getContents() {
         StringBuilder contentBuilder = new StringBuilder();
@@ -162,7 +123,13 @@ public class StoreExtensionDetailsItem implements ContentItem {
         this.gExtensionStore = gExtensionStore;
 
         StoreExtension.Author mainAuthor = storeExtension.getAuthors().get(0);
-        fetchLooks();
+
+        String avatarLook = "";
+        if (mainAuthor.getHotel() != null && mainAuthor.getUsername() != null) {
+            avatarLook = OUTFIT_URL
+                    .replace("{hotel}", mainAuthor.getHotel())
+                    .replace("{user}", mainAuthor.getUsername());
+        }
 
         id = "extdetail" + i + "_" + System.currentTimeMillis();
 
@@ -178,7 +145,7 @@ public class StoreExtensionDetailsItem implements ContentItem {
                 .append("<div class=\"cba_name\">").append(WebUtils.escapeMessage(mainAuthor.getName())).append("</div>")
                 .append("<div class=\"cba_text\">").append(mainAuthor.getReputation()).append(" reputation</div>")
                 .append("<div class=\"cba_text\">").append(mainAuthor.getExtensionsCount()).append(" releases</div>")
-                .append("<div class=\"cba_look\"><img src=\"").append(avatarImageUrl).append("\" alt=\"\"></div>") // todo look
+                .append("<div class=\"cba_look\"><img src=\"").append(avatarLook).append("\" alt=\"\"></div>") // todo look
                 .append("</div>")
                 .append("<div class=\"cb_content\">").append(contentsInHtml()).append("</div>")
                 .append("</div>")

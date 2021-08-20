@@ -70,7 +70,7 @@ public class StoreExtensionDetailsOverview extends HOverview {
 
     @Override
     public List<? extends ContentItem> getContentItems() {
-        return Collections.singletonList(new StoreExtensionDetailsItem(extension, this));
+        return Collections.singletonList(new StoreExtensionDetailsItem(extension));
     }
 
     @Override
