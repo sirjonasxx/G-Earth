@@ -65,10 +65,10 @@ public class StoreExtensionDetailsItem implements ContentItem {
             contentBuilder.append("Warning: this extension has been marked unstable!\n\n");
         }
 
-        contentBuilder.append("<div>"
+        contentBuilder.append("--startdiv--")
                 .append("\n*Screenshot: *").append("\n")
                 .append("--img:").append(gExtensionStore.getRepository().getResourceUrl("store", "extensions", storeExtension.getTitle(), "screenshot.png"))
-                .append("</div>");
+                .append(" --enddiv--");
 
         return contentBuilder.toString();
     }
@@ -108,6 +108,8 @@ public class StoreExtensionDetailsItem implements ContentItem {
             line = line.replaceAll("\\*([^*]*)\\*", "<b>$1</b>")
                     .replaceAll("_([^_<>]*)_", "<i>$1</i>")
                     .replaceAll("(^| |>)@([^ <>]*)($| |<)", "$1<u>$2</u>$3")
+                    .replaceAll("--startdiv--", "<div>")
+                    .replaceAll("--enddiv--", "</div>")
                     .replaceAll("--img:([^ ]*)", "<img src=\"$1\" alt=\"extension screenshot\" onerror=\"this.parentNode.remove()\">")
                     .replaceAll("--url:([^-]*)-(https?:[^ ]*)",
                             String.format("<a href=\"#\" onClick=\"%s.openUrl(&quot;$2&quot;)\">$1</a>", id));
