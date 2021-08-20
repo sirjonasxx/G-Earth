@@ -102,7 +102,8 @@ public class StoreExtensionTools {
     public static void installExtension(String name, StoreRepository storeRepository, InstallExtListener listener) {
         new Thread(() -> {
 
-            String downloadUrl = String.format("https://github.com/sirjonasxx/G-ExtensionStore/raw/repo/%s/store/extensions/%s/extension.zip", storeRepository.getRepoVersion(), name);
+            String downloadUrl = String.format("https://github.com/sirjonasxx/G-ExtensionStore/raw/repo/%s/store/extensions/%s/extension.zip", storeRepository.getRepoVersion(),
+                    EncodingUtil.encodeURIComponent(name));
             Optional<StoreExtension> maybeExt = storeRepository.getExtensions().stream().filter(e -> e.getTitle().equals(name)).findFirst();
             if (maybeExt.isPresent()) {
                 StoreExtension ext = maybeExt.get();
