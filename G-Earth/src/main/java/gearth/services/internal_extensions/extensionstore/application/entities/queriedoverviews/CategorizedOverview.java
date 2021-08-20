@@ -32,7 +32,7 @@ public class CategorizedOverview extends QueriedExtensionOverview {
         return new Header() {
             @Override
             public String iconUrl() {
-                return storeRepository.getResourceUrl(String.format("assets/icons/%s", category.getIcon()));
+                return storeRepository.getResourceUrl("assets", "icons", category.getIcon());
             }
 
             @Override

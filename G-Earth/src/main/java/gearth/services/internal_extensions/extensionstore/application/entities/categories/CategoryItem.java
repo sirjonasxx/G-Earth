@@ -49,7 +49,7 @@ public class CategoryItem implements ContentItem {
                 .append("<div class=\"overview_item ").append(i % 2 == 0 ? "item_lightblue" : "item_darkblue").append(" content_item\">")
 
                 .append("<div class=\"overview_item_logo\">")
-                .append("<img src=\"").append(repository.getResourceUrl(String.format("assets/icons/%s", category.getIcon()))).append("\" alt=\"\">")
+                .append("<img src=\"").append(repository.getResourceUrl("assets", "icons", category.getIcon())).append("\" alt=\"\">")
                 .append("</div>")
 
                 .append("<div class=\"overview_item_info\">")

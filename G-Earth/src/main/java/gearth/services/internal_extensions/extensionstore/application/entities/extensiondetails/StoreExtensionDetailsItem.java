@@ -7,12 +7,14 @@ import gearth.services.internal_extensions.extensionstore.application.entities.C
 import gearth.services.internal_extensions.extensionstore.application.entities.HOverview;
 import gearth.services.internal_extensions.extensionstore.repository.models.ExtCategory;
 import gearth.services.internal_extensions.extensionstore.repository.models.StoreExtension;
+import gearth.services.internal_extensions.extensionstore.tools.EncodingUtil;
 import netscape.javascript.JSObject;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -48,7 +50,7 @@ public class StoreExtensionDetailsItem implements ContentItem {
                         try {
                             JSONObject habboData = new JSONObject(IOUtils.toString(
                                     new URL(HABBO_API_URL.replace("{hotel}", mainAuthor.getHotel()).replace("{user}",
-                                            mainAuthor.getUsername())).openStream(), StandardCharsets.UTF_8));
+                                            EncodingUtil.encodeURIComponent(mainAuthor.getUsername()))).openStream(), StandardCharsets.UTF_8));
 
                             if (habboData.has("figureString")) {
                                 avatarImageUrl = OUTFIT_URL.replace("{figureString}", habboData.getString("figureString"));
@@ -101,7 +103,7 @@ public class StoreExtensionDetailsItem implements ContentItem {
         }
 
         contentBuilder.append("\n*Screenshot: *").append("\n")
-                .append("--img:").append(gExtensionStore.getRepository().getResourceUrl(String.format("store/extensions/%s/screenshot.png", storeExtension.getTitle())));
+                .append("--img:").append(gExtensionStore.getRepository().getResourceUrl("store", "extensions", storeExtension.getTitle(), "screenshot.png"));
 
         return contentBuilder.toString();
     }

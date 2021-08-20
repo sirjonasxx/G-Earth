@@ -51,7 +51,7 @@ public class StoreExtensionItem implements ContentItem {
                 .append("<div class=\"overview_item ").append(displayColor(i)).append(" content_item\">")
 
                 .append("<div class=\"overview_item_logo\">")
-                .append("<img src=\"").append(repository.getResourceUrl(String.format("store/extensions/%s/icon.png", storeExtension.getTitle()))).append("\" alt=\"\">")
+                .append("<img src=\"").append(repository.getResourceUrl("store", "extensions", storeExtension.getTitle(), "icon.png")).append("\" alt=\"\">")
                 .append("</div>")
 
                 .append("<div class=\"overview_item_info\">")

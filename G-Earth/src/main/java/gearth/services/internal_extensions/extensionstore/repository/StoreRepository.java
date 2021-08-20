@@ -2,7 +2,10 @@ package gearth.services.internal_extensions.extensionstore.repository;
 
 import gearth.services.internal_extensions.extensionstore.repository.models.*;
 import gearth.services.internal_extensions.extensionstore.repository.querying.ExtensionOrdering;
+import gearth.services.internal_extensions.extensionstore.tools.EncodingUtil;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -112,8 +115,9 @@ public class StoreRepository {
         return repoVersion;
     }
 
-    public String getResourceUrl(String resource) {
-        return String.format("https://raw.githubusercontent.com/%s/repo/%s/%s", source, repoVersion, resource);
+    public String getResourceUrl(String... resource) {
+        return String.format("https://raw.githubusercontent.com/%s/repo/%s/%s", source, repoVersion,
+                Arrays.stream(resource).map(EncodingUtil::encodeURIComponent).collect(Collectors.joining("/")));
     }
 }
 

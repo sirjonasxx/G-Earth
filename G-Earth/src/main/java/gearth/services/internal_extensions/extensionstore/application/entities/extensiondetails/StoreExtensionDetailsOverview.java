@@ -159,7 +159,7 @@ public class StoreExtensionDetailsOverview extends HOverview {
         return new Header() {
             @Override
             public String iconUrl() {
-                return storeRepository.getResourceUrl(String.format("store/extensions/%s/icon.png", extension.getTitle()));
+                return storeRepository.getResourceUrl("store", "extensions", extension.getTitle(), "icon.png");
             }
 
             @Override
