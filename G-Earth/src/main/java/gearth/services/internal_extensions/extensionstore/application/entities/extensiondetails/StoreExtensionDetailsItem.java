@@ -94,6 +94,8 @@ public class StoreExtensionDetailsItem implements ContentItem {
                 .append("> Framework: ").append(storeExtension.getFramework().getFramework().getName()).append(" - v").append(storeExtension.getFramework().getVersion()).append("\n")
                 .append("> Systems: ").append(String.join(", ", storeExtension.getCompatibility().getSystems())).append("\n \n");
 
+        contentBuilder.append("*Compatible clients:* ").append(String.join(", ", storeExtension.getCompatibility().getClients())).append("\n\n");
+
         if (storeExtension.getFramework().getFramework().isInstallationRequired()) {
             contentBuilder.append("Warning: the framework requires --url:additional installations-")
                     .append(storeExtension.getFramework().getFramework().getInstallationInstructions()).append(" !\n");
