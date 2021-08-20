@@ -111,7 +111,6 @@ public class StoreExtensionTools {
                 String folderName = name + "_" + version;
                 String path = Paths.get(EXTENSIONS_PATH, folderName).toString();
 
-                File dir = new File(path);
                 File extensionPath = new File(Paths.get(path, "extension").toString());
 
                 if (extensionPath.mkdirs()) {
@@ -131,16 +130,20 @@ public class StoreExtensionTools {
 
                         } catch (IOException e) {
                             listener.fail("Error while unzipping");
+                            removeExtension(path);
                         }
 
                     } catch (MalformedURLException e) {
                         listener.fail("Invalid extension URL");
+                        removeExtension(path); // cleanup
                     } catch (IOException e) {
                         listener.fail("Extension not available in repository");
+                        removeExtension(path); // cleanup
                     }
                 }
                 else {
                     listener.fail("Something went wrong creating the extension directory, does the extension already exist?");
+                    // don't do cleanup since you might not want removal of current extension files
                 }
             }
             else {
@@ -151,8 +154,12 @@ public class StoreExtensionTools {
 
     }
 
-    public static void removeExtension(String extensionPath) throws IOException {
-        FileUtils.deleteDirectory(new File(extensionPath));
+    public static void removeExtension(String extensionPath) {
+        try {
+            FileUtils.deleteDirectory(new File(extensionPath));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static List<InstalledExtension> getInstalledExtension() {

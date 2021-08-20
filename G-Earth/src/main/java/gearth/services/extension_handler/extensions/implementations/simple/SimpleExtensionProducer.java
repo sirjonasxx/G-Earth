@@ -3,12 +3,8 @@ package gearth.services.extension_handler.extensions.implementations.simple;
 import gearth.extensions.InternalExtensionFormBuilder;
 import gearth.services.extension_handler.extensions.extensionproducers.ExtensionProducer;
 import gearth.services.extension_handler.extensions.extensionproducers.ExtensionProducerObserver;
-import gearth.services.internal_extensions.blockreplacepackets.BlockAndReplacePackets;
-import gearth.services.internal_extensions.blockreplacepackets.BlockAndReplacePacketsLauncher;
 import gearth.services.internal_extensions.extensionstore.GExtensionStore;
 import gearth.services.internal_extensions.extensionstore.GExtensionStoreLauncher;
-import gearth.services.internal_extensions.packetinfoexplorer.PacketInfoExplorer;
-import gearth.services.internal_extensions.packetinfoexplorer.PacketInfoExplorerLauncher;
 
 public class SimpleExtensionProducer implements ExtensionProducer {
 
@@ -21,10 +17,5 @@ public class SimpleExtensionProducer implements ExtensionProducer {
         new InternalExtensionFormBuilder<GExtensionStoreLauncher, GExtensionStore>()
                 .launch(new GExtensionStoreLauncher(), observer);
 
-        new InternalExtensionFormBuilder<BlockAndReplacePacketsLauncher, BlockAndReplacePackets>()
-                .launch(new BlockAndReplacePacketsLauncher(), observer);
-
-        new InternalExtensionFormBuilder<PacketInfoExplorerLauncher, PacketInfoExplorer>()
-                .launch(new PacketInfoExplorerLauncher(), observer);
     }
 }
