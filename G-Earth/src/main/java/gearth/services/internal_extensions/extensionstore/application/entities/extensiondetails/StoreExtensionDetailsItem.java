@@ -98,10 +98,10 @@ public class StoreExtensionDetailsItem implements ContentItem {
 
         if (storeExtension.getFramework().getFramework().isInstallationRequired()) {
             contentBuilder.append("Warning: the framework requires --url:additional installations-")
-                    .append(storeExtension.getFramework().getFramework().getInstallationInstructions()).append(" !\n");
+                    .append(storeExtension.getFramework().getFramework().getInstallationInstructions()).append(" !\n\n");
         }
         if (!storeExtension.isStable()) {
-            contentBuilder.append("Warning: this extension has been marked unstable!\n");
+            contentBuilder.append("Warning: this extension has been marked unstable!\n\n");
         }
 
         contentBuilder.append("\n*Screenshot: *").append("\n")
