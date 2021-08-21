@@ -39,10 +39,10 @@ G-Python<sup>1</sup> | Python | sirjonasxx | https://github.com/sirjonasxx/G-Pyt
 Geode | C# & Visual Basic | ArachisH, LilithRainbows | https://github.com/LilithRainbows/Geode
 Xabbo | C# | b7 | https://github.com/b7c/Xabbo.Scripter
 G-Node | Node.js | WiredSpast | https://github.com/WiredSpast/G-Node
-GProgrammer<sup>2</sup> | Node.js | at15four2020 | https://github.com/at15four2020/GProgrammer/wiki
+GProgrammer<sup>2</sup> | Javascript | at15four2020 | https://github.com/at15four2020/GProgrammer/wiki
 
 <sub>1: built-in in G-Earth through the [live scripting console](https://github.com/sirjonasxx/G-Earth/wiki/G-Python-qtConsole) </sub>  
-<sub>2: not an implementation of the extension API, but allows for Node.js scripting, also check [G-WiredFly](https://github.com/at15four2020/G-Wiredfy) </sub>
+<sub>2: not an implementation of the extension API, but allows for Javascript scripting, also check [G-WiredFly](https://github.com/at15four2020/G-Wiredfy) </sub>
 
 Release your extensions in the [G-ExtensionStore](https://github.com/sirjonasxx/G-ExtensionStore)
 
