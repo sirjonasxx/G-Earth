@@ -42,6 +42,8 @@ public class GExtensionStoreController implements Initializable {
 
         webView.getEngine().getLoadWorker().stateProperty().addListener((observableValue, oldState, newState) -> {
             if (newState == Worker.State.SUCCEEDED) {
+                webView.getEngine().setUserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10.10; rv:54.0) Gecko/20100101 Firefox/54.0");
+
                 JSObject window = (JSObject) webView.getEngine().executeScript("window");
                 window.setMember("app", extensionStore);
 
