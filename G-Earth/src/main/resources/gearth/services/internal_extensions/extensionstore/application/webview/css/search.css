@@ -1,0 +1,55 @@
+.searchContainer {
+
+    background-color: #d4eaf5;
+
+    width: 100%;
+    min-height: 0;
+
+    flex: 1;
+    overflow-y: auto;
+
+}
+
+.searchInnerContainer {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+
+    padding: 10px;
+
+}
+
+.centeredFlex {
+    /*justify-content: center;*/
+    display: flex;
+    align-items: center
+}
+
+.inputBox {
+    margin-left: 10px;
+}
+
+.filterBox {
+    margin-right: 15px;
+    padding: 0 10px 10px 10px;
+    border: 1px solid #666;
+    border-radius: 5px;
+}
+
+.filterStuff {
+    margin-top: 10px;
+    display: flex;
+
+}
+
+/*.searchFiller {*/
+/*    flex: 1;*/
+/*    margin-bottom: auto;*/
+/*}*/
+
+
+.searchInnerContainer p, .searchInnerContainer label {
+    margin: 8px 0;
+    color: #454545;
+    min-width: 0;
+}

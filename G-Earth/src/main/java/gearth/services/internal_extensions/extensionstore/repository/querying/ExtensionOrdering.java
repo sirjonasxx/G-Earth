@@ -18,4 +18,13 @@ public enum ExtensionOrdering {
     public String getOrderName() {
         return orderName;
     }
+
+    public static ExtensionOrdering fromString(String text) {
+        for (ExtensionOrdering b : ExtensionOrdering.values()) {
+            if (b.orderName.equalsIgnoreCase(text)) {
+                return b;
+            }
+        }
+        return null;
+    }
 }

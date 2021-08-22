@@ -3,6 +3,8 @@ package gearth.services.internal_extensions.extensionstore.application.entities.
 import gearth.services.internal_extensions.extensionstore.GExtensionStore;
 import gearth.services.internal_extensions.extensionstore.application.entities.ContentItem;
 import gearth.services.internal_extensions.extensionstore.application.entities.HOverview;
+import gearth.services.internal_extensions.extensionstore.application.entities.extensiondetails.StoreExtensionDetailsOverview;
+import gearth.services.internal_extensions.extensionstore.application.entities.queriedoverviews.SearchedQueryOverview;
 import gearth.services.internal_extensions.extensionstore.repository.StoreRepository;
 
 import java.util.Collections;
@@ -10,27 +12,32 @@ import java.util.List;
 
 public class SearchOverview extends HOverview {
 
+    private static SearchComponent searchComponent = null;
     private final StoreRepository storeRepository;
 
     public SearchOverview(HOverview parent, StoreRepository storeRepository) {
         super(null, 0, 1);
         this.storeRepository = storeRepository;
+
+        if (searchComponent == null || searchComponent.getRepository() != storeRepository) {
+            searchComponent = new SearchComponent(storeRepository);
+        }
     }
 
 
     @Override
     public String buttonText() {
-        return null;
+        return "Search";
     }
 
     @Override
     public boolean buttonEnabled() {
-        return false;
+        return true;
     }
 
     @Override
     public List<? extends ContentItem> getContentItems() {
-        return Collections.singletonList(new SearchComponent());
+        return Collections.singletonList(searchComponent);
     }
 
     @Override
@@ -40,7 +47,21 @@ public class SearchOverview extends HOverview {
 
     @Override
     public void buttonClick(GExtensionStore gExtensionStore) {
-        // nothing
+        gExtensionStore.getController().pushOverview(
+                new SearchedQueryOverview(
+                        gExtensionStore.getController().getCurrentOverview(),
+                        0,
+                        GExtensionStore.PAGESIZE,
+                        storeRepository,
+                        searchComponent.getSearchKeyword(),
+                        searchComponent.getOrdering(),
+                        searchComponent.getClients(),
+                        searchComponent.getFrameworks(),
+                        searchComponent.getCategories(),
+                        false,
+                        false
+                )
+        );
     }
 
     @Override
