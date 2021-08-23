@@ -7,10 +7,7 @@ import gearth.services.packet_info.PacketInfo;
 import gearth.services.packet_info.PacketInfoManager;
 import org.reactfx.util.Lists;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -119,7 +116,7 @@ public abstract class ExtensionBase extends IExtension {
                         hashOrNameIncomingListeners :
                         hashOrNameOutgoingListeners ;
 
-        List<MessageListener> correctListeners = new ArrayList<>();
+        Set<MessageListener> correctListeners = new HashSet<>();
 
         synchronized (listeners) {
             if (listeners.containsKey(-1)) { // registered on all packets
