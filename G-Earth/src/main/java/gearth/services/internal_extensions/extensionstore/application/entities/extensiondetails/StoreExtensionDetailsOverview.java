@@ -120,7 +120,7 @@ public class StoreExtensionDetailsOverview extends HOverview {
     @Override
     public void buttonClick(GExtensionStore gExtensionStore) {
         int mode = mode();
-        if (mode == 2) return;
+        if (mode == 1) return;
 
         String modeString = mode() == 0 ? "Install" : "Update";
         HOverview selff = this;
@@ -149,7 +149,7 @@ public class StoreExtensionDetailsOverview extends HOverview {
         if (mode() == 0) {
             StoreExtensionTools.installExtension(extension.getTitle(), storeRepository, listener);
         }
-        else if (mode() == 1) {
+        else if (mode() == 2) {
             StoreExtensionTools.updateExtension(extension.getTitle(), storeRepository, listener);
         }
     }
