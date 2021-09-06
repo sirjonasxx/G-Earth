@@ -32,4 +32,36 @@ public class HFrontPageItem {
 
         this.expirationTime = packet.readInteger();
     }
+
+    public int getPosition() {
+        return position;
+    }
+
+    public String getItemName() {
+        return itemName;
+    }
+
+    public String getItemPromoImage() {
+        return itemPromoImage;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public String getCataloguePageLocation() {
+        return cataloguePageLocation;
+    }
+
+    public int getProductOfferId() {
+        return productOfferId;
+    }
+
+    public String getProductCode() {
+        return productCode;
+    }
+
+    public int getExpirationTime() {
+        return expirationTime;
+    }
 }

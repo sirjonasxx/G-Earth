@@ -17,7 +17,7 @@ public class HOffer {
     private List<HProduct> products = new ArrayList<>();
     private int clubLevel;
     private boolean bundlePurchaseAllowed;
-    private boolean unused;
+    private boolean isPet;
     private String previewImage;
 
 
@@ -37,7 +37,7 @@ public class HOffer {
 
         this.clubLevel = packet.readInteger();
         this.bundlePurchaseAllowed = packet.readBoolean();
-        this.unused = packet.readBoolean();
+        this.isPet = packet.readBoolean();
         this.previewImage = packet.readString();
     }
 
@@ -81,8 +81,8 @@ public class HOffer {
         return bundlePurchaseAllowed;
     }
 
-    public boolean isUnused() {
-        return unused;
+    public boolean isPet() {
+        return isPet;
     }
 
     public String getPreviewImage() {
