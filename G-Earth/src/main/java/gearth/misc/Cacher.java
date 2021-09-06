@@ -17,8 +17,9 @@ import java.util.List;
 public class Cacher {
 
     private static final String DEFAULT_CACHE_FILENAME = "cache.json";
+    private static String cacheDir;
 
-    public static String getCacheDir() {
+    static {
         File GEarthDir = null;
         try {
             GEarthDir = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParentFile();
@@ -26,13 +27,19 @@ public class Cacher {
                 GEarthDir = GEarthDir.getParentFile();
             }
 
-        } catch (URISyntaxException e) {
-//            e.printStackTrace();
-        }
+        } catch (URISyntaxException e) { }
 
-        return GEarthDir
+        cacheDir = GEarthDir
                 + File.separator
                 + "Cache";
+    }
+
+    public static void setCacheDir(String s) {
+        cacheDir = s;
+    }
+
+    public static String getCacheDir() {
+        return cacheDir;
     }
 
 

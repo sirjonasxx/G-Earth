@@ -142,10 +142,14 @@ public class StoreExtensionTools {
 
                     } catch (MalformedURLException e) {
                         listener.fail("Invalid extension URL");
-                        removeExtension(path); // cleanup
+                        try {
+                            removeExtension(path); // cleanup
+                        } catch (IOException ignore) { }
                     } catch (IOException e) {
                         listener.fail("Extension not available in repository");
-                        removeExtension(path); // cleanup
+                        try {
+                            removeExtension(path); // cleanup
+                        } catch (IOException ignore) { }
                     }
                 }
                 else {
@@ -161,12 +165,8 @@ public class StoreExtensionTools {
 
     }
 
-    public static void removeExtension(String extensionPath) {
-        try {
-            FileUtils.deleteDirectory(new File(extensionPath));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public static void removeExtension(String extensionPath) throws IOException {
+        FileUtils.deleteDirectory(new File(extensionPath));
     }
 
     public static List<InstalledExtension> getInstalledExtension() {
