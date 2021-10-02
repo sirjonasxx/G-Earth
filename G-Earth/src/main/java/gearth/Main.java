@@ -15,7 +15,7 @@ import javafx.stage.Stage;
 public class Main extends Application {
 
     public static Application main;
-    public static String version = "1.5";
+    public static String version = "1.5.1";
     public static String gitApi = "https://api.github.com/repos/sirjonasxx/G-Earth/releases/latest";
     public static String theme = "G-Earth";
 
