@@ -144,7 +144,8 @@ public class ExtensionItemContainer extends GridPane {
         parent.getChildren().add(this);
 
         if (item.extensionType() == ExtensionType.INTERNAL) {
-            setBackground(new Background(new BackgroundFill(Paint.valueOf("F0FFFF"), CornerRadii.EMPTY, Insets.EMPTY)));
+            getStyleClass().clear();
+            getStyleClass().add("internalExtension");
         }
 
 
@@ -176,7 +177,8 @@ public class ExtensionItemContainer extends GridPane {
         ExtensionItemContainer this2 = this;
         item.getDeletedObservable().addListener(() -> Platform.runLater(() -> {
             if (item.isInstalledExtension()) {
-                setBackground(new Background(new BackgroundFill(Paint.valueOf("#cccccc"),null, null)));
+                getStyleClass().clear();
+                getStyleClass().add("disconnectedExtension");
                 getChildren().remove(buttonsBox);
                 add(additionalButtonBox, 4, 0);
                 reloadButton.setVisible(true);
@@ -191,7 +193,8 @@ public class ExtensionItemContainer extends GridPane {
         item = extension;
         initExtension();
 
-        setBackground(new Background(new BackgroundFill(Paint.valueOf("#ffffff"),null, null)));
+        getStyleClass().clear();
+        getStyleClass().add("connectedExtension");
         getChildren().remove(additionalButtonBox);
         if (buttonsBox != null) {
             add(buttonsBox, 4, 0);

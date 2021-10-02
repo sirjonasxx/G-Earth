@@ -8,7 +8,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Random;
 
@@ -133,7 +132,7 @@ public class GUnityFileServer extends HttpServlet
 
     private void getLogo(HttpServletResponse response) throws IOException {
         OutputStream out = response.getOutputStream();
-        InputStream in = Main.class.getResourceAsStream("G-EarthLogo.png");
+        InputStream in = Main.class.getResourceAsStream(String.format("/gearth/themes/%s/logo.png", Main.theme));
 
         byte[] bytes = new byte[4096];
         int bytesRead;

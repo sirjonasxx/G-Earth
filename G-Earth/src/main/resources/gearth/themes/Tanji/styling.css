@@ -197,28 +197,28 @@ VBox > .split-menu-button.last > .arrow-button {
 
 .button.primary,.split-menu-button.primary,.toggle-button.primary,.menu-button.primary,
 .split-menu-button.primary > .label, .split-menu-button.primary > .arrow-button {
-    -fx-background-color: #337ab7;
+    -fx-background-color: #b77714;
 }
 
 .button.primary,.menu-button.primary,.toggle-button.primary,
 .split-menu-button.primary > .label,.split-menu-button.primary > .arrow-button {
-    -fx-border-color: #2e6da4;
+    -fx-border-color: #a46a37;
     -fx-text-fill: white;
 }
 /*hover state*/
 .button.primary:hover,.menu-button.primary:hover,.toggle-button.primary:hover,
 .split-menu-button.primary > .label:hover, .split-menu-button.primary > .arrow-button:hover {
-    -fx-border-color: #204d74;
-    -fx-background-color: #286090;
+    -fx-border-color: #744d15;
+    -fx-background-color: #905710;
 }
 /*pressed selected*/
 .button.primary:pressed, .button.primary:selected,
 .menu-button.primary:pressed,.menu-button.primary:selected
 ,.toggle-button.primary:pressed,.toggle-button.primary:selected,
 .split-menu-button.primary:pressed > .label, .split-menu-button.primary > .arrow-button:pressed {
-    -fx-background-color: #286090;
-    -fx-border-color: #204d74;
-    -fx-effect: innershadow(gaussian, #204d74, 10, 0, 0, 3);
+    -fx-background-color: #905710;
+    -fx-border-color: #744d15;
+    -fx-effect: innershadow(gaussian, #744d15, 10, 0, 0, 3);
 }
 
 /*success*/
@@ -253,19 +253,19 @@ VBox > .split-menu-button.last > .arrow-button {
 
 .button.info,.split-menu-button.info,.toggle-button.info,.menu-button.info,
 .split-menu-button.info > .label, .split-menu-button.info > .arrow-button {
-    -fx-background-color: #5bc0de;
+    -fx-background-color: #e2ab40;
 }
 
 .button.info,.menu-button.info,.toggle-button.info,
 .split-menu-button.info > .label,.split-menu-button.info > .arrow-button {
-    -fx-border-color: #46b8da;
+    -fx-border-color: #e29b23;
     -fx-text-fill: white;
 }
 /*hover state*/
 .button.info:hover,.menu-button.info:hover,.toggle-button.info:hover,
 .split-menu-button.info > .label:hover, .split-menu-button.info > .arrow-button:hover {
-    -fx-border-color: #269abc;
-    -fx-background-color: #31b0d5;
+    -fx-border-color: #bc862a;
+    -fx-background-color: #d59735;
 }
 /*pressed selected*/
 .button.info:pressed, .button.info:selected,
@@ -411,8 +411,8 @@ VBox > .split-menu-button.last > .arrow-button {
 }
 
 .text-field:focused, .text-area:focused {
-    -fx-border-color: #66afe9;
-    -fx-effect: dropshadow(gaussian, #66afe9, 10, 0, 0, 0);
+    -fx-border-color: #e9b365;
+    -fx-effect: dropshadow(gaussian, #e9b365, 10, 0, 0, 0);
 }
 
 .text-area .scroll-pane, .text-area .scroll-pane .content {
@@ -437,7 +437,7 @@ VBox > .split-menu-button.last > .arrow-button {
 }
 
 .tab-pane .tab-header-area .tab .tab-label {
-    -fx-text-fill: #337ab7;
+    -fx-text-fill: #b77714;
 }
 
 .tab-pane .tab-header-area .tab:hover {
@@ -465,7 +465,7 @@ VBox > .split-menu-button.last > .arrow-button {
 }
 
 .tab-pane > .tab-header-area > .headers-region > .tab > .tab-container > .tab-close-button {
-    -fx-background-color: #337ab7;
+    -fx-background-color: #b77714;
 }
 .tab-pane > .tab-header-area > .headers-region > .tab:selected > .tab-container > .tab-close-button {
     -fx-background-color: #333333;
@@ -569,7 +569,7 @@ VBox > .split-menu-button.last > .arrow-button {
 }
 .menu-bar > .container > .menu-button:hover,
 .menu-bar > .container > .menu-button:showing {
-    -fx-background-color: #56c0e0;
+    -fx-background-color: #e2b14a;
 }
 
 .color-palette {
@@ -603,7 +603,7 @@ VBox > .split-menu-button.last > .arrow-button {
 
 .progress-bar > .bar {
     -fx-background-insets: 0;
-    -fx-background-color: #337ab7;
+    -fx-background-color: #b77714;
 }
 
 .progress-bar.success > .bar {
@@ -647,10 +647,10 @@ VBox > .split-menu-button.last > .arrow-button {
 }
 
 .tooltip.info {
-    -fx-background: #d8ecf6;
-    -fx-background-color: #d8ecf6;
-    -fx-text-fill: #31708f;
-    -fx-border-color: #bce8f1;
+    -fx-background: #f6e4c1;
+    -fx-background-color: #f6e4c1;
+    -fx-text-fill: #8f5c16;
+    -fx-border-color: #f7c195;
 }
 
 .tooltip.warning {
@@ -689,12 +689,12 @@ VBox > .split-menu-button.last > .arrow-button {
 }
 
 .titled-pane.primary > .title {
-    -fx-background-color: #337ab7;
-    -fx-border-color: #337ab7;
+    -fx-background-color: #b77714;
+    -fx-border-color: #b77714;
 }
 
 .titled-pane.primary > .content {
-    -fx-border-color: #337ab7;
+    -fx-border-color: #b77714;
 }
 
 .titled-pane.success .arrow,
@@ -718,16 +718,16 @@ VBox > .split-menu-button.last > .arrow-button {
 }
 
 .titled-pane.info {
-    -fx-text-fill: #31708f;
+    -fx-text-fill: #8f5c16;
 }
 
 .titled-pane.info > .title {
-    -fx-background-color: #d9edf7;
-    -fx-border-color: #bce8f1;
+    -fx-background-color: #f7d9c2;
+    -fx-border-color: #f7c195;
 }
 
 .titled-pane.info > .content {
-    -fx-border-color: #bce8f1;
+    -fx-border-color: #f7c195;
 }
 
 .titled-pane.warning {
@@ -822,7 +822,7 @@ VBox > .split-menu-button.last > .arrow-button {
     -fx-background-radius: 3;
     /*-fx-padding: 0.166667em 0.166667em 0.25em 0.25em; !* 2 2 3 3 *!*/
     -fx-padding:0;
-    -fx-border-color: #56c0e0;
+    -fx-border-color: #e2b14a;
     -fx-border-radius: 3;
     -fx-background-color: white;
 }
@@ -841,7 +841,7 @@ VBox > .split-menu-button.last > .arrow-button {
     -fx-padding: 0;
 }
 .check-box:selected > .box > .mark {
-    -fx-background-color: linear-gradient(to bottom, #56c0e0, #40b8dc);
+    -fx-background-color: linear-gradient(to bottom, #e2b14a, #e29a16);
 }
 
 /*******************************************************************************
@@ -857,7 +857,7 @@ VBox > .split-menu-button.last > .arrow-button {
 }
 .radio-button > .radio,
 .radio-button:focused > .radio  {
-    -fx-border-color: #56c0e0;
+    -fx-border-color: #e2b14a;
     -fx-border-radius: 1em;
     -fx-background-radius: 1.0em; /* large value to make sure this remains circular */
     -fx-padding: 1 2 3 2;
@@ -870,13 +870,13 @@ VBox > .split-menu-button.last > .arrow-button {
     -fx-background-insets: 3 2 1 2;
 }
 .radio-button:selected > .radio,.radio-button:hover > .radio {
-    -fx-fill-color: #56c0e0;
+    -fx-fill-color: #e2b14a;
 }
 .radio-button:pressed > .radio {
-    -fx-background-color: #50c0e2;
+    -fx-background-color: #e2ab40;
 }
 .radio-button:selected > .radio > .dot {
-    -fx-background-color: #56c0e0;
+    -fx-background-color: #e2b14a;
 }
 
 /*common things*/
@@ -889,5 +889,22 @@ VBox > .split-menu-button.last > .arrow-button {
 
 .check-box:pressed > .box,
 .radio-button:pressed > .radio {
-    -fx-background-color: #50c0e2;
+    -fx-background-color: #e2ab40;
+}
+
+
+.hyperlink {
+    -fx-text-fill: #c88600;
+}
+
+.internalExtension {
+    -fx-background-color: #fff0e3;
+}
+
+.disconnectedExtension {
+    -fx-background-color: #CCCCCC;
+}
+
+.connectedExtension {
+    -fx-background-color: #FFFFFF;
 }

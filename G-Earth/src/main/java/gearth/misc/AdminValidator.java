@@ -1,5 +1,10 @@
 package gearth.misc;
 
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.layout.Region;
+
 import java.io.PrintStream;
 import java.util.prefs.Preferences;
 
@@ -32,6 +37,20 @@ public class AdminValidator {
         }
 
         return isAdmin;
+    }
+
+    public static void validate() {
+        new Thread(() -> {
+            if (!AdminValidator.isAdmin()) {
+                Platform.runLater(() -> {
+                    Alert alert = new Alert(Alert.AlertType.WARNING, "G-Earth needs admin privileges in order to work on Flash, please restart G-Earth with admin permissions unless you're using Unity", ButtonType.OK);
+                    alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+                    alert.setResizable(false);
+                    alert.show();
+                });
+
+            }
+        }).start();
     }
 
 }

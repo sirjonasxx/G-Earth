@@ -6,7 +6,6 @@ import javafx.scene.control.*;
 import gearth.ui.SubForm;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Region;
 import javafx.scene.web.WebView;
 
@@ -34,9 +33,10 @@ public class InfoController extends SubForm {
     }
 
     public void initialize() {
+        version.setText(version.getText().replace("$theme", Main.theme));
         version.setText(version.getText().replace("$version", Main.version));
 
-        img_logo.setImage(new Image("/gearth/G-EarthLogo.png"));
+        img_logo.setImage(new Image(String.format("/gearth/themes/%s/logo.png", Main.theme)));
 
         link_ase.setTooltip(new Tooltip("https://allseeingeye.to"));
         link_darkbox.setTooltip(new Tooltip("https://darkbox.nl"));

@@ -15,7 +15,7 @@
    <AnchorPane prefHeight="200.0" prefWidth="200.0">
       <children>
          <ImageView fx:id="img_logo" fitHeight="228.0" fitWidth="217.0" layoutX="23.0" layoutY="23.0" pickOnBounds="true" preserveRatio="true" />
-         <Label fx:id="version" layoutX="260.0" layoutY="23.0" text="G-Earth $version" textFill="#000000b2">
+         <Label fx:id="version" layoutX="260.0" layoutY="23.0" text="\$theme $version" textFill="#000000b2">
             <font>
                <Font size="18.0" />
             </font>
