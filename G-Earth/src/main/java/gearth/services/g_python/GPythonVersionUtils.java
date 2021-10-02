@@ -10,7 +10,7 @@ import java.util.List;
 
 public class GPythonVersionUtils {
 
-    private static final String MIN_GPYTHON_VERSION = "0.1.5";
+    private static final String MIN_GPYTHON_VERSION = "0.1.6";
     private static final String MIN_PYTHON_VERSION = "3.2";
 
     // returns null if python not installed
