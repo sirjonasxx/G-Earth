@@ -102,6 +102,21 @@
                                 <copy todir="../Build/Windows_64bit/">
                                     <fileset dir="src/main/resources/build/windows/64bit" includes="**/*" />
                                 </copy>
+
+
+                                <copy todir="../Build/Mac/Cache">
+                                    <fileset dir="src/main/resources/build/cache" includes="**/*" />
+                                </copy>
+                                <copy todir="../Build/Linux/Cache">
+                                    <fileset dir="src/main/resources/build/cache" includes="**/*" />
+                                </copy>
+                                <copy todir="../Build/Windows_32bit/Cache">
+                                    <fileset dir="src/main/resources/build/cache" includes="**/*" />
+                                </copy>
+                                <copy todir="../Build/Windows_64bit/Cache">
+                                    <fileset dir="src/main/resources/build/cache" includes="**/*" />
+                                </copy>
+
                             </target>
                         </configuration>
                         <goals>
