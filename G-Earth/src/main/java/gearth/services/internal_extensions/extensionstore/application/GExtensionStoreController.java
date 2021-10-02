@@ -135,6 +135,8 @@ public class GExtensionStoreController implements Initializable {
         }
     }
 
+    private List<? extends ContentItem> currentContentItems; // store so java doesn't garbage collect it!
+
     public void setOverview(boolean scrollTop) {
         if (initialized) {
             Platform.runLater(() -> {
@@ -142,9 +144,10 @@ public class GExtensionStoreController implements Initializable {
 
                 Element content_items_container = webView.getEngine().getDocument().getElementById(contentItemsContainer);
                 WebUtils.clearElement(content_items_container);
-                for (int i = 0; i < overview.getAmount(); i++) {
-                    ContentItem contentItem = overview.getContentItems().get(i);
-                    contentItem.addHtml(i, extensionStore);
+
+                currentContentItems = overview.getContentItems();
+                for (int i = 0; i < currentContentItems.size(); i++) {
+                    currentContentItems.get(i).addHtml(i, extensionStore);
                 }
                 if (scrollTop) {
                     webView.getEngine().executeScript("document.getElementById('" + contentItemsContainer + "').scrollTop = 0");
