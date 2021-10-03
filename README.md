@@ -1,11 +1,18 @@
+<a href="https://discord.gg/AVkcF8y">
+    <img src="https://img.shields.io/discord/744927320871010404?color=%237289da&label=Join%20us!&logo=discord&logoColor=white" alt="Discord bagde" title="Join us on Discord!" align="right" />
+</a>
+
 # G-Earth
+
+<a href="https://discord.gg/AVkcF8y">
+    <img src="https://github.com/sirjonasxx/G-Earth/blob/master/G-Earth/src/main/resources/gearth/themes/G-Earth/logo.png?raw=true" alt="G-Earth logo" title="G-Earth" align="right" height="100" />
+</a>
+
 Feature-rich habbo packet logger & manipulator for Windows, Linux and Mac.
 
 - Requires Java 8
 
 [CLICK HERE FOR TROUBLESHOOTING](https://github.com/sirjonasxx/G-Earth/wiki/Troubleshooting)
-
-Join the G-Earth [Discord server](https://discord.gg/AVkcF8y)
 
 ## Getting Started
 
@@ -106,3 +113,15 @@ TODO
 ## Others
 
 For the memorysearcher that extracts the RC4 table, go to [G-Mem](https://github.com/sirjonasxx/G-Mem).
+
+# How to Contribute
+
+TODO (fork)
+
+1. Clone repo and create a new branch: $ git checkout https://github.com/alichtman/stronghold -b name_for_new_branch.
+1. Make changes and test
+1. Submit Pull Request with comprehensive description of changes
+
+# Donations
+
+This is free, open-source software. If you'd like to support the development of future projects, or say thanks for this one, you can donate BTC at `1GEarthEV9Ua3RcixsKTcuc1PPZd9hqri3`.
