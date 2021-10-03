@@ -172,13 +172,22 @@ public class ExtraController extends SubForm implements SocksConfiguration {
                     cbx_gpython.setSelected(false);
                     cbx_gpython.setDisable(true);
                 });
-                if (!GPythonVersionUtils.validInstallation()) {
+                try {
+                    GPythonVersionUtils.validInstallation();
+                    Platform.runLater(() -> {
+                        cbx_gpython.setSelected(true);
+                        cbx_gpython.setDisable(false);
+                        parentController.extensionsController.updateGPythonStatus();
+                    });
+                } catch (Exception e) {
                     Platform.runLater(() -> {
                         Alert alert = new Alert(Alert.AlertType.ERROR, "G-Python installation", ButtonType.OK);
                         alert.setTitle("G-Python installation");
 
                         FlowPane fp = new FlowPane();
-                        Label lbl = new Label("Before using G-Python, install the right packages using pip!" +
+                        Label lbl = new Label("Something isn't right in the G-Python instalation:" +
+                                System.lineSeparator() + System.lineSeparator() + "Error: "+ e.message +
+                                System.lineSeparator() + System.lineSeparator() + "Before using G-Python, install the right packages using pip!" +
                                 System.lineSeparator() + System.lineSeparator() + "More information here:");
                         Hyperlink link = new Hyperlink(INFO_URL_GPYTHON);
                         fp.getChildren().addAll( lbl, link);
@@ -192,13 +201,6 @@ public class ExtraController extends SubForm implements SocksConfiguration {
                         alert.show();
 
                         cbx_gpython.setDisable(false);
-                    });
-                }
-                else {
-                    Platform.runLater(() -> {
-                        cbx_gpython.setSelected(true);
-                        cbx_gpython.setDisable(false);
-                        parentController.extensionsController.updateGPythonStatus();
                     });
                 }
             }).start();
