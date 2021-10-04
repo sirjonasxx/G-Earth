@@ -12,10 +12,10 @@
         <img src="https://img.shields.io/github/release-date/sirjonasxx/G-Earth?logo=github&label=Last%20release&style=flat-square" title="Release date bagde" />
     </a>
     <a href="https://github.com/sirjonasxx/G-Earth/releases">
-        <img src="https://img.shields.io/github/downloads/sirjonasxx/G-Earth/total?label=Total %20downloads&logo=github&style=flat-square" title="Total downloads badge" />
+        <img src="https://img.shields.io/github/downloads/sirjonasxx/G-Earth/total?label=Total%20downloads&logo=github&style=flat-square" title="Total downloads badge" />
     </a>
     <a href="https://github.com/sirjonasxx/G-Earth/graphs/contributors">
-        <img src="https://img.shields.io/github/contributors/sirjonasxx/G-Earth?logo=github&style=flat-square&label=Contributors" title="Last commit bagde" />
+        <img src="https://img.shields.io/github/contributors/sirjonasxx/G-Earth?logo=github&style=flat-square&label=Contributors" title="Contributors counter bagde" />
     </a>
     <a href="https://github.com/sirjonasxx/G-Earth/issues">
         <img src="https://img.shields.io/github/issues/sirjonasxx/G-Earth?logo=github&style=flat-square&label=Issues" title="Issues counter badge" />
@@ -32,11 +32,11 @@
         <img src="https://img.shields.io/badge/es-flag.svg?color=red&labelColor=grey&style=flat-square&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3NTAgNTAwIj4NCjxwYXRoIGZpbGw9IiNjNjBiMWUiIGQ9Im0wLDBoNzUwdjUwMGgtNzUweiIvPg0KPHBhdGggZmlsbD0iI2ZmYzQwMCIgZD0ibTAsMTI1aDc1MHYyNTBoLTc1MHoiLz4NCjwvc3ZnPg0K">
     </a>
     <a href="https://github.com/gofiber/fiber/blob/master/.github/README.pt-BR.md" title="(unavailable) README in Portuguese (Brazil)">
-        <img src="https://img.shields.io/badge/pt--BR-flag.svg?color=red&labelColor=grey&style=flat-square&logo=data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4NCjxzdmcgdmVyc2lvbj0iMS4wIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iNzIwIiBoZWlnaHQ9IjUwNCIgdmlld0JveD0iLTIxMDAgLTE0NzAgNDIwMCAyOTQwIj4NCgk8cmVjdCB4PSItNTAlIiB5PSItNTAlIiB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjMDA5YjNhIi8+DQoJPHBhdGggZD0iTSAtMTc0MywwIDAsMTExMyAxNzQzLDAgMCwtMTExMyB6IiBmaWxsPSIjZmVkZjAwIi8+DQoJPGNpcmNsZSByPSI3MzUiIGZpbGw9IiMwMDI3NzYiLz4NCgk8Y2xpcFBhdGggaWQ9ImJhbmQiPg0KCQk8Y2lyY2xlIHI9IjczNSIvPg0KCTwvY2xpcFBhdGg+DQoJPHBhdGggZD0iTSAtMjIwNSwxNDcwIGEgMTc4NSAxNzg1IDAgMCAxIDM1NzAsMCBoIC0xMDUgYSAxNjgwIDE2ODAgMCAxIDAgLTMzNjAsMCB6IiBjbGlwLXBhdGg9InVybCgjYmFuZCkiIGZpbGw9IiNmZmYiLz4NCjwvc3ZnPg==">
+        <img src="https://img.shields.io/badge/pt--BR-flag.svg?color=orange&labelColor=grey&style=flat-square&logo=data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4NCjxzdmcgdmVyc2lvbj0iMS4wIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iNzIwIiBoZWlnaHQ9IjUwNCIgdmlld0JveD0iLTIxMDAgLTE0NzAgNDIwMCAyOTQwIj4NCgk8cmVjdCB4PSItNTAlIiB5PSItNTAlIiB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjMDA5YjNhIi8+DQoJPHBhdGggZD0iTSAtMTc0MywwIDAsMTExMyAxNzQzLDAgMCwtMTExMyB6IiBmaWxsPSIjZmVkZjAwIi8+DQoJPGNpcmNsZSByPSI3MzUiIGZpbGw9IiMwMDI3NzYiLz4NCgk8Y2xpcFBhdGggaWQ9ImJhbmQiPg0KCQk8Y2lyY2xlIHI9IjczNSIvPg0KCTwvY2xpcFBhdGg+DQoJPHBhdGggZD0iTSAtMjIwNSwxNDcwIGEgMTc4NSAxNzg1IDAgMCAxIDM1NzAsMCBoIC0xMDUgYSAxNjgwIDE2ODAgMCAxIDAgLTMzNjAsMCB6IiBjbGlwLXBhdGg9InVybCgjYmFuZCkiIGZpbGw9IiNmZmYiLz4NCjwvc3ZnPg==">
     </a>
 </p>
 
-<p align="center" id="logo">
+<p align="center">
     <a href="#📖-about">About</a> •
     <a href="#⚡️-getting-started">Getting Started</a> •
     <a href="#⚙️-features">Features</a> •
@@ -70,7 +70,7 @@ You can download the JRE and the JDK that comes with JavaFX from [Oracle downloa
 
 1. Go to the latest release page [here](https://github.com/sirjonasxx/G-Earth/releases/latest);
 1. Look for your OS specifc version in the assets section and download it;
-1. Extract it to a new folder;
+1. Extract it to a new folder.
 
 > 🔔 If you are playing in the browser-based Unity client, you must install the [G-Chrome extension](https://chrome.google.com/webstore/detail/g-chrome/cdjgbghobmfmfcenhoahgfnfpcadddag) to make it work with G-Earth.
 
@@ -108,9 +108,9 @@ The *Connection* tab is where you connect the G-Earth with the Habbo client. If 
 
 You can read more about it in the Wiki (TODO).
 
+### 💉 Injection
 
 [(Back to top)](#logo)
-### 💉 Injection
 
 TODO (screenshot)
 
