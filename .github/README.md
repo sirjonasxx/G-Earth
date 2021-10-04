@@ -31,8 +31,8 @@
     <a href="https://github.com/sirjonasxx/G-Earth/blob/master/.github/README.es.md" title="(unavailable) README in Spanish (Spain)">
         <img src="https://img.shields.io/badge/es-flag.svg?color=red&labelColor=grey&style=flat-square&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3NTAgNTAwIj4NCjxwYXRoIGZpbGw9IiNjNjBiMWUiIGQ9Im0wLDBoNzUwdjUwMGgtNzUweiIvPg0KPHBhdGggZmlsbD0iI2ZmYzQwMCIgZD0ibTAsMTI1aDc1MHYyNTBoLTc1MHoiLz4NCjwvc3ZnPg0K">
     </a>
-    <a href="https://github.com/sirjonasxx/G-Earth/blob/master/.github/README.pt-BR.md" title="(unavailable) README in Portuguese (Brazil)">
-        <img src="https://img.shields.io/badge/pt--BR-flag.svg?color=orange&labelColor=grey&style=flat-square&logo=data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4NCjxzdmcgdmVyc2lvbj0iMS4wIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iNzIwIiBoZWlnaHQ9IjUwNCIgdmlld0JveD0iLTIxMDAgLTE0NzAgNDIwMCAyOTQwIj4NCgk8cmVjdCB4PSItNTAlIiB5PSItNTAlIiB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjMDA5YjNhIi8+DQoJPHBhdGggZD0iTSAtMTc0MywwIDAsMTExMyAxNzQzLDAgMCwtMTExMyB6IiBmaWxsPSIjZmVkZjAwIi8+DQoJPGNpcmNsZSByPSI3MzUiIGZpbGw9IiMwMDI3NzYiLz4NCgk8Y2xpcFBhdGggaWQ9ImJhbmQiPg0KCQk8Y2lyY2xlIHI9IjczNSIvPg0KCTwvY2xpcFBhdGg+DQoJPHBhdGggZD0iTSAtMjIwNSwxNDcwIGEgMTc4NSAxNzg1IDAgMCAxIDM1NzAsMCBoIC0xMDUgYSAxNjgwIDE2ODAgMCAxIDAgLTMzNjAsMCB6IiBjbGlwLXBhdGg9InVybCgjYmFuZCkiIGZpbGw9IiNmZmYiLz4NCjwvc3ZnPg==">
+    <a href="https://github.com/sirjonasxx/G-Earth/blob/master/.github/README.pt-BR.md" title="(available) README in Portuguese (Brazil)">
+        <img src="https://img.shields.io/badge/pt--BR-flag.svg?color=blue&labelColor=grey&style=flat-square&logo=data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4NCjxzdmcgdmVyc2lvbj0iMS4wIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iNzIwIiBoZWlnaHQ9IjUwNCIgdmlld0JveD0iLTIxMDAgLTE0NzAgNDIwMCAyOTQwIj4NCgk8cmVjdCB4PSItNTAlIiB5PSItNTAlIiB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjMDA5YjNhIi8+DQoJPHBhdGggZD0iTSAtMTc0MywwIDAsMTExMyAxNzQzLDAgMCwtMTExMyB6IiBmaWxsPSIjZmVkZjAwIi8+DQoJPGNpcmNsZSByPSI3MzUiIGZpbGw9IiMwMDI3NzYiLz4NCgk8Y2xpcFBhdGggaWQ9ImJhbmQiPg0KCQk8Y2lyY2xlIHI9IjczNSIvPg0KCTwvY2xpcFBhdGg+DQoJPHBhdGggZD0iTSAtMjIwNSwxNDcwIGEgMTc4NSAxNzg1IDAgMCAxIDM1NzAsMCBoIC0xMDUgYSAxNjgwIDE2ODAgMCAxIDAgLTMzNjAsMCB6IiBjbGlwLXBhdGg9InVybCgjYmFuZCkiIGZpbGw9IiNmZmYiLz4NCjwvc3ZnPg==">
     </a>
 </p>
 
@@ -124,7 +124,7 @@ You can read more about it in the Wiki (TODO).
 
 TODO (screenshot)
 
-In the *Tools* tab you will se two sections, *Encoding/Decoding* and *Packet <-> expression*. These converters are usefull if you are manipulating the packets by hand. They don't have effect on the current packets that are beeing send or receiving.
+In the *Tools* tab you will see two sections, *Encoding/Decoding* and *Packet <-> expression*. These converters are usefull if you are manipulating the packets by hand. They don't have effect on the current packets that are beeing send or receiving.
 
 This is an advanced subject, so to understand more about this things, read in the Wiki (TODO).
 
@@ -146,7 +146,7 @@ TODO (screenshot)
 
 The most powerfull tab, the *Extension* tab allows you to connect multiple custom extensions that anyone can create and share. These extensions have full access to the packets, so it can do things from replace everybody's avatar (see [MackleEverywhere](https://github.com/sirjonasxx/G-Earth-template-extensions/tree/master/MackleEverywhere)) to a full room+wired save and replace (see [Wired Presets](https://github.com/sirjonasxx/Wired-Presets)).
 
-The most commom extensions uses the native frameworkd, as it doesn't required further installations from who will use it. These extensions are a single `.jar` file, so you just need to click in the *Install* button and select that file.
+The most commom extensions uses the native framework, as it doesn't required further installations from who will use it. These extensions are a single `.jar` file, so you just need to click in the *Install* button and select that file.
 
 Since v1.5, you can install awesome extension from the [G-ExtensionStore](https://github.com/sirjonasxx/G-ExtensionStore#readme). It has the most updated extensions from a one click away. We try to keep it malicious-free, not be aimed at disturbing the game and all of them are open-source.
 
@@ -181,11 +181,11 @@ In the *Extra* tab you have some utilities and settings. Some things you can do:
 - *Notepad*: save anything usefull you want;
 - *Always on top*: fixes the G-Earth window on top of the others;
 - *Client-side staff permissions*: the client thinks that you are an staff and shows you more buttons, like mute people, move anything anywhere, etc (it's only client-side so most of it doesn't work when you try to use);
-- *G-Python scripting*: enables the *G-Python shell* button in the *Extensions* tab (read more in [G Python qtConsole](https://github.com/sirjonasxx/G-Earth/wiki/G-Python-qtConsole))
+- *G-Python scripting*: enables the *G-Python shell* button in the *Extensions* tab (read more in [G Python qtConsole](https://github.com/sirjonasxx/G-Earth/wiki/G-Python-qtConsole));
 - *Advanced*:
   - *Use SOCKS proxy*;
-  - *Disable decryption*
-  - *Debug to stdout*
+  - *Disable decryption*;
+  - *Debug to stdout*.
 
 ## 📒 Wiki
 
@@ -205,15 +205,15 @@ G-Earth uses [G-Mem](https://github.com/sirjonasxx/G-Mem) as memorysearcher that
 
 [(Back to top)](#logo)
 
-Please take a look at our [contributing](https://github.com/sirjonasxx/G-Earth/blob/master/.github/CONTRIBUTING.md) (TODO) guidelines if you're interested in helping!
+Please take a look at our [contributing guidelines](https://github.com/sirjonasxx/G-Earth/blob/master/.github/CONTRIBUTING.md) (TODO) if you're interested in helping!
 
 ## To Do List
 
 - Wiki update;
 - [About](#📖-about) section;
 - Screenshots in the [Features](#⚙️-features) section;
-- Contributors list in the [Creadits](#👨‍💻-credits) section;
-- [Contributing](https://github.com/sirjonasxx/G-Earth/blob/master/.github/CONTRIBUTING.md) guidelines;
+- Contributors list in the [Credits](#👨‍💻-credits) section;
+- [Contributing guidelines](https://github.com/sirjonasxx/G-Earth/blob/master/.github/CONTRIBUTING.md);
 - Translations of this README.
 
 # 👨‍💻 Credits
@@ -238,4 +238,4 @@ This is free, open-source software. If you'd like to support the development of 
 
 [(Back to top)](#logo)
 
-The MIT License (MIT) 2018 - [sirjonasxx](https://github.com/sirjonasxx). Please have a look at the [LICENSE](https://github.com/sirjonasxx/G-Earth/blob/master/LICENSE) for more details.
+The MIT License 2018 - [sirjonasxx](https://github.com/sirjonasxx). Please have a look at the [LICENSE](https://github.com/sirjonasxx/G-Earth/blob/master/LICENSE) for more details.

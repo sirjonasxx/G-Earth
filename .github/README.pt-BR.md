@@ -52,7 +52,7 @@
 
 [(Voltar ao topo)](#logo)
 
-TODO
+PENTENDE
 
 ## ⚡️ Começando
 
@@ -102,61 +102,61 @@ Você pode rodar o arquivo `G-Earth.jar` com `java -jar G-Earth.jar` em um termi
 
 [(Voltar ao topo)](#logo)
 
-TODO (screenshot)
+PENTENDE (captura de tela)
 
 A aba *Conexão* é onde você conecta o G-Earth com o cliente Habbo. Se você sempre utiliza o cliente Flash/Air, só clique no botão *Conectar*, ele irá mudar para *Abortar* e o *Estado de conexão* vai mudar para *Esperando conexão*. Depois disso você entra no hotel e é isso!
 
-Você pode ler mais sobre isso na Wiki (TODO).
+Você pode ler mais sobre isso na Wiki (PENTENDE).
 
 ### 💉 Injeção
 
 [(Voltar ao topo)](#logo)
 
-TODO (screenshot)
+PENTENDE (captura de tela)
 
-Na aba *Injeção* você tem acesso fácil para enviar pacote manualmente, para o servidor ou para o cliente. Se você enviar para o servidor é a igual se estivesse fazendo alguma ação no jogo (como andando para algum lugar), então todos podem ver o que você está fazendo. No outro sentido, se você enviar para o cliente, só irá afetar o seu jogo (como removendo/colocando algum item no quarto).
+Na aba *Injeção* você tem acesso fácil para enviar pacote manualmente, para o servidor ou para o cliente. Se você enviar para o servidor é a igual se estivesse fazendo alguma ação no jogo (como andando para algum lugar), então PENTENDEs podem ver o que você está fazendo. No outro sentido, se você enviar para o cliente, só irá afetar o seu jogo (como removendo/colocando algum item no quarto).
 
-Você pode ler mais sobre isso na Wiki (TODO).
+Você pode ler mais sobre isso na Wiki (PENTENDE).
 
 ### 🛠️ Tools
 
 [(Voltar ao topo)](#logo)
 
-TODO (screenshot)
+PENTENDE (captura de tela)
 
-In the *Tools* tab you will se two sections, *Encoding/Decoding* and *Packet <-> expression*. These converters are usefull if you are manipulating the packets by hand. They don't have effect on the current packets that are beeing send or receiving.
+Na aba *Tools* você irá ver duas seções, *Codifidando/Decodificando* e *Pacote <-> expressão*. Esses conversores são úteis se você estiver manipulando pacotes na mão. Eles não possuem efeito nos pacotes atuais que estão sendo enviados e recebidos.
 
-This is an advanced subject, so to understand more about this things, read in the Wiki (TODO).
+Este é um assunto avançado, então para entender melhor sobre essas coisas, leia na Wiki (PENTENDE).
 
-### ⏲️ Scheduler
-
-[(Voltar ao topo)](#logo)
-
-TODO (screenshot)
-
-In the *Scheduler* you can send any packets repeatedly, with specific interval+offset for each packet. After you have done, you can save the list to an file and load that configuration aftwards.
-
-Read more about it in the Wiki (TODO).
-
-### 🧩 Extensions
+### ⏲️ Agendador
 
 [(Voltar ao topo)](#logo)
 
-TODO (screenshot)
+PENTENDE (captura de tela)
 
-The most powerfull tab, the *Extension* tab allows you to connect multiple custom extensions that anyone can create and share. These extensions have full access to the packets, so it can do things from replace everybody's avatar (see [MackleEverywhere](https://github.com/sirjonasxx/G-Earth-template-extensions/tree/master/MackleEverywhere)) to a full room+wired save and replace (see [Wired Presets](https://github.com/sirjonasxx/Wired-Presets)).
+No *Agendador* você pode enviar qualquer pacote repetidamente, com um intervalo+atraso específico para cada pacote. Depois que estiver pronto, você pode saltar a lista para um arquivo e carregar essa configuração futuramente.
 
-The most commom extensions uses the native frameworkd, as it doesn't required further installations from who will use it. These extensions are a single `.jar` file, so you just need to click in the *Install* button and select that file.
+Leia mais sobre isso na Wiki (PENTENDE).
 
-Since v1.5, you can install awesome extension from the [G-ExtensionStore](https://github.com/sirjonasxx/G-ExtensionStore#readme). It has the most updated extensions from a one click away. We try to keep it malicious-free, not be aimed at disturbing the game and all of them are open-source.
+### 🧩 Extensões
 
-You can read more details about extensions in the Wiki (TODO).
+[(Voltar ao topo)](#logo)
+
+PENTENDE (captura de tela)
+
+A aba mais poderosa, a aba *Extensões* permite você connectar múltiplas extensões customizadas que qualquer um pode criar e compartilhar. Estas extensões possuem acesso total aos pacotes, portanto ela pode fazer coisas desde substituir o avatar de PENTENDE mundo (veja [MackleEverywhere](https://github.com/sirjonasxx/G-Earth-template-extensions/tree/master/MackleEverywhere)) até um completo salvar e recolocar quarto+wired (veja [Wired Presets](https://github.com/sirjonasxx/Wired-Presets)).
+
+As extensões mais comuns utilizam o framework nativo, pois ele não requer outras instalações de quem vai usá-la. Estas extensões são um único arquivo `.jar`, então você só precisa clicar no botão *Instalar* e selecionar aquele arquivo.
+
+Desde v1.5, você consegue instalar incríveis extensões a partir da [G-ExtensionStore](https://github.com/sirjonasxx/G-ExtensionStore#readme). Ela possui as extensões mais atualizadas a um clique de distância. Nós tentamos manter ela livre de más intenções, não ser destinado a perturbar o jogo e todas selas são código-aberto.
+
+Você pode ler mais detalhes sobre extensões na Wiki (PENTENDE).
 
 #### Frameworks
 
-Aside from the native framework, there some are others that let you create your own extension and communicate with G-Earth:
+Além do framework nativo, existem alguns outros que permitem você criar sua própria extensão e comunicar com o G-Earth:
 
-Name | Language | Developers | Github
+Nome | Linguagem | Desenvolvedores | Github
 --- | --- | --- | --- |
 G-Earth (Native) | Java | sirjonasxx | https://github.com/sirjonasxx/G-Earth
 G-Python<sup>1</sup> | Python | sirjonasxx | https://github.com/sirjonasxx/G-Python
@@ -165,77 +165,77 @@ Xabbo | C# | b7 | https://github.com/b7c/Xabbo.Scripter
 G-Node | Node.js | WiredSpast | https://github.com/WiredSpast/G-Node
 GProgrammer<sup>2</sup> | Javascript | at15four2020 | https://github.com/at15four2020/GProgrammer/wiki
 
-<sub>1: built-in in G-Earth through the [live scripting console](https://github.com/sirjonasxx/G-Earth/wiki/G-Python-qtConsole) </sub>  
-<sub>2: not an implementation of the extension API, but allows for Javascript scripting, also check [G-Wiredfy](https://github.com/at15four2020/G-Wiredfy) </sub>
+<sub>1: integrado no G-Earth através do [console de programação ao vivo](https://github.com/sirjonasxx/G-Earth/wiki/G-Python-qtConsole) </sub>  
+<sub>2: não uma implementação da API de extensões, mas permite programação em JavaScript, veja também [G-Wiredfy](https://github.com/at15four2020/G-Wiredfy) </sub>
 
-> 🔔 **Please note**: if you received some extension from those frameworks, please follow the installation guide specific to that framework. You have to setup your environment only once.
+> 🔔 **Por favor note**: se você recebeu alguma extensão desses frameworks, por favor siga o guia de instalação específico para aquele framework. Você precisa configurar seu ambiente apenas uma vez.
 
-You can read more advanced info about the frameworks in the Wiki (TODO).
+Você pode ler mais informações avançadas sobre os frameworks na Wiki (PENTENDE).
 
 ### ➕ Extra
 
 [(Voltar ao topo)](#logo)
 
-In the *Extra* tab you have some utilities and settings. Some things you can do:
+Na aba *Extra* você tem algumas utilidades e configurações. Algumas coisas que você pode fazer:
 
-- *Notepad*: save anything usefull you want;
-- *Always on top*: fixes the G-Earth window on top of the others;
-- *Client-side staff permissions*: the client thinks that you are an staff and shows you more buttons, like mute people, move anything anywhere, etc (it's only client-side so most of it doesn't work when you try to use);
-- *G-Python scripting*: enables the *G-Python shell* button in the *Extensions* tab (read more in [G Python qtConsole](https://github.com/sirjonasxx/G-Earth/wiki/G-Python-qtConsole))
-- *Advanced*:
-  - *Use SOCKS proxy*;
-  - *Disable decryption*
-  - *Debug to stdout*
+- *Bloco de anotações*: salve qualquer coisa útil que você quiser;
+- *Sempre no topo*: fixa a janela do G-Earth em cima das outras;
+- *Permissões staff no lado do cliente*: o clienque irá pensar que você é um staff e exibe pra você mais botões, tipo mutar pessoas, mover qualquer coisa em qualquer lugar, etc (é só no lado do cliente então a maior parte não funciona quando você tenta usar).
+- *Programação com G-Python*: habilita o botão *Shell G-Python* na aba *Extensões* (leia mais em [G Python qtConsole](https://github.com/sirjonasxx/G-Earth/wiki/G-Python-qtConsole));
+- *Avançado*:
+  - *Usar proxy SOCKS*;
+  - *Desabilitar decodificação*;
+  - *Depurar para stdout*.
 
 ## 📒 Wiki
 
 [(Voltar ao topo)](#logo)
 
-TODO
+PENTENDE
 
-## Others
+## Outros
 
 [(Voltar ao topo)](#logo)
 
 ### G-Mem
 
-G-Earth uses [G-Mem](https://github.com/sirjonasxx/G-Mem) as memorysearcher that extracts the RC4 table.
+G-Earth usa [G-Mem](https://github.com/sirjonasxx/G-Mem) como buscador de memória que extrai a tabela RC4.
 
 # ✍️ Contribuindo
 
 [(Voltar ao topo)](#logo)
 
-Please take a look at our [contributing](https://github.com/sirjonasxx/G-Earth/blob/master/.github/CONTRIBUTING.md) (TODO) guidelines if you're interested in helping!
+Por favor veja as nossas [diretrizes de contribuições](https://github.com/sirjonasxx/G-Earth/blob/master/.github/CONTRIBUTING.md) (PENTENDE) se você está interessado em ajudar!
 
-## To Do List
+## Lista de Afazeres
 
-- Wiki update;
-- [Sobre](#📖-about) section;
-- Screenshots in the [Funcionalidades](#⚙️-features) section;
-- Contribuidores list in the [Creadits](#👨‍💻-credits) section;
-- [Contribuindo](https://github.com/sirjonasxx/G-Earth/blob/master/.github/CONTRIBUTING.md) guidelines;
-- Translations of this README.
+- Atualizar a Wiki;
+- Seção [Sobre](#📖-sobre);
+- Capturas de tela na seção [Funcionalidades](#⚙️-funcionalidades);
+- Lista de contribuidores na seção [Créditos](#👨‍💻-créditos);
+- [Diretrizes de contribuições](https://github.com/sirjonasxx/G-Earth/blob/master/.github/CONTRIBUTING.md);
+- Traduções desse README.
 
 # 👨‍💻 Créditos
 
 [(Voltar ao topo)](#logo)
 
-TODO (https://allcontributors.org/)
+PENTENDE (https://allcontributors.org/)
 
 # 🐛 Soluções de Problemas
 
 [(Voltar ao topo)](#logo)
 
-If you are getting stuck and having problems, please take a momment and read [these topics](https://github.com/sirjonasxx/G-Earth/wiki/Soluções de Problemas) of the Wiki, your problem might be listed there.
+Se você está ficando preso e tendo problemas, por favor tire um momento e leia [estes tópicos](https://github.com/sirjonasxx/G-Earth/wiki/Troubleshooting) da Wiki, seu problema pode estar listado lá.
 
 # 🌟 Doações
 
 [(Voltar ao topo)](#logo)
 
-This is free, open-source software. If you'd like to support the development of future projects, or say thanks for this one, you can donate BTC at `1GEarthEV9Ua3RcixsKTcuc1PPZd9hqri3`.
+Este é um programa gratuíto, de código aberto. Caso você querer apoiar o desenvolvimento de projetos futuros, ou dizer obrigado para este aqui, você pode doar BTC para `1GEarthEV9Ua3RcixsKTcuc1PPZd9hqri3`.
 
 # ⚠️ Licença
 
 [(Voltar ao topo)](#logo)
 
-The MIT Licença (MIT) 2018 - [sirjonasxx](https://github.com/sirjonasxx). Please have a look at the [LICENSE](https://github.com/sirjonasxx/G-Earth/blob/master/LICENSE) for more details.
+A Licença MIT 2018 - [sirjonasxx](https://github.com/sirjonasxx). Por favor dê uma olhada em [LICENSE](https://github.com/sirjonasxx/G-Earth/blob/master/LICENSE) para mais detalhes.
