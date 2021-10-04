@@ -39,7 +39,7 @@
 <p align="center">
     <a href="#-sobre">Sobre</a> •
     <a href="#%EF%B8%8F-começando">Começando</a> •
-    <a href="#%EF%B8%8F-functionalidades">Funcionalidades</a> •
+    <a href="#%EF%B8%8F-funcionalidades">Funcionalidades</a> •
     <a href="#-wiki">Wiki</a> •
     <a href="#%EF%B8%8F-contribuindo">Contribuindo</a> •
     <a href="#-créditos">Créditos</a> •
