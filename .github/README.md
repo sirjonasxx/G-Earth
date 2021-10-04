@@ -37,15 +37,15 @@
 </p>
 
 <p align="center">
-    <a href="#📖-about">About</a> •
-    <a href="#⚡️-getting-started">Getting Started</a> •
-    <a href="#⚙️-features">Features</a> •
-    <a href="#📒-wiki">Wiki</a> •
-    <a href="#✍️-contributing">Contributing</a> •
-    <a href="#👨‍💻-credits">Credits</a> •
-    <a href="#🐛-troubleshooting">Troubleshooting</a> •
-    <a href="#🌟-donations">Donations</a> •
-    <a href="#⚠️-license">License</a>
+    <a href="#-about">About</a> •
+    <a href="#-getting-started">Getting Started</a> •
+    <a href="#️-features">Features</a> •
+    <a href="#-wiki">Wiki</a> •
+    <a href="#-contributing">Contributing</a> •
+    <a href="#-credits">Credits</a> •
+    <a href="#-troubleshooting">Troubleshooting</a> •
+    <a href="#-donations">Donations</a> •
+    <a href="#-license">License</a>
 </p>
 
 ## 📖 About
@@ -210,9 +210,9 @@ Please take a look at our [contributing guidelines](https://github.com/sirjonasx
 ## To Do List
 
 - Wiki update;
-- [About](#📖-about) section;
-- Screenshots in the [Features](#⚙️-features) section;
-- Contributors list in the [Credits](#👨‍💻-credits) section;
+- [About](#-about) section;
+- Screenshots in the [Features](#-features) section;
+- Contributors list in the [Credits](#-credits) section;
 - [Contributing guidelines](https://github.com/sirjonasxx/G-Earth/blob/master/.github/CONTRIBUTING.md);
 - Translations of this README.
 

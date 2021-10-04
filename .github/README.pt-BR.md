@@ -37,15 +37,15 @@
 </p>
 
 <p align="center">
-    <a href="#📖-sobre">Sobre</a> •
-    <a href="#⚡️-começando">Começando</a> •
-    <a href="#⚙️-functionalidades">Funcionalidades</a> •
-    <a href="#📒-wiki">Wiki</a> •
-    <a href="#✍️-contribuindo">Contribuindo</a> •
-    <a href="#👨‍💻-créditos">Créditos</a> •
-    <a href="#🐛-soluções-de-problemas">Soluções de Problemas</a> •
-    <a href="#🌟-doações">Doações</a> •
-    <a href="#⚠️-licença">Licença</a>
+    <a href="#-sobre">Sobre</a> •
+    <a href="#-começando">Começando</a> •
+    <a href="#-functionalidades">Funcionalidades</a> •
+    <a href="#-wiki">Wiki</a> •
+    <a href="#-contribuindo">Contribuindo</a> •
+    <a href="#créditos">Créditos</a> •
+    <a href="#-soluções-de-problemas">Soluções de Problemas</a> •
+    <a href="#-doações">Doações</a> •
+    <a href="#-licença">Licença</a>
 </p>
 
 ## 📖 Sobre
@@ -210,9 +210,9 @@ Por favor veja as nossas [diretrizes de contribuições](https://github.com/sirj
 ## Lista de Afazeres
 
 - Atualizar a Wiki;
-- Seção [Sobre](#📖-sobre);
-- Capturas de tela na seção [Funcionalidades](#⚙️-funcionalidades);
-- Lista de contribuidores na seção [Créditos](#👨‍💻-créditos);
+- Seção [Sobre](#-sobre);
+- Capturas de tela na seção [Funcionalidades](#-funcionalidades);
+- Lista de contribuidores na seção [Créditos](#-créditos);
 - [Diretrizes de contribuições](https://github.com/sirjonasxx/G-Earth/blob/master/.github/CONTRIBUTING.md);
 - Traduções desse README.
 
