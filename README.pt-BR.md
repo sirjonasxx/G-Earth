@@ -6,7 +6,7 @@
 
 <p align="center">
     <a href="https://discord.gg/AVkcF8y">
-        <img src="https://img.shields.io/discord/744927320871010404?color=%237289da&label=Junte-se%20a%20nós!&logo=discord&logoColor=white&style=flat-square" alt="Emblema do Discord" title="Junte-se a nós no Discord!" />
+        <img src="https://img.shields.io/discord/744927320871010404?color=%237289da&label=Junte-se%20a%20n%C3%B3s!&logo=discord&logoColor=white&style=flat-square" alt="Emblema do Discord" title="Junte-se a nós no Discord!" />
     </a>
     <a href="https://github.com/sirjonasxx/G-Earth/releases">
         <img src="https://img.shields.io/github/release-date/sirjonasxx/G-Earth?logo=github&label=Último lançamento&style=flat-square" title="Emblema da data do último lançamento" />
