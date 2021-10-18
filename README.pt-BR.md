@@ -28,8 +28,8 @@
     <a href="/README.md" title="(disponível) README em Inglês (Global)">
         <img src="https://img.shields.io/badge/en-flag.svg?color=blue&labelColor=grey&style=flat-square&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjM1IDY1MCIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiPg0KPGRlZnM+DQo8ZyBpZD0idW5pb24iPg0KPHVzZSB5PSItLjIxNiIgeGxpbms6aHJlZj0iI3g0Ii8+DQo8dXNlIHhsaW5rOmhyZWY9IiN4NCIvPg0KPHVzZSB5PSIuMjE2IiB4bGluazpocmVmPSIjczYiLz4NCjwvZz4NCjxnIGlkPSJ4NCI+DQo8dXNlIHhsaW5rOmhyZWY9IiNzNiIvPg0KPHVzZSB5PSIuMDU0IiB4bGluazpocmVmPSIjczUiLz4NCjx1c2UgeT0iLjEwOCIgeGxpbms6aHJlZj0iI3M2Ii8+DQo8dXNlIHk9Ii4xNjIiIHhsaW5rOmhyZWY9IiNzNSIvPg0KPC9nPg0KPGcgaWQ9InM1Ij4NCjx1c2UgeD0iLS4yNTIiIHhsaW5rOmhyZWY9IiNzdGFyIi8+DQo8dXNlIHg9Ii0uMTI2IiB4bGluazpocmVmPSIjc3RhciIvPg0KPHVzZSB4bGluazpocmVmPSIjc3RhciIvPg0KPHVzZSB4PSIuMTI2IiB4bGluazpocmVmPSIjc3RhciIvPg0KPHVzZSB4PSIuMjUyIiB4bGluazpocmVmPSIjc3RhciIvPg0KPC9nPg0KPGcgaWQ9InM2Ij4NCjx1c2UgeD0iLS4wNjMiIHhsaW5rOmhyZWY9IiNzNSIvPg0KPHVzZSB4PSIuMzE1IiB4bGluazpocmVmPSIjc3RhciIvPg0KPC9nPg0KPGcgaWQ9InN0YXIiPg0KPHVzZSB4bGluazpocmVmPSIjcHQiIHRyYW5zZm9ybT0ibWF0cml4KC0uODA5MDIgLS41ODc3OSAuNTg3NzkgLS44MDkwMiAwIDApIi8+DQo8dXNlIHhsaW5rOmhyZWY9IiNwdCIgdHJhbnNmb3JtPSJtYXRyaXgoLjMwOTAyIC0uOTUxMDYgLjk1MTA2IC4zMDkwMiAwIDApIi8+DQo8dXNlIHhsaW5rOmhyZWY9IiNwdCIvPg0KPHVzZSB4bGluazpocmVmPSIjcHQiIHRyYW5zZm9ybT0icm90YXRlKDcyKSIvPg0KPHVzZSB4bGluazpocmVmPSIjcHQiIHRyYW5zZm9ybT0icm90YXRlKDE0NCkiLz4NCjwvZz4NCjxwYXRoIGZpbGw9IiNmZmYiIGlkPSJwdCIgZD0iTS0uMTYyNSwwIDAtLjUgLjE2MjUsMHoiIHRyYW5zZm9ybT0ic2NhbGUoLjA2MTYpIi8+DQo8cGF0aCBmaWxsPSIjYmYwYTMwIiBpZD0ic3RyaXBlIiBkPSJtMCwwaDEyMzV2NTBoLTEyMzV6Ii8+DQo8L2RlZnM+DQo8cGF0aCBmaWxsPSIjZmZmIiBkPSJtMCwwaDEyMzV2NjUwaC0xMjM1eiIvPg0KPHVzZSB4bGluazpocmVmPSIjc3RyaXBlIi8+DQo8dXNlIHk9IjEwMCIgeGxpbms6aHJlZj0iI3N0cmlwZSIvPg0KPHVzZSB5PSIyMDAiIHhsaW5rOmhyZWY9IiNzdHJpcGUiLz4NCjx1c2UgeT0iMzAwIiB4bGluazpocmVmPSIjc3RyaXBlIi8+DQo8dXNlIHk9IjQwMCIgeGxpbms6aHJlZj0iI3N0cmlwZSIvPg0KPHVzZSB5PSI1MDAiIHhsaW5rOmhyZWY9IiNzdHJpcGUiLz4NCjx1c2UgeT0iNjAwIiB4bGluazpocmVmPSIjc3RyaXBlIi8+DQo8cGF0aCBmaWxsPSIjMDAyODY4IiBkPSJtMCwwaDQ5NHYzNTBoLTQ5NHoiLz4NCjx1c2UgeGxpbms6aHJlZj0iI3VuaW9uIiB0cmFuc2Zvcm09Im1hdHJpeCg2NTAgMCAwIDY1MCAyNDcgMTc1KSIvPg0KPC9zdmc+DQo=">
     </a>
-    <a href="/README.es.md" title="(indisponível) README em Espanhol (Espanha)">
-        <img src="https://img.shields.io/badge/es-flag.svg?color=red&labelColor=grey&style=flat-square&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3NTAgNTAwIj4NCjxwYXRoIGZpbGw9IiNjNjBiMWUiIGQ9Im0wLDBoNzUwdjUwMGgtNzUweiIvPg0KPHBhdGggZmlsbD0iI2ZmYzQwMCIgZD0ibTAsMTI1aDc1MHYyNTBoLTc1MHoiLz4NCjwvc3ZnPg0K">
+    <a href="/README.es.md" title="(disponível) README em Espanhol (Espanha)">
+        <img src="https://img.shields.io/badge/es-flag.svg?color=blue&labelColor=grey&style=flat-square&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3NTAgNTAwIj4NCjxwYXRoIGZpbGw9IiNjNjBiMWUiIGQ9Im0wLDBoNzUwdjUwMGgtNzUweiIvPg0KPHBhdGggZmlsbD0iI2ZmYzQwMCIgZD0ibTAsMTI1aDc1MHYyNTBoLTc1MHoiLz4NCjwvc3ZnPg0K">
     </a>
     <a href="/README.pt-BR.md" title="(atual) README en Português (Brasil)">
         <img src="https://img.shields.io/badge/pt--BR-flag.svg?color=brightgreen&labelColor=grey&style=flat-square&logo=data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4NCjxzdmcgdmVyc2lvbj0iMS4wIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iNzIwIiBoZWlnaHQ9IjUwNCIgdmlld0JveD0iLTIxMDAgLTE0NzAgNDIwMCAyOTQwIj4NCgk8cmVjdCB4PSItNTAlIiB5PSItNTAlIiB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjMDA5YjNhIi8+DQoJPHBhdGggZD0iTSAtMTc0MywwIDAsMTExMyAxNzQzLDAgMCwtMTExMyB6IiBmaWxsPSIjZmVkZjAwIi8+DQoJPGNpcmNsZSByPSI3MzUiIGZpbGw9IiMwMDI3NzYiLz4NCgk8Y2xpcFBhdGggaWQ9ImJhbmQiPg0KCQk8Y2lyY2xlIHI9IjczNSIvPg0KCTwvY2xpcFBhdGg+DQoJPHBhdGggZD0iTSAtMjIwNSwxNDcwIGEgMTc4NSAxNzg1IDAgMCAxIDM1NzAsMCBoIC0xMDUgYSAxNjgwIDE2ODAgMCAxIDAgLTMzNjAsMCB6IiBjbGlwLXBhdGg9InVybCgjYmFuZCkiIGZpbGw9IiNmZmYiLz4NCjwvc3ZnPg==">
@@ -52,7 +52,7 @@
 
 [(Voltar ao topo)](#logo)
 
-PENTENDE
+PENDENTE
 
 ## ⚡️ Começando
 
@@ -102,63 +102,63 @@ Você pode rodar o arquivo `G-Earth.jar` com `java -jar G-Earth.jar` em um termi
 
 [(Voltar ao topo)](#logo)
 
-PENTENDE (captura de tela)
+PENDENTE (captura de tela)
 
 A aba *Conexão* é onde você conecta o G-Earth com o cliente Habbo. Se você sempre utiliza o cliente Flash/Air, só clique no botão *Conectar*, ele irá mudar para *Abortar* e o *Estado de conexão* vai mudar para *Esperando conexão*. Depois disso você entra no hotel e é isso!
 
-Você pode ler mais sobre isso na Wiki (PENTENDE).
+Você pode ler mais sobre isso na Wiki (PENDENTE).
 
 ### 💉 Injeção
 
 [(Voltar ao topo)](#logo)
 
-PENTENDE (captura de tela)
+PENDENTE (captura de tela)
 
-Na aba *Injeção* você tem acesso fácil para enviar pacote manualmente, para o servidor ou para o cliente. Se você enviar para o servidor é a igual se estivesse fazendo alguma ação no jogo (como andando para algum lugar), então PENTENDEs podem ver o que você está fazendo. No outro sentido, se você enviar para o cliente, só irá afetar o seu jogo (como removendo/colocando algum item no quarto).
+Na aba *Injeção* você tem acesso fácil para enviar pacote manualmente, para o servidor ou para o cliente. Se você enviar para o servidor é a igual se estivesse fazendo alguma ação no jogo (como andando para algum lugar), então todos podem ver o que você está fazendo. No outro sentido, se você enviar para o cliente, só irá afetar o seu jogo (como removendo/colocando algum item no quarto).
 
-Você pode ler mais sobre isso na Wiki (PENTENDE).
+Você pode ler mais sobre isso na Wiki (PENDENTE).
 
-### 🛠️ Tools
+### 🛠️ Ferramentas
 
 [(Voltar ao topo)](#logo)
 
-PENTENDE (captura de tela)
+PENDENTE (captura de tela)
 
-Na aba *Tools* você irá ver duas seções, *Codifidando/Decodificando* e *Pacote <-> expressão*. Esses conversores são úteis se você estiver manipulando pacotes na mão. Eles não possuem efeito nos pacotes atuais que estão sendo enviados e recebidos.
+Na aba *Ferramentas* você irá ver duas seções, *Codifidando/Decodificando* e *Pacote <-> expressão*. Esses conversores são úteis se você estiver manipulando pacotes na mão. Eles não possuem efeito nos pacotes atuais que estão sendo enviados e recebidos.
 
-Este é um assunto avançado, então para entender melhor sobre essas coisas, leia na Wiki (PENTENDE).
+Este é um assunto avançado, então para entender melhor sobre essas coisas, leia na Wiki (PENDENTE).
 
 ### ⏲️ Agendador
 
 [(Voltar ao topo)](#logo)
 
-PENTENDE (captura de tela)
+PENDENTE (captura de tela)
 
 No *Agendador* você pode enviar qualquer pacote repetidamente, com um intervalo+atraso específico para cada pacote. Depois que estiver pronto, você pode saltar a lista para um arquivo e carregar essa configuração futuramente.
 
-Leia mais sobre isso na Wiki (PENTENDE).
+Leia mais sobre isso na Wiki (PENDENTE).
 
 ### 🧩 Extensões
 
 [(Voltar ao topo)](#logo)
 
-PENTENDE (captura de tela)
+PENDENTE (captura de tela)
 
-A aba mais poderosa, a aba *Extensões* permite você connectar múltiplas extensões customizadas que qualquer um pode criar e compartilhar. Estas extensões possuem acesso total aos pacotes, portanto ela pode fazer coisas desde substituir o avatar de PENTENDE mundo (veja [MackleEverywhere](https://github.com/sirjonasxx/G-Earth-template-extensions/tree/master/MackleEverywhere)) até um completo salvar e recolocar quarto+wired (veja [Wired Presets](https://github.com/sirjonasxx/Wired-Presets)).
+A aba mais poderosa, a aba *Extensões* permite você connectar múltiplas extensões customizadas que qualquer um pode criar e compartilhar. Estas extensões possuem acesso total aos pacotes, portanto ela pode fazer coisas desde substituir o avatar de todo mundo (veja [MackleEverywhere](https://github.com/sirjonasxx/G-Earth-template-extensions/tree/master/MackleEverywhere)) até um completo salvar e recolocar quarto+wired (veja [Wired Presets](https://github.com/sirjonasxx/Wired-Presets)).
 
 As extensões mais comuns utilizam o framework nativo, pois ele não requer outras instalações de quem vai usá-la. Estas extensões são um único arquivo `.jar`, então você só precisa clicar no botão *Instalar* e selecionar aquele arquivo.
 
 Desde v1.5, você consegue instalar incríveis extensões a partir da [G-ExtensionStore](https://github.com/sirjonasxx/G-ExtensionStore#readme). Ela possui as extensões mais atualizadas a um clique de distância. Nós tentamos manter ela livre de más intenções, não ser destinado a perturbar o jogo e todas selas são código-aberto.
 
-Você pode ler mais detalhes sobre extensões na Wiki (PENTENDE).
+Você pode ler mais detalhes sobre extensões na Wiki (PENDENTE).
 
 #### Frameworks
 
 Além do framework nativo, existem alguns outros que permitem você criar sua própria extensão e comunicar com o G-Earth:
 
-Nome | Linguagem | Desenvolvedores | Github
+Nome | Linguagem | Desenvolvedores | GitHub
 --- | --- | --- | --- |
-G-Earth (Native) | Java | sirjonasxx | https://github.com/sirjonasxx/G-Earth
+G-Earth (Nativo) | Java | sirjonasxx | https://github.com/sirjonasxx/G-Earth
 G-Python<sup>1</sup> | Python | sirjonasxx | https://github.com/sirjonasxx/G-Python
 Geode | C# & Visual Basic | ArachisH, LilithRainbows | https://github.com/LilithRainbows/Geode
 Xabbo | C# | b7 | https://github.com/b7c/Xabbo.Scripter
@@ -170,7 +170,7 @@ GProgrammer<sup>2</sup> | Javascript | at15four2020 | https://github.com/at15fou
 
 > 🔔 **Por favor note**: se você recebeu alguma extensão desses frameworks, por favor siga o guia de instalação específico para aquele framework. Você precisa configurar seu ambiente apenas uma vez.
 
-Você pode ler mais informações avançadas sobre os frameworks na Wiki (PENTENDE).
+Você pode ler mais informações avançadas sobre os frameworks na Wiki (PENDENTE).
 
 ### ➕ Extra
 
@@ -191,7 +191,7 @@ Na aba *Extra* você tem algumas utilidades e configurações. Algumas coisas qu
 
 [(Voltar ao topo)](#logo)
 
-PENTENDE
+PENDENTE
 
 ## Outros
 
@@ -205,7 +205,7 @@ G-Earth usa [G-Mem](https://github.com/sirjonasxx/G-Mem) como buscador de memór
 
 [(Voltar ao topo)](#logo)
 
-Por favor veja as nossas [diretrizes de contribuições](/CONTRIBUTING.md) (PENTENDE) se você está interessado em ajudar!
+Por favor veja as nossas [diretrizes de contribuições](/CONTRIBUTING.md) (PENDENTE) se você está interessado em ajudar!
 
 ## Lista de Afazeres
 
@@ -213,14 +213,13 @@ Por favor veja as nossas [diretrizes de contribuições](/CONTRIBUTING.md) (PENT
 - Seção [Sobre](#-sobre);
 - Capturas de tela na seção [Funcionalidades](#%EF%B8%8F-funcionalidades);
 - Lista de contribuidores na seção [Créditos](#-créditos);
-- [Diretrizes de contribuições](/CONTRIBUTING.md);
-- Traduções desse README.
+- [Diretrizes de contribuições](/CONTRIBUTING.md).
 
 # 👨‍💻 Créditos
 
 [(Voltar ao topo)](#logo)
 
-PENTENDE (https://allcontributors.org/)
+PENDENTE (https://allcontributors.org/)
 
 # 🐛 Soluções de Problemas
 
