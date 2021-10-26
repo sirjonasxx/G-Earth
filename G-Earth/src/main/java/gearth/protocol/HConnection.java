@@ -140,6 +140,7 @@ public class HConnection {
 
 
     public boolean sendToClient(HPacket packet) {
+        HProxy proxy = this.proxy;
         if (proxy == null) return false;
 
         if (!packet.isPacketComplete()) {
@@ -149,10 +150,10 @@ public class HConnection {
             if (!packet.isPacketComplete() || !packet.canSendToClient()) return false;
         }
 
-        proxy.getPacketSenderQueue().queueToClient(packet);
-        return true;
+        return proxy.sendToClient(packet);
     }
     public boolean sendToServer(HPacket packet) {
+        HProxy proxy = this.proxy;
         if (proxy == null) return false;
 
         if (!packet.isPacketComplete()) {
@@ -162,8 +163,7 @@ public class HConnection {
             if (!packet.isPacketComplete() || !packet.canSendToServer()) return false;
         }
 
-        proxy.getPacketSenderQueue().queueToServer(packet);
-        return true;
+        return proxy.sendToServer(packet);
     }
 
     public String getClientHost() {
