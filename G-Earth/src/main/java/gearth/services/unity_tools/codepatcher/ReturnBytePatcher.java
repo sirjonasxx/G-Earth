@@ -6,7 +6,6 @@ import wasm.disassembly.modules.sections.code.Func;
 import wasm.disassembly.types.FuncType;
 import wasm.disassembly.types.ResultType;
 import wasm.disassembly.types.ValType;
-import wasm.misc.CodeCompare;
 import wasm.misc.StreamReplacement;
 
 import java.util.Arrays;
@@ -36,13 +35,11 @@ public class ReturnBytePatcher implements StreamReplacement {
     }
 
     @Override
-    public CodeCompare getCodeCompare() {
-        return code -> {
-            if (code.getLocalss().size() != 0) return false;
-            if (code.getExpression().getInstructions().size() != 30) return false;
-            List<Instr> expr = code.getExpression().getInstructions();
-            if (expr.get(expr.size() - 1).getInstrType() != InstrType.I32_XOR) return false;
-            return true;
-        };
+    public boolean codeMatches(Func code) {
+        if (code.getLocalss().size() != 0) return false;
+        if (code.getExpression().getInstructions().size() != 30) return false;
+        List<Instr> expr = code.getExpression().getInstructions();
+        if (expr.get(expr.size() - 1).getInstrType() != InstrType.I32_XOR) return false;
+        return true;
     }
 }

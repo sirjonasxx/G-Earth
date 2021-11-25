@@ -7,7 +7,6 @@ import wasm.disassembly.modules.sections.code.Locals;
 import wasm.disassembly.types.FuncType;
 import wasm.disassembly.types.ResultType;
 import wasm.disassembly.types.ValType;
-import wasm.misc.CodeCompare;
 import wasm.misc.StreamReplacement;
 
 import java.util.Arrays;
@@ -38,23 +37,21 @@ public class SetKeyPatcher implements StreamReplacement {
     }
 
     @Override
-    public CodeCompare getCodeCompare() {
-        return code -> {
-            if (!(code.getLocalss().equals(Collections.singletonList(new Locals(1, ValType.I32)))))
-                return false;
-            List<InstrType> expectedExpr = Arrays.asList(InstrType.I32_CONST, InstrType.I32_LOAD8_S,
-                    InstrType.I32_EQZ, InstrType.IF, InstrType.BLOCK, InstrType.LOCAL_GET, InstrType.I32_CONST,
-                    InstrType.LOCAL_GET, InstrType.I32_LOAD, InstrType.I32_CONST, InstrType.I32_CONST, InstrType.I32_CONST,
-                    InstrType.CALL);
+    public boolean codeMatches(Func code) {
+        if (!(code.getLocalss().equals(Collections.singletonList(new Locals(1, ValType.I32)))))
+            return false;
+        List<InstrType> expectedExpr = Arrays.asList(InstrType.I32_CONST, InstrType.I32_LOAD8_S,
+                InstrType.I32_EQZ, InstrType.IF, InstrType.BLOCK, InstrType.LOCAL_GET, InstrType.I32_CONST,
+                InstrType.LOCAL_GET, InstrType.I32_LOAD, InstrType.I32_CONST, InstrType.I32_CONST, InstrType.I32_CONST,
+                InstrType.CALL);
 
-            if (code.getExpression().getInstructions().size() != expectedExpr.size()) return false;
+        if (code.getExpression().getInstructions().size() != expectedExpr.size()) return false;
 
-            for (int j = 0; j < code.getExpression().getInstructions().size(); j++) {
-                Instr instr = code.getExpression().getInstructions().get(j);
-                if (instr.getInstrType() != expectedExpr.get(j)) return false;
-            }
+        for (int j = 0; j < code.getExpression().getInstructions().size(); j++) {
+            Instr instr = code.getExpression().getInstructions().get(j);
+            if (instr.getInstrType() != expectedExpr.get(j)) return false;
+        }
 
-            return true;
-        };
+        return true;
     }
 }
