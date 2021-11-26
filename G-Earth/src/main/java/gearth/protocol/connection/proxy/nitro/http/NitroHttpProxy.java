@@ -1,15 +1,25 @@
 package gearth.protocol.connection.proxy.nitro.http;
 
+import gearth.misc.ConfirmationDialog;
 import gearth.protocol.connection.proxy.nitro.NitroConstants;
 import gearth.protocol.connection.proxy.nitro.os.NitroOsFunctions;
 import gearth.protocol.connection.proxy.nitro.os.NitroOsFunctionsFactory;
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import org.littleshoot.proxy.HttpProxyServer;
 import org.littleshoot.proxy.impl.DefaultHttpProxyServer;
 import org.littleshoot.proxy.mitm.Authority;
 import org.littleshoot.proxy.mitm.CertificateSniffingMitmManager;
 import org.littleshoot.proxy.mitm.RootCertificateException;
 
+import java.io.File;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 public class NitroHttpProxy {
+
+    private static final String ADMIN_WARNING_KEY = "admin_warning_dialog";
 
     private final Authority authority;
     private final NitroOsFunctions osFunctions;
@@ -24,6 +34,43 @@ public class NitroHttpProxy {
     }
 
     private boolean initializeCertificate() {
+        final File certificate = this.authority.aliasFile(".pem");
+
+        // All good if certificate is already trusted.
+        if (this.osFunctions.isRootCertificateTrusted(certificate)) {
+            return true;
+        }
+
+        // Let the user know about admin permissions.
+        final Semaphore waitForDialog = new Semaphore(0);
+        final AtomicBoolean shouldInstall = new AtomicBoolean();
+
+        Platform.runLater(() -> {
+            Alert alert = ConfirmationDialog.createAlertWithOptOut(Alert.AlertType.WARNING, ADMIN_WARNING_KEY,
+                    "Root certificate installation", null,
+                    "G-Earth detected that you do not have the root certificate authority installed. " +
+                            "This is required for Nitro to work, do you want to continue? " +
+                            "G-Earth will ask you for Administrator permission if you do so.", "Remember my choice",
+                    ButtonType.YES, ButtonType.NO
+            );
+
+            shouldInstall.set(!(alert.showAndWait().filter(t -> t == ButtonType.YES).isPresent()));
+            waitForDialog.release();
+        });
+
+        // Wait for dialog choice.
+        try {
+            waitForDialog.acquire();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        // User opted out.
+        if (!shouldInstall.get()) {
+            return false;
+        }
+
         return this.osFunctions.installRootCertificate(this.authority.aliasFile(".pem"));
     }
 

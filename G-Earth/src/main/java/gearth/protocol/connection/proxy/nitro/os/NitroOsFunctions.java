@@ -4,6 +4,8 @@ import java.io.File;
 
 public interface NitroOsFunctions {
 
+    boolean isRootCertificateTrusted(File certificate);
+
     boolean installRootCertificate(File certificate);
 
     boolean registerSystemProxy(String host, int port);
