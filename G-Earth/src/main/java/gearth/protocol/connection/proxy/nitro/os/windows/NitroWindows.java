@@ -13,6 +13,11 @@ import java.io.IOException;
 public class NitroWindows implements NitroOsFunctions {
 
     /**
+     * Semicolon separated hosts to ignore for proxying.
+     */
+    private static final String PROXY_IGNORE = "discord.com;github.com;";
+
+    /**
      * Checks if the certificate is trusted by the local machine.
      * @param certificate Absolute path to the certificate.
      * @return true if trusted
@@ -59,6 +64,7 @@ public class NitroWindows implements NitroOsFunctions {
         try {
             final String proxy = String.format("%s:%d", host, port);
             Runtime.getRuntime().exec("reg add \"HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\" /v ProxyServer /t REG_SZ /d \"" + proxy + "\" /f");
+            Runtime.getRuntime().exec("reg add \"HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\" /v ProxyOverride /t REG_SZ /d \"" + PROXY_IGNORE + "\" /f");
             Runtime.getRuntime().exec("reg add \"HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\" /v ProxyEnable /t REG_DWORD /d 1 /f");
             return true;
         } catch (Exception e) {
