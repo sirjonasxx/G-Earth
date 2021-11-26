@@ -246,6 +246,10 @@ public class ConnectionController extends SubForm {
                 Platform.runLater(() -> rd_unity.setSelected(true));
                 getHConnection().startUnity();
             }
+            else if (connectMode.equals("nitro")) {
+                Platform.runLater(() -> rd_nitro.setSelected(true));
+                getHConnection().startNitro();
+            }
             Platform.runLater(this::updateInputUI);
         }
     }
@@ -255,16 +259,16 @@ public class ConnectionController extends SubForm {
 
             btnConnect.setDisable(true);
             new Thread(() -> {
-                if (useFlash()) {
+                if (isClientMode(HClient.FLASH)) {
                     if (cbx_autodetect.isSelected()) {
                         getHConnection().start();
-                    }
-                    else {
+                    } else {
                         getHConnection().start(inpHost.getEditor().getText(), Integer.parseInt(inpPort.getEditor().getText()));
                     }
-                }
-                else {
+                } else if (isClientMode(HClient.UNITY)) {
                     getHConnection().startUnity();
+                } else if (isClientMode(HClient.NITRO)) {
+                    getHConnection().startNitro();
                 }
 
 
@@ -296,5 +300,18 @@ public class ConnectionController extends SubForm {
 
     private boolean useFlash() {
         return rd_flash.isSelected();
+    }
+
+    private boolean isClientMode(HClient client) {
+        switch (client) {
+            case FLASH:
+                return rd_flash.isSelected();
+            case UNITY:
+                return rd_unity.isSelected();
+            case NITRO:
+                return rd_nitro.isSelected();
+        }
+
+        return false;
     }
 }

@@ -1,0 +1,13 @@
+package gearth.protocol.connection.proxy.nitro.os;
+
+import java.io.File;
+
+public interface NitroOsFunctions {
+
+    boolean installRootCertificate(File certificate);
+
+    boolean registerSystemProxy(String host, int port);
+
+    boolean unregisterSystemProxy();
+
+}
