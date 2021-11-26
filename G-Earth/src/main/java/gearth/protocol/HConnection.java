@@ -1,6 +1,7 @@
 package gearth.protocol;
 
 import gearth.misc.listenerpattern.Observable;
+import gearth.protocol.connection.proxy.nitro.NitroProxyProvider;
 import gearth.services.packet_info.PacketInfoManager;
 import gearth.protocol.connection.HClient;
 import gearth.protocol.connection.HProxy;
@@ -65,6 +66,12 @@ public class HConnection {
     public void startUnity() {
         HConnection selff = this;
         proxyProvider = new UnityProxyProvider(proxy -> selff.proxy = proxy, selff::setState, this);
+        startMITM();
+    }
+
+    public void startNitro() {
+        HConnection selff = this;
+        proxyProvider = new NitroProxyProvider(proxy -> selff.proxy = proxy, selff::setState, this);
         startMITM();
     }
 
