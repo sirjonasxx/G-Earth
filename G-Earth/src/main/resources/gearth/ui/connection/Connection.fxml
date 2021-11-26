@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<GridPane alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="258.0" prefWidth="650.0" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gearth.ui.connection.ConnectionController">
+<GridPane alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="258.0" prefWidth="650.0" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gearth.ui.connection.ConnectionController">
     <columnConstraints>
         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
     </columnConstraints>
@@ -132,9 +132,9 @@
                <columnConstraints>
                   <ColumnConstraints hgrow="SOMETIMES" maxWidth="149.0" minWidth="10.0" prefWidth="76.0" />
                   <ColumnConstraints hgrow="SOMETIMES" maxWidth="149.0" minWidth="10.0" prefWidth="25.0" />
-                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="177.0" minWidth="66.0" prefWidth="93.0" />
-                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="133.0" minWidth="8.0" prefWidth="98.0" />
-                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="242.0" minWidth="10.0" prefWidth="32.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="177.0" minWidth="66.0" prefWidth="90.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="133.0" minWidth="8.0" prefWidth="70.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="242.0" minWidth="10.0" prefWidth="70.0" />
                </columnConstraints>
                <rowConstraints>
                   <RowConstraints minHeight="20.0" prefHeight="34.0" vgrow="SOMETIMES" />
@@ -156,7 +156,13 @@
                   <RadioButton fx:id="rd_flash" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="35.0" prefWidth="111.0" selected="true" text="Flash / Air" toggleGroup="$tgl_clientMode" GridPane.columnIndex="2">
                      <GridPane.margin>
                         <Insets />
-                     </GridPane.margin></RadioButton>
+                     </GridPane.margin>
+                  </RadioButton>
+                  <RadioButton fx:id="rd_nitro" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="22.0" prefWidth="54.0" selected="true" text="Nitro" toggleGroup="$tgl_clientMode" GridPane.columnIndex="4">
+                     <GridPane.margin>
+                        <Insets />
+                     </GridPane.margin>
+                  </RadioButton>
                </children>
                <padding>
                   <Insets bottom="8.0" top="8.0" />

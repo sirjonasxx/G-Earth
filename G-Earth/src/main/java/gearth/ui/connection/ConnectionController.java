@@ -2,6 +2,7 @@ package gearth.ui.connection;
 
 import gearth.Main;
 import gearth.misc.Cacher;
+import gearth.protocol.connection.HClient;
 import gearth.protocol.connection.HState;
 import gearth.protocol.connection.proxy.ProxyProviderFactory;
 import gearth.services.Constants;
@@ -38,10 +39,11 @@ public class ConnectionController extends SubForm {
     private volatile int fullyInitialized = 0;
 
 
-    public static final String USE_UNITY_CLIENT_CACHE_KEY = "use_unity";
+    public static final String CLIENT_CACHE_KEY = "last_client_mode";
     public ToggleGroup tgl_clientMode;
     public RadioButton rd_unity;
     public RadioButton rd_flash;
+    public RadioButton rd_nitro;
     public GridPane grd_clientSelection;
 
     private volatile int initcount = 0;
@@ -54,9 +56,18 @@ public class ConnectionController extends SubForm {
             Constants.UNITY_PACKETS = rd_unity.isSelected();
         });
 
-        if (Cacher.getCacheContents().has(USE_UNITY_CLIENT_CACHE_KEY)) {
-            rd_unity.setSelected(Cacher.getCacheContents().getBoolean(USE_UNITY_CLIENT_CACHE_KEY));
-            rd_flash.setSelected(!Cacher.getCacheContents().getBoolean(USE_UNITY_CLIENT_CACHE_KEY));
+        if (Cacher.getCacheContents().has(CLIENT_CACHE_KEY)) {
+            switch (Cacher.getCacheContents().getEnum(HClient.class, CLIENT_CACHE_KEY)) {
+                case FLASH:
+                    rd_flash.setSelected(true);
+                    break;
+                case UNITY:
+                    rd_unity.setSelected(true);
+                    break;
+                case NITRO:
+                    rd_nitro.setSelected(true);
+                    break;
+            }
         }
 
 
@@ -269,7 +280,13 @@ public class ConnectionController extends SubForm {
 
     @Override
     protected void onExit() {
-        Cacher.put(USE_UNITY_CLIENT_CACHE_KEY, rd_unity.isSelected());
+        if (rd_flash.isSelected()) {
+            Cacher.put(CLIENT_CACHE_KEY, HClient.FLASH);
+        } else if (rd_unity.isSelected()) {
+            Cacher.put(CLIENT_CACHE_KEY, HClient.UNITY);
+        } else if (rd_nitro.isSelected()) {
+            Cacher.put(CLIENT_CACHE_KEY, HClient.NITRO);
+        }
         getHConnection().abort();
     }
 
