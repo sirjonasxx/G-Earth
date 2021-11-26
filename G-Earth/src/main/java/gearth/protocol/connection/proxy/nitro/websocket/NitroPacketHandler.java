@@ -6,6 +6,7 @@ import gearth.protocol.packethandler.PacketHandler;
 import gearth.services.extension_handler.ExtensionHandler;
 import gearth.services.extension_handler.OnHMessageHandled;
 
+import javax.websocket.Session;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
@@ -22,12 +23,18 @@ public class NitroPacketHandler extends PacketHandler {
 
     @Override
     public boolean sendToStream(byte[] buffer) {
+        final Session localSession = session.getSession();
+
+        if (localSession == null) {
+            return false;
+        }
+
         // Required to prevent garbage buffer within the UI logger.
         if (direction == HMessage.Direction.TOSERVER) {
             buffer = buffer.clone();
         }
 
-        session.getSession().getAsyncRemote().sendBinary(ByteBuffer.wrap(buffer));
+        localSession.getAsyncRemote().sendBinary(ByteBuffer.wrap(buffer));
         return true;
     }
 

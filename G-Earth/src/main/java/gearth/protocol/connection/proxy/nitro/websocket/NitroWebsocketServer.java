@@ -13,9 +13,11 @@ import java.net.URI;
 public class NitroWebsocketServer implements NitroSession {
 
     private final PacketHandler packetHandler;
+    private final NitroWebsocketClient client;
     private Session activeSession = null;
 
     public NitroWebsocketServer(HConnection connection, NitroWebsocketClient client) {
+        this.client = client;
         this.packetHandler = new NitroPacketHandler(HMessage.Direction.TOCLIENT, client, connection.getExtensionHandler(), connection.getTrafficObservables());
     }
 
@@ -35,23 +37,21 @@ public class NitroWebsocketServer implements NitroSession {
 
     @OnMessage
     public void onMessage(byte[] b, Session session) throws IOException {
-        //System.out.printf("onMessage (%d)%n", b.length);
-        //System.out.println(session);
-        //System.out.println(Hexdump.hexdump(b));
-
         packetHandler.act(b);
     }
 
     @OnClose
     public void onClose(Session userSession, CloseReason reason) {
-        //System.out.println("closing websocket");
+        // Hotel closed connection.
+        client.shutdownProxy();
     }
 
     @OnError
     public void onError(Session session, Throwable throwable) {
-        //System.out.println("onError");
-        //System.out.println(session);
-        //System.out.println(throwable);
+        throwable.printStackTrace();
+
+        // Shutdown.
+        client.shutdownProxy();
     }
 
     @Override
@@ -61,5 +61,22 @@ public class NitroWebsocketServer implements NitroSession {
 
     public PacketHandler getPacketHandler() {
         return packetHandler;
+    }
+
+    /**
+     * Shutdown and clean up the server connection.
+     */
+    public void shutdown() {
+        if (activeSession == null) {
+            return;
+        }
+
+        try {
+            activeSession.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            activeSession = null;
+        }
     }
 }
