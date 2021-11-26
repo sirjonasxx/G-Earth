@@ -31,7 +31,7 @@ public class NitroHttpProxy {
      * Register HTTP(s) proxy on the system.
      */
     private boolean registerProxy() {
-        return this.osFunctions.registerSystemProxy("127.0.0.1", NitroConstants.PORT_HTTP);
+        return this.osFunctions.registerSystemProxy("127.0.0.1", NitroConstants.HTTP_PORT);
     }
 
     /**
@@ -44,7 +44,7 @@ public class NitroHttpProxy {
     public boolean start() {
         try {
             proxyServer = DefaultHttpProxyServer.bootstrap()
-                    .withPort(NitroConstants.PORT_HTTP)
+                    .withPort(NitroConstants.HTTP_PORT)
                     .withManInTheMiddle(new CertificateSniffingMitmManager(authority))
                     .withFiltersSource(new NitroHttpProxyFilterSource(serverCallback))
                     .start();

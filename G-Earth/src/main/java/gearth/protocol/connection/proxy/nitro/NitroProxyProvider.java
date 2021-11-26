@@ -79,7 +79,7 @@ public class NitroProxyProvider implements ProxyProvider, NitroHttpProxyServerCa
     @Override
     public String replaceWebsocketServer(String configUrl, String websocketUrl) {
         originalWebsocketUrl = websocketUrl;
-        return String.format("ws://127.0.0.1:%d", NitroConstants.PORT_WEBSOCKET);
+        return String.format("ws://127.0.0.1:%d", NitroConstants.WEBSOCKET_PORT);
     }
 
     @Override

@@ -28,7 +28,7 @@ public class NitroWebsocketProxy {
         this.stateSetter = stateSetter;
         this.connection = connection;
         this.proxyProvider = proxyProvider;
-        this.server = new Server(NitroConstants.PORT_WEBSOCKET);
+        this.server = new Server(NitroConstants.WEBSOCKET_PORT);
     }
 
     public boolean start() {

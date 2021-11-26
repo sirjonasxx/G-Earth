@@ -5,7 +5,6 @@ import gearth.protocol.HMessage;
 import gearth.protocol.connection.*;
 import gearth.protocol.connection.proxy.nitro.NitroConstants;
 import gearth.protocol.connection.proxy.nitro.NitroProxyProvider;
-import gearth.services.internal_extensions.uilogger.hexdumper.Hexdump;
 
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
@@ -45,7 +44,7 @@ public class NitroWebsocketClient implements NitroSession {
                 this.server.getPacketHandler(),
                 this.packetHandler,
                 NitroConstants.WEBSOCKET_REVISION,
-                "HTML5" // TODO: What is its purpose?
+                NitroConstants.WEBSOCKET_CLIENT_IDENTIFIER
         );
 
         proxySetter.setProxy(proxy);

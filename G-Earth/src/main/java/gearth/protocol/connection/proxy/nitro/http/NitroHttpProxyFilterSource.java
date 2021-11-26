@@ -1,5 +1,6 @@
 package gearth.protocol.connection.proxy.nitro.http;
 
+import gearth.protocol.connection.proxy.nitro.NitroConstants;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpRequest;
@@ -41,6 +42,6 @@ public class NitroHttpProxyFilterSource extends HttpFiltersSourceAdapter {
     @Override
     public int getMaximumResponseBufferSizeInBytes() {
         // Increasing this causes LittleProxy to output "FullHttpResponse" objects.
-        return 1024 * 1024 * 1024;
+        return NitroConstants.HTTP_BUFFER_SIZE;
     }
 }
