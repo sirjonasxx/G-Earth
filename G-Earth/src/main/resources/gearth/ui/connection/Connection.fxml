@@ -158,7 +158,7 @@
                         <Insets />
                      </GridPane.margin>
                   </RadioButton>
-                  <RadioButton fx:id="rd_nitro" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="22.0" prefWidth="54.0" selected="true" text="Nitro" toggleGroup="$tgl_clientMode" GridPane.columnIndex="4">
+                  <RadioButton fx:id="rd_nitro" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="22.0" prefWidth="54.0" text="Nitro" toggleGroup="$tgl_clientMode" GridPane.columnIndex="4">
                      <GridPane.margin>
                         <Insets />
                      </GridPane.margin>
