@@ -13,11 +13,13 @@ import java.util.regex.Pattern;
 public class NitroHttpProxyFilter extends HttpFiltersAdapter {
 
     private static final String NitroConfigSearch = "\"socket.url\"";
+    private static final String NitroClientSearch = "configurationUrls:";
     private static final Pattern NitroConfigPattern = Pattern.compile("\"socket\\.url\":.?\"(wss?://.*?)\"", Pattern.MULTILINE);
 
     private static final String HeaderAcceptEncoding = "Accept-Encoding";
     private static final String HeaderAge = "Age";
     private static final String HeaderCacheControl = "Cache-Control";
+    private static final String HeaderContentSecurityPolicy = "Content-Security-Policy";
     private static final String HeaderETag = "ETag";
     private static final String HeaderIfNoneMatch = "If-None-Match";
     private static final String HeaderIfModifiedSince = "If-Modified-Since";
@@ -88,9 +90,35 @@ public class NitroHttpProxyFilter extends HttpFiltersAdapter {
             if (responseModified) {
                 responseWrite(response, responseBody);
             }
+
+            // CSP.
+            if (responseBody.contains(NitroClientSearch)) {
+                stripContentSecurityPolicy(response);
+            }
         }
 
         return httpObject;
+    }
+
+    /**
+     * Modify Content-Security-Policy header, which could prevent Nitro from connecting with G-Earth.
+     */
+    private void stripContentSecurityPolicy(FullHttpResponse response) {
+        final HttpHeaders headers = response.headers();
+
+        if (!headers.contains(HeaderContentSecurityPolicy)){
+            return;
+        }
+
+        String csp = headers.get(HeaderContentSecurityPolicy);
+
+        if (csp.contains("connect-src")) {
+            csp = csp.replace("connect-src", "connect-src *");
+        } else if (csp.contains("default-src")) {
+            csp = csp.replace("default-src", "default-src *");
+        }
+
+        headers.set(HeaderContentSecurityPolicy, csp);
     }
 
     private static String responseRead(FullHttpResponse response) {
