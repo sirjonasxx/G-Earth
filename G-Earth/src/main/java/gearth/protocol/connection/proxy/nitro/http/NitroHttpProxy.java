@@ -1,5 +1,6 @@
 package gearth.protocol.connection.proxy.nitro.http;
 
+import gearth.protocol.connection.proxy.nitro.NitroConstants;
 import gearth.protocol.connection.proxy.nitro.os.NitroOsFunctions;
 import gearth.protocol.connection.proxy.nitro.os.NitroOsFunctionsFactory;
 import org.littleshoot.proxy.HttpProxyServer;
@@ -12,10 +13,12 @@ public class NitroHttpProxy {
 
     private final Authority authority;
     private final NitroOsFunctions osFunctions;
+    private final NitroHttpProxyServerCallback serverCallback;
 
     private HttpProxyServer proxyServer = null;
 
-    public NitroHttpProxy() {
+    public NitroHttpProxy(NitroHttpProxyServerCallback serverCallback) {
+        this.serverCallback = serverCallback;
         this.authority = new NitroAuthority();
         this.osFunctions = NitroOsFunctionsFactory.create();
     }
@@ -28,7 +31,7 @@ public class NitroHttpProxy {
      * Register HTTP(s) proxy on the system.
      */
     private boolean registerProxy() {
-        return this.osFunctions.registerSystemProxy("127.0.0.1", 9090);
+        return this.osFunctions.registerSystemProxy("127.0.0.1", NitroConstants.PORT_HTTP);
     }
 
     /**
@@ -39,18 +42,11 @@ public class NitroHttpProxy {
     }
 
     public boolean start() {
-
-
         try {
             proxyServer = DefaultHttpProxyServer.bootstrap()
-                    .withPort(9090)
+                    .withPort(NitroConstants.PORT_HTTP)
                     .withManInTheMiddle(new CertificateSniffingMitmManager(authority))
-                    // TODO: Replace lambda with some class
-                    .withFiltersSource(new NitroHttpProxyFilterSource((configUrl, websocketUrl) -> {
-                        System.out.printf("Found %s at %s%n", websocketUrl, configUrl);
-
-                        return "wss://127.0.0.1:2096";
-                    }))
+                    .withFiltersSource(new NitroHttpProxyFilterSource(serverCallback))
                     .start();
 
             if (!initializeCertificate()) {
@@ -74,10 +70,14 @@ public class NitroHttpProxy {
         }
     }
 
-    public void stop() {
+    public void pause() {
         if (!unregisterProxy()) {
             System.out.println("Failed to unregister system proxy, please check manually");
         }
+    }
+
+    public void stop() {
+        pause();
 
         if (proxyServer == null) {
             return;
