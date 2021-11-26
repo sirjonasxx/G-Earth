@@ -22,13 +22,18 @@ public class NitroPacketHandler extends PacketHandler {
 
     @Override
     public boolean sendToStream(byte[] buffer) {
+        // Required to prevent garbage buffer within the UI logger.
+        if (direction == HMessage.Direction.TOSERVER) {
+            buffer = buffer.clone();
+        }
+
         session.getSession().getAsyncRemote().sendBinary(ByteBuffer.wrap(buffer));
         return true;
     }
 
     @Override
     public void act(byte[] buffer) throws IOException {
-        HMessage hMessage = new HMessage(new HPacket(deepCopy(buffer)), direction, currentIndex);
+        HMessage hMessage = new HMessage(new HPacket(buffer), direction, currentIndex);
 
         OnHMessageHandled afterExtensionIntercept = hMessage1 -> {
             notifyListeners(2, hMessage1);
@@ -44,13 +49,4 @@ public class NitroPacketHandler extends PacketHandler {
 
         currentIndex++;
     }
-
-    public static byte[] deepCopy(byte[] org) {
-        if (org == null)
-            return null;
-        byte[] result = new byte[org.length];
-        System.arraycopy(org, 0, result, 0, org.length);
-        return result;
-    }
-
 }
