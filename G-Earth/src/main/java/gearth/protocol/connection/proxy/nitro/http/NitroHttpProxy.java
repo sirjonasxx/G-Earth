@@ -20,6 +20,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class NitroHttpProxy {
 
     private static final String ADMIN_WARNING_KEY = "admin_warning_dialog";
+    private static final AtomicBoolean SHUTDOWN_HOOK = new AtomicBoolean();
 
     private final Authority authority;
     private final NitroOsFunctions osFunctions;
@@ -89,6 +90,8 @@ public class NitroHttpProxy {
     }
 
     public boolean start() {
+        setupShutdownHook();
+
         try {
             proxyServer = DefaultHttpProxyServer.bootstrap()
                     .withPort(NitroConstants.HTTP_PORT)
@@ -132,5 +135,19 @@ public class NitroHttpProxy {
 
         proxyServer.stop();
         proxyServer = null;
+    }
+
+    /**
+     * Ensure the system proxy is removed when G-Earth exits.
+     * Otherwise, users might complain that their browsers / discord stop working when closing G-Earth incorrectly.
+     */
+    private static void setupShutdownHook() {
+        if (SHUTDOWN_HOOK.get()) {
+            return;
+        }
+
+        if (SHUTDOWN_HOOK.compareAndSet(false, true)) {
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> NitroOsFunctionsFactory.create().unregisterSystemProxy()));
+        }
     }
 }
