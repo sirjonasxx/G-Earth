@@ -95,7 +95,7 @@ public class NitroHttpProxy {
         try {
             proxyServer = DefaultHttpProxyServer.bootstrap()
                     .withPort(NitroConstants.HTTP_PORT)
-                    .withManInTheMiddle(new CertificateSniffingMitmManager(authority))
+                    .withManInTheMiddle(new NitroCertificateSniffingManager(authority))
                     .withFiltersSource(new NitroHttpProxyFilterSource(serverCallback))
                     .start();
 
