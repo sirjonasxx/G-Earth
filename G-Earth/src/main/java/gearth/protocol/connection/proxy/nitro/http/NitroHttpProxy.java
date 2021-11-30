@@ -54,7 +54,7 @@ public class NitroHttpProxy {
                     ButtonType.YES, ButtonType.NO
             );
 
-            shouldInstall.set(!(alert.showAndWait().filter(t -> t == ButtonType.YES).isPresent()));
+            shouldInstall.set(alert.showAndWait().filter(t -> t == ButtonType.YES).isPresent());
             waitForDialog.release();
         });
 
