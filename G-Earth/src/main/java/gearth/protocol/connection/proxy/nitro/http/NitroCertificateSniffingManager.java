@@ -9,6 +9,7 @@ import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.SSLSession;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
+import java.util.List;
 
 /**
  * {@link MitmManager} that uses the common name and subject alternative names
@@ -18,11 +19,11 @@ public class NitroCertificateSniffingManager implements MitmManager {
 
     private static final boolean DEBUG = false;
 
-    private BouncyCastleSslEngineSource sslEngineSource;
+    private final BouncyCastleSslEngineSource sslEngineSource;
 
     public NitroCertificateSniffingManager(Authority authority) throws RootCertificateException {
         try {
-            sslEngineSource = new BouncyCastleSslEngineSource(authority, true, true);
+            sslEngineSource = new BouncyCastleSslEngineSource(authority, true, true, null);
         } catch (final Exception e) {
             throw new RootCertificateException("Errors during assembling root CA.", e);
         }
@@ -54,7 +55,11 @@ public class NitroCertificateSniffingManager implements MitmManager {
             san.addAll(upstreamCert.getSubjectAlternativeNames());
 
             if (DEBUG) {
-                System.out.printf("[NitroCertificateSniffingManager] Subject Alternative Names: %s%n", san);
+                System.out.println("[NitroCertificateSniffingManager] Subject Alternative Names");
+
+                for (List<?> name : upstreamCert.getSubjectAlternativeNames()) {
+                    System.out.printf("[NitroCertificateSniffingManager] - %s%n", name.toString());
+                }
             }
 
             return sslEngineSource.createCertForHost(commonName, san);
