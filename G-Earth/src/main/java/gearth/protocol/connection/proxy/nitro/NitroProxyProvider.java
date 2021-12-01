@@ -11,6 +11,8 @@ import gearth.protocol.connection.proxy.nitro.http.NitroHttpProxyServerCallback;
 import gearth.protocol.connection.proxy.nitro.websocket.NitroWebsocketProxy;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 public class NitroProxyProvider implements ProxyProvider, NitroHttpProxyServerCallback, StateChangeListener {
 
@@ -21,6 +23,7 @@ public class NitroProxyProvider implements ProxyProvider, NitroHttpProxyServerCa
     private final NitroWebsocketProxy nitroWebsocketProxy;
 
     private String originalWebsocketUrl;
+    private String originalOriginUrl;
 
     public NitroProxyProvider(HProxySetter proxySetter, HStateSetter stateSetter, HConnection connection) {
         this.proxySetter = proxySetter;
@@ -32,6 +35,10 @@ public class NitroProxyProvider implements ProxyProvider, NitroHttpProxyServerCa
 
     public String getOriginalWebsocketUrl() {
         return originalWebsocketUrl;
+    }
+
+    public String getOriginalOriginUrl() {
+        return originalOriginUrl;
     }
 
     @Override
@@ -79,6 +86,8 @@ public class NitroProxyProvider implements ProxyProvider, NitroHttpProxyServerCa
     @Override
     public String replaceWebsocketServer(String configUrl, String websocketUrl) {
         originalWebsocketUrl = websocketUrl;
+        originalOriginUrl = extractOriginUrl(configUrl);
+
         return String.format("ws://127.0.0.1:%d", NitroConstants.WEBSOCKET_PORT);
     }
 
@@ -89,5 +98,16 @@ public class NitroProxyProvider implements ProxyProvider, NitroHttpProxyServerCa
             // We are not stopping the http proxy because some requests might still require it to be running.
             nitroHttpProxy.pause();
         }
+    }
+
+    private static String extractOriginUrl(String url) {
+        try {
+            final URI uri = new URI(url);
+            return String.format("%s://%s/", uri.getScheme(), uri.getHost());
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 }

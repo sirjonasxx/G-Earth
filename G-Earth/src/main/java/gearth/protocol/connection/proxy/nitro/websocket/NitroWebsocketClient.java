@@ -39,7 +39,7 @@ public class NitroWebsocketClient implements NitroSession {
         activeSession = session;
         activeSession.setMaxBinaryMessageBufferSize(NitroConstants.WEBSOCKET_BUFFER_SIZE);
 
-        server.connect(proxyProvider.getOriginalWebsocketUrl());
+        server.connect(proxyProvider.getOriginalWebsocketUrl(), proxyProvider.getOriginalOriginUrl());
 
         final HProxy proxy = new HProxy(HClient.NITRO, "", "", -1, -1, "");
 
