@@ -112,7 +112,7 @@ public class NitroWebsocketClient implements NitroSession {
 
             // Reset program state.
             proxySetter.setProxy(null);
-            stateSetter.setState(HState.NOT_CONNECTED);
+            stateSetter.setState(HState.ABORTING);
         }
     }
 }

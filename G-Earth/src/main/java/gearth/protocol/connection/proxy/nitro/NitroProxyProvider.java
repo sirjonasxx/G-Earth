@@ -13,6 +13,7 @@ import gearth.protocol.connection.proxy.nitro.websocket.NitroWebsocketProxy;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class NitroProxyProvider implements ProxyProvider, NitroHttpProxyServerCallback, StateChangeListener {
 
@@ -21,6 +22,7 @@ public class NitroProxyProvider implements ProxyProvider, NitroHttpProxyServerCa
     private final HConnection connection;
     private final NitroHttpProxy nitroHttpProxy;
     private final NitroWebsocketProxy nitroWebsocketProxy;
+    private final AtomicBoolean abortLock;
 
     private String originalWebsocketUrl;
     private String originalOriginUrl;
@@ -31,6 +33,7 @@ public class NitroProxyProvider implements ProxyProvider, NitroHttpProxyServerCa
         this.connection = connection;
         this.nitroHttpProxy = new NitroHttpProxy(this);
         this.nitroWebsocketProxy = new NitroWebsocketProxy(proxySetter, stateSetter, connection, this);
+        this.abortLock = new AtomicBoolean();
     }
 
     public String getOriginalWebsocketUrl() {
@@ -62,6 +65,14 @@ public class NitroProxyProvider implements ProxyProvider, NitroHttpProxyServerCa
 
     @Override
     public void abort() {
+        if (abortLock.get()) {
+            return;
+        }
+
+        if (abortLock.compareAndSet(true, true)) {
+            return;
+        }
+
         stateSetter.setState(HState.ABORTING);
 
         new Thread(() -> {
@@ -97,6 +108,11 @@ public class NitroProxyProvider implements ProxyProvider, NitroHttpProxyServerCa
             // Unregister but do not stop http proxy.
             // We are not stopping the http proxy because some requests might still require it to be running.
             nitroHttpProxy.pause();
+        }
+
+        // Catch setState ABORTING inside NitroWebsocketClient.
+        if (newState == HState.ABORTING) {
+            abort();
         }
     }
 
