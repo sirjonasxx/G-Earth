@@ -4,7 +4,7 @@ There are some known issues with the execution G-Earth, please read this through
 
 First of all, make sure you have extracted the .rar file into its own folder.
 If you're using a mac; make sure you have completed the mac-installation wiki page.
-
+*
 ## Problem 1: G-Earth doesn't open
 * It's recommended to use Java 8, some problems have occurred with people using Java 11 or other versions. It shouldn't be hard to fix this with a simple google search.
 * On Linux, if you get a "Invalid MIT-MAGIC-COOKIE-1" exception, execute "xhost +local:" in a terminal
@@ -25,6 +25,21 @@ If you're using a mac; make sure you have completed the mac-installation wiki pa
 * Make sure you don't have a VPN(/browser extension) enabled
 * Your antivirus might be the problem, try to disable it
 * Your firewall might be the problem, try to disable it
+
+## Problem 4: Retro doesn't loads (with or without G-Earth)
+* If you can't connect to the retro after using G-Earth and you are stuck at 76% without G-Earth
+
+    Try the following steps:
+
+    - Open cmd as administrator (https://www.wikihow.com/Run-Command-Prompt-As-an-Administrator-on-Windows)
+    - Run this command `netsh interface ip delete address "Loopback" HOST`
+
+        Replace `HOST` with the host of you retro
+
+    If you don't see any message after the command, it works, 
+    but if you have something like "can't find this ip address":
+     1) Your host is wrong or
+     2) The problem does not come from here
 
 ## Creating an Issue
 If the solutions did NOT help you, navigate to https://github.com/sirjonasxx/G-Earth/issues and, if it hasn't been solved before, create a new issue.
