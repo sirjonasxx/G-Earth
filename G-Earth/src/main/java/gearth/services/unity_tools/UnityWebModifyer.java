@@ -13,33 +13,29 @@ import java.nio.file.Paths;
 
 public class UnityWebModifyer {
 
-    public final static String UNITY_PROD = "habbo2020-global-prod.json";
     public final static String UNITY_DATA = "habbo2020-global-prod.data.unityweb";
-    public final static String UNITY_CODE = "habbo2020-global-prod.wasm.code.unityweb";
-    public final static String UNITY_FRAMEWORK = "habbo2020-global-prod.wasm.framework.unityweb";
-    public final static String UNITY_LOADER = "UnityLoader.js";
+    public final static String UNITY_CODE = "habbo2020-global-prod.wasm.gz";
+    public final static String UNITY_FRAMEWORK = "habbo2020-global-prod.framework.js.gz";
+    public final static String UNITY_LOADER = "habbo2020-global-prod.loader.js";
 
     private final static String UNITYFILES_URL = "https://images.habbo.com/habbo-webgl-clients/{revision}/WebGL/habbo2020-global-prod/Build/";
 
-    private final String revision;
-    private final File saveFolder;
-    private final String currentUrl;
+    private String revision;
+    private File saveFolder;
+    private String currentUrl;
 
 
-    public UnityWebModifyer(String revision, String saveFolder) {
+    public synchronized boolean modifyAllFiles(String revision, String saveFolderName) {
         this.revision = revision;
-        this.currentUrl = UNITYFILES_URL.replace("{revision}", revision);
-        this.saveFolder = new File(saveFolder);
-    }
+        currentUrl = UNITYFILES_URL.replace("{revision}", revision);
+        saveFolder = new File(saveFolderName);
 
-    public boolean modifyAllFiles() {
         if (saveFolder.exists()) {
             return true;
         }
         saveFolder.mkdirs();
 
         try {
-            modifyProdFile();
             modifyDataFile();
             modifyCodeFile();
             modifyFrameworkFile();
@@ -57,27 +53,6 @@ public class UnityWebModifyer {
         return true;
     }
 
-    // return urls for: data, code & framework file
-    private void modifyProdFile() throws IOException {
-        String prodUrl = currentUrl + UNITY_PROD;
-
-        URLConnection connection = new URL(prodUrl).openConnection();
-        InputStream is = connection.getInputStream();
-        BufferedReader in = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
-
-        FileWriter fileWriter = new FileWriter(new File(saveFolder, UNITY_PROD));
-        BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-
-        String line;
-        while ((line = in.readLine()) != null) {
-            bufferedWriter.write(line);
-            bufferedWriter.newLine();
-        }
-
-        bufferedWriter.close();
-        in.close();
-    }
-
     private void downloadToFile(URL url, File file) throws IOException {
         BufferedInputStream in = new BufferedInputStream(url.openStream());
         FileOutputStream fileOutputStream = new FileOutputStream(file);
@@ -89,7 +64,7 @@ public class UnityWebModifyer {
         fileOutputStream.close();
         in.close();
     }
-
+//
     private void modifyDataFile() throws IOException {
         File dataFile = new File(saveFolder, UNITY_DATA);
         URL dataUrl = new URL(currentUrl + UNITY_DATA);

@@ -15,6 +15,7 @@ public class GUnityFileServer extends HttpServlet
 {
 
     public final static int FILESERVER_PORT = 9089;
+    private final static UnityWebModifyer modifyer = new UnityWebModifyer();
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException
@@ -38,11 +39,10 @@ public class GUnityFileServer extends HttpServlet
 
             String revision = url.split("/")[4];
 
-            if (path.equals("/prod")) getProd(revision, response);
-            else if (path.equals("/data")) getData(revision, response);
-            else if (path.equals("/wasm/code")) getWasmCode(revision, response);
-            else if (path.equals("/wasm/framework")) getWasmFramework(revision, response);
-            else if (path.equals("/unityloader")) getUnityLoader(revision, response);
+            if (path.equals("/data")) getData(revision, response);
+            else if (path.equals("/wasm")) getWasmCode(revision, response);
+            else if (path.equals("/framework")) getWasmFramework(revision, response);
+            else if (path.equals("/loader")) getLoader(revision, response);
             else if (path.equals("/version")) getVersion(revision, response, url);
             else if (path.equals("/logo")) getLogo(response);
             else {
@@ -93,29 +93,26 @@ public class GUnityFileServer extends HttpServlet
     }
 
 
-    private void getProd(String revision, HttpServletResponse response) throws IOException {
-        UnityWebModifyer unitywebModifyer = new UnityWebModifyer(revision, getDir(revision));
-        unitywebModifyer.modifyAllFiles();
-
-        fileResponse(getDir(revision) + UnityWebModifyer.UNITY_PROD, response, "application/json");
-    }
-
     private void getData(String revision, HttpServletResponse response) throws IOException {
-        // application/vnd.unity
+        modifyer.modifyAllFiles(revision, getDir(revision));
+
         fileResponse(getDir(revision) + UnityWebModifyer.UNITY_DATA, response, "application/vnd.unity");
     }
 
     private void getWasmCode(String revision, HttpServletResponse response) throws IOException {
+        modifyer.modifyAllFiles(revision, getDir(revision));
+
         fileResponse(getDir(revision) + UnityWebModifyer.UNITY_CODE, response, "application/vnd.unity");
     }
 
     private void getWasmFramework(String revision, HttpServletResponse response) throws IOException {
+        modifyer.modifyAllFiles(revision, getDir(revision));
+
         fileResponse(getDir(revision) + UnityWebModifyer.UNITY_FRAMEWORK, response, "application/vnd.unity");
     }
 
-    private void getUnityLoader(String revision, HttpServletResponse response) throws IOException {
-        UnityWebModifyer unitywebModifyer = new UnityWebModifyer(revision, getDir(revision));
-        unitywebModifyer.modifyAllFiles();
+    private void getLoader(String revision, HttpServletResponse response) throws IOException {
+        modifyer.modifyAllFiles(revision, getDir(revision));
 
         fileResponse(getDir(revision) + UnityWebModifyer.UNITY_LOADER, response, "text/javascript");
     }
