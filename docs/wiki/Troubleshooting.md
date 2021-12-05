@@ -1,10 +1,8 @@
-**HABBO AIR CURRENTLY DOESN'T WORK FOR MAC**
-
 There are some known issues with the execution G-Earth, please read this through carefully.
 
 First of all, make sure you have extracted the .rar file into its own folder.
 If you're using a mac; make sure you have completed the mac-installation wiki page.
-*
+
 ## Problem 1: G-Earth doesn't open
 * It's recommended to use Java 8, some problems have occurred with people using Java 11 or other versions. It shouldn't be hard to fix this with a simple google search.
 * On Linux, if you get a "Invalid MIT-MAGIC-COOKIE-1" exception, execute "xhost +local:" in a terminal
