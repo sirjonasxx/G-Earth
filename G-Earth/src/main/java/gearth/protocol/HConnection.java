@@ -1,6 +1,7 @@
 package gearth.protocol;
 
 import gearth.misc.listenerpattern.Observable;
+import gearth.protocol.connection.proxy.nitro.NitroProxyProvider;
 import gearth.services.packet_info.PacketInfoManager;
 import gearth.protocol.connection.HClient;
 import gearth.protocol.connection.HProxy;
@@ -65,6 +66,12 @@ public class HConnection {
     public void startUnity() {
         HConnection selff = this;
         proxyProvider = new UnityProxyProvider(proxy -> selff.proxy = proxy, selff::setState, this);
+        startMITM();
+    }
+
+    public void startNitro() {
+        HConnection selff = this;
+        proxyProvider = new NitroProxyProvider(proxy -> selff.proxy = proxy, selff::setState, this);
         startMITM();
     }
 
@@ -140,6 +147,7 @@ public class HConnection {
 
 
     public boolean sendToClient(HPacket packet) {
+        HProxy proxy = this.proxy;
         if (proxy == null) return false;
 
         if (!packet.isPacketComplete()) {
@@ -149,10 +157,10 @@ public class HConnection {
             if (!packet.isPacketComplete() || !packet.canSendToClient()) return false;
         }
 
-        proxy.getPacketSenderQueue().queueToClient(packet);
-        return true;
+        return proxy.sendToClient(packet);
     }
     public boolean sendToServer(HPacket packet) {
+        HProxy proxy = this.proxy;
         if (proxy == null) return false;
 
         if (!packet.isPacketComplete()) {
@@ -162,8 +170,7 @@ public class HConnection {
             if (!packet.isPacketComplete() || !packet.canSendToServer()) return false;
         }
 
-        proxy.getPacketSenderQueue().queueToServer(packet);
-        return true;
+        return proxy.sendToServer(packet);
     }
 
     public String getClientHost() {

@@ -20,7 +20,7 @@ public abstract class PacketHandler {
     }
 
 
-    public abstract void sendToStream(byte[] buffer);
+    public abstract boolean sendToStream(byte[] buffer);
 
     public abstract void act(byte[] buffer) throws IOException;
 

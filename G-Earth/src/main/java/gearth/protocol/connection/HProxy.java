@@ -1,5 +1,6 @@
 package gearth.protocol.connection;
 
+import gearth.protocol.HPacket;
 import gearth.services.packet_info.PacketInfoManager;
 import gearth.protocol.packethandler.PacketHandler;
 
@@ -25,8 +26,6 @@ public class HProxy {
     private volatile String clientIdentifier = "";
     private volatile PacketInfoManager packetInfoManager = null;
 
-    private volatile PacketSenderQueue packetSenderQueue = null;
-
     public HProxy(HClient hClient, String input_domain, String actual_domain, int actual_port, int intercept_port, String intercept_host) {
         this.hClient = hClient;
         this.input_domain = input_domain;
@@ -46,7 +45,20 @@ public class HProxy {
         this.hotelVersion = hotelVersion;
         this.clientIdentifier = clientIdentifier;
         this.packetInfoManager = PacketInfoManager.fromHotelVersion(hotelVersion, hClient);
-        this.packetSenderQueue = new PacketSenderQueue(this);
+    }
+
+    public boolean sendToServer(HPacket packet) {
+        if (outHandler != null) {
+            return outHandler.sendToStream(packet.toBytes());
+        }
+        return false;
+    }
+
+    public boolean sendToClient(HPacket packet) {
+        if (inHandler != null) {
+            return inHandler.sendToStream(packet.toBytes());
+        }
+        return false;
     }
 
     public String getClientIdentifier() {
@@ -87,10 +99,6 @@ public class HProxy {
 
     public String getHotelVersion() {
         return hotelVersion;
-    }
-
-    public PacketSenderQueue getPacketSenderQueue() {
-        return packetSenderQueue;
     }
 
     public HClient gethClient() {

@@ -114,8 +114,7 @@ public class PacketInfoManager {
 
         if (clientType == HClient.UNITY) {
             result.addAll(new GEarthUnityPacketInfoProvider(hotelversion).provide());
-        }
-        else if (clientType == HClient.FLASH) {
+        } else if (clientType == HClient.FLASH || clientType == HClient.NITRO) {
             try {
                 List<RemotePacketInfoProvider> providers = new ArrayList<>();
                 providers.add(new HarblePacketInfoProvider(hotelversion));

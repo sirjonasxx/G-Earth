@@ -224,7 +224,11 @@
             <artifactId>bytes</artifactId>
             <version>1.5.0</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.github.ganskef</groupId>
+            <artifactId>littleproxy-mitm</artifactId>
+            <version>1.1.0</version>
+        </dependency>
 
 
 
@@ -232,7 +236,7 @@
         <dependency>
             <groupId>G-Earth</groupId>
             <artifactId>G-Wasm</artifactId>
-            <version>1.0</version>
+            <version>1.0.1</version>
         </dependency>
 
     </dependencies>

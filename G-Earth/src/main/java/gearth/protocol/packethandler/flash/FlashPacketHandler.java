@@ -51,7 +51,9 @@ public abstract class FlashPacketHandler extends PacketHandler {
 
     public void act(byte[] buffer) throws IOException {
         if (!isDataStream) {
-            out.write(buffer);
+            synchronized (sendLock) {
+                out.write(buffer);
+            }
             return;
         }
 
@@ -113,7 +115,7 @@ public abstract class FlashPacketHandler extends PacketHandler {
         isTempBlocked = false;
     }
 
-    public void sendToStream(byte[] buffer) {
+    public boolean sendToStream(byte[] buffer) {
         synchronized (sendLock) {
             try {
                 out.write(
@@ -121,8 +123,10 @@ public abstract class FlashPacketHandler extends PacketHandler {
                                 ? buffer
                                 : encryptcipher.rc4(buffer)
                 );
+                return true;
             } catch (IOException e) {
                 e.printStackTrace();
+                return false;
             }
         }
     }

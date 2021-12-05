@@ -1,0 +1,88 @@
+name: Build G-Earth
+
+on:
+  push:
+    paths:
+      - '.github/workflows/**'
+      - 'G-Earth/**'
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+    - name: Checkout G-Earth
+      uses: actions/checkout@v2
+
+    - name: Checkout G-Wasm
+      uses: actions/checkout@v2
+      with:
+        repository: sirjonasxx/G-Wasm
+        path: gwasm
+        ref: minimal
+
+    - name: Set up JDK 8
+      uses: actions/setup-java@v2
+      with:
+        java-version: '8'
+        java-package: jdk+fx
+        distribution: 'liberica'
+
+    - name: Install G-Wasm
+      working-directory: gwasm
+      run: mvn -B install
+       
+    - name: Build G-Earth
+      run: mvn -B package
+    
+    - name: Zip Build/Mac
+      run: | 
+        cd ${{ github.workspace }}/Build/Mac/
+        zip -r ../../build-mac.zip *
+    
+    - name: Zip Build/Linux
+      run: | 
+        cd ${{ github.workspace }}/Build/Linux/
+        zip -r ../../build-linux.zip *
+    
+    - name: Zip Build/Windows_32bit
+      run: | 
+        cd ${{ github.workspace }}/Build/Windows_32bit/
+        zip -r ../../build-win32.zip *
+    
+    - name: Zip Build/Windows_64bit
+      run: |
+        cd ${{ github.workspace }}/Build/Windows_64bit/
+        zip -r ../../build-win64.zip *
+
+    - name: Upload Mac OSX
+      uses: actions/upload-artifact@v2
+      with:
+        name: Mac OSX
+        path: build-mac.zip
+        retention-days: 7
+
+    - name: Upload Linux
+      uses: actions/upload-artifact@v2
+      with:
+        name: Linux
+        path: build-linux.zip
+        retention-days: 7
+
+    - name: Upload Windows x32
+      uses: actions/upload-artifact@v2
+      with:
+        name: Windows x32
+        path: build-win32.zip
+        retention-days: 7
+
+    - name: Upload Windows x64
+      uses: actions/upload-artifact@v2
+      with:
+        name: Windows x64
+        path: build-win64.zip
+        retention-days: 7

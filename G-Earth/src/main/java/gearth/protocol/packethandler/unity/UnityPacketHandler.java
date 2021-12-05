@@ -23,11 +23,12 @@ public class UnityPacketHandler extends PacketHandler {
     }
 
     @Override
-    public void sendToStream(byte[] buffer) {
+    public boolean sendToStream(byte[] buffer) {
         byte[] prefix = new byte[]{(direction == HMessage.Direction.TOCLIENT ? ((byte)0) : ((byte)1))};
         byte[] combined = ByteArrayUtils.combineByteArrays(prefix, buffer);
 
         session.getAsyncRemote().sendBinary(ByteBuffer.wrap(combined));
+        return true;
     }
 
     @Override
