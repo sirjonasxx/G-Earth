@@ -10,7 +10,6 @@ import javafx.scene.control.ButtonType;
 import org.littleshoot.proxy.HttpProxyServer;
 import org.littleshoot.proxy.impl.DefaultHttpProxyServer;
 import org.littleshoot.proxy.mitm.Authority;
-import org.littleshoot.proxy.mitm.CertificateSniffingMitmManager;
 import org.littleshoot.proxy.mitm.RootCertificateException;
 
 import java.io.File;
@@ -55,7 +54,7 @@ public class NitroHttpProxy {
                     ButtonType.YES, ButtonType.NO
             );
 
-            shouldInstall.set(!(alert.showAndWait().filter(t -> t == ButtonType.YES).isPresent()));
+            shouldInstall.set(alert.showAndWait().filter(t -> t == ButtonType.YES).isPresent());
             waitForDialog.release();
         });
 
@@ -95,7 +94,7 @@ public class NitroHttpProxy {
         try {
             proxyServer = DefaultHttpProxyServer.bootstrap()
                     .withPort(NitroConstants.HTTP_PORT)
-                    .withManInTheMiddle(new CertificateSniffingMitmManager(authority))
+                    .withManInTheMiddle(new NitroCertificateSniffingManager(authority))
                     .withFiltersSource(new NitroHttpProxyFilterSource(serverCallback))
                     .start();
 

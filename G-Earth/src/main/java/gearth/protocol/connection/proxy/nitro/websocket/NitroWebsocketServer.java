@@ -8,9 +8,11 @@ import gearth.protocol.packethandler.PacketHandler;
 import javax.websocket.*;
 import java.io.IOException;
 import java.net.URI;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
-@ClientEndpoint
-public class NitroWebsocketServer implements NitroSession {
+public class NitroWebsocketServer extends Endpoint implements NitroSession {
 
     private final PacketHandler packetHandler;
     private final NitroWebsocketClient client;
@@ -21,32 +23,50 @@ public class NitroWebsocketServer implements NitroSession {
         this.packetHandler = new NitroPacketHandler(HMessage.Direction.TOCLIENT, client, connection.getExtensionHandler(), connection.getTrafficObservables());
     }
 
-    public void connect(String websocketUrl) throws IOException {
+    public void connect(String websocketUrl, String originUrl) throws IOException {
         try {
-            ContainerProvider.getWebSocketContainer().connectToServer(this, URI.create(websocketUrl));
+            ClientEndpointConfig.Builder builder = ClientEndpointConfig.Builder.create();
+
+            if (originUrl != null) {
+                builder.configurator(new ClientEndpointConfig.Configurator() {
+                    @Override
+                    public void beforeRequest(Map<String, List<String>> headers) {
+                        headers.put("Origin", Collections.singletonList(originUrl));
+                    }
+                });
+            }
+
+            ClientEndpointConfig config = builder.build();
+
+            ContainerProvider.getWebSocketContainer().connectToServer(this, config, URI.create(websocketUrl));
         } catch (DeploymentException e) {
             throw new IOException("Failed to deploy websocket client", e);
         }
     }
 
-    @OnOpen
-    public void onOpen(Session Session) {
-        this.activeSession = Session;
+    @Override
+    public void onOpen(Session session, EndpointConfig config) {
+        this.activeSession = session;
         this.activeSession.setMaxBinaryMessageBufferSize(NitroConstants.WEBSOCKET_BUFFER_SIZE);
+        this.activeSession.addMessageHandler(new MessageHandler.Whole<byte[]>() {
+            @Override
+            public void onMessage(byte[] message) {
+                try {
+                    packetHandler.act(message);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
-    @OnMessage
-    public void onMessage(byte[] b, Session session) throws IOException {
-        packetHandler.act(b);
-    }
-
-    @OnClose
-    public void onClose(Session userSession, CloseReason reason) {
+    @Override
+    public void onClose(Session session, CloseReason closeReason) {
         // Hotel closed connection.
         client.shutdownProxy();
     }
 
-    @OnError
+    @Override
     public void onError(Session session, Throwable throwable) {
         throwable.printStackTrace();
 
