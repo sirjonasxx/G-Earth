@@ -37,12 +37,14 @@ Name | Language | Developers | Github
 G-Earth (Native) | Java | sirjonasxx | https://github.com/sirjonasxx/G-Earth
 G-Python<sup>1</sup> | Python | sirjonasxx | https://github.com/sirjonasxx/G-Python
 Geode | C# & Visual Basic | ArachisH, LilithRainbows | https://github.com/LilithRainbows/Geode
-Xabbo | C# | b7 | https://github.com/b7c/Xabbo.Scripter
+Xabbo | C# | b7 | https://github.com/b7c/Xabbo.GEarth
+Xabbo scripter<sup>2</sup> | C# | b7 | https://github.com/b7c/Xabbo.Scripter
 G-Node | Node.js | WiredSpast | https://github.com/WiredSpast/G-Node
-GProgrammer<sup>2</sup> | Javascript | at15four2020 | https://github.com/at15four2020/GProgrammer/wiki
+GProgrammer<sup>3</sup> | Javascript | at15four2020 | https://github.com/at15four2020/GProgrammer/wiki
 
 <sub>1: built-in in G-Earth through the [live scripting console](https://github.com/sirjonasxx/G-Earth/wiki/G-Python-qtConsole) </sub>  
-<sub>2: not an implementation of the extension API, but allows for Javascript scripting, also check [G-WiredFly](https://github.com/at15four2020/G-Wiredfy) </sub>
+<sub>2: not an implementation of the extension API, but allows for C# scripting </sub>  
+<sub>3: not an implementation of the extension API, but allows for Javascript scripting, also check [G-WiredFly](https://github.com/at15four2020/G-Wiredfy) </sub>
 
 Release your extensions in the [G-ExtensionStore](https://github.com/sirjonasxx/G-ExtensionStore)
 
