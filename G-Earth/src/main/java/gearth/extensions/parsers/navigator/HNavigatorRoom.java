@@ -227,5 +227,91 @@ public class HNavigatorRoom {
         this.categoryId = categoryId;
     }
 
-    
+    public String[] getTags() {
+        return tags;
+    }
+
+    public void setTags(String[] tags) {
+        this.tags = tags;
+    }
+
+    public String getOfficialRoomPicRef() {
+        return officialRoomPicRef;
+    }
+
+    public void setOfficialRoomPicRef(String officialRoomPicRef) {
+        this.officialRoomPicRef = officialRoomPicRef;
+    }
+
+    public int getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(int groupId) {
+        this.groupId = groupId;
+    }
+
+    public String getGroupName() {
+        return groupName;
+    }
+
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
+    }
+
+    public String getGroupBadgeCode() {
+        return groupBadgeCode;
+    }
+
+    public void setGroupBadgeCode(String groupBadgeCode) {
+        this.groupBadgeCode = groupBadgeCode;
+    }
+
+    public String getRoomAdName() {
+        return roomAdName;
+    }
+
+    public void setRoomAdName(String roomAdName) {
+        this.roomAdName = roomAdName;
+    }
+
+    public String getRoomAdDescription() {
+        return roomAdDescription;
+    }
+
+    public void setRoomAdDescription(String roomAdDescription) {
+        this.roomAdDescription = roomAdDescription;
+    }
+
+    public int getRoomAdExpiresInMin() {
+        return roomAdExpiresInMin;
+    }
+
+    public void setRoomAdExpiresInMin(int roomAdExpiresInMin) {
+        this.roomAdExpiresInMin = roomAdExpiresInMin;
+    }
+
+    public boolean isShowOwner() {
+        return showOwner;
+    }
+
+    public void setShowOwner(boolean showOwner) {
+        this.showOwner = showOwner;
+    }
+
+    public boolean isAllowPets() {
+        return allowPets;
+    }
+
+    public void setAllowPets(boolean allowPets) {
+        this.allowPets = allowPets;
+    }
+
+    public boolean isDisplayRoomEntryAd() {
+        return displayRoomEntryAd;
+    }
+
+    public void setDisplayRoomEntryAd(boolean displayRoomEntryAd) {
+        this.displayRoomEntryAd = displayRoomEntryAd;
+    }
 }
