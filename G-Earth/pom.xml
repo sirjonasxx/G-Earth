@@ -235,8 +235,8 @@
 
         <dependency>
             <groupId>G-Earth</groupId>
-            <artifactId>G-Wasm</artifactId>
-            <version>1.0.1</version>
+            <artifactId>G-Wasm-Minimal</artifactId>
+            <version>1.0.2</version>
         </dependency>
 
     </dependencies>
