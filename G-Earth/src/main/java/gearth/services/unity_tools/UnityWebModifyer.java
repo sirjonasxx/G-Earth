@@ -1,5 +1,6 @@
 package gearth.services.unity_tools;
 
+import org.apache.commons.io.IOUtils;
 import org.codehaus.plexus.util.FileUtils;
 import wasm.disassembly.InvalidOpCodeException;
 
@@ -10,10 +11,12 @@ import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 public class UnityWebModifyer {
 
-    public final static String UNITY_DATA = "habbo2020-global-prod.data.unityweb";
+    public final static String UNITY_DATA = "habbo2020-global-prod.data.gz";
     public final static String UNITY_CODE = "habbo2020-global-prod.wasm.gz";
     public final static String UNITY_FRAMEWORK = "habbo2020-global-prod.framework.js.gz";
     public final static String UNITY_LOADER = "habbo2020-global-prod.loader.js";
@@ -64,7 +67,7 @@ public class UnityWebModifyer {
         fileOutputStream.close();
         in.close();
     }
-//
+    //
     private void modifyDataFile() throws IOException {
         File dataFile = new File(saveFolder, UNITY_DATA);
         URL dataUrl = new URL(currentUrl + UNITY_DATA);
@@ -106,7 +109,7 @@ public class UnityWebModifyer {
         downloadToFile(frameworkUrl, frameworkFile);
 
 
-        byte[] encoded = Files.readAllBytes(Paths.get(frameworkFile.getAbsolutePath()));
+        byte[] encoded = IOUtils.toByteArray(new GZIPInputStream(new FileInputStream(frameworkFile)));
         String contents = new String(encoded, StandardCharsets.UTF_8);
 
         contents = insertFrameworkCode(contents, 0, "js_code/unity_code.js");
@@ -124,7 +127,7 @@ public class UnityWebModifyer {
                 .replace("var _malloc", "_malloc")
                 .replace("{{RevisionName}}", revision);
 
-        BufferedWriter writer = new BufferedWriter(new FileWriter(frameworkFile));
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new GZIPOutputStream(new FileOutputStream(frameworkFile))));
         writer.write(contents);
         writer.close();
     }
@@ -137,14 +140,14 @@ public class UnityWebModifyer {
         byte[] encoded = Files.readAllBytes(Paths.get(loaderFile.getAbsolutePath()));
         String contents = new String(encoded, StandardCharsets.UTF_8);
 
-        contents = contents.replace("o.result.responseHeaders[e]==a.getResponseHeader(e)", "false");
-        contents = contents.replace("i.responseHeaders[e]=o.getResponseHeader(e)",
+        contents = contents.replace("o.result.responseHeaders[e]==s.getResponseHeader(e)", "false");
+        contents = contents.replace("a.responseHeaders[e]=o.getResponseHeader(e)",
                 "const genRanHex = size => [...Array(size)].map(() => Math.floor(Math.random() * 16).toString(16)).join('');\n" +
                         "                if (e === \"ETag\") {\n" +
-                        "                    i.responseHeaders[e] = \"W/\\\"\" + genRanHex(6) + \"-\" + genRanHex(13) + \"\\\"\"\n" +
+                        "                    a.responseHeaders[e] = \"W/\\\"\" + genRanHex(6) + \"-\" + genRanHex(13) + \"\\\"\"\n" +
                         "                }\n" +
                         "                else {\n" +
-                        "                    i.responseHeaders[e] = o.getResponseHeader(e)\n" +
+                        "                    a.responseHeaders[e] = o.getResponseHeader(e)\n" +
                         "                }");
 
         BufferedWriter writer = new BufferedWriter(new FileWriter(loaderFile));

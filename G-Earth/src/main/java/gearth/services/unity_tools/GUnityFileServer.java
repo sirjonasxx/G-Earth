@@ -76,10 +76,16 @@ public class GUnityFileServer extends HttpServlet
     }
 
 
-    private void fileResponse(String file, HttpServletResponse response, String contentType) throws IOException {
+    private void fileResponse(String file, HttpServletResponse response, String contentType, boolean gzip) throws IOException {
         ServletOutputStream out = response.getOutputStream();
         InputStream in = new FileInputStream(file);
-//        response.setContentType(contentType);
+        if (contentType != null) {
+            response.setContentType(contentType);
+        }
+
+        if (gzip) {
+            response.setHeader("Content-Encoding", "gzip");
+        }
 
         byte[] bytes = new byte[4096];
         int bytesRead;
@@ -96,25 +102,25 @@ public class GUnityFileServer extends HttpServlet
     private void getData(String revision, HttpServletResponse response) throws IOException {
         modifyer.modifyAllFiles(revision, getDir(revision));
 
-        fileResponse(getDir(revision) + UnityWebModifyer.UNITY_DATA, response, "application/vnd.unity");
+        fileResponse(getDir(revision) + UnityWebModifyer.UNITY_DATA, response, null, true);
     }
 
     private void getWasmCode(String revision, HttpServletResponse response) throws IOException {
         modifyer.modifyAllFiles(revision, getDir(revision));
 
-        fileResponse(getDir(revision) + UnityWebModifyer.UNITY_CODE, response, "application/vnd.unity");
+        fileResponse(getDir(revision) + UnityWebModifyer.UNITY_CODE, response, "application/wasm", true);
     }
 
     private void getWasmFramework(String revision, HttpServletResponse response) throws IOException {
         modifyer.modifyAllFiles(revision, getDir(revision));
 
-        fileResponse(getDir(revision) + UnityWebModifyer.UNITY_FRAMEWORK, response, "application/vnd.unity");
+        fileResponse(getDir(revision) + UnityWebModifyer.UNITY_FRAMEWORK, response, "text/javascript", true);
     }
 
     private void getLoader(String revision, HttpServletResponse response) throws IOException {
         modifyer.modifyAllFiles(revision, getDir(revision));
 
-        fileResponse(getDir(revision) + UnityWebModifyer.UNITY_LOADER, response, "text/javascript");
+        fileResponse(getDir(revision) + UnityWebModifyer.UNITY_LOADER, response, "text/javascript", false);
     }
 
     private void getVersion(String revision, HttpServletResponse response, String url) throws IOException {
