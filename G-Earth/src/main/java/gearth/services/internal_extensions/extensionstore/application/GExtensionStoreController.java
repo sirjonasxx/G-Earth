@@ -7,6 +7,7 @@ import gearth.services.internal_extensions.extensionstore.application.entities.c
 import gearth.services.internal_extensions.extensionstore.application.entities.installed.InstalledOverview;
 import gearth.services.internal_extensions.extensionstore.application.entities.queriedoverviews.ByDateOverview;
 import gearth.services.internal_extensions.extensionstore.application.entities.queriedoverviews.ByRatingOverview;
+import gearth.services.internal_extensions.extensionstore.application.entities.queriedoverviews.ByUpdateOverview;
 import gearth.services.internal_extensions.extensionstore.application.entities.search.SearchOverview;
 import gearth.services.internal_extensions.extensionstore.repository.StoreRepository;
 import javafx.application.Platform;
@@ -47,20 +48,20 @@ public class GExtensionStoreController implements Initializable {
                 JSObject window = (JSObject) webView.getEngine().executeScript("window");
                 window.setMember("app", extensionStore);
 
-                Element by_date_link = webView.getEngine().getDocument().getElementById("overview_by_date");
+                Element by_update_link = webView.getEngine().getDocument().getElementById("overview_by_update");
                 Element by_rating_link = webView.getEngine().getDocument().getElementById("overview_by_rating");
                 Element by_category_link = webView.getEngine().getDocument().getElementById("overview_by_category");
                 Element installed_link = webView.getEngine().getDocument().getElementById("overview_installed");
                 Element seach_link = webView.getEngine().getDocument().getElementById("search_page");
 
                 Map<Element, Supplier<HOverview>> hOverviewSupplier = new HashMap<>();
-                hOverviewSupplier.put(by_date_link, () -> new ByDateOverview(null, 0, GExtensionStore.PAGESIZE, getStoreRepository()));
+                hOverviewSupplier.put(by_update_link, () -> new ByUpdateOverview(null, 0, GExtensionStore.PAGESIZE, getStoreRepository()));
                 hOverviewSupplier.put(by_rating_link, () -> new ByRatingOverview(null, 0, GExtensionStore.PAGESIZE, getStoreRepository()));
                 hOverviewSupplier.put(by_category_link, () -> new CategoryOverview(null, 0, GExtensionStore.PAGESIZE, getStoreRepository()));
                 hOverviewSupplier.put(installed_link, () -> new InstalledOverview(null, 0, GExtensionStore.PAGESIZE, getStoreRepository()));
                 hOverviewSupplier.put(seach_link, () -> new SearchOverview(null, getStoreRepository()));
 
-                Arrays.asList(by_date_link, by_rating_link, by_category_link, installed_link, seach_link).forEach(l ->
+                Arrays.asList(by_update_link, by_rating_link, by_category_link, installed_link, seach_link).forEach(l ->
                     ((EventTarget) l).addEventListener("click", event -> {
                         if (initialized) setRootOverview(hOverviewSupplier.get(l).get());
                     }, true));
@@ -210,7 +211,7 @@ public class GExtensionStoreController implements Initializable {
 
     private void onFullInitialize() {
         initialized = true;
-        setRootOverview(new ByDateOverview(null, 0, GExtensionStore.PAGESIZE, getStoreRepository()));
+        setRootOverview(new ByUpdateOverview(null, 0, GExtensionStore.PAGESIZE, getStoreRepository()));
     }
 
     public void gExtensionStore(GExtensionStore gExtensionStore) {
