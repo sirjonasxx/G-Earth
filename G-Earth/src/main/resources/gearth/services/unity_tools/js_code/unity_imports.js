@@ -30,27 +30,20 @@ function g_incoming_packet(param1, param2, param3, param4, param5) {
     }
 }
 
-// function g_chacha_setkey(param1, param2, param3, param4) {
-//     if (chachas.length === 2) {
-//         chachas = [];
-//     }
-//
-//     chachas.push(param1);
-// }
+function g_chacha_setkey(param1, param2, param3, param4) {
+    if (chachas.length === 2) {
+        chachas = [];
+    }
+
+    chachas.push(param1);
+}
 
 function g_chacha_returnbyte(param1, param2, param3) {
-    console.log("hi");
     chachaClass = param3;
-    if (chachas[0] === -1) {
-        chachas[0] = param1;
-    }
-    else if (chachas[1] === -1 && chachas[0] !== param1) {
-        chachas[1] = param1;
-    }
     return param2;
 }
 
 env["g_outgoing_packet"] = g_outgoing_packet;
 env["g_incoming_packet"] = g_incoming_packet;
-// env["g_chacha_setkey"] = g_chacha_setkey;
+env["g_chacha_setkey"] = g_chacha_setkey;
 env["g_chacha_returnbyte"] = g_chacha_returnbyte;

@@ -20,7 +20,7 @@ let _gearth_incoming_copy;
 
 let _malloc;
 let _free;
-let Module;
+let _module;
 
 
 var packetBuff = {"out": [], "in": []};
@@ -98,10 +98,10 @@ function inject_out(packet) {
         let inject_amount = Math.min(_g_packet_split, packet.length - i);
 
         let packet_location = _malloc(inject_amount + 16);
-        Module.HEAPU8.set(out_packet_objid, packet_location);
-        Module.HEAPU8.fill(0, packet_location + 4, packet_location + 12);
-        Module.HEAPU8.set(writeLittleEndian(inject_amount), packet_location + 12);
-        Module.HEAPU8.set(packet.slice(i, i + inject_amount), packet_location + 16);
+        _module.HEAPU8.set(out_packet_objid, packet_location);
+        _module.HEAPU8.fill(0, packet_location + 4, packet_location + 12);
+        _module.HEAPU8.set(writeLittleEndian(inject_amount), packet_location + 12);
+        _module.HEAPU8.set(packet.slice(i, i + inject_amount), packet_location + 16);
 
         _gearth_outgoing_copy(out_send_param1, packet_location, out_send_param3);
         _free(packet_location);
@@ -129,8 +129,8 @@ function inject_in(packet) {
         let inject_amount = Math.min(_g_packet_split, packet.length - i);
 
         let packet_location = _malloc(inject_amount + 16);
-        Module.HEAPU8.set(in_packet_prefix, packet_location);
-        Module.HEAPU8.set(packet.slice(i, i + inject_amount), packet_location + 16);
+        _module.HEAPU8.set(in_packet_prefix, packet_location);
+        _module.HEAPU8.set(packet.slice(i, i + inject_amount), packet_location + 16);
 
         _gearth_incoming_copy(in_recv_param1, packet_location, 0, inject_amount, 0);
         _free(packet_location);
