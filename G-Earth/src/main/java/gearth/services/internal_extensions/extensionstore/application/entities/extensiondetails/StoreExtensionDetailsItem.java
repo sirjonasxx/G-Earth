@@ -49,8 +49,12 @@ public class StoreExtensionDetailsItem implements ContentItem {
                 .append("*Author(s):* ").append(storeExtension.getAuthors().stream().map(StoreExtension.Author::getName).collect(Collectors.joining(", "))).append("\n\n")
                 .append("*Categories:* ").append(storeExtension.getCategories().stream().map(ExtCategory::getName).collect(Collectors.joining(", "))).append("\n\n");
 
-        contentBuilder.append("*Technical information*").append("\n")
-                .append("> Language: ").append(storeExtension.getLanguage()).append("\n")
+        contentBuilder.append("*Technical information*").append("\n");
+
+        if(storeExtension.getReleases() != null)
+            contentBuilder.append("> Releases: --url:Click Here-").append(storeExtension.getReleases()).append("\n");
+
+        contentBuilder.append("> Language: ").append(storeExtension.getLanguage()).append("\n")
                 .append("> Source: --url:Click Here-").append(storeExtension.getSource()).append("\n")
                 .append("> Framework: ").append(storeExtension.getFramework().getFramework().getName()).append(" - v").append(storeExtension.getFramework().getVersion()).append("\n")
                 .append("> Systems: ").append(String.join(", ", storeExtension.getCompatibility().getSystems())).append("\n \n");
