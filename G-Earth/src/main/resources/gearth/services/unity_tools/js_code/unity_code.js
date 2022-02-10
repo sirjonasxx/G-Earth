@@ -4,7 +4,7 @@ let revision = "{{RevisionName}}";
 let g_ws;
 
 
-let chachas = [-1, -1];
+let chachas = [];
 let chachaClass = -1;
 
 let out_send_param1 = -1;

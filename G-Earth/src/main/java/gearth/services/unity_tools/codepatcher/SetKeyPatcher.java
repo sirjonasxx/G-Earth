@@ -2,6 +2,8 @@ package gearth.services.unity_tools.codepatcher;
 
 import wasm.disassembly.instructions.Instr;
 import wasm.disassembly.instructions.InstrType;
+import wasm.disassembly.instructions.numeric.NumericI32ConstInstr;
+import wasm.disassembly.instructions.variable.LocalVariableInstr;
 import wasm.disassembly.modules.sections.code.Func;
 import wasm.disassembly.modules.sections.code.Locals;
 import wasm.disassembly.types.FuncType;
@@ -40,17 +42,19 @@ public class SetKeyPatcher implements StreamReplacement {
     public boolean codeMatches(Func code) {
         if (!(code.getLocalss().equals(Collections.singletonList(new Locals(1, ValType.I32)))))
             return false;
-        List<InstrType> expectedExpr = Arrays.asList(InstrType.I32_CONST, InstrType.I32_LOAD8_S,
-                InstrType.I32_EQZ, InstrType.IF, InstrType.BLOCK, InstrType.LOCAL_GET, InstrType.I32_CONST,
-                InstrType.LOCAL_GET, InstrType.I32_LOAD, InstrType.I32_CONST, InstrType.I32_CONST, InstrType.I32_CONST,
-                InstrType.CALL);
+        List<Instr> expression = code.getExpression().getInstructions();
+        List<InstrType> expectedExpr = Arrays.asList(InstrType.BLOCK, InstrType.LOCAL_GET,
+                InstrType.I32_CONST, InstrType.LOCAL_GET, InstrType.I32_LOAD, InstrType.I32_CONST, InstrType.I32_CONST,
+                InstrType.I32_CONST, InstrType.CALL );
 
-        if (code.getExpression().getInstructions().size() != expectedExpr.size()) return false;
+        if (expression.size() != expectedExpr.size()) return false;
 
-        for (int j = 0; j < code.getExpression().getInstructions().size(); j++) {
-            Instr instr = code.getExpression().getInstructions().get(j);
+        for (int j = 0; j < expression.size(); j++) {
+            Instr instr = expression.get(j);
             if (instr.getInstrType() != expectedExpr.get(j)) return false;
         }
+
+//        if (((NumericI32ConstInstr)(expression.get(5))).getConstValue() != 14) return false;
 
         return true;
     }

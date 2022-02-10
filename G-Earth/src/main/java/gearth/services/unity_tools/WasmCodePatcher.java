@@ -20,7 +20,7 @@ public class WasmCodePatcher {
 
     public void patch() throws IOException, InvalidOpCodeException {
         Module module = new Module(file, true, Arrays.asList(
-//                new SetKeyPatcher(),
+                new SetKeyPatcher(),
                 new ReturnBytePatcher(),
                 new OutgoingPacketPatcher(),
                 new IncomingPacketPatcher()
