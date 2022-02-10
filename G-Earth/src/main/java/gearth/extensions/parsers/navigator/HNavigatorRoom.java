@@ -128,7 +128,7 @@ public class HNavigatorRoom {
         }
 
         packet.appendInt(multiUse);
-        packet.appendObjects(objectsToAppend);
+        packet.appendObjects(objectsToAppend.toArray(new Object[] {}));
     }
 
     public int getFlatId() {
