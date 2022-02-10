@@ -19,12 +19,12 @@ public class WasmCodePatcher {
     }
 
     public void patch() throws IOException, InvalidOpCodeException {
-        Module module = new Module(file, Arrays.asList(
-                new SetKeyPatcher(),
+        Module module = new Module(file, true, Arrays.asList(
+//                new SetKeyPatcher(),
                 new ReturnBytePatcher(),
                 new OutgoingPacketPatcher(),
                 new IncomingPacketPatcher()
         ));
-        module.assembleToFile(file);
+        module.assembleToFile(file, true);
     }
 }

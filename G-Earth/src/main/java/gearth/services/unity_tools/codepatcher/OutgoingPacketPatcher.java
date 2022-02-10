@@ -2,6 +2,7 @@ package gearth.services.unity_tools.codepatcher;
 
 import wasm.disassembly.instructions.Instr;
 import wasm.disassembly.instructions.InstrType;
+import wasm.disassembly.instructions.variable.LocalVariableInstr;
 import wasm.disassembly.modules.sections.code.Func;
 import wasm.disassembly.types.FuncType;
 import wasm.disassembly.types.ResultType;
@@ -44,6 +45,8 @@ public class OutgoingPacketPatcher implements StreamReplacement {
         if (expression.get(3).getInstrType() != InstrType.I32_LOAD) return false;
         if (expression.get(4).getInstrType() != InstrType.I32_CONST) return false;
         if (expression.get(5).getInstrType() != InstrType.CALL) return false;
+
+        if (((LocalVariableInstr)(expression.get(2))).getLocalIdx().getX() != 1) return false;
 
         return true;
     }

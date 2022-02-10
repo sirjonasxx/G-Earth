@@ -125,6 +125,7 @@ public class UnityWebModifyer {
         contents = contents
                 .replace("var _free", "_free")
                 .replace("var _malloc", "_malloc")
+                .replace("var Module", "Module")
                 .replace("{{RevisionName}}", revision);
 
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new GZIPOutputStream(new FileOutputStream(frameworkFile))));
