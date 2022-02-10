@@ -32,4 +32,15 @@ public abstract class PacketHandler {
         message.getPacket().resetReadIndex();
     }
 
+    protected void awaitListeners(HMessage message, PacketSender packetSender) {
+        notifyListeners(0, message);
+        notifyListeners(1, message);
+        extensionHandler.handle(message, message2 -> {
+            notifyListeners(2, message2);
+            if (!message2.isBlocked()) {
+                packetSender.send(message2);
+            }
+        });
+    }
+
 }
