@@ -2,6 +2,10 @@ package gearth.services.unity_tools.codepatcher;
 
 import wasm.disassembly.instructions.Instr;
 import wasm.disassembly.instructions.InstrType;
+import wasm.disassembly.instructions.control.IfElseInstr;
+import wasm.disassembly.instructions.memory.MemArg;
+import wasm.disassembly.instructions.memory.MemInstr;
+import wasm.disassembly.instructions.variable.LocalVariableInstr;
 import wasm.disassembly.modules.sections.code.Func;
 import wasm.disassembly.modules.sections.code.Locals;
 import wasm.disassembly.types.FuncType;
@@ -51,6 +55,9 @@ public class IncomingPacketPatcher implements StreamReplacement {
             Instr instr = code.getExpression().getInstructions().get(j);
             if (instr.getInstrType() != expectedExpr.get(j)) return false;
         }
+
+        if (((MemInstr)(code.getExpression().getInstructions().get(5))).getMemArg().getAlign() != 2 ||
+                ((MemInstr)(code.getExpression().getInstructions().get(5))).getMemArg().getOffset() != 32) return false;
 
         return true;
     }

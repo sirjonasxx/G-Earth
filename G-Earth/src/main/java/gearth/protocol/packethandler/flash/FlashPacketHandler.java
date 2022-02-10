@@ -8,7 +8,6 @@ import gearth.protocol.crypto.RC4;
 import gearth.protocol.packethandler.PacketHandler;
 import gearth.protocol.packethandler.PayloadBuffer;
 import gearth.services.extension_handler.ExtensionHandler;
-import gearth.services.extension_handler.OnHMessageHandled;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -116,10 +115,14 @@ public abstract class FlashPacketHandler extends PacketHandler {
     }
 
     public boolean sendToStream(byte[] buffer) {
+        return sendToStream(buffer, isEncryptedStream);
+    }
+
+    private boolean sendToStream(byte[] buffer, boolean isEncrypted) {
         synchronized (sendLock) {
             try {
                 out.write(
-                        (!isEncryptedStream)
+                        (!isEncrypted)
                                 ? buffer
                                 : encryptcipher.rc4(buffer)
                 );
@@ -139,29 +142,11 @@ public abstract class FlashPacketHandler extends PacketHandler {
                 HMessage hMessage = new HMessage(hpacket, getMessageSide(), currentIndex);
                 boolean isencrypted = isEncryptedStream;
 
-                OnHMessageHandled afterExtensionIntercept = hMessage1 -> {
-                    if (isDataStream) {
-                        notifyListeners(2, hMessage1);
-                    }
-
-                    if (!hMessage1.isBlocked())	{
-                        synchronized (sendLock) {
-                            out.write(
-                                    (!isencrypted)
-                                            ? hMessage1.getPacket().toBytes()
-                                            : encryptcipher.rc4(hMessage1.getPacket().toBytes())
-                            );
-                        }
-                    }
-                };
-
                 if (isDataStream) {
-                    notifyListeners(0, hMessage);
-                    notifyListeners(1, hMessage);
-                    extensionHandler.handle(hMessage, afterExtensionIntercept);
+                    awaitListeners(hMessage, hMessage1 -> sendToStream(hMessage1.getPacket().toBytes(), isencrypted));
                 }
                 else {
-                    afterExtensionIntercept.finished(hMessage);
+                    sendToStream(hMessage.getPacket().toBytes(), isencrypted);
                 }
 
                 currentIndex++;

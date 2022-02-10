@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 public class StoreExtension {
 
-    public StoreExtension(String title, String description, List<Author> authors, String version, List<ExtCategory> categories, String source, String readme, boolean stable, Framework framework, String language, Commands commands, Compatibility compatibility, LocalDateTime submissionDate, LocalDateTime updateDate, boolean isOutdated, int rating) {
+    public StoreExtension(String title, String description, List<Author> authors, String version, List<ExtCategory> categories, String source, String readme, String releases, boolean stable, Framework framework, String language, Commands commands, Compatibility compatibility, LocalDateTime submissionDate, LocalDateTime updateDate, boolean isOutdated, int rating) {
         this.title = title;
         this.description = description;
         this.authors = authors;
@@ -18,6 +18,7 @@ public class StoreExtension {
         this.categories = categories;
         this.source = source;
         this.readme = readme;
+        this.releases = releases;
         this.stable = stable;
         this.framework = framework;
         this.language = language;
@@ -38,6 +39,7 @@ public class StoreExtension {
                 .toList().stream().anyMatch(j -> j.equals(c.getName()))).collect(Collectors.toList());
         this.source = object.getString("source");
         this.readme = object.has("readme") ? object.getString("readme") : null;
+        this.releases = object.has("releases") ? object.getString("releases") : null;
         this.stable = object.getBoolean("stable");
         this.framework = new Framework(object.getJSONObject("framework"), storeConfig);
         this.language = object.getString("language");
@@ -201,6 +203,7 @@ public class StoreExtension {
 
     private final String source;
     private final String readme;
+    private final String releases;
 
     private final boolean stable;
 
@@ -244,6 +247,10 @@ public class StoreExtension {
 
     public String getReadme() {
         return readme;
+    }
+
+    public String getReleases() {
+        return releases;
     }
 
     public boolean isStable() {

@@ -34,11 +34,11 @@ public class StoreFetch {
                         new URL(String.format("https://raw.githubusercontent.com/%s/repo/%s/store/config.json", source, version))
                                 .openStream(), StandardCharsets.UTF_8));
 
-                JSONArray exensions = new JSONArray(IOUtils.toString(
+                JSONArray extensions = new JSONArray(IOUtils.toString(
                         new URL(String.format("https://raw.githubusercontent.com/%s/repo/%s/.auto-generated/extensions.json", source, version))
                                 .openStream(), StandardCharsets.UTF_8));
 
-                storeFetchListener.success(new StoreRepository(new StoreData(config, exensions), version, source));
+                storeFetchListener.success(new StoreRepository(new StoreData(config, extensions), version, source));
 
             } catch (Exception e) {
                 storeFetchListener.fail(e.getLocalizedMessage());

@@ -14,12 +14,12 @@ import javafx.scene.web.WebView;
  */
 public class InfoController extends SubForm {
     public ImageView img_logo;
-    public Hyperlink link_ase;
     public Hyperlink link_darkbox;
-    public Hyperlink link_d_harble;
     public Hyperlink link_g_gearth;
     public Hyperlink link_g_tanji;
     public Hyperlink link_d_gearth;
+    public Hyperlink link_g_store;
+    public Hyperlink link_t_gearth;
 
     public Label version;
 
@@ -38,19 +38,19 @@ public class InfoController extends SubForm {
 
         img_logo.setImage(new Image(String.format("/gearth/themes/%s/logo.png", Main.theme)));
 
-        link_ase.setTooltip(new Tooltip("https://allseeingeye.to"));
         link_darkbox.setTooltip(new Tooltip("https://darkbox.nl"));
-        link_d_harble.setTooltip(new Tooltip("https://discord.gg/CzRuHvW"));
         link_d_gearth.setTooltip(new Tooltip("https://discord.gg/AVkcF8y"));
         link_g_gearth.setTooltip(new Tooltip("https://github.com/sirjonasxx/G-Earth"));
         link_g_tanji.setTooltip(new Tooltip("https://github.com/ArachisH/Tanji"));
+        link_g_store.setTooltip(new Tooltip("https://github.com/sirjonasxx/G-ExtensionStore"));
+        link_t_gearth.setTooltip(new Tooltip("https://twitter.com/Scripting_Habbo"));
 
-        activateHyperlink(link_ase);
         activateHyperlink(link_darkbox);
-        activateHyperlink(link_d_harble);
         activateHyperlink(link_d_gearth);
         activateHyperlink(link_g_gearth);
         activateHyperlink(link_g_tanji);
+        activateHyperlink(link_g_store);
+        activateHyperlink(link_t_gearth);
     }
 
     public void donate(ActionEvent actionEvent) {
