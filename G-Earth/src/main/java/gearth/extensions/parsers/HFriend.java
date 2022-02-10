@@ -105,7 +105,7 @@ public class HFriend {
             packet.readString();
         }
 
-        int friendCount = packet.getReadIndex();
+        int friendCount = packet.readInteger();
         List<Integer> removedIds = new ArrayList<>();
         for(int i = 0; i < friendCount; i++) {
             if(packet.readInteger() != -1) {
