@@ -27,16 +27,16 @@ public class GPythonVersionUtils {
         return maybeVersion.split(" ")[1];
     }
 
-    public static boolean validInstallation() {
+    public static boolean validInstallation() throws Exception {
         // validates if user has all dependencies installed
         String pythonVersion = pythonVersion();
         if (pythonVersion == null) {
-            return false;
+            throw new Exception("Python is not installed.");
         }
 
         ComparableVersion version = new ComparableVersion(pythonVersion);
         if (version.compareTo(new ComparableVersion(MIN_PYTHON_VERSION)) < 0) {
-            return false;
+            throw new Exception("Python version must be at least "+MIN_PYTHON_VERSION+", but only "+version+" was found.");
         }
 
         List<String> allPackages = executeCommand("python", "-m", "pip", "list");
@@ -48,11 +48,15 @@ public class GPythonVersionUtils {
         String gPython = getPackageVersion(allPackages, "g-python");
 
         if (qtconsole == null || pyqt5 == null || jupyterConsole == null || gPython == null) {
-            return false;
+            throw new Exception("One or more of these dependencies was not found: 'qtconsole', 'pyqt5', 'jupyter-console', 'g-python'.");
         }
 
         ComparableVersion gVersion = new ComparableVersion(gPython);
-        return gVersion.compareTo(new ComparableVersion(MIN_GPYTHON_VERSION)) >= 0;
+        if (gVersion.compareTo(new ComparableVersion(MIN_GPYTHON_VERSION)) < 0) {
+            throw new Exception("G-Python version must be at least "+MIN_GPYTHON_VERSION+", but only "+gVersion+" was found.");
+        }
+
+        return true;
     }
 
     // null if not found
