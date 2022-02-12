@@ -22,55 +22,48 @@
     </parent>
 
     <build>
+        <finalName>G-Earth</finalName>
         <plugins>
-            <!-- this builds a non-standalone JAR file -->
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/bin/Dependencies</outputDirectory>
+                            <overWriteReleases>false</overWriteReleases>
+                            <overWriteSnapshots>false</overWriteSnapshots>
+                            <overWriteIfNewer>true</overWriteIfNewer>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.1.2</version>
+                <version>3.2.2</version>
                 <configuration>
                     <outputDirectory>${project.build.directory}/bin</outputDirectory>
                     <archive>
                         <manifest>
-                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                             <addClasspath>true</addClasspath>
-                            <classpathPrefix>lib/</classpathPrefix>
+                            <classpathPrefix>Dependencies/</classpathPrefix>
                             <mainClass>gearth.Main</mainClass>
-                            <useUniqueVersions>false</useUniqueVersions>
                         </manifest>
                     </archive>
                 </configuration>
             </plugin>
 
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>3.1.1</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <outputDirectory>${project.build.directory}/bin</outputDirectory>
-                    <archive>
-                        <manifest>
-                            <mainClass>gearth.Main</mainClass>
-                        </manifest>
-                    </archive>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                    <!--<finalName>G-Earth-${project.version}</finalName>-->
-                    <finalName>G-Earth</finalName>
-                    <appendAssemblyId>false</appendAssemblyId>
-                </configuration>
-            </plugin>
 
 
-            <!-- global build folder -->
+<!--             global build folder-->
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <version>3.0.0</version>
@@ -80,41 +73,26 @@
                         <phase>package</phase>
                         <configuration>
                             <target name="copy G-Earth.jar to Build folder">
-                                <copy file="target/bin/G-Earth.jar" todir="../Build/Mac/"/>
-                                <copy file="target/bin/G-Earth.jar" todir="../Build/Linux/"/>
-                                <copy file="target/bin/G-Earth.jar" todir="../Build/Windows_32bit/"/>
-                                <copy file="target/bin/G-Earth.jar" todir="../Build/Windows_64bit/"/>
-
-                                <copy file="src/main/resources/build/messages.json" todir="../Build/Mac/"/>
-                                <copy file="src/main/resources/build/messages.json" todir="../Build/Linux/"/>
-                                <copy file="src/main/resources/build/messages.json" todir="../Build/Windows_32bit/"/>
-                                <copy file="src/main/resources/build/messages.json" todir="../Build/Windows_64bit/"/>
 
                                 <copy todir="../Build/Mac/">
-                                    <fileset dir="src/main/resources/build/mac" includes="**/*" />
+                                    <fileset dir="target/bin" includes="**/*" />
+                                    <fileset dir="src/main/resources/build/common" includes="**/*" />
+                                    <fileset dir="src/main/resources/build/mac" includes="**/*" excludes=".gitkeep" />
                                 </copy>
                                 <copy todir="../Build/Linux/">
+                                    <fileset dir="target/bin" includes="**/*" />
+                                    <fileset dir="src/main/resources/build/common" includes="**/*" />
                                     <fileset dir="src/main/resources/build/linux" includes="**/*" excludes=".gitkeep" />
                                 </copy>
                                 <copy todir="../Build/Windows_32bit/">
-                                    <fileset dir="src/main/resources/build/windows/32bit" includes="**/*" />
+                                    <fileset dir="target/bin" includes="**/*" />
+                                    <fileset dir="src/main/resources/build/common" includes="**/*" />
+                                    <fileset dir="src/main/resources/build/windows/32bit" includes="**/*" excludes=".gitkeep" />
                                 </copy>
                                 <copy todir="../Build/Windows_64bit/">
-                                    <fileset dir="src/main/resources/build/windows/64bit" includes="**/*" />
-                                </copy>
-
-
-                                <copy todir="../Build/Mac/Cache">
-                                    <fileset dir="src/main/resources/build/cache" includes="**/*" />
-                                </copy>
-                                <copy todir="../Build/Linux/Cache">
-                                    <fileset dir="src/main/resources/build/cache" includes="**/*" />
-                                </copy>
-                                <copy todir="../Build/Windows_32bit/Cache">
-                                    <fileset dir="src/main/resources/build/cache" includes="**/*" />
-                                </copy>
-                                <copy todir="../Build/Windows_64bit/Cache">
-                                    <fileset dir="src/main/resources/build/cache" includes="**/*" />
+                                    <fileset dir="target/bin" includes="**/*" />
+                                    <fileset dir="src/main/resources/build/common" includes="**/*" />
+                                    <fileset dir="src/main/resources/build/windows/64bit" includes="**/*" excludes=".gitkeep" />
                                 </copy>
 
                             </target>
@@ -138,6 +116,75 @@
                     </execution>
                 </executions>
             </plugin>
+
+
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.3.0</version>
+                <executions>
+                    <execution>
+                        <id>ziprelease-mac</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <outputDirectory>../Build</outputDirectory>
+                            <finalName>G-Earth-${project.version}-Mac</finalName>
+                            <descriptors>
+                                <descriptor>${basedir}/assembly/mac.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>ziprelease-linux</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <outputDirectory>../Build</outputDirectory>
+                            <finalName>G-Earth-${project.version}-Linux</finalName>
+                            <descriptors>
+                                <descriptor>${basedir}/assembly/linux.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>ziprelease-windows_32bit</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <outputDirectory>../Build</outputDirectory>
+                            <finalName>G-Earth-${project.version}-Windows_32bit</finalName>
+                            <descriptors>
+                                <descriptor>${basedir}/assembly/windows_32bit.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>ziprelease-windows_64bit</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <outputDirectory>../Build</outputDirectory>
+                            <finalName>G-Earth-${project.version}-Windows_64bit</finalName>
+                            <descriptors>
+                                <descriptor>${basedir}/assembly/windows_64bit.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
 
         </plugins>
     </build>
