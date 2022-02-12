@@ -1,6 +1,6 @@
 package gearth.services.g_python;
 
-import gearth.Main;
+import gearth.GEarth;
 import gearth.ui.extra.ExtraController;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
@@ -177,7 +177,7 @@ public class GPythonShell {
             Hyperlink link = new Hyperlink(ExtraController.INFO_URL_GPYTHON);
             fp.getChildren().addAll(lbl, link);
             link.setOnAction(event -> {
-                Main.main.getHostServices().showDocument(link.getText());
+                GEarth.main.getHostServices().showDocument(link.getText());
                 event.consume();
             });
 

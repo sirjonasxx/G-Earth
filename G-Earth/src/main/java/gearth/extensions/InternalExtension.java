@@ -1,6 +1,6 @@
 package gearth.extensions;
 
-import gearth.Main;
+import gearth.GEarth;
 import gearth.protocol.HPacket;
 
 
@@ -32,7 +32,7 @@ public class InternalExtension extends ExtensionBase {
 
     @Override
     public boolean requestFlags(FlagsCheckListener flagRequestCallback) {
-        flagRequestCallback.act(Main.args);
+        flagRequestCallback.act(GEarth.args);
         return true;
     }
 

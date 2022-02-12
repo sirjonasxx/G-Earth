@@ -1,6 +1,6 @@
 package gearth.services.internal_extensions.extensionstore.tools;
 
-import gearth.Main;
+import gearth.GEarth;
 import gearth.misc.OSValidator;
 import gearth.services.extension_handler.extensions.implementations.network.authentication.Authenticator;
 import gearth.services.extension_handler.extensions.implementations.network.executer.ExecutionInfo;
@@ -242,7 +242,7 @@ public class StoreExtensionTools {
     }
 
     public static void main(String[] args) {
-        StoreFetch.fetch(Main.version, new StoreFetch.StoreFetchListener() {
+        StoreFetch.fetch(GEarth.version, new StoreFetch.StoreFetchListener() {
             @Override
             public void success(StoreRepository storeRepository) {
                 installExtension("G-BuildTools", storeRepository, new InstallExtListener() {

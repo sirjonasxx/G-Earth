@@ -1,6 +1,6 @@
 package gearth.services.unity_tools;
 
-import gearth.Main;
+import gearth.GEarth;
 import gearth.misc.Cacher;
 
 import javax.servlet.ServletOutputStream;
@@ -135,7 +135,7 @@ public class GUnityFileServer extends HttpServlet
 
     private void getLogo(HttpServletResponse response) throws IOException {
         OutputStream out = response.getOutputStream();
-        InputStream in = Main.class.getResourceAsStream(String.format("/gearth/themes/%s/logo.png", Main.theme));
+        InputStream in = GEarth.class.getResourceAsStream(String.format("/gearth/themes/%s/logo.png", GEarth.theme));
 
         byte[] bytes = new byte[4096];
         int bytesRead;

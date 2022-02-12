@@ -1,6 +1,6 @@
 package gearth.services.internal_extensions.extensionstore.repository;
 
-import gearth.Main;
+import gearth.GEarth;
 import gearth.services.internal_extensions.extensionstore.repository.models.StoreData;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
@@ -19,7 +19,7 @@ public class StoreFetch {
     }
 
     public static void fetch(StoreFetchListener storeFetchListener) {
-        fetch(Main.version, storeFetchListener, "sirjonasxx/G-ExtensionStore");
+        fetch(GEarth.version, storeFetchListener, "sirjonasxx/G-ExtensionStore");
     }
 
     public static void fetch(String version, StoreFetchListener storeFetchListener) {

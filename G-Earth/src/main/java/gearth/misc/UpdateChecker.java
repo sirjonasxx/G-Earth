@@ -1,6 +1,6 @@
 package gearth.misc;
 
-import gearth.Main;
+import gearth.GEarth;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -17,8 +17,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
-import static gearth.Main.gitApi;
-import static gearth.Main.version;
+import static gearth.GEarth.gitApi;
+import static gearth.GEarth.version;
 
 public class UpdateChecker {
 
@@ -41,7 +41,7 @@ public class UpdateChecker {
                         Hyperlink link = new Hyperlink("https://github.com/sirjonasxx/G-Earth/releases");
                         fp.getChildren().addAll( lbl, link);
                         link.setOnAction(event -> {
-                            Main.main.getHostServices().showDocument(link.getText());
+                            GEarth.main.getHostServices().showDocument(link.getText());
                             event.consume();
                         });
 

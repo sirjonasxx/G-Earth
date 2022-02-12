@@ -8,8 +8,6 @@
 
     <packaging>jar</packaging>
 
-    <version>1.5.1</version>
-
     <properties>
         <javafx.version>1.8</javafx.version>
         <jettyVersion>9.4.41.v20210516</jettyVersion>
@@ -55,7 +53,9 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>Dependencies/</classpathPrefix>
-                            <mainClass>gearth.Main</mainClass>
+                            <mainClass>gearth.GEarth</mainClass>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                         </manifest>
                     </archive>
                 </configuration>

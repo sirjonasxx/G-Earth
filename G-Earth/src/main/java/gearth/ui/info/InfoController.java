@@ -1,6 +1,6 @@
 package gearth.ui.info;
 
-import gearth.Main;
+import gearth.GEarth;
 import javafx.event.ActionEvent;
 import javafx.scene.control.*;
 import gearth.ui.SubForm;
@@ -27,16 +27,16 @@ public class InfoController extends SubForm {
         link.setOnAction((ActionEvent event) -> {
             Hyperlink h = (Hyperlink) event.getTarget();
             String s = h.getTooltip().getText();
-            Main.main.getHostServices().showDocument(s);
+            GEarth.main.getHostServices().showDocument(s);
             event.consume();
         });
     }
 
     public void initialize() {
-        version.setText(version.getText().replace("$theme", Main.theme));
-        version.setText(version.getText().replace("$version", Main.version));
+        version.setText(version.getText().replace("$theme", GEarth.theme));
+        version.setText(version.getText().replace("$version", GEarth.version));
 
-        img_logo.setImage(new Image(String.format("/gearth/themes/%s/logo.png", Main.theme)));
+        img_logo.setImage(new Image(String.format("/gearth/themes/%s/logo.png", GEarth.theme)));
 
         link_darkbox.setTooltip(new Tooltip("https://darkbox.nl"));
         link_d_gearth.setTooltip(new Tooltip("https://discord.gg/AVkcF8y"));

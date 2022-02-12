@@ -1,10 +1,8 @@
 package gearth.ui.extra;
 
-import gearth.Main;
+import gearth.GEarth;
 import gearth.misc.Cacher;
 import gearth.protocol.HConnection;
-import gearth.protocol.HMessage;
-import gearth.protocol.TrafficListener;
 import gearth.protocol.connection.HState;
 import gearth.protocol.connection.proxy.ProxyProviderFactory;
 import gearth.protocol.connection.proxy.SocksConfiguration;
@@ -183,7 +181,7 @@ public class ExtraController extends SubForm implements SocksConfiguration {
                         Hyperlink link = new Hyperlink(INFO_URL_GPYTHON);
                         fp.getChildren().addAll( lbl, link);
                         link.setOnAction(event -> {
-                            Main.main.getHostServices().showDocument(link.getText());
+                            GEarth.main.getHostServices().showDocument(link.getText());
                             event.consume();
                         });
 

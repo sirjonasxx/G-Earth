@@ -1,6 +1,6 @@
 package gearth.protocol.memory;
 
-import gearth.Main;
+import gearth.GEarth;
 import gearth.protocol.HConnection;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
@@ -86,7 +86,7 @@ public class Rc4Obtainer {
                     Hyperlink link = new Hyperlink("https://github.com/sirjonasxx/G-Earth/wiki/Troubleshooting");
                     fp.getChildren().addAll( lbl, link);
                     link.setOnAction(event -> {
-                        Main.main.getHostServices().showDocument(link.getText());
+                        GEarth.main.getHostServices().showDocument(link.getText());
                         event.consume();
                     });
 
@@ -96,7 +96,7 @@ public class Rc4Obtainer {
                     alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
                     alert.getDialogPane().setContent(fp);
                     alert.setOnCloseRequest(event -> {
-                        Main.main.getHostServices().showDocument(link.getText());
+                        GEarth.main.getHostServices().showDocument(link.getText());
                     });
                     alert.show();
 
