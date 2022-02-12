@@ -1,6 +1,6 @@
 package gearth.misc;
 
-import gearth.Main;
+import gearth.GEarth;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
@@ -27,8 +27,8 @@ public class ConfirmationDialog {
         // Need to force the alert to layout in order to grab the graphic,
         // as we are replacing the dialog pane with a custom pane
         Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-        stage.getIcons().add(new Image(Main.class.getResourceAsStream(String.format("/gearth/themes/%s/logoSmall.png", Main.theme))));
-        stage.getScene().getStylesheets().add(Main.class.getResource(String.format("/gearth/themes/%s/styling.css", Main.theme)).toExternalForm());
+        stage.getIcons().add(new Image(GEarth.class.getResourceAsStream(String.format("/gearth/themes/%s/logoSmall.png", GEarth.theme))));
+        stage.getScene().getStylesheets().add(GEarth.class.getResource(String.format("/gearth/themes/%s/styling.css", GEarth.theme)).toExternalForm());
         alert.getDialogPane().applyCss();
         Node graphic = alert.getDialogPane().getGraphic();
         // Create a new dialog pane that has a checkbox instead of the hide/show details button

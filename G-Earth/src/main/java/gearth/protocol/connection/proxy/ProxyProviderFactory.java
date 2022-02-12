@@ -1,13 +1,12 @@
 package gearth.protocol.connection.proxy;
 
-import gearth.Main;
+import gearth.GEarth;
 import gearth.misc.Cacher;
 import gearth.misc.OSValidator;
 import gearth.protocol.HConnection;
 import gearth.protocol.connection.HProxySetter;
 import gearth.protocol.connection.HStateSetter;
 import gearth.protocol.connection.proxy.flash.NormalFlashProxyProvider;
-import gearth.protocol.connection.proxy.flash.FlashProxyProvider;
 import gearth.protocol.connection.proxy.flash.unix.LinuxRawIpFlashProxyProvider;
 import gearth.protocol.connection.proxy.flash.windows.WindowsRawIpFlashProxyProvider;
 import javafx.application.Platform;
@@ -110,8 +109,8 @@ public class ProxyProviderFactory {
                             "Due to current limitations you can only connect one session per hotel to G-Earth in Raw IP mode on Windows.\n\n" +
                             "You can bypass this by using a SOCKS proxy [Extra -> Advanced -> SOCKS]", ButtonType.OK);
                     Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-                    stage.getIcons().add(new Image(Main.class.getResourceAsStream(String.format("/gearth/themes/%s/logoSmall.png", Main.theme))));
-                    stage.getScene().getStylesheets().add(Main.class.getResource(String.format("/gearth/themes/%s/styling.css", Main.theme)).toExternalForm());
+                    stage.getIcons().add(new Image(GEarth.class.getResourceAsStream(String.format("/gearth/themes/%s/logoSmall.png", GEarth.theme))));
+                    stage.getScene().getStylesheets().add(GEarth.class.getResource(String.format("/gearth/themes/%s/styling.css", GEarth.theme)).toExternalForm());
                     alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
                     alert.setResizable(false);
                     alert.show();

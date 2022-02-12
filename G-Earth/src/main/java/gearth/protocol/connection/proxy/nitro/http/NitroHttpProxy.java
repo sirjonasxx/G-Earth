@@ -1,6 +1,6 @@
 package gearth.protocol.connection.proxy.nitro.http;
 
-import gearth.Main;
+import gearth.GEarth;
 import gearth.misc.ConfirmationDialog;
 import gearth.protocol.connection.proxy.nitro.NitroConstants;
 import gearth.protocol.connection.proxy.nitro.os.NitroOsFunctions;
@@ -57,8 +57,8 @@ public class NitroHttpProxy {
                     ButtonType.YES, ButtonType.NO
             );
             Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-            stage.getIcons().add(new Image(Main.class.getResourceAsStream(String.format("/gearth/themes/%s/logoSmall.png", Main.theme))));
-            stage.getScene().getStylesheets().add(Main.class.getResource(String.format("/gearth/themes/%s/styling.css", Main.theme)).toExternalForm());
+            stage.getIcons().add(new Image(GEarth.class.getResourceAsStream(String.format("/gearth/themes/%s/logoSmall.png", GEarth.theme))));
+            stage.getScene().getStylesheets().add(GEarth.class.getResource(String.format("/gearth/themes/%s/styling.css", GEarth.theme)).toExternalForm());
 
             shouldInstall.set(alert.showAndWait().filter(t -> t == ButtonType.YES).isPresent());
             waitForDialog.release();
