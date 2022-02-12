@@ -1,6 +1,6 @@
 package gearth.services.extension_handler;
 
-import gearth.Main;
+import gearth.GEarth;
 import gearth.misc.listenerpattern.Observable;
 import gearth.protocol.HConnection;
 import gearth.protocol.HMessage;
@@ -184,7 +184,7 @@ public class ExtensionHandler {
                 ExtensionListener listener = new ExtensionListener() {
                     @Override
                     public void flagsRequest() {
-                        extension.provideFlags(Main.args);
+                        extension.provideFlags(GEarth.args);
                     }
 
                     @Override

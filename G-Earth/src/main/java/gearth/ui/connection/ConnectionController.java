@@ -1,6 +1,6 @@
 package gearth.ui.connection;
 
-import gearth.Main;
+import gearth.GEarth;
 import gearth.misc.Cacher;
 import gearth.protocol.connection.HClient;
 import gearth.protocol.connection.HState;
@@ -221,12 +221,12 @@ public class ConnectionController extends SubForm {
     }
 
     private void maybeConnectOnInit() {
-        String connectMode = Main.getArgument("--connect", "-c");
+        String connectMode = GEarth.getArgument("--connect", "-c");
         if (connectMode != null) {
             if (connectMode.equals("flash")) {
                 Platform.runLater(() -> rd_flash.setSelected(true));
-                String host = Main.getArgument("--host");
-                String port = Main.getArgument("--port");
+                String host = GEarth.getArgument("--host");
+                String port = GEarth.getArgument("--port");
                 if (host != null && port != null) {
                     Platform.runLater(() -> {
                         if (!inpHost.getItems().contains(host)) inpHost.getItems().add(host);

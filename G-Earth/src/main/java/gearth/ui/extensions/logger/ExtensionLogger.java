@@ -1,6 +1,6 @@
 package gearth.ui.extensions.logger;
 
-import gearth.Main;
+import gearth.GEarth;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -35,15 +35,15 @@ public class ExtensionLogger {
 
 
             stage = new Stage();
-            stage.setTitle(String.format("%s | Extension Console", Main.theme));
+            stage.setTitle(String.format("%s | Extension Console", GEarth.theme));
             stage.initModality(Modality.NONE);
-            stage.getIcons().add(new Image(getClass().getResourceAsStream(String.format("/gearth/themes/%s/logoSmall.png", Main.theme))));
+            stage.getIcons().add(new Image(getClass().getResourceAsStream(String.format("/gearth/themes/%s/logoSmall.png", GEarth.theme))));
             stage.setAlwaysOnTop(true);
             stage.setMinHeight(235);
             stage.setMinWidth(370);
 
             Scene scene = new Scene(root);
-            scene.getStylesheets().add(String.format("/gearth/themes/%s/styling.css", Main.theme));
+            scene.getStylesheets().add(String.format("/gearth/themes/%s/styling.css", GEarth.theme));
             scene.getStylesheets().add("/gearth/ui/extensions/logger/logger.css");
             ExtensionLoggerController controller = loader.getController();
             controller.setStage(stage);

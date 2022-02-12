@@ -1,6 +1,6 @@
 package gearth.misc;
 
-import gearth.Main;
+import gearth.GEarth;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -22,7 +22,7 @@ public class Cacher {
     static {
         File GEarthDir = null;
         try {
-            GEarthDir = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParentFile();
+            GEarthDir = new File(GEarth.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParentFile();
             if (GEarthDir.getName().equals("Extensions")) {
                 GEarthDir = GEarthDir.getParentFile();
             }

@@ -1,10 +1,10 @@
 function g_outgoing_packet(param1, param2, param3) {
     out_send_param1 = param1;
     out_send_param3 = param3;
-    out_packet_objid = unityInstance.Module.HEAPU8.slice(param2, param2 + 4);
+    out_packet_objid = Module.HEAPU8.slice(param2, param2 + 4);
 
-    let length = readLittleEndian(unityInstance.Module.HEAPU8.subarray(param2 + 12, param2 + 12 + 4));
-    let array = [].slice.call(unityInstance.Module.HEAPU8.subarray(param2 + 12 + 4, param2 + 12 + 4 + length));
+    let length = readLittleEndian(Module.HEAPU8.subarray(param2 + 12, param2 + 12 + 4));
+    let array = [].slice.call(Module.HEAPU8.subarray(param2 + 12 + 4, param2 + 12 + 4 + length));
 
     packetBuff["out"] = packetBuff["out"].concat(array);
 
@@ -15,9 +15,9 @@ function g_outgoing_packet(param1, param2, param3) {
 
 function g_incoming_packet(param1, param2, param3, param4, param5) {
     in_recv_param1 = param1;
-    in_packet_prefix = unityInstance.Module.HEAPU8.slice(param2, param2 + 16);
+    in_packet_prefix = Module.HEAPU8.slice(param2, param2 + 16);
 
-    let buffer = unityInstance.Module.HEAPU8.slice(param2 + 16, param2 + 16 + param4);
+    let buffer = Module.HEAPU8.slice(param2 + 16, param2 + 16 + param4);
     packetBuff["in"] = packetBuff["in"].concat([].slice.call(buffer));
 
     let packets = collect_packets("in");

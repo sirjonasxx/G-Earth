@@ -1,6 +1,6 @@
 package gearth.ui.logger.loggerdisplays;
 
-import gearth.Main;
+import gearth.GEarth;
 import gearth.extensions.InternalExtensionFormBuilder;
 import gearth.misc.OSValidator;
 import gearth.services.extension_handler.ExtensionHandler;
@@ -17,7 +17,7 @@ public class PacketLoggerFactory implements ExtensionProducer {
     private UiLogger uiLogger;
 
     public static boolean usesUIlogger() {
-        return (!Main.hasFlag("-t"));
+        return (!GEarth.hasFlag("-t"));
     }
 
     public PacketLoggerFactory(ExtensionHandler handler) {

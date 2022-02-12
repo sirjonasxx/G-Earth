@@ -1,10 +1,8 @@
 package gearth.ui.extra;
 
-import gearth.Main;
+import gearth.GEarth;
 import gearth.misc.Cacher;
 import gearth.protocol.HConnection;
-import gearth.protocol.HMessage;
-import gearth.protocol.TrafficListener;
 import gearth.protocol.connection.HState;
 import gearth.protocol.connection.proxy.ProxyProviderFactory;
 import gearth.protocol.connection.proxy.SocksConfiguration;
@@ -178,8 +176,8 @@ public class ExtraController extends SubForm implements SocksConfiguration {
                     Platform.runLater(() -> {
                         Alert alert = new Alert(Alert.AlertType.ERROR, "G-Python installation", ButtonType.OK);
                         Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-                        stage.getIcons().add(new Image(Main.class.getResourceAsStream(String.format("/gearth/themes/%s/logoSmall.png", Main.theme))));
-                        stage.getScene().getStylesheets().add(Main.class.getResource(String.format("/gearth/themes/%s/styling.css", Main.theme)).toExternalForm());
+                        stage.getIcons().add(new Image(GEarth.class.getResourceAsStream(String.format("/gearth/themes/%s/logoSmall.png", GEarth.theme))));
+                        stage.getScene().getStylesheets().add(GEarth.class.getResource(String.format("/gearth/themes/%s/styling.css", GEarth.theme)).toExternalForm());
                         alert.setTitle("G-Python installation");
 
                         FlowPane fp = new FlowPane();
@@ -188,7 +186,7 @@ public class ExtraController extends SubForm implements SocksConfiguration {
                         Hyperlink link = new Hyperlink(INFO_URL_GPYTHON);
                         fp.getChildren().addAll( lbl, link);
                         link.setOnAction(event -> {
-                            Main.main.getHostServices().showDocument(link.getText());
+                            GEarth.main.getHostServices().showDocument(link.getText());
                             event.consume();
                         });
 

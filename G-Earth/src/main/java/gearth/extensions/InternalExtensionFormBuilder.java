@@ -1,6 +1,6 @@
 package gearth.extensions;
 
-import gearth.Main;
+import gearth.GEarth;
 import gearth.services.extension_handler.extensions.GEarthExtension;
 import gearth.services.extension_handler.extensions.extensionproducers.ExtensionProducerObserver;
 import javafx.application.Platform;
@@ -51,7 +51,7 @@ public class InternalExtensionFormBuilder<L extends InternalExtensionFormLaunche
                     return extensionForm.canDelete();
                 }
             };
-            extensionForm.hostServices = Main.main.getHostServices();
+            extensionForm.hostServices = GEarth.main.getHostServices();
             extensionForm.extension = internalExtension;
             extensionForm.primaryStage = stage;
 

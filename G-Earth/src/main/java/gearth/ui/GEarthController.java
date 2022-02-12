@@ -1,6 +1,6 @@
 package gearth.ui;
 
-import gearth.Main;
+import gearth.GEarth;
 import gearth.protocol.connection.proxy.ProxyProviderFactory;
 import gearth.protocol.connection.proxy.SocksConfiguration;
 import gearth.ui.logger.loggerdisplays.PacketLoggerFactory;
@@ -8,10 +8,7 @@ import javafx.application.Platform;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.Region;
-import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import gearth.protocol.HConnection;
 import gearth.ui.connection.ConnectionController;
@@ -127,18 +124,18 @@ public class GEarthController {
     }
 
     public void setTheme(String theme) {
-        Main.theme = theme;
+        GEarth.theme = theme;
 
         getStage().getScene().getStylesheets().clear();
-        getStage().getScene().getStylesheets().add(Main.class.getResource(String.format("/gearth/themes/%s/styling.css", theme)).toExternalForm());
+        getStage().getScene().getStylesheets().add(GEarth.class.getResource(String.format("/gearth/themes/%s/styling.css", theme)).toExternalForm());
 
         getStage().getIcons().clear();
-        getStage().getIcons().add(new Image(Main.class.getResourceAsStream(String.format("/gearth/themes/%s/logoSmall.png", theme))));
+        getStage().getIcons().add(new Image(GEarth.class.getResourceAsStream(String.format("/gearth/themes/%s/logoSmall.png", theme))));
 
-        getStage().setTitle(theme.split("_")[0] + " " + Main.version);
+        getStage().setTitle(theme.split("_")[0] + " " + GEarth.version);
         titleLabel.setText(getStage().getTitle());
 
-        infoController.img_logo.setImage(new Image(Main.class.getResourceAsStream(String.format("/gearth/themes/%s/logo.png", theme))));
+        infoController.img_logo.setImage(new Image(GEarth.class.getResourceAsStream(String.format("/gearth/themes/%s/logo.png", theme))));
         infoController.version.setText(getStage().getTitle());
     }
 
@@ -173,7 +170,7 @@ public class GEarthController {
     }
 
     public void toggleTheme(MouseEvent event) {
-        int themeIndex = Arrays.asList(Main.themes).indexOf(Main.theme);
-        setTheme(Main.themes[(themeIndex + 1) % Main.themes.length]);
+        int themeIndex = Arrays.asList(GEarth.themes).indexOf(GEarth.theme);
+        setTheme(GEarth.themes[(themeIndex + 1) % GEarth.themes.length]);
     }
 }

@@ -17,7 +17,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
-public class Main extends Application {
+public class GEarth extends Application {
 
     public static Application main;
     public static String version = "1.5.1";
@@ -67,7 +67,7 @@ public class Main extends Application {
     public static String[] args;
 
     public static void main(String[] args) {
-        Main.args = args;
+        GEarth.args = args;
         launch(args);
     }
 
