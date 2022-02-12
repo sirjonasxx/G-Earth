@@ -1,5 +1,6 @@
 package gearth.protocol.connection.proxy;
 
+import gearth.Main;
 import gearth.misc.Cacher;
 import gearth.misc.OSValidator;
 import gearth.protocol.HConnection;
@@ -12,7 +13,9 @@ import gearth.protocol.connection.proxy.flash.windows.WindowsRawIpFlashProxyProv
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.image.Image;
 import javafx.scene.layout.Region;
+import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -106,6 +109,9 @@ public class ProxyProviderFactory {
                     Alert alert = new Alert(Alert.AlertType.ERROR, "G-Earth is already connected to this hotel. " +
                             "Due to current limitations you can only connect one session per hotel to G-Earth in Raw IP mode on Windows.\n\n" +
                             "You can bypass this by using a SOCKS proxy [Extra -> Advanced -> SOCKS]", ButtonType.OK);
+                    Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+                    stage.getIcons().add(new Image(Main.class.getResourceAsStream(String.format("/gearth/themes/%s/logoSmall.png", Main.theme))));
+                    stage.getScene().getStylesheets().add(Main.class.getResource(String.format("/gearth/themes/%s/styling.css", Main.theme)).toExternalForm());
                     alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
                     alert.setResizable(false);
                     alert.show();

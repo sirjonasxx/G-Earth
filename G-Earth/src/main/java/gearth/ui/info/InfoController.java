@@ -8,6 +8,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Region;
 import javafx.scene.web.WebView;
+import javafx.stage.Stage;
 
 /**
  * Created by Jonas on 06/04/18.
@@ -33,11 +34,6 @@ public class InfoController extends SubForm {
     }
 
     public void initialize() {
-        version.setText(version.getText().replace("$theme", GEarth.theme));
-        version.setText(version.getText().replace("$version", GEarth.version));
-
-        img_logo.setImage(new Image(String.format("/gearth/themes/%s/logo.png", GEarth.theme)));
-
         link_darkbox.setTooltip(new Tooltip("https://darkbox.nl"));
         link_d_gearth.setTooltip(new Tooltip("https://discord.gg/AVkcF8y"));
         link_g_gearth.setTooltip(new Tooltip("https://github.com/sirjonasxx/G-Earth"));

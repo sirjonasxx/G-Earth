@@ -9,15 +9,21 @@ import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.ToolBar;
 import javafx.scene.image.Image;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 public class GEarth extends Application {
 
     public static Application main;
     public static String version = "1.5.1";
     public static String gitApi = "https://api.github.com/repos/sirjonasxx/G-Earth/releases/latest";
-    public static String theme = "G-Earth";
+    public static String theme = "G-Earth_Dark";
+    public static String[] themes = new String[] {"G-Earth", "Tanji", "G-Earth_Dark"};
 
     static {
         if (Cacher.getCacheContents().has("theme")) {
@@ -33,19 +39,18 @@ public class GEarth extends Application {
         Parent root = loader.load();
         GEarthController companion = loader.getController();
         companion.setStage(primaryStage);
+        primaryStage.initStyle(StageStyle.TRANSPARENT);
 
-        primaryStage.getIcons().add(new Image(getClass().getResourceAsStream(String.format("/gearth/themes/%s/logoSmall.png", theme))));
-
-        primaryStage.setTitle(theme + " " + version);
         // https://stackoverflow.com/questions/20732100/javafx-why-does-stage-setresizablefalse-cause-additional-margins
 //        primaryStage.setScene(new Scene(root, 650, 295));
         primaryStage.setScene(new Scene(root));
         primaryStage.setResizable(false);
         primaryStage.sizeToScene();
+        
+        primaryStage.getScene().setFill(Color.TRANSPARENT);
+        companion.setTheme(theme);
 
         primaryStage.show();
-        primaryStage.getScene().getStylesheets().add(getClass().getResource(String.format("/gearth/themes/%s/styling.css", theme)).toExternalForm());
-
         primaryStage.setOnCloseRequest( event -> {
             companion.exit();
             Platform.exit();

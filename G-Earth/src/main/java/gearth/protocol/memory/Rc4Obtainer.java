@@ -15,9 +15,11 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Region;
 import javafx.scene.web.WebView;
+import javafx.stage.Stage;
 
 import java.util.Arrays;
 import java.util.List;
@@ -80,6 +82,9 @@ public class Rc4Obtainer {
 
                 Platform.runLater(() -> {
                     Alert alert = new Alert(Alert.AlertType.WARNING, "Something went wrong!", ButtonType.OK);
+                    Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+                    stage.getIcons().add(new Image(GEarth.class.getResourceAsStream(String.format("/gearth/themes/%s/logoSmall.png", GEarth.theme))));
+                    stage.getScene().getStylesheets().add(GEarth.class.getResource(String.format("/gearth/themes/%s/styling.css", GEarth.theme)).toExternalForm());
 
                     FlowPane fp = new FlowPane();
                     Label lbl = new Label("G-Earth has experienced an issue" + System.lineSeparator()+ System.lineSeparator() + "Head over to our Troubleshooting page to solve the problem:");

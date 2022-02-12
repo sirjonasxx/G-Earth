@@ -17,7 +17,7 @@
             <Insets bottom="8.0" left="17.0" right="17.0" top="17.0" />
         </GridPane.margin>
         <VBox fx:id="schedulecontainer" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
-            <GridPane fx:id="header" gridLinesVisible="true">
+            <GridPane fx:id="header" gridLinesVisible="true" styleClass="table-header">
                 <columnConstraints>
                     <ColumnConstraints hgrow="SOMETIMES" maxWidth="163.0" minWidth="10.0" percentWidth="10.0" prefWidth="57.0" />
                     <ColumnConstraints hgrow="SOMETIMES" maxWidth="190.0" minWidth="10.0" percentWidth="39.0" prefWidth="189.0" />

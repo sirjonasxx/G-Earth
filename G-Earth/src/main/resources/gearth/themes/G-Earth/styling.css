@@ -1,6 +1,10 @@
-.root {
-    -fx-body-color : #F5F5F5;
+#main-window {
+    -fx-body-color : transparent;
+    -fx-background-radius: 15;
     -fx-outer-border : #cecece;
+    -fx-border-color: #cecece;
+    -fx-border-radius: 11;
+    -fx-border-width: 0 1 1 1;
 }
 .button,.menu-button,.toggle-button,.split-menu-button {
     -fx-font-size: 14;
@@ -909,4 +913,76 @@ VBox > .split-menu-button.last > .arrow-button {
 
 .connectedExtension {
     -fx-background-color: #FFFFFF;
+}
+
+#title-bar {
+    -fx-background-color: #f4f4f4;
+    -fx-background-radius: 10 10 0 0;
+}
+
+#close-button {
+    -fx-image: url("../../ui/titlebar/files/closeButton.png");
+}
+
+#close-button:hover {
+    -fx-image: url("../../ui/titlebar/files/closeButtonHover.png");
+}
+
+#close-button:pressed {
+    -fx-image: url("../../ui/titlebar/files/closeButtonPressed.png");
+}
+
+#minimize-button {
+    -fx-image: url("../../ui/titlebar/files/minimizeButton.png");
+}
+
+#minimize-button:hover {
+    -fx-image: url("../../ui/titlebar/files/minimizeButtonHover.png");
+}
+
+#minimize-button:pressed {
+    -fx-image: url("../../ui/titlebar/files/minimizeButtonPressed.png");
+}
+
+#main-tab-pane, #main-tab-pane > * {
+    -fx-background-radius: 0 0 10 10;
+}
+
+#icon {
+    -fx-image: url("./logoSmall.png");
+}
+
+#theme-button {
+    -fx-image: url("./themeButton.png");
+}
+
+.corrupted-label {
+    -fx-fill: #ee0404b2;
+}
+
+.not-corrupted-label {
+    -fx-fill: green;
+}
+
+.label {
+    -fx-text-fill: black;
+}
+
+.list-view {
+    -fx-border-color: #cccccc;
+    -fx-border-radius: 4;
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 4;
+}
+
+.list-cell {
+    -fx-background-color: transparent;
+}
+
+.list-cell:even {
+    -fx-background-color: rgba(140, 140, 140, 0.1);
+}
+
+.scroll-pane {
+    -fx-background-color: white;
 }

@@ -107,21 +107,24 @@ public class InjectionController extends SubForm {
         boolean dirty = false;
 
         lbl_corrruption.setText("isCorrupted: False");
-        lbl_corrruption.setFill(Paint.valueOf("Green"));
+        lbl_corrruption.getStyleClass().clear();
+        lbl_corrruption.getStyleClass().add("not-corrupted-label");
 
         HPacket[] packets = parsePackets(inputPacket.getText());
 
         if (packets.length == 0) {
             dirty = true;
             lbl_corrruption.setFill(Paint.valueOf("#ee0404b2"));
-            lbl_corrruption.setText("isCorrupted: True");
+            lbl_corrruption.getStyleClass().clear();
+            lbl_corrruption.getStyleClass().add("corrupted-label");
         }
 
         for (int i = 0; i < packets.length; i++) {
             if (packets[i].isCorrupted()) {
                 if (!dirty) {
                     lbl_corrruption.setText("isCorrupted: True -> " + i);
-                    lbl_corrruption.setFill(Paint.valueOf("#ee0404b2"));
+                    lbl_corrruption.getStyleClass().clear();
+                    lbl_corrruption.getStyleClass().add("corrupted-label");
                     dirty = true;
                 } else
                     lbl_corrruption.setText(lbl_corrruption.getText() + ", " + i);
