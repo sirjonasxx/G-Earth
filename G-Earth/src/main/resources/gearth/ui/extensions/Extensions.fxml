@@ -12,12 +12,12 @@
         <RowConstraints maxHeight="227.0" minHeight="10.0" prefHeight="222.0" vgrow="SOMETIMES" />
         <RowConstraints maxHeight="185.0" minHeight="10.0" prefHeight="40.0" vgrow="SOMETIMES" />
     </rowConstraints>
-    <ScrollPane fx:id="scroller" hbarPolicy="NEVER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-border-color: #888888; -fx-background: #FFFFFF; -fx-border-radius: 4px;" vbarPolicy="ALWAYS">
+    <ScrollPane fx:id="scroller" hbarPolicy="NEVER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-border-color: #888888; -fx-background: transparent; -fx-border-radius: 4px;" styleClass="table-header" vbarPolicy="ALWAYS">
         <GridPane.margin>
             <Insets bottom="8.0" left="17.0" right="17.0" top="17.0" />
         </GridPane.margin>
         <VBox fx:id="extensioncontainer" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
-            <GridPane fx:id="header_ext" gridLinesVisible="true">
+            <GridPane fx:id="header_ext" gridLinesVisible="true" styleClass="table-header">
                 <columnConstraints>
                     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="22.0" prefWidth="132.0" />
                     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="34.0" prefWidth="204.0" />

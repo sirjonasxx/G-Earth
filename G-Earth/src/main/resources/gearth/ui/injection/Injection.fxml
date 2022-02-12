@@ -37,12 +37,12 @@
               <GridPane.margin>
                   <Insets left="13.0" right="13.0" top="4.0" />
               </GridPane.margin>
-              <Text fx:id="lbl_corrruption" fill="#ee0404b2" strokeType="OUTSIDE" strokeWidth="0.0" text="isCorrupted: True">
+              <Text fx:id="lbl_corrruption" styleClass="corrupted-label" strokeType="OUTSIDE" strokeWidth="0.0" text="isCorrupted: True">
                   <font>
                       <Font name="System Italic" size="11.0" />
                   </font>
               </Text>
-              <Text fx:id="lbl_pcktInfo" fill="#000000b2" nodeOrientation="LEFT_TO_RIGHT" strokeType="OUTSIDE" strokeWidth="0.0" text="header (id:NULL, length:0)" GridPane.columnIndex="1" GridPane.halignment="RIGHT">
+              <Text fx:id="lbl_pcktInfo" fill="#000000b2" styleClass="pckt-info" nodeOrientation="LEFT_TO_RIGHT" strokeType="OUTSIDE" strokeWidth="0.0" text="header (id:NULL, length:0)" GridPane.columnIndex="1" GridPane.halignment="RIGHT">
                   <font>
                       <Font name="System Italic" size="11.0" />
                   </font>

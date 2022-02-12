@@ -15,9 +15,11 @@ import gearth.ui.info.InfoController;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Region;
+import javafx.stage.Stage;
 import org.json.JSONObject;
 
 /**
@@ -175,6 +177,9 @@ public class ExtraController extends SubForm implements SocksConfiguration {
                 if (!GPythonVersionUtils.validInstallation()) {
                     Platform.runLater(() -> {
                         Alert alert = new Alert(Alert.AlertType.ERROR, "G-Python installation", ButtonType.OK);
+                        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+                        stage.getIcons().add(new Image(Main.class.getResourceAsStream(String.format("/gearth/themes/%s/logoSmall.png", Main.theme))));
+                        stage.getScene().getStylesheets().add(Main.class.getResource(String.format("/gearth/themes/%s/styling.css", Main.theme)).toExternalForm());
                         alert.setTitle("G-Python installation");
 
                         FlowPane fp = new FlowPane();

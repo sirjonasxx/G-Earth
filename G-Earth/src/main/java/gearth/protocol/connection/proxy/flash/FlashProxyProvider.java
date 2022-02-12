@@ -1,5 +1,6 @@
 package gearth.protocol.connection.proxy.flash;
 
+import gearth.Main;
 import gearth.protocol.HConnection;
 import gearth.protocol.connection.HProxy;
 import gearth.protocol.connection.HProxySetter;
@@ -13,7 +14,9 @@ import gearth.protocol.packethandler.flash.FlashPacketHandler;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.image.Image;
 import javafx.scene.layout.Region;
+import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -121,6 +124,9 @@ public abstract class FlashProxyProvider implements ProxyProvider {
     protected void showInvalidConnectionError() {
         Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.ERROR, "You entered invalid connection information, G-Earth could not connect", ButtonType.OK);
+            Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+            stage.getIcons().add(new Image(Main.class.getResourceAsStream(String.format("/gearth/themes/%s/logoSmall.png", Main.theme))));
+            stage.getScene().getStylesheets().add(Main.class.getResource(String.format("/gearth/themes/%s/styling.css", Main.theme)).toExternalForm());
             alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
             alert.setResizable(false);
             alert.show();
