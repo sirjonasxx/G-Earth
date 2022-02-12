@@ -37,7 +37,7 @@ public class ReturnBytePatcher implements StreamReplacement {
     @Override
     public boolean codeMatches(Func code) {
         if (code.getLocalss().size() != 0) return false;
-        if (code.getExpression().getInstructions().size() != 30) return false;
+        if (code.getExpression().getInstructions().size() != 26) return false;
         List<Instr> expr = code.getExpression().getInstructions();
         if (expr.get(expr.size() - 1).getInstrType() != InstrType.I32_XOR) return false;
         return true;

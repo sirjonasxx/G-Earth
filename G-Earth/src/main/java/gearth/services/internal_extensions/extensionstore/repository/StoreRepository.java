@@ -78,7 +78,7 @@ public class StoreRepository {
     }
 
     public List<String> getClients() {
-        return Arrays.asList("Unity", "Flash");
+        return Arrays.asList("Unity", "Flash", "Nitro");
     }
 
     public List<String> getLanguages() {

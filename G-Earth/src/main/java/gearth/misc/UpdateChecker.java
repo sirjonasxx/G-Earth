@@ -1,6 +1,6 @@
 package gearth.misc;
 
-import gearth.Main;
+import gearth.GEarth;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -19,8 +19,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
-import static gearth.Main.gitApi;
-import static gearth.Main.version;
+import static gearth.GEarth.gitApi;
+import static gearth.GEarth.version;
 
 public class UpdateChecker {
 
@@ -38,15 +38,15 @@ public class UpdateChecker {
 
                         Alert alert = new Alert(isForcedUpdate ? Alert.AlertType.ERROR : Alert.AlertType.INFORMATION, "G-Earth is outdated!", ButtonType.OK);
                         Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-                        stage.getIcons().add(new Image(Main.class.getResourceAsStream(String.format("/gearth/themes/%s/logoSmall.png", Main.theme))));
-                        stage.getScene().getStylesheets().add(Main.class.getResource(String.format("/gearth/themes/%s/styling.css", Main.theme)).toExternalForm());
+                        stage.getIcons().add(new Image(GEarth.class.getResourceAsStream(String.format("/gearth/themes/%s/logoSmall.png", GEarth.theme))));
+                        stage.getScene().getStylesheets().add(GEarth.class.getResource(String.format("/gearth/themes/%s/styling.css", GEarth.theme)).toExternalForm());
 
                         FlowPane fp = new FlowPane();
                         Label lbl = new Label("A new version of G-Earth has been found ("+gitv+")" + System.lineSeparator()+ System.lineSeparator() + "Update to the latest version:");
                         Hyperlink link = new Hyperlink("https://github.com/sirjonasxx/G-Earth/releases");
                         fp.getChildren().addAll( lbl, link);
                         link.setOnAction(event -> {
-                            Main.main.getHostServices().showDocument(link.getText());
+                            GEarth.main.getHostServices().showDocument(link.getText());
                             event.consume();
                         });
 

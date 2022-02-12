@@ -5,6 +5,7 @@ import gearth.protocol.HMessage;
 import gearth.protocol.connection.*;
 import gearth.protocol.connection.proxy.nitro.NitroConstants;
 import gearth.protocol.connection.proxy.nitro.NitroProxyProvider;
+import gearth.protocol.packethandler.nitro.NitroPacketHandler;
 
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;

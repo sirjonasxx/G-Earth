@@ -1,6 +1,6 @@
 package gearth.services.g_python;
 
-import gearth.Main;
+import gearth.GEarth;
 import gearth.ui.extra.ExtraController;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
@@ -171,8 +171,8 @@ public class GPythonShell {
         Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.ERROR, "G-Python error", ButtonType.OK);
             Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-            stage.getIcons().add(new Image(Main.class.getResourceAsStream(String.format("/gearth/themes/%s/logoSmall.png", Main.theme))));
-            stage.getScene().getStylesheets().add(Main.class.getResource(String.format("/gearth/themes/%s/styling.css", Main.theme)).toExternalForm());
+            stage.getIcons().add(new Image(GEarth.class.getResourceAsStream(String.format("/gearth/themes/%s/logoSmall.png", GEarth.theme))));
+            stage.getScene().getStylesheets().add(GEarth.class.getResource(String.format("/gearth/themes/%s/styling.css", GEarth.theme)).toExternalForm());
             alert.setTitle("G-Python error");
 
             FlowPane fp = new FlowPane();
@@ -182,7 +182,7 @@ public class GPythonShell {
             Hyperlink link = new Hyperlink(ExtraController.INFO_URL_GPYTHON);
             fp.getChildren().addAll(lbl, link);
             link.setOnAction(event -> {
-                Main.main.getHostServices().showDocument(link.getText());
+                GEarth.main.getHostServices().showDocument(link.getText());
                 event.consume();
             });
 

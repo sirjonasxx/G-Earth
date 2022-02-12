@@ -5,7 +5,6 @@ import gearth.protocol.HPacket;
 import gearth.protocol.packethandler.ByteArrayUtils;
 import gearth.protocol.packethandler.PacketHandler;
 import gearth.services.extension_handler.ExtensionHandler;
-import gearth.services.extension_handler.OnHMessageHandled;
 
 import javax.websocket.Session;
 import java.io.IOException;
@@ -34,19 +33,7 @@ public class UnityPacketHandler extends PacketHandler {
     @Override
     public void act(byte[] buffer) throws IOException {
         HMessage hMessage = new HMessage(new HPacket(buffer), direction, currentIndex);
-
-        OnHMessageHandled afterExtensionIntercept = hMessage1 -> {
-            notifyListeners(2, hMessage1);
-
-            if (!hMessage1.isBlocked())	{
-                sendToStream(hMessage1.getPacket().toBytes());
-            }
-        };
-
-        notifyListeners(0, hMessage);
-        notifyListeners(1, hMessage);
-        extensionHandler.handle(hMessage, afterExtensionIntercept);
-
+        awaitListeners(hMessage, hMessage1 -> sendToStream(hMessage1.getPacket().toBytes()));
         currentIndex++;
     }
 }

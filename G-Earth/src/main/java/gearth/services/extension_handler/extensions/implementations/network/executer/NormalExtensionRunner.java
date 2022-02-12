@@ -1,6 +1,6 @@
 package gearth.services.extension_handler.extensions.implementations.network.executer;
 
-import gearth.Main;
+import gearth.GEarth;
 import gearth.services.extension_handler.extensions.implementations.network.authentication.Authenticator;
 import gearth.services.internal_extensions.extensionstore.tools.StoreExtensionTools;
 
@@ -23,9 +23,9 @@ public class NormalExtensionRunner implements ExtensionRunner {
     static {
         String value;
         try {
-            value = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParent();
+            value = new File(GEarth.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParent();
         } catch (URISyntaxException e) {
-            value = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParent();
+            value = new File(GEarth.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParent();
             e.printStackTrace();
         }
         JARPATH = value;
@@ -115,7 +115,7 @@ public class NormalExtensionRunner implements ExtensionRunner {
     }
 
     public static void maybeLogExtension(String path, Process proc) {
-        if (Main.hasFlag(ExtensionRunner.SHOW_EXTENSIONS_LOG)) {
+        if (GEarth.hasFlag(ExtensionRunner.SHOW_EXTENSIONS_LOG)) {
             String sep = "" + System.lineSeparator();
             synchronized (System.out) {
                 System.out.println(path + sep + "Launching" + sep + "----------" + sep);

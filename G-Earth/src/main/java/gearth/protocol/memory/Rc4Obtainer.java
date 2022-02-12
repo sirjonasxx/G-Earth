@@ -1,6 +1,6 @@
 package gearth.protocol.memory;
 
-import gearth.Main;
+import gearth.GEarth;
 import gearth.protocol.HConnection;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
@@ -83,15 +83,15 @@ public class Rc4Obtainer {
                 Platform.runLater(() -> {
                     Alert alert = new Alert(Alert.AlertType.WARNING, "Something went wrong!", ButtonType.OK);
                     Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-                    stage.getIcons().add(new Image(Main.class.getResourceAsStream(String.format("/gearth/themes/%s/logoSmall.png", Main.theme))));
-                    stage.getScene().getStylesheets().add(Main.class.getResource(String.format("/gearth/themes/%s/styling.css", Main.theme)).toExternalForm());
+                    stage.getIcons().add(new Image(GEarth.class.getResourceAsStream(String.format("/gearth/themes/%s/logoSmall.png", GEarth.theme))));
+                    stage.getScene().getStylesheets().add(GEarth.class.getResource(String.format("/gearth/themes/%s/styling.css", GEarth.theme)).toExternalForm());
 
                     FlowPane fp = new FlowPane();
                     Label lbl = new Label("G-Earth has experienced an issue" + System.lineSeparator()+ System.lineSeparator() + "Head over to our Troubleshooting page to solve the problem:");
                     Hyperlink link = new Hyperlink("https://github.com/sirjonasxx/G-Earth/wiki/Troubleshooting");
                     fp.getChildren().addAll( lbl, link);
                     link.setOnAction(event -> {
-                        Main.main.getHostServices().showDocument(link.getText());
+                        GEarth.main.getHostServices().showDocument(link.getText());
                         event.consume();
                     });
 
@@ -101,7 +101,7 @@ public class Rc4Obtainer {
                     alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
                     alert.getDialogPane().setContent(fp);
                     alert.setOnCloseRequest(event -> {
-                        Main.main.getHostServices().showDocument(link.getText());
+                        GEarth.main.getHostServices().showDocument(link.getText());
                     });
                     alert.show();
 

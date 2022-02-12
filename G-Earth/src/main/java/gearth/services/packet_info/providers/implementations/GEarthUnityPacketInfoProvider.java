@@ -1,6 +1,6 @@
 package gearth.services.packet_info.providers.implementations;
 
-import gearth.Main;
+import gearth.GEarth;
 import gearth.services.packet_info.PacketInfo;
 import gearth.services.packet_info.providers.PacketInfoProvider;
 import gearth.protocol.HMessage;
@@ -21,7 +21,7 @@ public class GEarthUnityPacketInfoProvider extends PacketInfoProvider {
     @Override
     protected File getFile() {
         try {
-            return new File(new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI())
+            return new File(new File(GEarth.class.getProtectionDomain().getCodeSource().getLocation().toURI())
                     .getParentFile(), "messages.json");
         } catch (URISyntaxException e) {
             e.printStackTrace();
