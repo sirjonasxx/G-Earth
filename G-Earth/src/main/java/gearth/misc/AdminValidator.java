@@ -1,13 +1,18 @@
 package gearth.misc;
 
 import gearth.GEarth;
+import gearth.ui.titlebar.DefaultTitleBarConfig;
+import gearth.ui.titlebar.TitleBarController;
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Region;
 import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.prefs.Preferences;
 
@@ -48,11 +53,33 @@ public class AdminValidator {
                 Platform.runLater(() -> {
                     Alert alert = new Alert(Alert.AlertType.WARNING, "G-Earth needs admin privileges in order to work on Flash, please restart G-Earth with admin permissions unless you're using Unity", ButtonType.OK);
                     Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-                    stage.getIcons().add(new Image(GEarth.class.getResourceAsStream(String.format("/gearth/ui/themes/%s/logoSmall.png", GEarth.theme))));
-                    stage.getScene().getStylesheets().add(GEarth.class.getResource(String.format("/gearth/ui/themes/%s/styling.css", GEarth.theme)).toExternalForm());
-                    alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
-                    alert.setResizable(false);
-                    alert.show();
+                    stage.getIcons().add(new Image(GEarth.class.getResourceAsStream("/gearth/ui/themes/G-Earth/logoSmall.png")));
+                    stage.getScene().getStylesheets().add(GEarth.class.getResource(String.format("/gearth/ui/themes/%s/styling.css", GEarth.theme.internalName())).toExternalForm());
+//                    try {
+//                        TitleBarController.create(stage, new DefaultTitleBarConfig(stage));
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
+//                    alert.getDialogPane().setMaxHeight(-1);
+//                    alert.getDialogPane().setMinHeight(200);
+//                    alert.getDialogPane()
+//
+//
+//                    boolean[] once = new boolean[]{false};
+//                    stage.heightProperty().addListener(observable -> {
+//                        if (!once[0]) {
+//                            once[0] = true;
+//                            stage.setMinHeight(alert.getDialogPane().getHeight() + 25);
+//                            stage.setHeight(alert.getDialogPane().getHeight() + 25);
+//                            stage.setMaxHeight(alert.getDialogPane().getHeight() + 25);
+//                        }
+//
+//                    });
+
+//                    stage.setHeight(stage.getHeight() + 25);
+//                    stage.setResizable(false);
+//                    stage.sizeToScene();x
+                    stage.show();
                 });
 
             }

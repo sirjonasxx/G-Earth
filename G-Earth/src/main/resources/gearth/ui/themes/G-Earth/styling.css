@@ -57,7 +57,7 @@
 .info > .label,
 .warning > .label,
 .danger > .label {
-    -fx-text-fill: white;
+    -fx-text-fill: black;
 }
 
 .action-btn {
@@ -689,7 +689,7 @@ VBox > .split-menu-button.last > .arrow-button {
 }
 
 .titled-pane.primary {
-    -fx-text-fill: white;
+    -fx-text-fill: black;
 }
 
 .titled-pane.primary > .title {

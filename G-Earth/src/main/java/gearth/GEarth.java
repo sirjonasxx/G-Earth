@@ -19,13 +19,12 @@ import javafx.stage.StageStyle;
 
 public class GEarth extends Application {
 
-    public static Application main;
+    public static GEarth main;
     public static String version = "1.5.1";
     public static String gitApi = "https://api.github.com/repos/sirjonasxx/G-Earth/releases/latest";
     public static Theme theme;
 
     private Stage stage;
-    private TitleBarController titleBar;
     private GEarthController controller;
 
     static {
@@ -49,7 +48,7 @@ public class GEarth extends Application {
         stage.initStyle(StageStyle.TRANSPARENT);
 
         primaryStage.setScene(new Scene(root));
-        titleBar = TitleBarController.create(primaryStage, new TitleBarConfig() {
+        TitleBarController.create(primaryStage, new TitleBarConfig() {
             @Override
             public boolean displayThemePicker() {
                 return true;

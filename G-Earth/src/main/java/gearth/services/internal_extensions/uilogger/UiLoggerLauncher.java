@@ -17,12 +17,12 @@ public class UiLoggerLauncher extends InternalExtensionFormLauncher<UiLogger> {
         FXMLLoader loader = new FXMLLoader(UiLogger.class.getResource("UiLogger.fxml"));
 
         Parent root = loader.load();
-        stage.setTitle(String.format("%s | Packet Logger", GEarth.theme));
+        stage.setTitle("G-Earth | Packet Logger");
         stage.initModality(Modality.NONE);
-        stage.getIcons().add(new Image(getClass().getResourceAsStream(String.format("/gearth/ui/themes/%s/logoSmall.png", GEarth.theme))));
+        stage.getIcons().add(new Image(getClass().getResourceAsStream("/gearth/ui/themes/G-Earth/logoSmall.png")));
 
         Scene scene = new Scene(root);
-        scene.getStylesheets().add(String.format("/gearth/ui/themes/%s/styling.css", GEarth.theme));
+        scene.getStylesheets().add("/gearth/ui/themes/G-Earth/styling.css");
         scene.getStylesheets().add("/gearth/services/internal_extensions/uilogger/logger.css");
 
         UiLoggerController controller = loader.getController();

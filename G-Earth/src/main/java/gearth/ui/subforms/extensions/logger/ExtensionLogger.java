@@ -49,7 +49,7 @@ public class ExtensionLogger {
             controller.setStage(stage);
 
             stage.setScene(scene);
-            TitleBarController titleBar = TitleBarController.create(stage, new DefaultTitleBarConfig(stage) {
+            TitleBarController.create(stage, new DefaultTitleBarConfig(stage) {
                 @Override
                 public void onCloseClicked() {
                     stage.hide();

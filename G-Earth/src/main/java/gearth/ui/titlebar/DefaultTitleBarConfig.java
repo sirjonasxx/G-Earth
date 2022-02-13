@@ -27,7 +27,7 @@ public class DefaultTitleBarConfig implements TitleBarConfig {
 
     @Override
     public void onCloseClicked() {
-
+        stage.close();
     }
 
     @Override
