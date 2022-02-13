@@ -64,7 +64,7 @@
 }
 
 .label {
-    -fx-text-fill: #000000 !important;
+    /*-fx-text-fill: #000000 !important;*/
 }
 
 .scroll-bar:vertical {

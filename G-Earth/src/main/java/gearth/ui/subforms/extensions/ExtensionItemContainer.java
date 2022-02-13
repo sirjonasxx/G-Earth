@@ -142,6 +142,9 @@ public class ExtensionItemContainer extends GridPane {
 
         parent.getChildren().add(this);
 
+        getStyleClass().clear();
+        getStyleClass().add("connectedExtension");
+
         if (item.extensionType() == ExtensionType.INTERNAL) {
             getStyleClass().clear();
             getStyleClass().add("internalExtension");
