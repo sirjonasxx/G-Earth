@@ -43,9 +43,6 @@ public class GEarthController {
 
     private List<SubForm> tabs = null;
 
-    public Pane titleBar;
-    public Label titleLabel;
-
     public GEarthController() {
         SocksConfiguration temporary_socks = new SocksConfiguration() {
             public boolean useSocks() { return false; }
@@ -123,54 +120,9 @@ public class GEarthController {
         loggerController.miniLogText(color, text);
     }
 
-    public void setTheme(String theme) {
-        GEarth.theme = theme;
-
-        getStage().getScene().getStylesheets().clear();
-        getStage().getScene().getStylesheets().add(GEarth.class.getResource(String.format("/gearth/themes/%s/styling.css", theme)).toExternalForm());
-
-        getStage().getIcons().clear();
-        getStage().getIcons().add(new Image(GEarth.class.getResourceAsStream(String.format("/gearth/themes/%s/logoSmall.png", theme))));
-
-        getStage().setTitle(theme.split("_")[0] + " " + GEarth.version);
-        titleLabel.setText(getStage().getTitle());
-
-        infoController.img_logo.setImage(new Image(GEarth.class.getResourceAsStream(String.format("/gearth/themes/%s/logo.png", theme))));
-        infoController.version.setText(getStage().getTitle());
-    }
-
-
     public void exit() {
         tabs.forEach(SubForm::exit);
         hConnection.abort();
     }
 
-    public void handleCloseAction(MouseEvent event) {
-        this.exit();
-        Platform.exit();
-
-        // Platform.exit doesn't seem to be enough on Windows?
-        System.exit(0);
-    }
-
-    public void handleMinimizeAction(MouseEvent event) {
-        getStage().setIconified(true);
-    }
-
-    private double xOffset, yOffset;
-
-    public void handleClickAction(MouseEvent event) {
-        xOffset = event.getSceneX();
-        yOffset = event.getSceneY();
-    }
-
-    public void handleMovementAction(MouseEvent event) {
-        getStage().setX(event.getScreenX() - xOffset);
-        getStage().setY(event.getScreenY() - yOffset);
-    }
-
-    public void toggleTheme(MouseEvent event) {
-        int themeIndex = Arrays.asList(GEarth.themes).indexOf(GEarth.theme);
-        setTheme(GEarth.themes[(themeIndex + 1) % GEarth.themes.length]);
-    }
 }
