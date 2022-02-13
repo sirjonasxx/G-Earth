@@ -1,27 +1,21 @@
 package gearth.ui;
 
-import gearth.GEarth;
 import gearth.protocol.connection.proxy.ProxyProviderFactory;
 import gearth.protocol.connection.proxy.SocksConfiguration;
-import gearth.ui.logger.loggerdisplays.PacketLoggerFactory;
-import javafx.application.Platform;
+import gearth.ui.subforms.logger.loggerdisplays.PacketLoggerFactory;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import gearth.protocol.HConnection;
-import gearth.ui.connection.ConnectionController;
-import gearth.ui.extensions.ExtensionsController;
-import gearth.ui.info.InfoController;
-import gearth.ui.injection.InjectionController;
-import gearth.ui.logger.LoggerController;
-import gearth.ui.scheduler.SchedulerController;
-import gearth.ui.extra.ExtraController;
-import gearth.ui.tools.ToolsController;
+import gearth.ui.subforms.connection.ConnectionController;
+import gearth.ui.subforms.extensions.ExtensionsController;
+import gearth.ui.subforms.info.InfoController;
+import gearth.ui.subforms.injection.InjectionController;
+import gearth.ui.subforms.logger.LoggerController;
+import gearth.ui.subforms.scheduler.SchedulerController;
+import gearth.ui.subforms.extra.ExtraController;
+import gearth.ui.subforms.tools.ToolsController;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class GEarthController {

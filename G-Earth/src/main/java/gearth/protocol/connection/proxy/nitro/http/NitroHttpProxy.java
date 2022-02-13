@@ -57,8 +57,8 @@ public class NitroHttpProxy {
                     ButtonType.YES, ButtonType.NO
             );
             Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-            stage.getIcons().add(new Image(GEarth.class.getResourceAsStream(String.format("/gearth/themes/%s/logoSmall.png", GEarth.theme))));
-            stage.getScene().getStylesheets().add(GEarth.class.getResource(String.format("/gearth/themes/%s/styling.css", GEarth.theme)).toExternalForm());
+            stage.getIcons().add(new Image(GEarth.class.getResourceAsStream(String.format("/gearth/ui/themes/%s/logoSmall.png", GEarth.theme))));
+            stage.getScene().getStylesheets().add(GEarth.class.getResource(String.format("/gearth/ui/themes/%s/styling.css", GEarth.theme)).toExternalForm());
 
             shouldInstall.set(alert.showAndWait().filter(t -> t == ButtonType.YES).isPresent());
             waitForDialog.release();

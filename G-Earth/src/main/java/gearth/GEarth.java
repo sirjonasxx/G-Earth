@@ -12,7 +12,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
@@ -90,15 +89,15 @@ public class GEarth extends Application {
         GEarth.theme = theme;
 
         stage.getScene().getStylesheets().clear();
-        stage.getScene().getStylesheets().add(GEarth.class.getResource(String.format("/gearth/themes/%s/styling.css", theme)).toExternalForm());
+        stage.getScene().getStylesheets().add(GEarth.class.getResource(String.format("/gearth/ui/themes/%s/styling.css", theme)).toExternalForm());
 
         stage.getIcons().clear();
-        stage.getIcons().add(new Image(GEarth.class.getResourceAsStream(String.format("/gearth/themes/%s/logoSmall.png", theme))));
+        stage.getIcons().add(new Image(GEarth.class.getResourceAsStream(String.format("/gearth/ui/themes/%s/logoSmall.png", theme))));
 
         stage.setTitle(theme.split("_")[0] + " " + GEarth.version);
         titleBar.setTitle(stage.getTitle());
 
-        controller.infoController.img_logo.setImage(new Image(GEarth.class.getResourceAsStream(String.format("/gearth/themes/%s/logo.png", theme))));
+        controller.infoController.img_logo.setImage(new Image(GEarth.class.getResourceAsStream(String.format("/gearth/ui/themes/%s/logo.png", theme))));
         controller.infoController.version.setText(stage.getTitle());
     }
 

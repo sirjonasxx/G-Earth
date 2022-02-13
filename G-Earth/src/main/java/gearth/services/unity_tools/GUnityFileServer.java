@@ -135,7 +135,7 @@ public class GUnityFileServer extends HttpServlet
 
     private void getLogo(HttpServletResponse response) throws IOException {
         OutputStream out = response.getOutputStream();
-        InputStream in = GEarth.class.getResourceAsStream(String.format("/gearth/themes/%s/logo.png", GEarth.theme));
+        InputStream in = GEarth.class.getResourceAsStream(String.format("/gearth/ui/themes/%s/logo.png", GEarth.theme));
 
         byte[] bytes = new byte[4096];
         int bytesRead;

@@ -34,6 +34,7 @@ public class TitleBarController {
         Parent parent = stage.getScene().getRoot();
 
         VBox newParent = new VBox(root, parent);
+        newParent.setId("titlebar-main-container");
         stage.getScene().setRoot(newParent);
         parent.getScene().setFill(Color.TRANSPARENT);
 

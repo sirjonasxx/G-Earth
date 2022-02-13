@@ -26,8 +26,8 @@ public class GExtensionStoreLauncher extends InternalExtensionFormLauncher<GExte
         stage.setHeight(530);
 
         stage.setScene(new Scene(root));
-        stage.getScene().getStylesheets().add(GEarthController.class.getResource(String.format("/gearth/themes/%s/styling.css", GEarth.theme)).toExternalForm());
-        stage.getIcons().add(new Image(GEarth.class.getResourceAsStream(String.format("/gearth/themes/%s/logoSmall.png", GEarth.theme))));
+        stage.getScene().getStylesheets().add(GEarthController.class.getResource(String.format("/gearth/ui/themes/%s/styling.css", GEarth.theme)).toExternalForm());
+        stage.getIcons().add(new Image(GEarth.class.getResourceAsStream(String.format("/gearth/ui/themes/%s/logoSmall.png", GEarth.theme))));
 
         GExtensionStore gExtensionStore = new GExtensionStore();
 

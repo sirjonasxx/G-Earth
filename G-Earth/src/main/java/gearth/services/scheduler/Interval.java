@@ -1,6 +1,6 @@
 package gearth.services.scheduler;
 
-import gearth.ui.scheduler.SchedulerController;
+import gearth.ui.subforms.scheduler.SchedulerController;
 
 /**
  * Created by Jonas on 11/04/18.

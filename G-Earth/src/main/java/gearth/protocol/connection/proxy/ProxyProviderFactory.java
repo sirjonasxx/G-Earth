@@ -109,8 +109,8 @@ public class ProxyProviderFactory {
                             "Due to current limitations you can only connect one session per hotel to G-Earth in Raw IP mode on Windows.\n\n" +
                             "You can bypass this by using a SOCKS proxy [Extra -> Advanced -> SOCKS]", ButtonType.OK);
                     Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-                    stage.getIcons().add(new Image(GEarth.class.getResourceAsStream(String.format("/gearth/themes/%s/logoSmall.png", GEarth.theme))));
-                    stage.getScene().getStylesheets().add(GEarth.class.getResource(String.format("/gearth/themes/%s/styling.css", GEarth.theme)).toExternalForm());
+                    stage.getIcons().add(new Image(GEarth.class.getResourceAsStream(String.format("/gearth/ui/themes/%s/logoSmall.png", GEarth.theme))));
+                    stage.getScene().getStylesheets().add(GEarth.class.getResource(String.format("/gearth/ui/themes/%s/styling.css", GEarth.theme)).toExternalForm());
                     alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
                     alert.setResizable(false);
                     alert.show();

@@ -110,8 +110,8 @@ public class NormalFlashProxyProvider extends FlashProxyProvider {
                     Alert a = new Alert(Alert.AlertType.ERROR, "The port is in use by " + processName,
                             ButtonType.OK);
                     Stage stage = (Stage) a.getDialogPane().getScene().getWindow();
-                    stage.getIcons().add(new Image(GEarth.class.getResourceAsStream(String.format("/gearth/themes/%s/logoSmall.png", GEarth.theme))));
-                    stage.getScene().getStylesheets().add(GEarth.class.getResource(String.format("/gearth/themes/%s/styling.css", GEarth.theme)).toExternalForm());
+                    stage.getIcons().add(new Image(GEarth.class.getResourceAsStream(String.format("/gearth/ui/themes/%s/logoSmall.png", GEarth.theme))));
+                    stage.getScene().getStylesheets().add(GEarth.class.getResource(String.format("/gearth/ui/themes/%s/styling.css", GEarth.theme)).toExternalForm());
                     a.showAndWait();
                 });
                 throw new IOException(e);
