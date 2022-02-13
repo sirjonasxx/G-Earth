@@ -1,10 +1,15 @@
 package gearth.ui.titlebar;
 
 import gearth.GEarth;
-import javafx.application.Platform;
+import gearth.ui.themes.Theme;
+import gearth.ui.themes.ThemeFactory;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -13,12 +18,12 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 public class TitleBarController {
 
     public Label titleLabel;
     public Pane titleBar;
+    public ImageView titleIcon;
 
     private Stage stage;
     private TitleBarConfig config;
@@ -38,7 +43,19 @@ public class TitleBarController {
         stage.getScene().setRoot(newParent);
         parent.getScene().setFill(Color.TRANSPARENT);
 
+        stage.titleProperty().addListener((i) -> controller.setTitle(stage.getTitle()));
+        controller.setTitle(stage.getTitle());
+
+        stage.getIcons().addListener((InvalidationListener) observable -> controller.updateIcon());
+        controller.updateIcon();
+
         return controller;
+    }
+
+    public void updateIcon() {
+        titleIcon.setImage(stage.getIcons().size() > 0 ? stage.getIcons().get(0) :
+                new Image(GEarth.class.getResourceAsStream(
+                        String.format("/gearth/ui/themes/%s/logoSmall.png", ThemeFactory.getDefaultTheme().internalName()))));
     }
 
     public void setTitle(String title) {
@@ -51,7 +68,7 @@ public class TitleBarController {
     }
 
     public void handleMinimizeAction(MouseEvent event) {
-        stage.setIconified(true);
+        config.onMinimizeClicked();
     }
 
     private double xOffset, yOffset;
@@ -67,8 +84,8 @@ public class TitleBarController {
     }
 
     public void toggleTheme(MouseEvent event) {
-        int themeIndex = Arrays.asList(GEarth.themes).indexOf(GEarth.theme);
-        config.onSetTheme(GEarth.themes[(themeIndex + 1) % GEarth.themes.length]);
+        int themeIndex = ThemeFactory.allThemes().indexOf(config.getCurrentTheme());
+        config.setTheme(ThemeFactory.allThemes().get((themeIndex + 1) % ThemeFactory.allThemes().size()));
     }
 
 }

@@ -1,7 +1,11 @@
 package gearth.ui.themes;
 
-public class Theme {
+public interface Theme {
 
+    String title();
+    String internalName();
 
+    boolean overridesLogo();
+    boolean overridesTitle();
 
 }

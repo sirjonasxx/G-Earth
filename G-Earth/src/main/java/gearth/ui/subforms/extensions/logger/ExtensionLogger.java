@@ -1,6 +1,8 @@
 package gearth.ui.subforms.extensions.logger;
 
 import gearth.GEarth;
+import gearth.ui.titlebar.DefaultTitleBarConfig;
+import gearth.ui.titlebar.TitleBarController;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -35,26 +37,31 @@ public class ExtensionLogger {
 
 
             stage = new Stage();
-            stage.setTitle(String.format("%s | Extension Console", GEarth.theme));
+            stage.setTitle("G-Earth | Extension Console");
             stage.initModality(Modality.NONE);
-            stage.getIcons().add(new Image(getClass().getResourceAsStream(String.format("/gearth/ui/themes/%s/logoSmall.png", GEarth.theme))));
             stage.setAlwaysOnTop(true);
             stage.setMinHeight(235);
             stage.setMinWidth(370);
 
             Scene scene = new Scene(root);
-            scene.getStylesheets().add(String.format("/gearth/ui/themes/%s/styling.css", GEarth.theme));
-            scene.getStylesheets().add("/gearth/ui/extensions/logger/logger.css");
+            scene.getStylesheets().add("/gearth/ui/subforms/extensions/logger/logger.css");
             ExtensionLoggerController controller = loader.getController();
             controller.setStage(stage);
 
             stage.setScene(scene);
-
-            // don't let the user close this window on their own
-            stage.setOnCloseRequest(windowEvent -> {
-                stage.hide();
-                isVisible = false;
+            TitleBarController titleBar = TitleBarController.create(stage, new DefaultTitleBarConfig(stage) {
+                @Override
+                public void onCloseClicked() {
+                    stage.hide();
+                    isVisible = false;
+                }
             });
+
+//            // don't let the user close this window on their own
+//            stage.setOnCloseRequest(windowEvent -> {
+//                stage.hide();
+//                isVisible = false;
+//            });
         } catch (IOException e) {
             e.printStackTrace();
         }

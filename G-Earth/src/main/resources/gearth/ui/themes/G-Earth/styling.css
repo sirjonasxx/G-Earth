@@ -949,7 +949,7 @@ VBox > .split-menu-button.last > .arrow-button {
 }
 
 #icon {
-    -fx-image: url("logoSmall.png");
+    /*-fx-image: url("logoSmall.png");*/
 }
 
 #theme-button {

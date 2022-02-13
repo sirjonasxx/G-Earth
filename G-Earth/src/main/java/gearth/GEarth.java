@@ -4,6 +4,8 @@ import gearth.misc.AdminValidator;
 import gearth.misc.Cacher;
 import gearth.misc.UpdateChecker;
 import gearth.ui.GEarthController;
+import gearth.ui.themes.Theme;
+import gearth.ui.themes.ThemeFactory;
 import gearth.ui.titlebar.TitleBarConfig;
 import gearth.ui.titlebar.TitleBarController;
 import javafx.application.Application;
@@ -20,8 +22,7 @@ public class GEarth extends Application {
     public static Application main;
     public static String version = "1.5.1";
     public static String gitApi = "https://api.github.com/repos/sirjonasxx/G-Earth/releases/latest";
-    public static String theme = "G-Earth_Dark";
-    public static String[] themes = new String[] {"G-Earth", "Tanji", "G-Earth_Dark"};
+    public static Theme theme;
 
     private Stage stage;
     private TitleBarController titleBar;
@@ -29,7 +30,10 @@ public class GEarth extends Application {
 
     static {
         if (Cacher.getCacheContents().has("theme")) {
-            theme = Cacher.getCacheContents().getString("theme");
+            theme = ThemeFactory.themeForTitle(Cacher.getCacheContents().getString("theme"));
+        }
+        else {
+            theme = ThemeFactory.getDefaultTheme();
         }
     }
 
@@ -62,14 +66,19 @@ public class GEarth extends Application {
             }
 
             @Override
-            public void onSetTheme(String theme) {
-                setTheme(theme);
+            public void setTheme(Theme theme) {
+                setGearthTheme(theme);
+            }
+
+            @Override
+            public Theme getCurrentTheme() {
+                return theme;
             }
         });
         primaryStage.setResizable(false);
         primaryStage.sizeToScene();
 
-        setTheme(theme);
+        setGearthTheme(theme);
 
         primaryStage.show();
         primaryStage.setOnCloseRequest( event -> closeGEarth());
@@ -85,19 +94,23 @@ public class GEarth extends Application {
         System.exit(0);
     }
 
-    private void setTheme(String theme) {
+    private void setGearthTheme(Theme theme) {
         GEarth.theme = theme;
+        Theme defaultTheme = ThemeFactory.getDefaultTheme();
 
         stage.getScene().getStylesheets().clear();
-        stage.getScene().getStylesheets().add(GEarth.class.getResource(String.format("/gearth/ui/themes/%s/styling.css", theme)).toExternalForm());
+        stage.getScene().getStylesheets().add(GEarth.class.getResource(String.format("/gearth/ui/themes/%s/styling.css", theme.internalName())).toExternalForm());
 
         stage.getIcons().clear();
-        stage.getIcons().add(new Image(GEarth.class.getResourceAsStream(String.format("/gearth/ui/themes/%s/logoSmall.png", theme))));
+        stage.getIcons().add(new Image(GEarth.class.getResourceAsStream(String.format("/gearth/ui/themes/%s/logoSmall.png", theme.overridesLogo() ? theme.internalName() : defaultTheme.internalName()))));
+        stage.setTitle((theme.overridesTitle() ? theme.title() : defaultTheme.title()) + " " + GEarth.version);
 
-        stage.setTitle(theme.split("_")[0] + " " + GEarth.version);
-        titleBar.setTitle(stage.getTitle());
-
-        controller.infoController.img_logo.setImage(new Image(GEarth.class.getResourceAsStream(String.format("/gearth/ui/themes/%s/logo.png", theme))));
+        controller.infoController.img_logo.setImage(new Image(GEarth.class.getResourceAsStream(
+                String.format(
+                        "/gearth/ui/themes/%s/logo.png",
+                        theme.overridesLogo() ? theme.internalName() : defaultTheme.internalName()
+                )
+        )));
         controller.infoController.version.setText(stage.getTitle());
     }
 
