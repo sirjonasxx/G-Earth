@@ -13,7 +13,7 @@
                <CheckMenuItem fx:id="chkAlwaysOnTop" mnemonicParsing="false" onAction="#toggleAlwaysOnTop" text="Always on top" />
                <Menu mnemonicParsing="false" text="On connect">
                  <items>
-                     <CheckMenuItem fx:id="chkOpenOnConnect" mnemonicParsing="false" selected="true" text="Open window" />
+                     <CheckMenuItem fx:id="chkOpenOnConnect" mnemonicParsing="false" text="Open window" />
                      <CheckMenuItem fx:id="chkResetOnConnect" mnemonicParsing="false" selected="true" text="Reset packetlogger" />
                  </items>
                </Menu>
@@ -26,7 +26,7 @@
            </items>
          </Menu>
             <Menu mnemonicParsing="false" text="View">
-            <CheckMenuItem fx:id="chkViewIncoming" mnemonicParsing="false" selected="true" text="View Incoming">
+            <CheckMenuItem fx:id="chkViewIncoming" mnemonicParsing="false" text="View Incoming">
                <accelerator>
                   <KeyCodeCombination alt="UP" code="I" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
                </accelerator></CheckMenuItem>
