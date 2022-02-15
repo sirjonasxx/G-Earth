@@ -2,6 +2,8 @@ package gearth.services.internal_extensions.uilogger;
 
 import gearth.GEarth;
 import gearth.extensions.InternalExtensionFormLauncher;
+import gearth.ui.titlebar.DefaultTitleBarConfig;
+import gearth.ui.titlebar.TitleBarController;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -30,6 +32,13 @@ public class UiLoggerLauncher extends InternalExtensionFormLauncher<UiLogger> {
         controller.setStage(stage);
 
         stage.setScene(scene);
+//        TitleBarController.create(stage, new DefaultTitleBarConfig(stage) {
+//            @Override
+//            public void onCloseClicked() {
+//                stage.hide();
+////                uiLogger.onHide();
+//            }
+//        });
         return uiLogger;
     }
 }

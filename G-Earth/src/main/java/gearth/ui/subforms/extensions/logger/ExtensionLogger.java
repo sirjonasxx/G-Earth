@@ -2,6 +2,7 @@ package gearth.ui.subforms.extensions.logger;
 
 import gearth.GEarth;
 import gearth.ui.titlebar.DefaultTitleBarConfig;
+import gearth.ui.titlebar.GEarthThemedTitleBarConfig;
 import gearth.ui.titlebar.TitleBarController;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -49,7 +50,7 @@ public class ExtensionLogger {
             controller.setStage(stage);
 
             stage.setScene(scene);
-            TitleBarController.create(stage, new DefaultTitleBarConfig(stage) {
+            TitleBarController.create(stage, new GEarthThemedTitleBarConfig(stage) {
                 @Override
                 public void onCloseClicked() {
                     stage.hide();

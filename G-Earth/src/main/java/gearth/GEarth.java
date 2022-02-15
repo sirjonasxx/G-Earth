@@ -3,7 +3,9 @@ package gearth;
 import gearth.misc.AdminValidator;
 import gearth.misc.Cacher;
 import gearth.misc.UpdateChecker;
+import gearth.misc.listenerpattern.Observable;
 import gearth.ui.GEarthController;
+import gearth.ui.subforms.logger.loggerdisplays.PacketLogger;
 import gearth.ui.themes.Theme;
 import gearth.ui.themes.ThemeFactory;
 import gearth.ui.titlebar.TitleBarConfig;
@@ -17,12 +19,15 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
+import java.util.function.Consumer;
+
 public class GEarth extends Application {
 
     public static GEarth main;
     public static String version = "1.5.1";
     public static String gitApi = "https://api.github.com/repos/sirjonasxx/G-Earth/releases/latest";
     public static Theme theme;
+    public static Observable<Consumer<Theme>> themeObservable = new Observable<>();
 
     private Stage stage;
     private GEarthController controller;
@@ -55,6 +60,16 @@ public class GEarth extends Application {
             }
 
             @Override
+            public boolean displayMinimizeButton() {
+                return true;
+            }
+
+//            @Override
+//            public boolean allowResizing() {
+//                return false;
+//            }
+
+            @Override
             public void onCloseClicked() {
                 closeGEarth();
             }
@@ -80,7 +95,7 @@ public class GEarth extends Application {
         setGearthTheme(theme);
 
         primaryStage.show();
-        primaryStage.setOnCloseRequest( event -> closeGEarth());
+        primaryStage.setOnCloseRequest(event -> closeGEarth());
 
         AdminValidator.validate();
         UpdateChecker.checkForUpdates();
@@ -94,23 +109,27 @@ public class GEarth extends Application {
     }
 
     private void setGearthTheme(Theme theme) {
+        themeObservable.fireEvent(t -> t.accept(theme));
         GEarth.theme = theme;
         Theme defaultTheme = ThemeFactory.getDefaultTheme();
 
-        stage.getScene().getStylesheets().clear();
-        stage.getScene().getStylesheets().add(GEarth.class.getResource(String.format("/gearth/ui/themes/%s/styling.css", theme.internalName())).toExternalForm());
+//        Platform.runLater(() -> {
+            stage.getScene().getStylesheets().clear();
+            stage.getScene().getStylesheets().add(GEarth.class.getResource(String.format("/gearth/ui/themes/%s/styling.css", theme.internalName())).toExternalForm());
 
-        stage.getIcons().clear();
-        stage.getIcons().add(new Image(GEarth.class.getResourceAsStream(String.format("/gearth/ui/themes/%s/logoSmall.png", theme.overridesLogo() ? theme.internalName() : defaultTheme.internalName()))));
-        stage.setTitle((theme.overridesTitle() ? theme.title() : defaultTheme.title()) + " " + GEarth.version);
+            stage.getIcons().clear();
+            stage.getIcons().add(new Image(GEarth.class.getResourceAsStream(String.format("/gearth/ui/themes/%s/logoSmall.png", theme.overridesLogo() ? theme.internalName() : defaultTheme.internalName()))));
+            stage.setTitle((theme.overridesTitle() ? theme.title() : defaultTheme.title()) + " " + GEarth.version);
 
-        controller.infoController.img_logo.setImage(new Image(GEarth.class.getResourceAsStream(
-                String.format(
-                        "/gearth/ui/themes/%s/logo.png",
-                        theme.overridesLogo() ? theme.internalName() : defaultTheme.internalName()
-                )
-        )));
-        controller.infoController.version.setText(stage.getTitle());
+            controller.infoController.img_logo.setImage(new Image(GEarth.class.getResourceAsStream(
+                    String.format(
+                            "/gearth/ui/themes/%s/logo.png",
+                            theme.overridesLogo() ? theme.internalName() : defaultTheme.internalName()
+                    )
+            )));
+            controller.infoController.version.setText(stage.getTitle());
+//        });
+
     }
 
     public static String[] args;
@@ -138,5 +157,9 @@ public class GEarth extends Application {
             }
         }
         return null;
+    }
+
+    public static Observable<Consumer<Theme>> getThemeObservable() {
+        return themeObservable;
     }
 }

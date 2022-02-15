@@ -4,6 +4,7 @@ import gearth.protocol.connection.proxy.ProxyProviderFactory;
 import gearth.protocol.connection.proxy.SocksConfiguration;
 import gearth.ui.subforms.logger.loggerdisplays.PacketLoggerFactory;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import gearth.protocol.HConnection;
 import gearth.ui.subforms.connection.ConnectionController;

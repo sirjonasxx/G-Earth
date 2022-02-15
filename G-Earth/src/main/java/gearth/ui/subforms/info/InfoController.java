@@ -1,12 +1,16 @@
 package gearth.ui.subforms.info;
 
 import gearth.GEarth;
+import gearth.ui.titlebar.TitleBarController;
 import javafx.event.ActionEvent;
 import javafx.scene.control.*;
 import gearth.ui.SubForm;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
+
+import java.io.IOException;
 
 /**
  * Created by Jonas on 06/04/18.
@@ -53,15 +57,20 @@ public class InfoController extends SubForm {
         Alert alert = new Alert(Alert.AlertType.INFORMATION, "Donate Bitcoins", ButtonType.OK);
         alert.setHeaderText("Donate Bitcoins");
 
-        WebView webView = new WebView();
-        webView.getEngine().loadContent("<html>Bitcoin public address:<br><br>" +
-                "<textarea>" + pubkey +"</textarea>" +
-                "</html>");
-        webView.setPrefSize(200, 100);
+        VBox test = new VBox();
+        test.getChildren().add(new Label("Bitcoin public address:"));
+        TextArea pubText = new TextArea(pubkey);
+        pubText.setPrefHeight(28);
+        pubText.setMaxWidth(250);
+        test.getChildren().add(pubText);
 
         alert.setResizable(false);
         alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
-        alert.getDialogPane().setContent(webView);
-        alert.show();
+        alert.getDialogPane().setContent(test);
+        try {
+            TitleBarController.create(alert).showAlert();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

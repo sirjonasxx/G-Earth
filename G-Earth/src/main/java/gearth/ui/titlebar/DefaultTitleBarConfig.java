@@ -3,6 +3,7 @@ package gearth.ui.titlebar;
 import gearth.GEarth;
 import gearth.ui.themes.Theme;
 import gearth.ui.themes.ThemeFactory;
+import javafx.application.Platform;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
@@ -15,15 +16,29 @@ public class DefaultTitleBarConfig implements TitleBarConfig {
 
 
     public DefaultTitleBarConfig(Stage stage) {
+        this(stage, ThemeFactory.getDefaultTheme());
+    }
+
+    public DefaultTitleBarConfig(Stage stage, Theme theme) {
         this.stage = stage;
-        currentTheme = ThemeFactory.getDefaultTheme();
-        setTheme(currentTheme);
+        currentTheme = theme;
+        setTheme(theme);
     }
 
     @Override
     public boolean displayThemePicker() {
-        return false;
+        return true;
     }
+
+    @Override
+    public boolean displayMinimizeButton() {
+        return true;
+    }
+
+//    @Override
+//    public boolean allowResizing() {
+//        return false;
+//    }
 
     @Override
     public void onCloseClicked() {
@@ -38,15 +53,18 @@ public class DefaultTitleBarConfig implements TitleBarConfig {
     @Override
     public void setTheme(Theme theme) {
         currentTheme = theme;
-        Theme defaultTheme = ThemeFactory.getDefaultTheme();
-        if (currentStylesheet != null) {
-            stage.getScene().getStylesheets().remove(currentStylesheet);
-        }
-        currentStylesheet = GEarth.class.getResource(String.format("/gearth/ui/themes/%s/styling.css", theme.internalName())).toExternalForm();
-        stage.getScene().getStylesheets().add(currentStylesheet);
+        Platform.runLater(() -> {
+            Theme defaultTheme = ThemeFactory.getDefaultTheme();
+            if (currentStylesheet != null) {
+                stage.getScene().getStylesheets().remove(currentStylesheet);
+            }
+            currentStylesheet = GEarth.class.getResource(String.format("/gearth/ui/themes/%s/styling.css", theme.internalName())).toExternalForm();
+            stage.getScene().getStylesheets().add(currentStylesheet);
 
-        stage.getIcons().clear();
-        stage.getIcons().add(new Image(GEarth.class.getResourceAsStream(String.format("/gearth/ui/themes/%s/logoSmall.png", theme.overridesLogo() ? theme.internalName() : defaultTheme.internalName()))));
+            stage.getIcons().clear();
+            stage.getIcons().add(new Image(GEarth.class.getResourceAsStream(String.format("/gearth/ui/themes/%s/logoSmall.png", theme.overridesLogo() ? theme.internalName() : defaultTheme.internalName()))));
+
+        });
     }
 
     @Override
