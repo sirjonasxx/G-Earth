@@ -143,11 +143,11 @@ public class ExtensionItemContainer extends GridPane {
         parent.getChildren().add(this);
 
         getStyleClass().clear();
-        getStyleClass().add("connectedExtension");
+        getStyleClass().add("tableRowActive");
 
         if (item.extensionType() == ExtensionType.INTERNAL) {
             getStyleClass().clear();
-            getStyleClass().add("internalExtension");
+            getStyleClass().add("tableRowBlue");
         }
 
 
@@ -180,7 +180,7 @@ public class ExtensionItemContainer extends GridPane {
         item.getDeletedObservable().addListener(() -> Platform.runLater(() -> {
             if (item.isInstalledExtension()) {
                 getStyleClass().clear();
-                getStyleClass().add("disconnectedExtension");
+                getStyleClass().add("tableRowInactive");
                 getChildren().remove(buttonsBox);
                 add(additionalButtonBox, 4, 0);
                 reloadButton.setVisible(true);
@@ -196,7 +196,7 @@ public class ExtensionItemContainer extends GridPane {
         initExtension();
 
         getStyleClass().clear();
-        getStyleClass().add("connectedExtension");
+        getStyleClass().add("tableRowActive");
         getChildren().remove(additionalButtonBox);
         if (buttonsBox != null) {
             add(buttonsBox, 4, 0);

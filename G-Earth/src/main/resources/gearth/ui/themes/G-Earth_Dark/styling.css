@@ -8,6 +8,11 @@
     -fx-border-width: 0 1 1 1;
 }
 
+.themed-background {
+    -fx-background-color: #363636;
+    -fx-background-radius: 4;
+}
+
 .button,.menu-button,.toggle-button,.split-menu-button {
     -fx-font-size: 14;
     -fx-background-radius: 4;
@@ -925,15 +930,15 @@ VBox > .split-menu-button.last > .arrow-button {
     -fx-text-fill: #0096c8;
 }
 
-.internalExtension {
+.tableRowBlue {
     -fx-background-color: #3d5b69;
 }
 
-.disconnectedExtension {
+.tableRowInactive {
     -fx-background-color: #5e5e5e;
 }
 
-.connectedExtension {
+.tableRowActive {
     -fx-background-color: #525252;
 }
 

@@ -24,12 +24,14 @@ public class ExtensionLoggerController implements Initializable {
     @Override
     public void initialize(URL arg0, ResourceBundle arg1) {
         area = new StyleClassedTextArea();
-        area.getStyleClass().add("white");
+        area.getStyleClass().add("themed-background");
         area.setWrapText(true);
         area.setEditable(false);
 
         VirtualizedScrollPane<StyleClassedTextArea> vsPane = new VirtualizedScrollPane<>(area);
         borderPane.setCenter(vsPane);
+        vsPane.getStyleClass().add("themed-background");
+        borderPane.getStyleClass().add("themed-background");
 
         synchronized (appendOnLoad) {
             initialized = true;
@@ -73,7 +75,7 @@ public class ExtensionLoggerController implements Initializable {
             text = s.substring(s.indexOf("]") + 1);
         }
         else {
-            classname = "black";
+            classname = "label";
             text = s;
         }
 
@@ -81,7 +83,7 @@ public class ExtensionLoggerController implements Initializable {
             int index = text.indexOf(" --> ") + 5;
             String extensionAnnouncement = text.substring(0, index);
             text = text.substring(index);
-            elements.add(new Element(extensionAnnouncement, "black"));
+            elements.add(new Element(extensionAnnouncement, "label"));
         }
         elements.add(new Element(text + "\n", classname.toLowerCase()));
 

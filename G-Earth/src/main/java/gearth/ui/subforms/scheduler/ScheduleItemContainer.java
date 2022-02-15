@@ -83,11 +83,21 @@ public class ScheduleItemContainer extends GridPane {
 
         parent.getChildren().add(this);
 
+        getStyleClass().clear();
+        getStyleClass().add("tableRowActive");
 
         GridPane this2 = this;
         item.onDelete(() -> parent.getChildren().remove(this2));
-        item.onIsBeingUpdated(() -> setStyle("-fx-background-color: #faebcc;"));
-        item.onIsupdated(() -> setStyle("-fx-background-color: #ffffff;"));
+        item.onIsBeingUpdated(() -> {
+            getStyleClass().clear();
+            getStyleClass().add("tableRowBlue");
+//            setStyle("-fx-background-color: #faebcc;")
+        });
+        item.onIsupdated(() -> {
+            getStyleClass().clear();
+            getStyleClass().add("tableRowActive");
+//            setStyle("-fx-background-color: #ffffff;")
+        });
     }
 
     private Label initNewLabelColumn(String text) {
