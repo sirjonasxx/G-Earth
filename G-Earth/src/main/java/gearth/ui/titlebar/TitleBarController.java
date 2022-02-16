@@ -78,8 +78,6 @@ public class TitleBarController {
         controller.stage = stage;
         controller.config = config;
         stage.initStyle(StageStyle.TRANSPARENT);
-        stage.getScene().setFill(Color.TRANSPARENT);
-        stage.getScene().getRoot().getStyleClass().add("root-node");
 
         stage.titleProperty().addListener((i) -> controller.setTitle(stage.getTitle()));
         controller.setTitle(stage.getTitle());
@@ -88,6 +86,9 @@ public class TitleBarController {
         controller.updateIcon();
 
         Platform.runLater(() -> {
+            stage.getScene().setFill(Color.TRANSPARENT);
+            stage.getScene().getRoot().getStyleClass().add("root-node");
+
             controller.themeBtn.setVisible(config.displayThemePicker());
             if (!config.displayMinimizeButton()) {
                 ((GridPane) controller.minimizeBtn.getParent()).getChildren().remove(controller.minimizeBtn);

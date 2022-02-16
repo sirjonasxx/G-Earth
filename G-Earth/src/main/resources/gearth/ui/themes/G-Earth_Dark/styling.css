@@ -10,7 +10,11 @@
 
 .themed-background {
     -fx-background-color: #363636;
-    -fx-background-radius: 4;
+}
+
+.root-node > *  {
+    -fx-background-color: #363636;
+    -fx-background-radius: 0 0 10 10;
 }
 
 .button,.menu-button,.toggle-button,.split-menu-button {
@@ -1011,7 +1015,6 @@ VBox > .split-menu-button.last > .arrow-button {
 /* Error window */
 .dialog-pane {
     -fx-background-color: #333333;
-    -fx-background-radius: 0;
 }
 
 .dialog-pane:header .header-panel {

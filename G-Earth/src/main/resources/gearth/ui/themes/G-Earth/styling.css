@@ -9,7 +9,11 @@
 
 .themed-background {
     -fx-background-color: white;
-    -fx-background-radius: 4;
+}
+
+.root-node > *  {
+    -fx-background-color: white;
+    -fx-background-radius: 0 0 10 10;
 }
 
 .button,.menu-button,.toggle-button,.split-menu-button {
