@@ -110,7 +110,7 @@ public class GEarth extends Application {
     }
 
     private void setGearthTheme(Theme theme) {
-        Cacher.put("theme", theme.internalName());
+        Cacher.put("theme", theme.title());
         themeObservable.fireEvent(t -> t.accept(theme));
         GEarth.theme = theme;
         Theme defaultTheme = ThemeFactory.getDefaultTheme();
