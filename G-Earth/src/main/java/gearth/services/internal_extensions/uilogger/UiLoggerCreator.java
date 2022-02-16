@@ -1,9 +1,6 @@
 package gearth.services.internal_extensions.uilogger;
 
-import gearth.GEarth;
-import gearth.extensions.InternalExtensionFormLauncher;
-import gearth.ui.titlebar.DefaultTitleBarConfig;
-import gearth.ui.titlebar.TitleBarController;
+import gearth.extensions.InternalExtensionFormCreator;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -11,7 +8,7 @@ import javafx.scene.image.Image;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-public class UiLoggerLauncher extends InternalExtensionFormLauncher<UiLogger> {
+public class UiLoggerCreator extends InternalExtensionFormCreator<UiLogger> {
     @Override
     public UiLogger createForm(Stage stage) throws Exception {
         UiLogger uiLogger = new UiLogger();

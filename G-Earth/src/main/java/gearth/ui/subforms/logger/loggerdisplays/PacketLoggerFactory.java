@@ -1,13 +1,13 @@
 package gearth.ui.subforms.logger.loggerdisplays;
 
 import gearth.GEarth;
-import gearth.extensions.InternalExtensionFormBuilder;
+import gearth.extensions.InternalExtensionFormLauncher;
 import gearth.misc.OSValidator;
 import gearth.services.extension_handler.ExtensionHandler;
 import gearth.services.extension_handler.extensions.extensionproducers.ExtensionProducer;
 import gearth.services.extension_handler.extensions.extensionproducers.ExtensionProducerObserver;
 import gearth.services.internal_extensions.uilogger.UiLogger;
-import gearth.services.internal_extensions.uilogger.UiLoggerLauncher;
+import gearth.services.internal_extensions.uilogger.UiLoggerCreator;
 
 /**
  * Created by Jonas on 04/04/18.
@@ -40,8 +40,8 @@ public class PacketLoggerFactory implements ExtensionProducer {
     @Override
     public void startProducing(ExtensionProducerObserver observer) {
         if (usesUIlogger()) {
-            uiLogger = new InternalExtensionFormBuilder<UiLoggerLauncher, UiLogger>()
-                    .launch(new UiLoggerLauncher(), observer);
+            uiLogger = new InternalExtensionFormLauncher<UiLoggerCreator, UiLogger>()
+                    .launch(new UiLoggerCreator(), observer);
         }
     }
 }

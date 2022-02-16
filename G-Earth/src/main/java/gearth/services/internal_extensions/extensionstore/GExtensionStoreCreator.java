@@ -1,7 +1,7 @@
 package gearth.services.internal_extensions.extensionstore;
 
 import gearth.GEarth;
-import gearth.extensions.InternalExtensionFormLauncher;
+import gearth.extensions.InternalExtensionFormCreator;
 import gearth.services.internal_extensions.extensionstore.application.GExtensionStoreController;
 import gearth.ui.GEarthController;
 import javafx.fxml.FXMLLoader;
@@ -10,7 +10,7 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
-public class GExtensionStoreLauncher extends InternalExtensionFormLauncher<GExtensionStore> {
+public class GExtensionStoreCreator extends InternalExtensionFormCreator<GExtensionStore> {
 
     @Override
     public GExtensionStore createForm(Stage stage) throws Exception {
