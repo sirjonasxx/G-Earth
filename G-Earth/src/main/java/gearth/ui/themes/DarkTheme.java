@@ -12,6 +12,11 @@ public class DarkTheme implements Theme {
     }
 
     @Override
+    public boolean isDark() {
+        return true;
+    }
+
+    @Override
     public boolean overridesLogo() {
         return false;
     }

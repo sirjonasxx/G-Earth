@@ -27,13 +27,18 @@ public abstract class ThemedExtensionFormCreator extends ExtensionFormCreator {
         primaryStage.setResizable(false);
         primaryStage.sizeToScene();
 
-        DefaultTitleBarConfig config = new DefaultTitleBarConfig(primaryStage, ThemeFactory.getDefaultTheme()) {
+        Theme defaultTheme = ThemeFactory.getDefaultTheme();
+        DefaultTitleBarConfig config = new DefaultTitleBarConfig(primaryStage, defaultTheme) {
             @Override
             public boolean displayThemePicker() {
                 return false;
             }
         };
         TitleBarController.create(primaryStage, config);
+        Platform.runLater(() -> {
+            primaryStage.getScene().getRoot().getStyleClass().add(defaultTheme.title().replace(" ", "-").toLowerCase());
+            primaryStage.getScene().getRoot().getStyleClass().add(defaultTheme.isDark() ? "g-dark" : "g-light");
+        });
 
         ExtensionForm extensionForm = loader.getController();
         extensionForm.fieldsInitialized.addListener(() -> extensionForm.extension.observableHostInfo.addListener(hostInfo -> {
@@ -42,12 +47,18 @@ public abstract class ThemedExtensionFormCreator extends ExtensionFormCreator {
                 Theme theme = ThemeFactory.themeForTitle(themeTitle);
                 if (config.getCurrentTheme() != theme) {
                     String styleClassOld = config.getCurrentTheme().title().replace(" ", "-").toLowerCase();
+                    String lightClassOld = config.getCurrentTheme().isDark() ? "g-dark" : "g-light";
                     String styleClassNew = theme.title().replace(" ", "-").toLowerCase();
+                    String lightClassNew = theme.isDark() ? "g-dark" : "g-light";
                     config.setTheme(theme);
                     Parent currentRoot = primaryStage.getScene().getRoot();
                     Platform.runLater(() -> {
                         currentRoot.getStyleClass().remove(styleClassOld);
                         currentRoot.getStyleClass().add(styleClassNew);
+                        if (!lightClassOld.equals(lightClassNew)) {
+                            currentRoot.getStyleClass().remove(lightClassOld);
+                            currentRoot.getStyleClass().add(lightClassNew);
+                        }
                     });
                 }
             }

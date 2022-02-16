@@ -12,6 +12,11 @@ public class LightTheme implements Theme {
     }
 
     @Override
+    public boolean isDark() {
+        return false;
+    }
+
+    @Override
     public boolean overridesLogo() {
         return true;
     }
