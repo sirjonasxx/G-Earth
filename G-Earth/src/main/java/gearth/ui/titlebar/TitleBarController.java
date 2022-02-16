@@ -79,6 +79,7 @@ public class TitleBarController {
         controller.config = config;
         stage.initStyle(StageStyle.TRANSPARENT);
         stage.getScene().setFill(Color.TRANSPARENT);
+        stage.getScene().getRoot().getStyleClass().add("root-node");
 
         stage.titleProperty().addListener((i) -> controller.setTitle(stage.getTitle()));
         controller.setTitle(stage.getTitle());

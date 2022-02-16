@@ -996,6 +996,10 @@ VBox > .split-menu-button.last > .arrow-button {
     -fx-background-radius: 0 0 10 10;
 }
 
+.root-node {
+    -fx-background-radius: 0 0 10 10;
+}
+
 #icon {
     /*-fx-image: url("logoSmall.png");*/
 }
