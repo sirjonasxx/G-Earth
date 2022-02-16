@@ -2,6 +2,7 @@ package gearth.ui.subforms.extensions;
 
 import gearth.services.extension_handler.extensions.ExtensionType;
 import gearth.services.extension_handler.extensions.GEarthExtension;
+import gearth.ui.titlebar.TitleBarController;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -17,6 +18,7 @@ import gearth.services.extension_handler.extensions.implementations.network.exec
 import gearth.services.extension_handler.extensions.implementations.network.executer.ExtensionRunnerFactory;
 import gearth.services.extension_handler.extensions.implementations.network.executer.NormalExtensionRunner;
 
+import java.io.IOException;
 import java.nio.file.Paths;
 
 /**
@@ -113,8 +115,13 @@ public class ExtensionItemContainer extends GridPane {
                         ButtonType.YES, ButtonType.NO
                 );
 
-                if (!(alert.showAndWait().filter(t -> t == ButtonType.YES).isPresent())) {
-                    delet_dis = false;
+                try {
+                    if (!(TitleBarController.create(alert).showAlertAndWait()
+                            .filter(t -> t == ButtonType.YES).isPresent())) {
+                        delet_dis = false;
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
 

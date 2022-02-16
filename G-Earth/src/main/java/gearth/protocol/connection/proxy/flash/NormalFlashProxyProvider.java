@@ -10,6 +10,7 @@ import gearth.protocol.hostreplacer.hostsfile.HostReplacer;
 import gearth.protocol.hostreplacer.hostsfile.HostReplacerFactory;
 import gearth.protocol.portchecker.PortChecker;
 import gearth.protocol.portchecker.PortCheckerFactory;
+import gearth.ui.titlebar.TitleBarController;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -109,10 +110,11 @@ public class NormalFlashProxyProvider extends FlashProxyProvider {
                 Platform.runLater(() -> {
                     Alert a = new Alert(Alert.AlertType.ERROR, "The port is in use by " + processName,
                             ButtonType.OK);
-                    Stage stage = (Stage) a.getDialogPane().getScene().getWindow();
-                    stage.getIcons().add(new Image(GEarth.class.getResourceAsStream(String.format("/gearth/ui/themes/%s/logoSmall.png", GEarth.theme))));
-                    stage.getScene().getStylesheets().add(GEarth.class.getResource(String.format("/gearth/ui/themes/%s/styling.css", GEarth.theme)).toExternalForm());
-                    a.showAndWait();
+                    try {
+                        TitleBarController.create(a).showAlertAndWait();
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
                 });
                 throw new IOException(e);
             }

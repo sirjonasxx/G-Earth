@@ -11,12 +11,14 @@ import gearth.services.internal_extensions.extensionstore.repository.StoreReposi
 import gearth.services.internal_extensions.extensionstore.repository.models.StoreExtension;
 import gearth.services.internal_extensions.extensionstore.tools.InstalledExtension;
 import gearth.services.internal_extensions.extensionstore.tools.StoreExtensionTools;
+import gearth.ui.titlebar.TitleBarController;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import org.apache.maven.artifact.versioning.ComparableVersion;
 import org.w3c.dom.Element;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -114,7 +116,11 @@ public class StoreExtensionDetailsOverview extends HOverview {
         alert.setHeaderText(header);
         alert.setContentText(context);
 
-        alert.showAndWait();
+        try {
+            TitleBarController.create(alert).showAlertAndWait();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

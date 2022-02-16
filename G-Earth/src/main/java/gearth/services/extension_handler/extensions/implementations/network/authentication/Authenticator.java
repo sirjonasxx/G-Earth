@@ -2,10 +2,12 @@ package gearth.services.extension_handler.extensions.implementations.network.aut
 
 import gearth.misc.ConfirmationDialog;
 import gearth.services.extension_handler.extensions.implementations.network.NetworkExtension;
+import gearth.ui.titlebar.TitleBarController;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -70,8 +72,13 @@ public class Authenticator {
                         ButtonType.YES, ButtonType.NO
                 );
 
-                if (!(alert.showAndWait().filter(t -> t == ButtonType.YES).isPresent())) {
-                    allowConnection[0] = false;
+                try {
+                    if (!(TitleBarController.create(alert).showAlertAndWait()
+                            .filter(t -> t == ButtonType.YES).isPresent())) {
+                        allowConnection[0] = false;
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
                 done[0] = true;
                 if (!ConfirmationDialog.showDialog(connectExtensionKey)) {

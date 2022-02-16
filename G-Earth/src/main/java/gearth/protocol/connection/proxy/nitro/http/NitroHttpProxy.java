@@ -5,6 +5,7 @@ import gearth.misc.ConfirmationDialog;
 import gearth.protocol.connection.proxy.nitro.NitroConstants;
 import gearth.protocol.connection.proxy.nitro.os.NitroOsFunctions;
 import gearth.protocol.connection.proxy.nitro.os.NitroOsFunctionsFactory;
+import gearth.ui.titlebar.TitleBarController;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -16,6 +17,7 @@ import org.littleshoot.proxy.mitm.Authority;
 import org.littleshoot.proxy.mitm.RootCertificateException;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -56,11 +58,13 @@ public class NitroHttpProxy {
                             "G-Earth will ask you for Administrator permission if you do so.", "Remember my choice",
                     ButtonType.YES, ButtonType.NO
             );
-            Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-            stage.getIcons().add(new Image(GEarth.class.getResourceAsStream(String.format("/gearth/ui/themes/%s/logoSmall.png", GEarth.theme))));
-            stage.getScene().getStylesheets().add(GEarth.class.getResource(String.format("/gearth/ui/themes/%s/styling.css", GEarth.theme)).toExternalForm());
 
-            shouldInstall.set(alert.showAndWait().filter(t -> t == ButtonType.YES).isPresent());
+            try {
+                shouldInstall.set(TitleBarController.create(alert).showAlertAndWait()
+                        .filter(t -> t == ButtonType.YES).isPresent());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             waitForDialog.release();
         });
 

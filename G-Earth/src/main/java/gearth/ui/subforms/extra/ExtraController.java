@@ -10,6 +10,7 @@ import gearth.services.always_admin.AdminService;
 import gearth.services.g_python.GPythonVersionUtils;
 import gearth.ui.SubForm;
 import gearth.ui.subforms.info.InfoController;
+import gearth.ui.titlebar.TitleBarController;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.scene.control.*;
@@ -19,6 +20,8 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Region;
 import javafx.stage.Stage;
 import org.json.JSONObject;
+
+import java.io.IOException;
 
 /**
  * Created by Jonas on 06/04/18.
@@ -175,9 +178,6 @@ public class ExtraController extends SubForm implements SocksConfiguration {
                 if (!GPythonVersionUtils.validInstallation()) {
                     Platform.runLater(() -> {
                         Alert alert = new Alert(Alert.AlertType.ERROR, "G-Python installation", ButtonType.OK);
-                        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-                        stage.getIcons().add(new Image(GEarth.class.getResourceAsStream(String.format("/gearth/ui/themes/%s/logoSmall.png", GEarth.theme))));
-                        stage.getScene().getStylesheets().add(GEarth.class.getResource(String.format("/gearth/ui/themes/%s/styling.css", GEarth.theme)).toExternalForm());
                         alert.setTitle("G-Python installation");
 
                         FlowPane fp = new FlowPane();
@@ -192,7 +192,11 @@ public class ExtraController extends SubForm implements SocksConfiguration {
 
                         alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
                         alert.getDialogPane().setContent(fp);
-                        alert.show();
+                        try {
+                            TitleBarController.create(alert).showAlert();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
 
                         cbx_gpython.setDisable(false);
                     });

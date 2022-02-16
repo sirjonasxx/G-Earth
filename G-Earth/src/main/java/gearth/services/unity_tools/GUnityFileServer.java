@@ -2,6 +2,7 @@ package gearth.services.unity_tools;
 
 import gearth.GEarth;
 import gearth.misc.Cacher;
+import gearth.ui.themes.ThemeFactory;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
@@ -135,7 +136,7 @@ public class GUnityFileServer extends HttpServlet
 
     private void getLogo(HttpServletResponse response) throws IOException {
         OutputStream out = response.getOutputStream();
-        InputStream in = GEarth.class.getResourceAsStream(String.format("/gearth/ui/themes/%s/logo.png", GEarth.theme));
+        InputStream in = GEarth.class.getResourceAsStream(String.format("/gearth/ui/themes/%s/logo.png", ThemeFactory.getDefaultTheme().internalName()));
 
         byte[] bytes = new byte[4096];
         int bytesRead;

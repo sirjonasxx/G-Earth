@@ -2,6 +2,7 @@ package gearth.services.g_python;
 
 import gearth.GEarth;
 import gearth.ui.subforms.extra.ExtraController;
+import gearth.ui.titlebar.TitleBarController;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -170,9 +171,6 @@ public class GPythonShell {
     private void showError() {
         Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.ERROR, "G-Python error", ButtonType.OK);
-            Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-            stage.getIcons().add(new Image(GEarth.class.getResourceAsStream(String.format("/gearth/ui/themes/%s/logoSmall.png", GEarth.theme))));
-            stage.getScene().getStylesheets().add(GEarth.class.getResource(String.format("/gearth/ui/themes/%s/styling.css", GEarth.theme)).toExternalForm());
             alert.setTitle("G-Python error");
 
             FlowPane fp = new FlowPane();
@@ -188,7 +186,11 @@ public class GPythonShell {
 
             alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
             alert.getDialogPane().setContent(fp);
-            alert.show();
+            try {
+                TitleBarController.create(alert).showAlert();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         });
     }
 

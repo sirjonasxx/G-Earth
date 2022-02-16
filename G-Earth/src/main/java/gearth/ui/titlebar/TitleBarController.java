@@ -4,12 +4,11 @@ import gearth.GEarth;
 import gearth.ui.themes.ThemeFactory;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -22,6 +21,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 import java.io.IOException;
+import java.util.Optional;
 
 public class TitleBarController {
 
@@ -33,6 +33,8 @@ public class TitleBarController {
 
     private Stage stage;
     private TitleBarConfig config;
+
+    private Alert alert = null;
 
     public static TitleBarController create(Stage stage, TitleBarConfig config) throws IOException {
         FXMLLoader loader = new FXMLLoader(TitleBarController.class.getResource("Titlebar.fxml"));
@@ -60,6 +62,7 @@ public class TitleBarController {
         };
         TitleBarController controller = initNewController(loader, stage, config);
 
+        controller.alert = alert;
         Parent parent = alert.getDialogPane().getScene().getRoot();
         VBox newParent = new VBox(titleBar, parent);
         newParent.setId("titlebar-main-container");
@@ -137,8 +140,18 @@ public class TitleBarController {
     }
 
     public void showAlert() {
-        stage.show();
-        Platform.runLater(() -> stage.sizeToScene());
+        if (alert != null) {
+            alert.show();
+            Platform.runLater(() -> stage.sizeToScene());
+        }
+    }
+
+    public Optional<ButtonType> showAlertAndWait() {
+        if (alert != null) {
+            Platform.runLater(() -> stage.sizeToScene());
+            return alert.showAndWait();
+        }
+        return Optional.empty();
     }
 
 }
