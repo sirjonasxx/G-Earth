@@ -1,5 +1,6 @@
 package gearth.services.extension_handler.extensions.implementations.network;
 
+import gearth.misc.HostInfo;
 import gearth.services.packet_info.PacketInfoManager;
 import gearth.protocol.HMessage;
 import gearth.protocol.connection.HClient;
@@ -213,10 +214,12 @@ public class NetworkExtension extends GEarthExtension {
     }
 
     @Override
-    public void init(boolean isConnected) {
-        sendMessage(
-                new HPacket(NetworkExtensionInfo.OUTGOING_MESSAGES_IDS.INIT, isConnected)
-        );
+    public void init(boolean isConnected, HostInfo hostInfo) {
+        HPacket initPacket = new HPacket(NetworkExtensionInfo.OUTGOING_MESSAGES_IDS.INIT);
+        initPacket.appendBoolean(isConnected);
+        hostInfo.appendToPacket(initPacket);
+
+        sendMessage(initPacket);
     }
 
     @Override
@@ -224,6 +227,13 @@ public class NetworkExtension extends GEarthExtension {
         try {
             connection.close();
         } catch (IOException ignored) { }
+    }
+
+    @Override
+    public void updateHostInfo(HostInfo hostInfo) {
+        HPacket packet = new HPacket(NetworkExtensionInfo.OUTGOING_MESSAGES_IDS.UPDATEHOSTINFO);
+        hostInfo.appendToPacket(packet);
+        sendMessage(packet);
     }
 
     @Override

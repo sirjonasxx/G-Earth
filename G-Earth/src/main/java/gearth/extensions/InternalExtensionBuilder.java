@@ -1,6 +1,7 @@
 package gearth.extensions;
 
 
+import gearth.misc.HostInfo;
 import gearth.services.packet_info.PacketInfoManager;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
@@ -118,14 +119,21 @@ public class InternalExtensionBuilder extends GEarthExtension {
         extension.onEndConnection();
     }
 
+
     @Override
-    public void init(boolean isConnected) {
+    public void init(boolean isConnected, HostInfo hostInfo) {
         extension.initExtension();
+        extension.updateHostInfo(hostInfo);
     } // not implementing isConnected, only relevant for g-python
 
     @Override
     public void close() {
         // no need in internal ext
+    }
+
+    @Override
+    public void updateHostInfo(HostInfo hostInfo) {
+        extension.updateHostInfo(hostInfo);
     }
 
     @Override

@@ -1,10 +1,13 @@
 package gearth.extensions;
 
+import gearth.misc.HostInfo;
 import gearth.misc.listenerpattern.Observable;
+import gearth.misc.listenerpattern.ObservableObject;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 import gearth.services.packet_info.PacketInfo;
 import gearth.services.packet_info.PacketInfoManager;
+import javafx.beans.property.ObjectProperty;
 import org.reactfx.util.Lists;
 
 import java.util.*;
@@ -30,6 +33,11 @@ public abstract class ExtensionBase extends IExtension {
 
 
     volatile PacketInfoManager packetInfoManager = PacketInfoManager.EMPTY;
+    protected ObservableObject<HostInfo> observableHostInfo = new ObservableObject<>(null);
+
+    void updateHostInfo(HostInfo hostInfo) {
+        observableHostInfo.setObject(hostInfo);
+    }
 
     /**
      * Register a listener on a specific packet Type
@@ -186,5 +194,9 @@ public abstract class ExtensionBase extends IExtension {
     @Override
     public PacketInfoManager getPacketInfoManager() {
         return packetInfoManager;
+    }
+
+    public HostInfo getHostInfo() {
+        return observableHostInfo.getObject();
     }
 }

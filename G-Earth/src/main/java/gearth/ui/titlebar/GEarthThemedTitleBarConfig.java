@@ -9,8 +9,8 @@ import java.util.function.Consumer;
 public class GEarthThemedTitleBarConfig extends DefaultTitleBarConfig {
 
     public GEarthThemedTitleBarConfig(Stage stage) {
-        super(stage, GEarth.theme);
-        GEarth.themeObservable.addListener(this::setTheme);
+        super(stage, GEarth.getTheme());
+        GEarth.getThemeObservable().addListener(this::setTheme);
     }
 
     @Override

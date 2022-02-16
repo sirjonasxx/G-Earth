@@ -4,6 +4,7 @@ import gearth.misc.AdminValidator;
 import gearth.misc.Cacher;
 import gearth.misc.UpdateChecker;
 import gearth.misc.listenerpattern.Observable;
+import gearth.misc.listenerpattern.ObservableObject;
 import gearth.ui.GEarthController;
 import gearth.ui.subforms.logger.loggerdisplays.PacketLogger;
 import gearth.ui.themes.Theme;
@@ -27,19 +28,17 @@ public class GEarth extends Application {
     public static GEarth main;
     public static String version = "1.5.1";
     public static String gitApi = "https://api.github.com/repos/sirjonasxx/G-Earth/releases/latest";
-    public static Theme theme;
-    public static Observable<Consumer<Theme>> themeObservable = new Observable<>();
+    public static ObservableObject<Theme> observableTheme;
 
     private Stage stage;
     private GEarthController controller;
 
     static {
-        if (Cacher.getCacheContents().has("theme")) {
-            theme = ThemeFactory.themeForTitle(Cacher.getCacheContents().getString("theme"));
-        }
-        else {
-            theme = ThemeFactory.getDefaultTheme();
-        }
+        observableTheme = new ObservableObject<>(
+                Cacher.getCacheContents().has("theme") ?
+                        ThemeFactory.themeForTitle(Cacher.getCacheContents().getString("theme")) :
+                        ThemeFactory.getDefaultTheme()
+        );
     }
 
     @Override
@@ -87,13 +86,13 @@ public class GEarth extends Application {
 
             @Override
             public Theme getCurrentTheme() {
-                return theme;
+                return observableTheme.getObject();
             }
         });
         primaryStage.setResizable(false);
         primaryStage.sizeToScene();
 
-        setGearthTheme(theme);
+        setGearthTheme(observableTheme.getObject());
 
         primaryStage.show();
         primaryStage.setOnCloseRequest(event -> closeGEarth());
@@ -111,8 +110,7 @@ public class GEarth extends Application {
 
     private void setGearthTheme(Theme theme) {
         Cacher.put("theme", theme.title());
-        themeObservable.fireEvent(t -> t.accept(theme));
-        GEarth.theme = theme;
+        observableTheme.setObject(theme);
         Theme defaultTheme = ThemeFactory.getDefaultTheme();
 
 //        Platform.runLater(() -> {
@@ -161,7 +159,11 @@ public class GEarth extends Application {
         return null;
     }
 
-    public static Observable<Consumer<Theme>> getThemeObservable() {
-        return themeObservable;
+    public static ObservableObject<Theme> getThemeObservable() {
+        return observableTheme;
+    }
+
+    public static Theme getTheme() {
+        return observableTheme.getObject();
     }
 }

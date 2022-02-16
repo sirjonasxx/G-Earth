@@ -1,5 +1,6 @@
 package gearth.services.extension_handler.extensions.implementations.simple;
 
+import gearth.misc.HostInfo;
 import gearth.services.packet_info.PacketInfoManager;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
@@ -96,8 +97,9 @@ public class ExampleExtension extends GEarthExtension {
         // the habbo connection has ended
     }
 
+
     @Override
-    public void init(boolean isConnected) {
+    public void init(boolean isConnected, HostInfo hostInfo) {
         System.out.println("Example extension is connected to G-Earth");
         // the extension is now connected with G-Earth
     }
@@ -110,7 +112,10 @@ public class ExampleExtension extends GEarthExtension {
         hasClosed();
     }
 
+    @Override
+    public void updateHostInfo(HostInfo hostInfo) {
 
+    }
 
 
     // ignore these
