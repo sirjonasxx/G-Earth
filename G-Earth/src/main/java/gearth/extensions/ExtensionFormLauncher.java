@@ -60,6 +60,7 @@ public class ExtensionFormLauncher extends Application {
         extensionForm.extension = extension;
 
         extensionForm.primaryStage = primaryStage;
+        extensionForm.fieldsInitialized.fireEvent();
         Thread t = new Thread(() -> {
             extension.run();
             //when the extension has ended, close this process

@@ -33,7 +33,7 @@ public abstract class ExtensionBase extends IExtension {
 
 
     volatile PacketInfoManager packetInfoManager = PacketInfoManager.EMPTY;
-    protected ObservableObject<HostInfo> observableHostInfo = new ObservableObject<>(null);
+    ObservableObject<HostInfo> observableHostInfo = new ObservableObject<>(null);
 
     void updateHostInfo(HostInfo hostInfo) {
         observableHostInfo.setObject(hostInfo);

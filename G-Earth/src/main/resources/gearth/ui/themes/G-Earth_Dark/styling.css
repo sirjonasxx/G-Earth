@@ -1036,6 +1036,10 @@ VBox > .split-menu-button.last > .arrow-button {
     -fx-text-fill: #f0f0f0 !important;
 }
 
+.label.softer {
+    -fx-text-fill: rgba(240, 240, 240, 0.8);
+}
+
 .pckt-info {
     -fx-fill: #ffffffa0;
 }
