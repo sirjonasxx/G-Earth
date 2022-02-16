@@ -92,6 +92,22 @@ public class HPacket implements StringifyAble {
         return 2;
     }
 
+    public HPacket skip(String structure) {
+        for (char c : structure.toCharArray()) {
+            switch (c) {
+                case 'i': readInteger(); break;
+                case 's': readString(); break;
+                case 'b': readByte(); break;
+                case 'B': readBoolean(); break;
+                case 'u': readShort(); break;
+                case 'l': readLong(); break;
+                case 'd': readDouble(); break;
+            }
+        }
+
+        return this;
+    }
+
     public void setIdentifier(String identifier) {
         this.identifier = identifier;
     }
@@ -730,4 +746,5 @@ public class HPacket implements StringifyAble {
         HPacket packet2 = (HPacket) object;
         return Arrays.equals(packetInBytes, packet2.packetInBytes) && (isEdited == packet2.isEdited);
     }
+    
 }
