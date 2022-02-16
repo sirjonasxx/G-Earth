@@ -6,6 +6,7 @@ import gearth.ui.titlebar.TitleBarController;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
 
 import java.io.IOException;
 import java.util.*;
@@ -68,9 +69,12 @@ public class Authenticator {
             Platform.runLater(() -> {
                 Alert alert = ConfirmationDialog.createAlertWithOptOut(Alert.AlertType.WARNING, connectExtensionKey
                         ,"Confirmation Dialog", null,
-                        "Extension \""+extension.getTitle()+"\" tries to connect but isn't known to G-Earth, accept this connection?", "Remember my choice",
+                        "", "Remember my choice",
                         ButtonType.YES, ButtonType.NO
                 );
+
+                alert.getDialogPane().setContent(new Label("Extension \""+extension.getTitle()+"\" tries to connect but isn't known to G-Earth,\n" +
+                        "accept this connection?"));
 
                 try {
                     if (!(TitleBarController.create(alert).showAlertAndWait()

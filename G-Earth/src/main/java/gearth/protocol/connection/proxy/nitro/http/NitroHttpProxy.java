@@ -9,6 +9,7 @@ import gearth.ui.titlebar.TitleBarController;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import org.littleshoot.proxy.HttpProxyServer;
@@ -53,11 +54,13 @@ public class NitroHttpProxy {
         Platform.runLater(() -> {
             Alert alert = ConfirmationDialog.createAlertWithOptOut(Alert.AlertType.WARNING, ADMIN_WARNING_KEY,
                     "Root certificate installation", null,
-                    "G-Earth detected that you do not have the root certificate authority installed. " +
-                            "This is required for Nitro to work, do you want to continue? " +
-                            "G-Earth will ask you for Administrator permission if you do so.", "Remember my choice",
+                    "", "Remember my choice",
                     ButtonType.YES, ButtonType.NO
             );
+
+            alert.getDialogPane().setContent(new Label("G-Earth detected that you do not have the root certificate authority installed.\n" +
+                    "This is required for Nitro to work, do you want to continue?\n" +
+                    "G-Earth will ask you for Administrator permission if you do so."));
 
             try {
                 shouldInstall.set(TitleBarController.create(alert).showAlertAndWait()
