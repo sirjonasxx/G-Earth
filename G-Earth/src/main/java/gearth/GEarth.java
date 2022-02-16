@@ -18,6 +18,7 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import sun.misc.Cache;
 
 import java.util.function.Consumer;
 
@@ -109,6 +110,7 @@ public class GEarth extends Application {
     }
 
     private void setGearthTheme(Theme theme) {
+        Cacher.put("theme", theme.internalName());
         themeObservable.fireEvent(t -> t.accept(theme));
         GEarth.theme = theme;
         Theme defaultTheme = ThemeFactory.getDefaultTheme();
