@@ -32,9 +32,8 @@ public class PacketStringUtils {
 
     public static HPacket fromString(String packet) throws InvalidPacketException {
         boolean fixLengthLater = false;
-        if (packet.startsWith("{l}")) {
+        if (packet.startsWith("{h:")) {
             fixLengthLater = true;
-            packet = packet.substring(3);
         }
 
         // note: in String expressions {s:"string"}, character " needs to be backslashed -> \" if used in string
@@ -203,7 +202,7 @@ public class PacketStringUtils {
             builder.append("{").append(packetInfo.getDestination() == HMessage.Direction.TOCLIENT ? "in:" : "out:").append(identifier).append("}");
         }
         else {
-            builder.append("{l}{h:").append(packet.headerId()).append("}");
+            builder.append("{h:").append(packet.headerId()).append("}");
         }
 
         buildExpressionFromGivenStructure(packet, struct, 0, builder);
@@ -269,29 +268,29 @@ public class PacketStringUtils {
     }
 
     public static void main(String[] args) throws InvalidPacketException {
-        HPacket fghdft = fromString("{l}{h:-1}{i:1}{i:0}{i:6}{i:4}{s:\"1.0\"}");
+        HPacket fghdft = fromString("{h:-1}{i:1}{i:0}{i:6}{i:4}{s:\"1.0\"}");
         System.out.println(fghdft);
 
         HPacket zed = fromString("{out:test}{s:\"¥\"}{i:0}{i:0}");
         System.out.println(zed);
 
-        HPacket p1 = fromString("{l}{h:1129}{s:\"\\\\\\\\\"}{i:0}{i:0}");
+        HPacket p1 = fromString("{h:1129}{s:\"\\\\\\\\\"}{i:0}{i:0}");
         System.out.println(p1.toExpression());
         HPacket p1_2 = fromString(p1.toExpression());
         System.out.println(p1_2.toExpression());
 
-        HPacket p2 = fromString("{l}{h:4564}{i:3}{i:0}{s:\"hi\"}{i:0}{i:1}{s:\"how\"}{i:3}{b:1}{b:2}{b:3}{i:2}{s:\"r u\"}{i:1}{b:120}{i:2}{b:true}");
+        HPacket p2 = fromString("{h:4564}{i:3}{i:0}{s:\"hi\"}{i:0}{i:1}{s:\"how\"}{i:3}{b:1}{b:2}{b:3}{i:2}{s:\"r u\"}{i:1}{b:120}{i:2}{b:true}");
         System.out.println(p2);
         System.out.println(p2.toExpression());
 
-        System.out.println(new HPacket("{l}{h:4564}{b:180}").toExpression());
+        System.out.println(new HPacket("{h:4564}{b:180}").toExpression());
 
         System.out.println(structureEquals(
                 new HPacket("{l}{h:5}{s:\"asdas\"}"),
                 "s"
         ));
 
-        HPacket p3 = fromString("{l}{h:2266}{s:\"¥\"}{i:0}{i:0}");
+        HPacket p3 = fromString("{h:2266}{s:\"¥\"}{i:0}{i:0}");
         System.out.println(p3);
     }
 
