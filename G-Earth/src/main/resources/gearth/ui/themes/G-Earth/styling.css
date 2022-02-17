@@ -989,20 +989,20 @@ VBox > .split-menu-button.last > .arrow-button {
     -fx-text-fill: rgba(0, 0, 0, 0.8);
 }
 
-.list-view {
-    -fx-border-color: #cccccc;
-    -fx-border-radius: 4;
-    -fx-background-color: #ffffff;
-    -fx-background-radius: 4;
-}
+/*.list-view {*/
+/*    -fx-border-color: #cccccc;*/
+/*    -fx-border-radius: 4;*/
+/*    -fx-background-color: #ffffff;*/
+/*    -fx-background-radius: 4;*/
+/*}*/
 
-.list-cell {
-    -fx-background-color: transparent;
-}
+/*.list-cell {*/
+/*    -fx-background-color: transparent;*/
+/*}*/
 
-.list-cell:even {
-    -fx-background-color: rgba(140, 140, 140, 0.1);
-}
+/*.list-cell:even {*/
+/*    -fx-background-color: rgba(140, 140, 140, 0.1);*/
+/*}*/
 
 .scroll-pane {
     -fx-background-color: white;
