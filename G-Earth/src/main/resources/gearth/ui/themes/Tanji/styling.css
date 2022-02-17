@@ -7,8 +7,11 @@
     -fx-border-width: 0 1 1 1;
 }
 
-.themed-background{
+.themed-background {
     -fx-background-color: white;
+}
+.themed-background2 {
+    -fx-background-color: #f4f4f4;
 }
 
 .root-node > *  {

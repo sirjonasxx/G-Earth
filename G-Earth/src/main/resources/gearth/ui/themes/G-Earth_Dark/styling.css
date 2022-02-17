@@ -11,6 +11,9 @@
 .themed-background {
     -fx-background-color: #363636;
 }
+.themed-background2 {
+    -fx-background-color: #222222;
+}
 
 .root-node > *  {
     -fx-background-color: #363636;
@@ -1057,4 +1060,56 @@ VBox > .split-menu-button.last > .arrow-button {
 
 .not-corrupted-label {
     -fx-fill: #8cff8c;
+}
+
+.table-view {
+    -fx-background-color: rgba(20, 20, 20, 0.4);
+}
+
+.table-view .table-cell{
+    -fx-text-fill: #f0f0f0;
+}
+
+.table-row-cell{
+    -fx-background-color: #313131;
+}
+
+
+.table-view .column-header {
+    -fx-background-color: #212121;
+}
+
+.table-view .table-cell{
+    -fx-border-color: #262626;
+    -fx-border-width: 0.5;
+}
+
+.table-row-cell:selected, .list-cell:selected {
+    -fx-background-color: #364349;
+}
+
+.table-view:focused .table-row-cell:selected, .list-view:focused .list-cell:selected {
+    -fx-background-color: #3d5b69;
+}
+
+.spinner .increment-arrow-button,
+.spinner .decrement-arrow-button {
+    -fx-body-color: #262626;
+}
+
+.spinner .increment-arrow-button .increment-arrow,
+.spinner .decrement-arrow-button .decrement-arrow {
+    -fx-background-color: #d7d7d7;
+}
+
+.slider .track {
+    -fx-background-color: #222222;
+    -fx-border-radius: 5;
+    -fx-border-color: rgba(240, 240, 240, 0.8);
+}
+
+.slider .thumb {
+    -fx-background-color: #222222;
+    -fx-border-radius: 10;
+    -fx-border-color: rgba(240, 240, 240, 0.8);
 }

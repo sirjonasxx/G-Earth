@@ -10,6 +10,9 @@
 .themed-background {
     -fx-background-color: white;
 }
+.themed-background2 {
+    -fx-background-color: #f4f4f4;
+}
 
 .root-node > *  {
     -fx-background-color: white;
