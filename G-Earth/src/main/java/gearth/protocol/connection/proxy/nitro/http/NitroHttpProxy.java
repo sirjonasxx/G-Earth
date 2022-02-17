@@ -5,9 +5,11 @@ import gearth.misc.ConfirmationDialog;
 import gearth.protocol.connection.proxy.nitro.NitroConstants;
 import gearth.protocol.connection.proxy.nitro.os.NitroOsFunctions;
 import gearth.protocol.connection.proxy.nitro.os.NitroOsFunctionsFactory;
+import gearth.ui.titlebar.TitleBarController;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import org.littleshoot.proxy.HttpProxyServer;
@@ -16,6 +18,7 @@ import org.littleshoot.proxy.mitm.Authority;
 import org.littleshoot.proxy.mitm.RootCertificateException;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -51,16 +54,20 @@ public class NitroHttpProxy {
         Platform.runLater(() -> {
             Alert alert = ConfirmationDialog.createAlertWithOptOut(Alert.AlertType.WARNING, ADMIN_WARNING_KEY,
                     "Root certificate installation", null,
-                    "G-Earth detected that you do not have the root certificate authority installed. " +
-                            "This is required for Nitro to work, do you want to continue? " +
-                            "G-Earth will ask you for Administrator permission if you do so.", "Remember my choice",
+                    "", "Remember my choice",
                     ButtonType.YES, ButtonType.NO
             );
-            Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-            stage.getIcons().add(new Image(GEarth.class.getResourceAsStream(String.format("/gearth/themes/%s/logoSmall.png", GEarth.theme))));
-            stage.getScene().getStylesheets().add(GEarth.class.getResource(String.format("/gearth/themes/%s/styling.css", GEarth.theme)).toExternalForm());
 
-            shouldInstall.set(alert.showAndWait().filter(t -> t == ButtonType.YES).isPresent());
+            alert.getDialogPane().setContent(new Label("G-Earth detected that you do not have the root certificate authority installed.\n" +
+                    "This is required for Nitro to work, do you want to continue?\n" +
+                    "G-Earth will ask you for Administrator permission if you do so."));
+
+            try {
+                shouldInstall.set(TitleBarController.create(alert).showAlertAndWait()
+                        .filter(t -> t == ButtonType.YES).isPresent());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             waitForDialog.release();
         });
 

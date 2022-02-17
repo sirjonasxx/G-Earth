@@ -1,0 +1,73 @@
+/* extension logger css */
+.grey {
+    -fx-fill: #a9a9a9;
+}
+
+.lightgrey {
+    -fx-fill: #D0D3D4;
+}
+
+.yellow {
+    -fx-fill: #ffff00;
+}
+
+.orange {
+    -fx-fill: orange;
+}
+
+.white {
+    -fx-fill: white;
+}
+
+.purple {
+    -fx-fill: purple;
+}
+
+.brown {
+    -fx-fill: brown;
+}
+
+.pink {
+    -fx-fill: pink;
+}
+
+.red {
+    -fx-fill: red;
+}
+
+.black {
+    -fx-fill: black;
+}
+
+.blue {
+    -fx-fill: blue;
+}
+
+.cyan {
+    -fx-fill: cyan;
+}
+
+.green {
+    -fx-fill: #73b504;
+}
+
+.darkergreen {
+    -fx-fill: green;
+}
+
+.dark {
+    -fx-background-color: #000000;
+}
+
+.caret {
+    -fx-stroke: #ffffff;
+}
+
+.label {
+    /*-fx-text-fill: #000000 !important;*/
+}
+
+.scroll-bar:vertical {
+    -fx-pref-width: 11.5;
+    -fx-padding: 1;
+}

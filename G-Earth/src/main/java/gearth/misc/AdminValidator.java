@@ -1,13 +1,13 @@
 package gearth.misc;
 
-import gearth.GEarth;
+import gearth.ui.titlebar.TitleBarController;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
-import javafx.scene.image.Image;
+import javafx.scene.control.Label;
 import javafx.scene.layout.Region;
-import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.prefs.Preferences;
 
@@ -46,13 +46,13 @@ public class AdminValidator {
         new Thread(() -> {
             if (!AdminValidator.isAdmin()) {
                 Platform.runLater(() -> {
-                    Alert alert = new Alert(Alert.AlertType.WARNING, "G-Earth needs admin privileges in order to work on Flash, please restart G-Earth with admin permissions unless you're using Unity", ButtonType.OK);
-                    Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-                    stage.getIcons().add(new Image(GEarth.class.getResourceAsStream(String.format("/gearth/themes/%s/logoSmall.png", GEarth.theme))));
-                    stage.getScene().getStylesheets().add(GEarth.class.getResource(String.format("/gearth/themes/%s/styling.css", GEarth.theme)).toExternalForm());
-                    alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
-                    alert.setResizable(false);
-                    alert.show();
+                    Alert alert = new Alert(Alert.AlertType.WARNING, "", ButtonType.OK);
+                    alert.getDialogPane().setContent(new Label("G-Earth needs admin privileges in order to work on Flash,\nplease restart G-Earth with admin permissions unless\nyou're using Unity"));
+                    try {
+                        TitleBarController.create(alert).showAlert();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 });
 
             }

@@ -1,5 +1,6 @@
 package gearth.extensions;
 
+import gearth.misc.HostInfo;
 import gearth.services.packet_info.PacketInfoManager;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
@@ -159,6 +160,8 @@ public abstract class Extension extends ExtensionBase {
                 }
                 else if (packet.headerId() == NetworkExtensionInfo.OUTGOING_MESSAGES_IDS.INIT) {
                     delayed_init = packet.readBoolean();
+                    HostInfo hostInfo = HostInfo.fromPacket(packet);
+                    updateHostInfo(hostInfo);
                     if (!delayed_init) {
                         initExtension();
                     }
@@ -177,7 +180,10 @@ public abstract class Extension extends ExtensionBase {
                     response.appendLongString(habboMessage.stringify());
 
                     writeToStream(response.toBytes());
-
+                }
+                else if (packet.headerId() == NetworkExtensionInfo.OUTGOING_MESSAGES_IDS.UPDATEHOSTINFO) {
+                    HostInfo hostInfo = HostInfo.fromPacket(packet);
+                    updateHostInfo(hostInfo);
                 }
             }
 

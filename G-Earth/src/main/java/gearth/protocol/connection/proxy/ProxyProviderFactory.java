@@ -9,9 +9,11 @@ import gearth.protocol.connection.HStateSetter;
 import gearth.protocol.connection.proxy.flash.NormalFlashProxyProvider;
 import gearth.protocol.connection.proxy.flash.unix.LinuxRawIpFlashProxyProvider;
 import gearth.protocol.connection.proxy.flash.windows.WindowsRawIpFlashProxyProvider;
+import gearth.ui.titlebar.TitleBarController;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Region;
 import javafx.stage.Stage;
@@ -105,15 +107,17 @@ public class ProxyProviderFactory {
                 }
 
                 Platform.runLater(() -> {
-                    Alert alert = new Alert(Alert.AlertType.ERROR, "G-Earth is already connected to this hotel. " +
+                    Alert alert = new Alert(Alert.AlertType.ERROR, "", ButtonType.OK);
+                    alert.getDialogPane().getChildren().add(new Label("G-Earth is already connected to this hotel.\n" +
                             "Due to current limitations you can only connect one session per hotel to G-Earth in Raw IP mode on Windows.\n\n" +
-                            "You can bypass this by using a SOCKS proxy [Extra -> Advanced -> SOCKS]", ButtonType.OK);
-                    Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-                    stage.getIcons().add(new Image(GEarth.class.getResourceAsStream(String.format("/gearth/themes/%s/logoSmall.png", GEarth.theme))));
-                    stage.getScene().getStylesheets().add(GEarth.class.getResource(String.format("/gearth/themes/%s/styling.css", GEarth.theme)).toExternalForm());
+                            "You can bypass this by using a SOCKS proxy [Extra -> Advanced -> SOCKS]"));
                     alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
                     alert.setResizable(false);
-                    alert.show();
+                    try {
+                        TitleBarController.create(alert).showAlert();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 });
 
                 return null;

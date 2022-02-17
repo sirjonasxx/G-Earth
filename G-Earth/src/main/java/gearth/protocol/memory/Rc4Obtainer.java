@@ -10,6 +10,7 @@ import gearth.protocol.memory.habboclient.HabboClientFactory;
 import gearth.protocol.packethandler.flash.BufferChangeListener;
 import gearth.protocol.packethandler.flash.FlashPacketHandler;
 import gearth.protocol.packethandler.PayloadBuffer;
+import gearth.ui.titlebar.TitleBarController;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -18,9 +19,11 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -82,9 +85,6 @@ public class Rc4Obtainer {
 
                 Platform.runLater(() -> {
                     Alert alert = new Alert(Alert.AlertType.WARNING, "Something went wrong!", ButtonType.OK);
-                    Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-                    stage.getIcons().add(new Image(GEarth.class.getResourceAsStream(String.format("/gearth/themes/%s/logoSmall.png", GEarth.theme))));
-                    stage.getScene().getStylesheets().add(GEarth.class.getResource(String.format("/gearth/themes/%s/styling.css", GEarth.theme)).toExternalForm());
 
                     FlowPane fp = new FlowPane();
                     Label lbl = new Label("G-Earth has experienced an issue" + System.lineSeparator()+ System.lineSeparator() + "Head over to our Troubleshooting page to solve the problem:");
@@ -95,15 +95,16 @@ public class Rc4Obtainer {
                         event.consume();
                     });
 
-                    WebView webView = new WebView();
-                    webView.getEngine().loadContent("<html>G-Earth has experienced an issue<br><br>Head over to our Troubleshooting page to solve the problem:<br><a href=\"https://github.com/sirjonasxx/G-Earth/wiki/Troubleshooting\">https://github.com/sirjonasxx/G-Earth/wiki/Troubleshooting</a></html>");
-                    webView.setPrefSize(500, 200);
                     alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
                     alert.getDialogPane().setContent(fp);
                     alert.setOnCloseRequest(event -> {
                         GEarth.main.getHostServices().showDocument(link.getText());
                     });
-                    alert.show();
+                    try {
+                        TitleBarController.create(alert).showAlert();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
 
                 });
 

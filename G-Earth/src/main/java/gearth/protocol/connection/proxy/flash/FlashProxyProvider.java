@@ -11,9 +11,11 @@ import gearth.protocol.memory.Rc4Obtainer;
 import gearth.protocol.packethandler.flash.IncomingFlashPacketHandler;
 import gearth.protocol.packethandler.flash.OutgoingFlashPacketHandler;
 import gearth.protocol.packethandler.flash.FlashPacketHandler;
+import gearth.ui.titlebar.TitleBarController;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Region;
 import javafx.stage.Stage;
@@ -123,13 +125,15 @@ public abstract class FlashProxyProvider implements ProxyProvider {
 
     protected void showInvalidConnectionError() {
         Platform.runLater(() -> {
-            Alert alert = new Alert(Alert.AlertType.ERROR, "You entered invalid connection information, G-Earth could not connect", ButtonType.OK);
-            Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-            stage.getIcons().add(new Image(GEarth.class.getResourceAsStream(String.format("/gearth/themes/%s/logoSmall.png", GEarth.theme))));
-            stage.getScene().getStylesheets().add(GEarth.class.getResource(String.format("/gearth/themes/%s/styling.css", GEarth.theme)).toExternalForm());
+            Alert alert = new Alert(Alert.AlertType.ERROR, "", ButtonType.OK);
+            alert.getDialogPane().getChildren().add(new Label("You entered invalid connection information, G-Earth could not connect"));
             alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
             alert.setResizable(false);
-            alert.show();
+            try {
+                TitleBarController.create(alert).showAlert();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         });
     }
 

@@ -3,64 +3,132 @@ package gearth;
 import gearth.misc.AdminValidator;
 import gearth.misc.Cacher;
 import gearth.misc.UpdateChecker;
+import gearth.misc.listenerpattern.Observable;
+import gearth.misc.listenerpattern.ObservableObject;
 import gearth.ui.GEarthController;
+import gearth.ui.subforms.logger.loggerdisplays.PacketLogger;
+import gearth.ui.themes.Theme;
+import gearth.ui.themes.ThemeFactory;
+import gearth.ui.titlebar.TitleBarConfig;
+import gearth.ui.titlebar.TitleBarController;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.ToolBar;
 import javafx.scene.image.Image;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import sun.misc.Cache;
+
+import java.util.function.Consumer;
 
 public class GEarth extends Application {
 
-    public static Application main;
+    public static GEarth main;
     public static String version = "1.5.1";
     public static String gitApi = "https://api.github.com/repos/sirjonasxx/G-Earth/releases/latest";
-    public static String theme = "G-Earth_Dark";
-    public static String[] themes = new String[] {"G-Earth", "Tanji", "G-Earth_Dark"};
+    public static ObservableObject<Theme> observableTheme;
+
+    private Stage stage;
+    private GEarthController controller;
 
     static {
-        if (Cacher.getCacheContents().has("theme")) {
-            theme = Cacher.getCacheContents().getString("theme");
-        }
+        observableTheme = new ObservableObject<>(
+                Cacher.getCacheContents().has("theme") ?
+                        ThemeFactory.themeForTitle(Cacher.getCacheContents().getString("theme")) :
+                        ThemeFactory.getDefaultTheme()
+        );
     }
 
     @Override
     public void start(Stage primaryStage) throws Exception{
         main = this;
+        stage = primaryStage;
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/gearth/ui/G-Earth.fxml"));
         Parent root = loader.load();
-        GEarthController companion = loader.getController();
-        companion.setStage(primaryStage);
-        primaryStage.initStyle(StageStyle.TRANSPARENT);
+        controller = loader.getController();
+        controller.setStage(primaryStage);
+        stage.initStyle(StageStyle.TRANSPARENT);
 
-        // https://stackoverflow.com/questions/20732100/javafx-why-does-stage-setresizablefalse-cause-additional-margins
-//        primaryStage.setScene(new Scene(root, 650, 295));
         primaryStage.setScene(new Scene(root));
+        TitleBarController.create(primaryStage, new TitleBarConfig() {
+            @Override
+            public boolean displayThemePicker() {
+                return true;
+            }
+
+            @Override
+            public boolean displayMinimizeButton() {
+                return true;
+            }
+
+//            @Override
+//            public boolean allowResizing() {
+//                return false;
+//            }
+
+            @Override
+            public void onCloseClicked() {
+                closeGEarth();
+            }
+
+            @Override
+            public void onMinimizeClicked() {
+                stage.setIconified(true);
+            }
+
+            @Override
+            public void setTheme(Theme theme) {
+                setGearthTheme(theme);
+            }
+
+            @Override
+            public Theme getCurrentTheme() {
+                return observableTheme.getObject();
+            }
+        });
         primaryStage.setResizable(false);
         primaryStage.sizeToScene();
-        
-        primaryStage.getScene().setFill(Color.TRANSPARENT);
-        companion.setTheme(theme);
+
+        setGearthTheme(observableTheme.getObject());
 
         primaryStage.show();
-        primaryStage.setOnCloseRequest( event -> {
-            companion.exit();
-            Platform.exit();
-
-            // Platform.exit doesn't seem to be enough on Windows?
-            System.exit(0);
-        });
+        primaryStage.setOnCloseRequest(event -> closeGEarth());
 
         AdminValidator.validate();
         UpdateChecker.checkForUpdates();
+
+    }
+
+    private void closeGEarth() {
+        controller.exit();
+        Platform.exit();
+        System.exit(0);
+    }
+
+    private void setGearthTheme(Theme theme) {
+        Cacher.put("theme", theme.title());
+        observableTheme.setObject(theme);
+        Theme defaultTheme = ThemeFactory.getDefaultTheme();
+
+//        Platform.runLater(() -> {
+            stage.getScene().getStylesheets().clear();
+            stage.getScene().getStylesheets().add(GEarth.class.getResource(String.format("/gearth/ui/themes/%s/styling.css", theme.internalName())).toExternalForm());
+
+            stage.getIcons().clear();
+            stage.getIcons().add(new Image(GEarth.class.getResourceAsStream(String.format("/gearth/ui/themes/%s/logoSmall.png", theme.overridesLogo() ? theme.internalName() : defaultTheme.internalName()))));
+            stage.setTitle((theme.overridesTitle() ? theme.title() : defaultTheme.title()) + " " + GEarth.version);
+
+            controller.infoController.img_logo.setImage(new Image(GEarth.class.getResourceAsStream(
+                    String.format(
+                            "/gearth/ui/themes/%s/logo.png",
+                            theme.overridesLogo() ? theme.internalName() : defaultTheme.internalName()
+                    )
+            )));
+            controller.infoController.version.setText(stage.getTitle());
+//        });
 
     }
 
@@ -89,5 +157,13 @@ public class GEarth extends Application {
             }
         }
         return null;
+    }
+
+    public static ObservableObject<Theme> getThemeObservable() {
+        return observableTheme;
+    }
+
+    public static Theme getTheme() {
+        return observableTheme.getObject();
     }
 }

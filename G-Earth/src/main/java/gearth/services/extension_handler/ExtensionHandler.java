@@ -1,6 +1,7 @@
 package gearth.services.extension_handler;
 
 import gearth.GEarth;
+import gearth.misc.HostInfo;
 import gearth.misc.listenerpattern.Observable;
 import gearth.protocol.HConnection;
 import gearth.protocol.HMessage;
@@ -11,10 +12,12 @@ import gearth.services.extension_handler.extensions.GEarthExtension;
 import gearth.services.extension_handler.extensions.extensionproducers.ExtensionProducer;
 import gearth.services.extension_handler.extensions.extensionproducers.ExtensionProducerFactory;
 import gearth.services.extension_handler.extensions.extensionproducers.ExtensionProducerObserver;
+import gearth.ui.themes.Theme;
 import javafx.util.Pair;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.function.Consumer;
 
 public class ExtensionHandler {
 
@@ -44,6 +47,14 @@ public class ExtensionHandler {
     }
 
     private void initialize() {
+        GEarth.getThemeObservable().addListener(theme -> {
+            synchronized (gEarthExtensions) {
+                for (GEarthExtension extension : gEarthExtensions) {
+                    extension.updateHostInfo(getHostInfo());
+                }
+            }
+        });
+
         hConnection.getStateObservable().addListener((oldState, newState) -> {
             if (newState == HState.CONNECTED) {
                 synchronized (gEarthExtensions) {
@@ -241,7 +252,7 @@ public class ExtensionHandler {
                 extension.getClickedObservable().addListener(extension::doubleclick);
                 observable.fireEvent(l -> l.onExtensionConnect(extension));
 
-                extension.init(hConnection.getState() == HState.CONNECTED);
+                extension.init(hConnection.getState() == HState.CONNECTED, getHostInfo());
                 if (hConnection.getState() == HState.CONNECTED) {
                     extension.connectionStart(
                             hConnection.getDomain(),
@@ -254,6 +265,16 @@ public class ExtensionHandler {
                 }
             }
         };
+    }
+
+    private HostInfo getHostInfo() {
+        HashMap<String, String> attributes = new HashMap<>();
+        attributes.put("theme", GEarth.getTheme().title());
+        return new HostInfo(
+                "G-Earth",
+                GEarth.version,
+                attributes
+        );
     }
 
     public List<ExtensionProducer> getExtensionProducers() {

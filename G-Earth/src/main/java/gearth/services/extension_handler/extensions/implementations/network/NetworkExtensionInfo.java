@@ -88,6 +88,8 @@ public class NetworkExtensionInfo {
         public static final int CONNECTIONEND = 6;
         public static final int INIT = 7;
 
+        public static final int UPDATEHOSTINFO = 10;
+
         public static final int PACKETTOSTRING_RESPONSE = 20;
         public static final int STRINGTOPACKET_RESPONSE = 21;
     }

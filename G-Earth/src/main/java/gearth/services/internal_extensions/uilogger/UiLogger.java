@@ -2,17 +2,10 @@ package gearth.services.internal_extensions.uilogger;
 
 import gearth.extensions.ExtensionForm;
 import gearth.extensions.ExtensionInfo;
-import gearth.services.packet_info.PacketInfoManager;
 import gearth.protocol.HConnection;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
-import gearth.ui.logger.loggerdisplays.PacketLogger;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.image.Image;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
+import gearth.ui.subforms.logger.loggerdisplays.PacketLogger;
 
 @ExtensionInfo(
         Title = "Packet Logger",

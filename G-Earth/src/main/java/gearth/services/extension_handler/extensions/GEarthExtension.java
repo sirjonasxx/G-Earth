@@ -1,5 +1,6 @@
 package gearth.services.extension_handler.extensions;
 
+import gearth.misc.HostInfo;
 import gearth.misc.listenerpattern.Observable;
 import gearth.misc.listenerpattern.SynchronizedObservable;
 import gearth.services.packet_info.PacketInfoManager;
@@ -40,8 +41,9 @@ public abstract class GEarthExtension {
     public abstract void provideFlags(String[] flags);
     public abstract void connectionStart(String host, int port, String hotelVersion, String clientIdentifier, HClient clientType, PacketInfoManager packetInfoManager);
     public abstract void connectionEnd();
-    public abstract void init(boolean isConnected);
+    public abstract void init(boolean isConnected, HostInfo hostInfo);
     public abstract void close();
+    public abstract void updateHostInfo(HostInfo hostInfo);
     public abstract void packetToStringResponse(String string, String expression);
     public abstract void stringToPacketResponse(HPacket packet);
     // ---------------------------------------------------------------

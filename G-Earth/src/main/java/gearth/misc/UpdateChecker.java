@@ -1,6 +1,7 @@
 package gearth.misc;
 
 import gearth.GEarth;
+import gearth.ui.titlebar.TitleBarController;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -37,9 +38,6 @@ public class UpdateChecker {
                         boolean isForcedUpdate = body.contains("(!)");
 
                         Alert alert = new Alert(isForcedUpdate ? Alert.AlertType.ERROR : Alert.AlertType.INFORMATION, "G-Earth is outdated!", ButtonType.OK);
-                        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-                        stage.getIcons().add(new Image(GEarth.class.getResourceAsStream(String.format("/gearth/themes/%s/logoSmall.png", GEarth.theme))));
-                        stage.getScene().getStylesheets().add(GEarth.class.getResource(String.format("/gearth/themes/%s/styling.css", GEarth.theme)).toExternalForm());
 
                         FlowPane fp = new FlowPane();
                         Label lbl = new Label("A new version of G-Earth has been found ("+gitv+")" + System.lineSeparator()+ System.lineSeparator() + "Update to the latest version:");
@@ -62,7 +60,11 @@ public class UpdateChecker {
                         if (isForcedUpdate) {
                             alert.setOnCloseRequest(event -> System.exit(0));
                         }
-                        alert.show();
+                        try {
+                            TitleBarController.create(alert).showAlert();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
 
                     });
                 }
