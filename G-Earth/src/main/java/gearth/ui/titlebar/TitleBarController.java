@@ -93,6 +93,10 @@ public class TitleBarController {
             if (!config.displayMinimizeButton()) {
                 ((GridPane) controller.minimizeBtn.getParent()).getChildren().remove(controller.minimizeBtn);
             }
+
+            if (!config.displayThemePicker()) {
+                ((GridPane) controller.themeBtn.getParent()).getChildren().remove(controller.themeBtn);
+            }
         });
         return controller;
     }
