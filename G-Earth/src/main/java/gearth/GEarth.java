@@ -26,7 +26,7 @@ import java.util.function.Consumer;
 public class GEarth extends Application {
 
     public static GEarth main;
-    public static String version = "1.5.1";
+    public static String version = "1.5.2";
     public static String gitApi = "https://api.github.com/repos/sirjonasxx/G-Earth/releases/latest";
     public static ObservableObject<Theme> observableTheme;
 
