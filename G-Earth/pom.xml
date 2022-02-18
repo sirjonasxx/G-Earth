@@ -10,7 +10,7 @@
 
     <properties>
         <javafx.version>1.8</javafx.version>
-        <jettyVersion>9.4.41.v20210516</jettyVersion>
+        <jettyVersion>9.4.43.v20210629</jettyVersion>
     </properties>
 
     <parent>
@@ -75,24 +75,24 @@
                             <target name="copy G-Earth.jar to Build folder">
 
                                 <copy todir="../Build/Mac/">
-                                    <fileset dir="target/bin" includes="**/*" />
-                                    <fileset dir="src/main/resources/build/common" includes="**/*" />
-                                    <fileset dir="src/main/resources/build/mac" includes="**/*" excludes=".gitkeep" />
+                                    <fileset dir="target/bin" includes="**/*"/>
+                                    <fileset dir="src/main/resources/build/common" includes="**/*"/>
+                                    <fileset dir="src/main/resources/build/mac" includes="**/*" excludes=".gitkeep"/>
                                 </copy>
                                 <copy todir="../Build/Linux/">
-                                    <fileset dir="target/bin" includes="**/*" />
-                                    <fileset dir="src/main/resources/build/common" includes="**/*" />
-                                    <fileset dir="src/main/resources/build/linux" includes="**/*" excludes=".gitkeep" />
+                                    <fileset dir="target/bin" includes="**/*"/>
+                                    <fileset dir="src/main/resources/build/common" includes="**/*"/>
+                                    <fileset dir="src/main/resources/build/linux" includes="**/*" excludes=".gitkeep"/>
                                 </copy>
                                 <copy todir="../Build/Windows_32bit/">
-                                    <fileset dir="target/bin" includes="**/*" />
-                                    <fileset dir="src/main/resources/build/common" includes="**/*" />
-                                    <fileset dir="src/main/resources/build/windows/32bit" includes="**/*" excludes=".gitkeep" />
+                                    <fileset dir="target/bin" includes="**/*"/>
+                                    <fileset dir="src/main/resources/build/common" includes="**/*"/>
+                                    <fileset dir="src/main/resources/build/windows/32bit" includes="**/*" excludes=".gitkeep"/>
                                 </copy>
                                 <copy todir="../Build/Windows_64bit/">
-                                    <fileset dir="target/bin" includes="**/*" />
-                                    <fileset dir="src/main/resources/build/common" includes="**/*" />
-                                    <fileset dir="src/main/resources/build/windows/64bit" includes="**/*" excludes=".gitkeep" />
+                                    <fileset dir="target/bin" includes="**/*"/>
+                                    <fileset dir="src/main/resources/build/common" includes="**/*"/>
+                                    <fileset dir="src/main/resources/build/windows/64bit" includes="**/*" excludes=".gitkeep"/>
                                 </copy>
 
                             </target>
@@ -106,8 +106,7 @@
                         <phase>clean</phase>
                         <configuration>
                             <target name="clean our own build folder">
-                                <delete dir="../Build"
-                                includeemptydirs="true"/>
+                                <delete dir="../Build" includeemptydirs="true"/>
                             </target>
                         </configuration>
                         <goals>
