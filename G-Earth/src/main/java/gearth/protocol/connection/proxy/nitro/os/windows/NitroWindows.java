@@ -25,7 +25,7 @@ public class NitroWindows implements NitroOsFunctions {
     @Override
     public boolean isRootCertificateTrusted(File certificate) {
         try {
-            final String output = RuntimeUtil.getCommandOutput(new String[] {"cmd", "/c", " certutil.exe -f -verify " + certificate.getAbsolutePath()});
+            final String output = RuntimeUtil.getCommandOutput(new String[] {"cmd", "/c", " certutil.exe -f -verify \"" + certificate.getAbsolutePath() + "\""});
 
             return !output.contains("CERT_TRUST_IS_UNTRUSTED_ROOT") &&
                     output.contains("dwInfoStatus=10c dwErrorStatus=0");
@@ -41,7 +41,7 @@ public class NitroWindows implements NitroOsFunctions {
         final String certificatePath = certificate.getAbsolutePath();
 
         // Prompt UAC elevation.
-        WinDef.HINSTANCE result = NitroWindowsShell32.INSTANCE.ShellExecuteA(null, "runas", "cmd.exe", "/S /C \"certutil -addstore root " + certificatePath + "\"", null, 1);
+        WinDef.HINSTANCE result = NitroWindowsShell32.INSTANCE.ShellExecuteA(null, "runas", "cmd.exe", "/S /C 'certutil -addstore root \"" + certificatePath + "\"'", null, 1);
 
         // Wait for exit.
         Kernel32.INSTANCE.WaitForSingleObject(result, WinBase.INFINITE);
