@@ -35,12 +35,12 @@ public final class NetworkExtensionsProducer implements ExtensionProducer {
     /**
      * Represents the maximum number of bytes per string encoded in an incoming packet.
      */
-    private static final int MAX_STRING_SIZE = Character.BYTES * 100;
+    private static final int MAX_STRING_SIZE = Character.BYTES * 4_000;
 
     /**
      * Length is encoded as an {@link Integer} and header id as an {@link Short}.
      */
-    private static final int LENGTH_AND_ID_SIZE = Integer.BYTES + Short.BYTES;
+    private static final int PACKET_HEADER_SIZE = Integer.BYTES + Short.BYTES;
 
     /**
      * Represents the maximum number of bytes in the body of an incoming packet.
@@ -100,18 +100,20 @@ public final class NetworkExtensionsProducer implements ExtensionProducer {
                             // listen to incoming data from client
                             while (!extensionSocket.isClosed()) {
 
-                                if (dIn.available() < LENGTH_AND_ID_SIZE)
+                                if (dIn.available() < PACKET_HEADER_SIZE)
                                     continue;
 
-                                final int length = dIn.readInt();
+                                final int bodyLength = dIn.readInt() - Short.BYTES;
                                 final short headerId = dIn.readShort();
 
                                 if (headerId == NetworkExtensionInfo.INCOMING_MESSAGES_IDS.EXTENSIONINFO) {
 
-                                    if (length > MAX_PACKET_BODY_SIZE)
+                                    if (bodyLength > MAX_PACKET_BODY_SIZE) {
+                                        System.err.printf("Incoming packet(h=%d, l=%d) exceeds max packet body size %d.", headerId, bodyLength, MAX_PACKET_BODY_SIZE);
                                         break;
+                                    }
 
-                                    final HPacket packet = readPacket(dIn, length, headerId);
+                                    final HPacket packet = readPacket(dIn, bodyLength, headerId);
 
                                     final NetworkExtension gEarthExtension = new NetworkExtension(packet, extensionSocket);
 
@@ -143,12 +145,12 @@ public final class NetworkExtensionsProducer implements ExtensionProducer {
         }
     }
 
-    private HPacket readPacket(DataInputStream dIn, int length, short id) throws IOException {
-        final byte[] headerAndBody = new byte[length + LENGTH_AND_ID_SIZE];
+    private HPacket readPacket(DataInputStream dIn, int amountToRead, short id) throws IOException {
+        final byte[] headerAndBody = new byte[amountToRead + PACKET_HEADER_SIZE];
 
         int amountRead = 0;
-        while (amountRead < length)
-            amountRead += dIn.read(headerAndBody,  amountRead + LENGTH_AND_ID_SIZE, Math.min(dIn.available(), length - amountRead));
+        while (amountRead < amountToRead)
+            amountRead += dIn.read(headerAndBody,  amountRead + PACKET_HEADER_SIZE, Math.min(dIn.available(), amountToRead - amountRead));
 
         final HPacket packet = new HPacket(headerAndBody);
         packet.fixLength();
