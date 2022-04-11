@@ -145,15 +145,13 @@ public class Rc4Obtainer {
                                 return true;
                             }
                         } catch (Exception e) {
-                            if (DEBUG)
-                                e.printStackTrace();
+                            e.printStackTrace();
                         }
                     }
                 }
             }
         } catch (Exception e) {
-            if (DEBUG)
-                e.printStackTrace();
+            e.printStackTrace();
         }
         return false;
     }
