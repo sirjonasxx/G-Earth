@@ -38,6 +38,11 @@ public final class NetworkExtensionsProducer implements ExtensionProducer {
     private static final int MAX_STRING_SIZE = Character.BYTES * 100;
 
     /**
+     * Length is encoded as an {@link Integer} and header id as an {@link Short}.
+     */
+    private static final int LENGTH_AND_ID_SIZE = Integer.BYTES + Short.BYTES;
+
+    /**
      * Represents the maximum number of bytes in the body of an incoming packet.
      * <p>
      * Used as a form of validation for packets, prevents other Apps that connect
@@ -95,14 +100,18 @@ public final class NetworkExtensionsProducer implements ExtensionProducer {
                             // listen to incoming data from client
                             while (!extensionSocket.isClosed()) {
 
+                                if (dIn.available() < LENGTH_AND_ID_SIZE)
+                                    continue;
+
                                 final int length = dIn.readInt();
+                                final short headerId = dIn.readShort();
 
-                                if (length > MAX_PACKET_BODY_SIZE)
-                                    break;
+                                if (headerId == NetworkExtensionInfo.INCOMING_MESSAGES_IDS.EXTENSIONINFO) {
 
-                                final HPacket packet = readPacket(dIn, length);
+                                    if (length > MAX_PACKET_BODY_SIZE)
+                                        break;
 
-                                if (packet.headerId() == NetworkExtensionInfo.INCOMING_MESSAGES_IDS.EXTENSIONINFO) {
+                                    final HPacket packet = readPacket(dIn, length, headerId);
 
                                     final NetworkExtension gEarthExtension = new NetworkExtension(packet, extensionSocket);
 
@@ -134,15 +143,17 @@ public final class NetworkExtensionsProducer implements ExtensionProducer {
         }
     }
 
-    private HPacket readPacket(DataInputStream dIn, int length) throws IOException {
-        final byte[] headerAndBody = new byte[length + 4];
+    private HPacket readPacket(DataInputStream dIn, int length, short id) throws IOException {
+        final byte[] headerAndBody = new byte[length + LENGTH_AND_ID_SIZE];
 
         int amountRead = 0;
         while (amountRead < length)
-            amountRead += dIn.read(headerAndBody, 4 + amountRead, Math.min(dIn.available(), length - amountRead));
+            amountRead += dIn.read(headerAndBody,  amountRead + LENGTH_AND_ID_SIZE, Math.min(dIn.available(), length - amountRead));
 
         final HPacket packet = new HPacket(headerAndBody);
         packet.fixLength();
+        packet.replaceShort(4, id); // add header id
+
         return packet;
     }
 
