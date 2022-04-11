@@ -38,7 +38,7 @@ public final class NetworkExtensionsProducer implements ExtensionProducer {
     private static final int MAX_STRING_SIZE = Character.BYTES * 100;
 
     /**
-     * Represents the maximum number of bytes of an incoming packet.
+     * Represents the maximum number of bytes in the body of an incoming packet.
      * <p>
      * Used as a form of validation for packets, prevents other Apps that connect
      * with the server from sending unexpected data and inexplicably causing huge byte array allocations.
@@ -46,7 +46,7 @@ public final class NetworkExtensionsProducer implements ExtensionProducer {
      * Since the server only accepts {@link NetworkExtensionInfo.INCOMING_MESSAGES_IDS#EXTENSIONINFO} packets,
      * this value is calculated based on that packet.
      */
-    private static final int MAX_PACKET_SIZE = (MAX_STRING_SIZE * 6) + (BOOLEAN_SIZE * 4);
+    private static final int MAX_PACKET_BODY_SIZE = (MAX_STRING_SIZE * 6) + (BOOLEAN_SIZE * 4);
 
     /**
      * The port at which the {@link #serverSocket} is listening for incoming connections.
@@ -97,7 +97,7 @@ public final class NetworkExtensionsProducer implements ExtensionProducer {
 
                                 final int length = dIn.readInt();
 
-                                if (length > MAX_PACKET_SIZE)
+                                if (length > MAX_PACKET_BODY_SIZE)
                                     break;
 
                                 final HPacket packet = readPacket(dIn, length);
