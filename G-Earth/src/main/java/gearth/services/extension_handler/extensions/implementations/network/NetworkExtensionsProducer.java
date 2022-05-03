@@ -100,9 +100,6 @@ public final class NetworkExtensionsProducer implements ExtensionProducer {
                             // listen to incoming data from client
                             while (!extensionSocket.isClosed()) {
 
-                                if (dIn.available() < PACKET_HEADER_SIZE)
-                                    continue;
-
                                 final int bodyLength = dIn.readInt() - Short.BYTES;
                                 final short headerId = dIn.readShort();
 
