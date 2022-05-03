@@ -89,9 +89,12 @@ public class TitleBarController {
             stage.getScene().setFill(Color.TRANSPARENT);
             stage.getScene().getRoot().getStyleClass().add("root-node");
 
-            controller.themeBtn.setVisible(config.displayThemePicker());
             if (!config.displayMinimizeButton()) {
                 ((GridPane) controller.minimizeBtn.getParent()).getChildren().remove(controller.minimizeBtn);
+            }
+
+            if (!config.displayThemePicker()) {
+                ((GridPane) controller.themeBtn.getParent()).getChildren().remove(controller.themeBtn);
             }
         });
         return controller;
@@ -106,7 +109,6 @@ public class TitleBarController {
     public void setTitle(String title) {
         Platform.runLater(() -> titleLabel.setText(title));
     }
-
 
     public void handleCloseAction(MouseEvent event) {
         config.onCloseClicked();

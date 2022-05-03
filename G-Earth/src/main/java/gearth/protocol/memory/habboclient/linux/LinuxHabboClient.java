@@ -10,7 +10,7 @@ import java.util.*;
 public class LinuxHabboClient extends HabboClient {
 
 
-    private static final String[] potentialProcessNames = {"--ppapi-flash-args", "plugin-container", "Habbo.exe"};
+    private static final String[] potentialProcessNames = {"--ppapi-flash-args", "plugin-container", "Habbo"};
 
     List<PotentialHabboProcess> potentialProcesses = new ArrayList<>();
 
