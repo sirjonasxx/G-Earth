@@ -3,10 +3,8 @@ package gearth;
 import gearth.misc.AdminValidator;
 import gearth.misc.Cacher;
 import gearth.misc.UpdateChecker;
-import gearth.misc.listenerpattern.Observable;
 import gearth.misc.listenerpattern.ObservableObject;
 import gearth.ui.GEarthController;
-import gearth.ui.subforms.logger.loggerdisplays.PacketLogger;
 import gearth.ui.themes.Theme;
 import gearth.ui.themes.ThemeFactory;
 import gearth.ui.titlebar.TitleBarConfig;
@@ -19,9 +17,6 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import sun.misc.Cache;
-
-import java.util.function.Consumer;
 
 public class GEarth extends Application {
 

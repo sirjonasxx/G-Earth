@@ -1,8 +1,5 @@
 package gearth.protocol.connection.proxy.unity;
 
-import javafx.beans.InvalidationListener;
-import org.eclipse.jetty.websocket.jsr356.annotations.JsrParamIdText;
-
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
