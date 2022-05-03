@@ -106,7 +106,7 @@ public final class NetworkExtensionsProducer implements ExtensionProducer {
                                 if (headerId == NetworkExtensionInfo.INCOMING_MESSAGES_IDS.EXTENSIONINFO) {
 
                                     if (bodyLength > MAX_PACKET_BODY_SIZE) {
-                                        System.err.printf("Incoming packet(h=%d, l=%d) exceeds max packet body size %d.", headerId, bodyLength, MAX_PACKET_BODY_SIZE);
+                                        System.err.printf("Incoming packet(h=%d, l=%d) exceeds max packet body size %d.\n", headerId, bodyLength, MAX_PACKET_BODY_SIZE);
                                         break;
                                     }
 
