@@ -118,7 +118,7 @@ tasks.jpackageImage {
                      *
                      * Which can be found here: https://github.com/dorving/g_mem_mac
                      */
-                    include("g_mem_mac")
+                    include("G-Mem")
                 }
             }
             into("$buildDir/jpackage/$outPath/app")
