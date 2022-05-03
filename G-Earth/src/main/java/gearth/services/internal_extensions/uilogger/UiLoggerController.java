@@ -46,7 +46,6 @@ public class UiLoggerController implements Initializable {
     public CheckMenuItem chkMessageHash;
     public CheckMenuItem chkMessageId;
     public Label lblPacketInfo;
-    public CheckMenuItem chkUseNewStructures;
     public CheckMenuItem chkAlwaysOnTop;
 
     public CheckMenuItem chkOpenOnConnect;
@@ -130,7 +129,7 @@ public class UiLoggerController implements Initializable {
     public void initialize(URL arg0, ResourceBundle arg1) {
         allMenuItems.addAll(Arrays.asList(
                 chkViewIncoming, chkViewOutgoing, chkDisplayStructure, chkAutoscroll,
-                chkSkipBigPackets, chkMessageName, chkMessageHash, chkMessageId, chkUseNewStructures,
+                chkSkipBigPackets, chkMessageName, chkMessageHash, chkMessageId,
                 chkOpenOnConnect, chkResetOnConnect, chkHideOnDisconnect, chkResetOnDisconnect,
                 chkAntiSpam_none, chkAntiSpam_low, chkAntiSpam_medium, chkAntiSpam_high, chkAntiSpam_ultra,
                 chkTimestamp, chkReprHex, chkReprLegacy, chkReprRawHex, chkReprNone
@@ -286,7 +285,7 @@ public class UiLoggerController implements Initializable {
 
         if (packet.length() <= 2000) {
             try {
-                String expr = packet.toExpression(isIncoming ? HMessage.Direction.TOCLIENT : HMessage.Direction.TOSERVER, uiLogger.getPacketInfoManager(), chkUseNewStructures.isSelected());
+                String expr = packet.toExpression(isIncoming ? HMessage.Direction.TOCLIENT : HMessage.Direction.TOSERVER, uiLogger.getPacketInfoManager(), true);
                 String cleaned = cleanTextContent(expr);
                 if (cleaned.equals(expr)) {
                     if (!expr.equals("") && chkDisplayStructure.isSelected()) {
