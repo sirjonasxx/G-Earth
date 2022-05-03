@@ -67,7 +67,6 @@
                        </items>
                      </Menu>
                      <CheckMenuItem fx:id="chkDisplayStructure" mnemonicParsing="false" selected="true" text="Structure" />
-                     <CheckMenuItem fx:id="chkUseNewStructures" mnemonicParsing="false" selected="true" text="New structures" />
                      <CheckMenuItem fx:id="chkTimestamp" mnemonicParsing="false" text="Timestamp" />
                  </items>
                </Menu>
