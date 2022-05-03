@@ -12,6 +12,9 @@ repositories {
     mavenCentral()
 }
 
+/**
+ * TODO: move dependency version declarations to different gradle file
+ */
 dependencies {
     implementation(files("libs/G-Wasm-Minimal-1.0.3.jar"))
     implementation("at.favre.lib:bytes:1.5.0")
@@ -20,11 +23,11 @@ dependencies {
     implementation("commons-io:commons-io:2.10.0")
     implementation("javax.websocket:javax.websocket-api:1.1")
     implementation("org.apache.maven:maven-artifact:3.6.3")
-    implementation("org.eclipse.jetty:jetty-server:9.4.41.v20210516")
-    implementation("org.eclipse.jetty.websocket:javax-websocket-server-impl:9.4.41.v20210516")   {
+    implementation("org.eclipse.jetty:jetty-server:9.4.43.v20210629")
+    implementation("org.eclipse.jetty.websocket:javax-websocket-server-impl:9.4.43.v20210629")   {
         exclude("javax.websocket", "javax.websocket-client-api")
     }
-    implementation("org.eclipse.jetty:jetty-http:9.4.41.v20210516")
+    implementation("org.eclipse.jetty:jetty-http:9.4.43.v20210629")
     implementation("org.fxmisc.richtext:richtextfx:0.10.5")
     implementation("org.json:json:20190722")
     implementation("org.jsoup:jsoup:1.14.2")
