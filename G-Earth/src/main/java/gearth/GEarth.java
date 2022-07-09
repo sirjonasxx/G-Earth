@@ -14,6 +14,7 @@ import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -160,5 +161,9 @@ public class GEarth extends Application {
 
     public static Theme getTheme() {
         return observableTheme.getObject();
+    }
+
+    public static void setAlertOwner(Alert alert) {
+        alert.initOwner(main.stage);
     }
 }

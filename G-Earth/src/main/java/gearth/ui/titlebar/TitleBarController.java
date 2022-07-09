@@ -49,6 +49,7 @@ public class TitleBarController {
     }
 
     public static TitleBarController create(Alert alert) throws IOException {
+        GEarth.setAlertOwner(alert);
 
         FXMLLoader loader = new FXMLLoader(TitleBarController.class.getResource("Titlebar.fxml"));
         Parent titleBar = loader.load();
