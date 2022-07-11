@@ -2,7 +2,7 @@ package gearth.services.internal_extensions.extensionstore.tools;
 
 import gearth.GEarth;
 import gearth.misc.OSValidator;
-import gearth.services.extension_handler.extensions.implementations.network.authentication.Authenticator;
+import gearth.services.extension_handler.extensions.implementations.network.NetworkExtensionAuthenticator;
 import gearth.services.extension_handler.extensions.implementations.network.executer.ExecutionInfo;
 import gearth.services.extension_handler.extensions.implementations.network.executer.NormalExtensionRunner;
 import gearth.services.internal_extensions.extensionstore.repository.StoreFetch;
@@ -33,7 +33,7 @@ public class StoreExtensionTools {
 
     }
 
-    public final static String EXTENSIONS_PATH = Paths.get(NormalExtensionRunner.JARPATH, ExecutionInfo.EXTENSIONSDIRECTORY).toString();
+    public final static String EXTENSIONS_PATH = Paths.get(NormalExtensionRunner.JAR_PATH, ExecutionInfo.EXTENSIONS_DIRECTORY).toString();
 
 
     public static void executeExtension(String extensionPath, int port) {
@@ -41,7 +41,7 @@ public class StoreExtensionTools {
             String installedExtensionId = Paths.get(extensionPath).getFileName().toString();
 
             String commandPath = Paths.get(extensionPath, "command.txt").toString();
-            String cookie = Authenticator.generateCookieForExtension(installedExtensionId);
+            String cookie = NetworkExtensionAuthenticator.generateCookieForExtension(installedExtensionId);
             List<String> command = new JSONArray(FileUtils.readFileToString(new File(commandPath), "UTF-8"))
                     .toList().stream().map(o -> (String)o).map(s -> s
                             .replace("{port}", port+"")

@@ -2,8 +2,8 @@ package gearth.ui.subforms.extensions;
 
 import gearth.services.extension_handler.ExtensionHandler;
 import gearth.services.extension_handler.extensions.ExtensionListener;
-import gearth.services.extension_handler.extensions.implementations.network.NetworkExtensionsProducer;
-import gearth.services.extension_handler.extensions.implementations.network.authentication.Authenticator;
+import gearth.services.extension_handler.extensions.implementations.network.NetworkExtensionServer;
+import gearth.services.extension_handler.extensions.implementations.network.NetworkExtensionAuthenticator;
 import gearth.services.extension_handler.extensions.implementations.network.executer.ExecutionInfo;
 import gearth.services.extension_handler.extensions.implementations.network.executer.ExtensionRunner;
 import gearth.services.extension_handler.extensions.implementations.network.executer.ExtensionRunnerFactory;
@@ -36,7 +36,7 @@ public class ExtensionsController extends SubForm {
 
     private ExtensionRunner extensionRunner = null;
     private ExtensionHandler extensionHandler;
-    private NetworkExtensionsProducer networkExtensionsProducer; // needed for port
+    private NetworkExtensionServer networkExtensionsProducer; // needed for port
     private ExtensionLogger extensionLogger = null;
 
 
@@ -56,8 +56,8 @@ public class ExtensionsController extends SubForm {
 
         //noinspection OptionalGetWithoutIsPresent
         networkExtensionsProducer
-                = (NetworkExtensionsProducer) extensionHandler.getExtensionProducers().stream()
-                .filter(producer1 -> producer1 instanceof NetworkExtensionsProducer)
+                = (NetworkExtensionServer) extensionHandler.getExtensionProducers().stream()
+                .filter(producer1 -> producer1 instanceof NetworkExtensionServer)
                 .findFirst().get();
 
 
@@ -82,7 +82,7 @@ public class ExtensionsController extends SubForm {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Install extension");
         fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("G-Earth extensions", ExecutionInfo.ALLOWEDEXTENSIONTYPES));
+                new FileChooser.ExtensionFilter("G-Earth extensions", ExecutionInfo.ALLOWED_EXTENSION_TYPES));
         File selectedFile = fileChooser.showOpenDialog(parentController.getStage());
         if (selectedFile != null) {
             extensionRunner.installAndRunExtension(selectedFile.getPath(), networkExtensionsProducer.getPort());
@@ -118,7 +118,7 @@ public class ExtensionsController extends SubForm {
         GPythonShell shell = new GPythonShell(
                 "Scripting shell " + gpytonShellCounter++,
                 networkExtensionsProducer.getPort(),
-                Authenticator.generatePermanentCookie()
+                NetworkExtensionAuthenticator.generatePermanentCookie()
         );
         shell.launch((b) -> {
             pythonShellLaunching = false;

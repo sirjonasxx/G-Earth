@@ -1,12 +1,14 @@
 package gearth.extensions;
 
 import gearth.misc.HostInfo;
+import gearth.services.extension_handler.extensions.implementations.network.NetworkExtensionMessage;
+import gearth.services.extension_handler.extensions.implementations.network.NetworkExtensionMessage.Incoming;
+import gearth.services.extension_handler.extensions.implementations.network.NetworkExtensionMessage.Outgoing;
 import gearth.services.packet_info.PacketInfoManager;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 import gearth.protocol.connection.HClient;
 import gearth.services.Constants;
-import gearth.services.extension_handler.extensions.implementations.network.NetworkExtensionInfo;
 
 import java.io.*;
 import java.net.Socket;
@@ -108,10 +110,10 @@ public abstract class Extension extends ExtensionBase {
                 packet.fixLength();
 
 
-                if (packet.headerId() == NetworkExtensionInfo.OUTGOING_MESSAGES_IDS.INFOREQUEST) {
+                if (packet.headerId() == Outgoing.InfoRequest.HEADER_ID) {
                     ExtensionInfo info = getInfoAnnotations();
 
-                    HPacket response = new HPacket(NetworkExtensionInfo.INCOMING_MESSAGES_IDS.EXTENSIONINFO);
+                    HPacket response = new HPacket(Incoming.ExtensionInfo.HEADER_ID);
                     response.appendString(info.Title())
                             .appendString(info.Author())
                             .appendString(info.Version())
@@ -124,7 +126,7 @@ public abstract class Extension extends ExtensionBase {
                             .appendBoolean(canDelete());
                     writeToStream(response.toBytes());
                 }
-                else if (packet.headerId() == NetworkExtensionInfo.OUTGOING_MESSAGES_IDS.CONNECTIONSTART) {
+                else if (packet.headerId() == Outgoing.ConnectionStart.HEADER_ID) {
                     String host = packet.readString();
                     int connectionPort = packet.readInteger();
                     String hotelVersion = packet.readString();
@@ -143,10 +145,10 @@ public abstract class Extension extends ExtensionBase {
                     );
                     onStartConnection();
                 }
-                else if (packet.headerId() == NetworkExtensionInfo.OUTGOING_MESSAGES_IDS.CONNECTIONEND) {
+                else if (packet.headerId() == Outgoing.ConnectionEnd.HEADER_ID) {
                     onEndConnection();
                 }
-                else if (packet.headerId() == NetworkExtensionInfo.OUTGOING_MESSAGES_IDS.FLAGSCHECK) {
+                else if (packet.headerId() == Outgoing.FlagsCheck.HEADER_ID) {
                     // body = an array of G-Earths gearth flags
                     if (flagRequestCallback != null) {
                         int arraysize = packet.readInteger();
@@ -158,7 +160,7 @@ public abstract class Extension extends ExtensionBase {
                     }
                     flagRequestCallback = null;
                 }
-                else if (packet.headerId() == NetworkExtensionInfo.OUTGOING_MESSAGES_IDS.INIT) {
+                else if (packet.headerId() == Outgoing.Init.HEADER_ID) {
                     delayed_init = packet.readBoolean();
                     HostInfo hostInfo = HostInfo.fromPacket(packet);
                     updateHostInfo(hostInfo);
@@ -167,21 +169,21 @@ public abstract class Extension extends ExtensionBase {
                     }
                     writeToConsole("green","Extension \"" + getInfoAnnotations().Title() + "\" successfully initialized", false);
                 }
-                else if (packet.headerId() == NetworkExtensionInfo.OUTGOING_MESSAGES_IDS.ONDOUBLECLICK) {
+                else if (packet.headerId() == Outgoing.OnDoubleClick.HEADER_ID) {
                     onClick();
                 }
-                else if (packet.headerId() == NetworkExtensionInfo.OUTGOING_MESSAGES_IDS.PACKETINTERCEPT) {
+                else if (packet.headerId() == Outgoing.PacketIntercept.HEADER_ID) {
                     String stringifiedMessage = packet.readLongString();
                     HMessage habboMessage = new HMessage(stringifiedMessage);
 
                     modifyMessage(habboMessage);
 
-                    HPacket response = new HPacket(NetworkExtensionInfo.INCOMING_MESSAGES_IDS.MANIPULATEDPACKET);
+                    HPacket response = new HPacket(Incoming.ManipulatedPacket.MANIPULATED_PACKET);
                     response.appendLongString(habboMessage.stringify());
 
                     writeToStream(response.toBytes());
                 }
-                else if (packet.headerId() == NetworkExtensionInfo.OUTGOING_MESSAGES_IDS.UPDATEHOSTINFO) {
+                else if (packet.headerId() == Outgoing.UpdateHostInfo.HEADER_ID) {
                     HostInfo hostInfo = HostInfo.fromPacket(packet);
                     updateHostInfo(hostInfo);
                 }
@@ -231,7 +233,7 @@ public abstract class Extension extends ExtensionBase {
         if (!packet.isPacketComplete()) packet.completePacket(packetInfoManager);
         if (!packet.isPacketComplete()) return false;
 
-        HPacket packet1 = new HPacket(NetworkExtensionInfo.INCOMING_MESSAGES_IDS.SENDMESSAGE);
+        HPacket packet1 = new HPacket(Incoming.SendMessage.HEADER_ID);
         packet1.appendByte(direction == HMessage.Direction.TOCLIENT ? (byte)0 : (byte)1);
         packet1.appendInt(packet.getBytesLength());
         packet1.appendBytes(packet.toBytes());
@@ -253,7 +255,7 @@ public abstract class Extension extends ExtensionBase {
         if (this.flagRequestCallback != null) return false;
         this.flagRequestCallback = flagRequestCallback;
         try {
-            writeToStream(new HPacket(NetworkExtensionInfo.INCOMING_MESSAGES_IDS.REQUESTFLAGS).toBytes());
+            writeToStream(new HPacket(Incoming.RequestFlags.HEADER_ID).toBytes());
             return true;
         } catch (IOException e) {
             e.printStackTrace();
@@ -279,7 +281,7 @@ public abstract class Extension extends ExtensionBase {
     private void writeToConsole(String colorClass, String s, boolean mentionTitle) {
         String text = "[" + colorClass + "]" + (mentionTitle ? (getInfoAnnotations().Title() + " --> ") : "") + s;
 
-        HPacket packet = new HPacket(NetworkExtensionInfo.INCOMING_MESSAGES_IDS.EXTENSIONCONSOLELOG);
+        HPacket packet = new HPacket(Incoming.ExtensionConsoleLog.HEADER_ID);
         packet.appendString(text);
         try {
             writeToStream(packet.toBytes());

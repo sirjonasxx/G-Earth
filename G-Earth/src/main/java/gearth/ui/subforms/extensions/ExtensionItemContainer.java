@@ -95,7 +95,7 @@ public class ExtensionItemContainer extends GridPane {
         reloadButton.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
             reloadButton.setVisible(false);
             ExtensionRunner runner = ExtensionRunnerFactory.get();
-            runner.tryRunExtension(Paths.get(NormalExtensionRunner.JARPATH, ExecutionInfo.EXTENSIONSDIRECTORY, item.getFileName()).toString(), port);
+            runner.tryRunExtension(Paths.get(NormalExtensionRunner.JAR_PATH, ExecutionInfo.EXTENSIONS_DIRECTORY, item.getFileName()).toString(), port);
         });
 
         DeleteButton deleteButton = new DeleteButton();
