@@ -12,7 +12,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -41,7 +43,7 @@ public final class NormalExtensionRunner implements ExtensionRunner {
     @Override
     public void runAllExtensions(int port) {
 
-        if (dirExists(ExecutionInfo.EXTENSIONS_DIRECTORY)){
+        if (dirExists(ExecutionInfo.EXTENSIONS_DIRECTORY)) {
 
             final File extensionsDirectory = Paths.get(JAR_PATH, ExecutionInfo.EXTENSIONS_DIRECTORY).toFile();
             final File[] extensionFiles = extensionsDirectory.listFiles();
@@ -68,7 +70,7 @@ public final class NormalExtensionRunner implements ExtensionRunner {
         final String[] split = name.split("\\.");
         final String ext = "*." + split[split.length - 1];
 
-        final String realName = String.join(".",Arrays.copyOf(split, split.length-1));
+        final String realName = String.join(".", Arrays.copyOf(split, split.length - 1));
         final String newName = realName + "-" + getRandomString() + ext.substring(1);
 
         final Path newPath = Paths.get(JAR_PATH, ExecutionInfo.EXTENSIONS_DIRECTORY, newName);
@@ -101,7 +103,7 @@ public final class NormalExtensionRunner implements ExtensionRunner {
             for (int i = 0; i < execCommand.length; i++) {
                 execCommand[i] = execCommand[i]
                         .replace("{path}", path)
-                        .replace("{port}", port+"")
+                        .replace("{port}", port + "")
                         .replace("{filename}", filename)
                         .replace("{cookie}", cookie);
             }
@@ -110,36 +112,37 @@ public final class NormalExtensionRunner implements ExtensionRunner {
             final Process process = processBuilder.start();
 
             maybeLogExtension(path, process);
+
         } catch (IOException e) {
             LOGGER.error("Failed to run extension at path {} using port {}", path, port, e);
         }
     }
 
+
     public static void maybeLogExtension(String path, Process process) {
         if (GEarth.hasFlag(ExtensionRunner.SHOW_EXTENSIONS_LOG)) {
 
-            final String separator = "" + System.lineSeparator();
-            LOGGER.info(path + separator + "Launching" + separator + "----------" + separator);
+            final Logger logger = LoggerFactory.getLogger(path);
+
+            logger.info("Launching...");
 
             final BufferedReader processInputReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-
             new Thread(() -> {
                 try {
                     String line;
-                    while((line = processInputReader.readLine()) != null)
-                        LOGGER.info(path + separator + "Output" + separator + line + separator + "----------" + separator);
+                    while ((line = processInputReader.readLine()) != null)
+                        logger.info(line);
                 } catch (IOException e) {
                     LOGGER.error("Failed to read input line from process {}", process, e);
                 }
-            }).start();
+            }, path+"-input").start();
 
             final BufferedReader processErrorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
             new Thread(() -> {
                 try {
                     String line;
-                    while((line = processErrorReader.readLine()) != null) {
-                        LOGGER.error(path + separator + "Error" + separator + line + separator + "----------" + separator);
-                    }
+                    while ((line = processErrorReader.readLine()) != null)
+                        logger.error(line);
                 } catch (IOException e) {
                     LOGGER.error("Failed to read error line from process {}", process, e);
                 }
