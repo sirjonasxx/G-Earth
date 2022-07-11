@@ -10,6 +10,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
 import io.netty.util.Attribute;
@@ -21,6 +22,7 @@ import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.ServerSocket;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 
 import static gearth.services.extension_handler.extensions.implementations.network.NetworkExtensionMessage.*;
@@ -52,8 +54,9 @@ public final class NetworkExtensionServer implements ExtensionProducer {
     public void startProducing(ExtensionProducerObserver observer) {
 
         final ServerBootstrap bootstrap = new ServerBootstrap()
-                .option(ChannelOption.TCP_NODELAY, true)
+                .channel(NioServerSocketChannel.class)
                 .childHandler(new Initializer(observer))
+                .childOption(ChannelOption.TCP_NODELAY, true)
                 .group(new NioEventLoopGroup());
 
         port = PORT_ONSET;
@@ -141,6 +144,10 @@ public final class NetworkExtensionServer implements ExtensionProducer {
         protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
             switch (stage) {
                 case LENGTH:
+
+                    if (in.readableBytes() < HEADER_LENGTH)
+                        return;
+
                     payloadLength = in.readInt();
                     stage = Stage.PAYLOAD;
                 break;
@@ -219,6 +226,7 @@ public final class NetworkExtensionServer implements ExtensionProducer {
         @Override
         public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
             LOGGER.trace("Channel unregistered (channel={})", ctx.channel());
+            close(ctx);
             super.channelUnregistered(ctx);
         }
 
@@ -251,7 +259,19 @@ public final class NetworkExtensionServer implements ExtensionProducer {
         @Override
         public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
             LOGGER.error("Channel exception caught (channel={}), closing channel", ctx.channel(), cause);
-            ctx.channel().close();
+            close(ctx);
+        }
+
+        private void close(ChannelHandlerContext ctx) {
+            final Optional<NetworkExtensionClient> optionalClient = findClient(ctx);
+            if (optionalClient.isPresent())
+                optionalClient.get().close();
+            else
+                ctx.channel().close();
+        }
+
+        private Optional<NetworkExtensionClient> findClient(ChannelHandlerContext ctx) {
+            return Optional.ofNullable(ctx.attr(CLIENT).get());
         }
     }
 }

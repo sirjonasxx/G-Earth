@@ -103,7 +103,84 @@ public final class NetworkExtensionCodec {
     }
 
     static {
-        // incoming
+        registerOutgoingMessages();
+        registerIncomingMessages();
+    }
+
+    private static void registerIncomingMessages() {
+        register(Incoming.ExtensionInfo.HEADER_ID,
+                Incoming.ExtensionInfo.class,
+                (message, hPacket) -> {
+                    hPacket.appendString(message.getTitle());
+                    hPacket.appendString(message.getAuthor());
+                    hPacket.appendString(message.getVersion());
+                    hPacket.appendString(message.getDescription());
+                    hPacket.appendBoolean(message.isOnClickUsed());
+                    hPacket.appendBoolean(message.getFile() != null);
+                    hPacket.appendString(Optional.ofNullable(message.getFile()).orElse(""));
+                    hPacket.appendString(Optional.ofNullable(message.getCookie()).orElse(""));
+                    hPacket.appendBoolean(message.isCanLeave());
+                    hPacket.appendBoolean(message.isCanDelete());
+                },
+                (hPacket -> {
+                    final String title = hPacket.readString();
+                    final String author = hPacket.readString();
+                    final String version = hPacket.readString();
+                    final String description = hPacket.readString();
+                    final boolean isOnClickUsed = hPacket.readBoolean();
+                    final boolean hasFile = hPacket.readBoolean();
+                    String file = hPacket.readString();
+                    if (!hasFile)
+                        file = null;
+                    String cookie = hPacket.readString();
+                    if (cookie.isEmpty())
+                        cookie = null;
+                    final boolean canLeave = hPacket.readBoolean();
+                    final boolean canDelete = hPacket.readBoolean();
+                    return new Incoming.ExtensionInfo(title, author, version, description, isOnClickUsed, file, cookie, canLeave, canDelete);
+                }));
+        register(Incoming.ManipulatedPacket.MANIPULATED_PACKET,
+                Incoming.ManipulatedPacket.class,
+                (message, hPacket) -> hPacket.appendLongString(message.gethMessage().stringify()),
+                (hPacket -> {
+                    final String packetString = hPacket.readLongString(6);
+                    final HMessage hMessage = new HMessage(packetString);
+                    return new Incoming.ManipulatedPacket(hMessage);
+                }));
+        register(Incoming.SendMessage.HEADER_ID,
+                Incoming.SendMessage.class,
+                ((message, hPacket) -> {
+                    hPacket.appendByte((byte) (message.getDirection() == TOCLIENT ? 0 : 1));
+                    hPacket.appendInt(message.getPacket().getBytesLength());
+                    hPacket.appendBytes(message.getPacket().toBytes());
+                }),
+                (hPacket -> {
+                    final byte side = hPacket.readByte();
+                    final int length = hPacket.readInteger();
+                    final byte[] data = hPacket.readBytes(length);
+                    final HPacket packet = new HPacket(data);
+                    return new Incoming.SendMessage(packet, side == 0 ? TOCLIENT : TOSERVER);
+                }));
+        register(Incoming.RequestFlags.HEADER_ID,
+                Incoming.RequestFlags.class,
+                (message, hPacket) -> {
+                },
+                (hPacket -> new Incoming.RequestFlags()));
+        register(Incoming.ExtensionConsoleLog.HEADER_ID,
+                Incoming.ExtensionConsoleLog.class,
+                (message, hPacket) -> hPacket.appendString(message.getContents()),
+                (hPacket -> new Incoming.ExtensionConsoleLog(hPacket.readString())));
+        register(Incoming.PacketToStringRequest.HEADER_ID,
+                Incoming.PacketToStringRequest.class,
+                (message, hPacket) -> hPacket.appendLongString(message.getString()),
+                (hPacket -> new Incoming.PacketToStringRequest(hPacket.readLongString())));
+        register(Incoming.StringToPacketRequest.HEADER_ID,
+                Incoming.StringToPacketRequest.class,
+                (message, hPacket) -> hPacket.appendLongString(message.getString(), StandardCharsets.UTF_8),
+                (hPacket -> new Incoming.StringToPacketRequest(hPacket.readLongString(StandardCharsets.UTF_8))));
+    }
+
+    private static void registerOutgoingMessages() {
         register(Outgoing.InfoRequest.HEADER_ID,
                 Outgoing.InfoRequest.class,
                 (message, hPacket) -> {
@@ -178,88 +255,25 @@ public final class NetworkExtensionCodec {
                 (message, hPacket) -> hPacket.appendLongString(message.getString()),
                 (hPacket -> new Outgoing.StringToPacketResponse(hPacket.readLongString()))
         );
-        // outgoing
-        register(Incoming.ExtensionInfo.HEADER_ID,
-                Incoming.ExtensionInfo.class,
-                (message, hPacket) -> {
-                    hPacket.appendString(message.getTitle());
-                    hPacket.appendString(message.getAuthor());
-                    hPacket.appendString(message.getVersion());
-                    hPacket.appendString(message.getDescription());
-                    hPacket.appendBoolean(message.isOnClickUsed());
-                    hPacket.appendBoolean(message.getFile() != null);
-                    hPacket.appendString(Optional.ofNullable(message.getFile()).orElse(""));
-                    hPacket.appendString(Optional.ofNullable(message.getCookie()).orElse(""));
-                    hPacket.appendBoolean(message.isCanLeave());
-                    hPacket.appendBoolean(message.isCanDelete());
-                },
-                (hPacket -> {
-                    final String title = hPacket.readString();
-                    final String author = hPacket.readString();
-                    final String version = hPacket.readString();
-                    final String description = hPacket.readString();
-                    final boolean isOnClickUsed = hPacket.readBoolean();
-                    final boolean hasFile = hPacket.readBoolean();
-                    String file = hPacket.readString();
-                    if (!hasFile)
-                        file = null;
-                    String cookie = hPacket.readString();
-                    if (cookie.isEmpty())
-                        cookie = null;
-                    final boolean canLeave = hPacket.readBoolean();
-                    final boolean canDelete = hPacket.readBoolean();
-                    return new Incoming.ExtensionInfo(title, author, version, description, isOnClickUsed, file, cookie, canLeave, canDelete);
-                }));
-        register(Incoming.ManipulatedPacket.MANIPULATED_PACKET,
-                Incoming.ManipulatedPacket.class,
-                (message, hPacket) -> hPacket.appendLongString(message.gethMessage().stringify()),
-                (hPacket -> {
-                    final String packetString = hPacket.readLongString(6);
-                    final HMessage hMessage = new HMessage(packetString);
-                    return new Incoming.ManipulatedPacket(hMessage);
-                }));
-        register(Incoming.SendMessage.HEADER_ID,
-                Incoming.SendMessage.class,
-                ((message, hPacket) -> {
-                    hPacket.appendByte((byte) (message.getDirection() == TOCLIENT ? 0 : 1));
-                    hPacket.appendInt(message.getPacket().getBytesLength());
-                    hPacket.appendBytes(message.getPacket().toBytes());
-                }),
-                (hPacket -> {
-                    final byte side = hPacket.readByte();
-                    final int length = hPacket.readInteger();
-                    final byte[] data = hPacket.readBytes(length);
-                    final HPacket packet = new HPacket(data);
-                    return new Incoming.SendMessage(packet, side == 0 ? TOCLIENT : TOSERVER);
-                }));
-        register(Incoming.RequestFlags.HEADER_ID,
-                Incoming.RequestFlags.class,
-                (message, hPacket) -> {
-                },
-                (hPacket -> new Incoming.RequestFlags()));
-        register(Incoming.ExtensionConsoleLog.HEADER_ID,
-                Incoming.ExtensionConsoleLog.class,
-                (message, hPacket) -> hPacket.appendString(message.getContents()),
-                (hPacket -> new Incoming.ExtensionConsoleLog(hPacket.readString())));
-        register(Incoming.PacketToStringRequest.HEADER_ID,
-                Incoming.PacketToStringRequest.class,
-                (message, hPacket) -> hPacket.appendLongString(message.getString()),
-                (hPacket -> new Incoming.PacketToStringRequest(hPacket.readLongString())));
-        register(Incoming.StringToPacketRequest.HEADER_ID,
-                Incoming.StringToPacketRequest.class,
-                (message, hPacket) -> hPacket.appendLongString(message.getString(), StandardCharsets.UTF_8),
-                (hPacket -> new Incoming.StringToPacketRequest(hPacket.readLongString(StandardCharsets.UTF_8))));
     }
 
     private static <T extends NetworkExtensionMessage> void register(final int headerId, Class<T> tClass, BiConsumer<T, HPacket> writer, Function<HPacket, T> reader) {
         final PacketStructure packetStructure = new PacketStructure(headerId, tClass.getSimpleName(), writer, reader);
         if (tClass.getSuperclass() == Outgoing.class)
-            incomingPacketStructures.put(headerId, packetStructure);
-        else
             outgoingPacketStructures.put(tClass, packetStructure);
+        else
+            incomingPacketStructures.put(headerId, packetStructure);
     }
 
-
+    /**
+     * Represents the packet structure of a {@link NetworkExtensionMessage}.
+     *
+     * Can be used to {@link PacketStructure#writer write} messages to packets
+     * and {@link PacketStructure#reader read} messages from packets.
+     *
+     * @apiNote At the moment both outgoing and incoming messages have a reader and writer defined,
+     *          this is so that in the future the same codec can be used for the Extensions API.
+     */
     static class PacketStructure {
 
         private final int headerId;

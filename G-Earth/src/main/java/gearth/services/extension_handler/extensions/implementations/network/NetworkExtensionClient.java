@@ -98,6 +98,8 @@ public final class NetworkExtensionClient extends GEarthExtension {
             channel.close();
         } catch (Exception e){
             LOGGER.error("Failed to close client (channel={})", channel, e);
+        } finally {
+            hasClosed();
         }
     }
 
