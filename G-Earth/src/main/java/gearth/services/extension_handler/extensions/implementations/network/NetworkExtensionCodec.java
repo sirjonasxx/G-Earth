@@ -252,9 +252,7 @@ public final class NetworkExtensionCodec {
     }
 
     private static <T extends NetworkExtensionMessage> void register(final int headerId, Class<T> tClass, BiConsumer<T, HPacket> writer, Function<HPacket, T> reader) {
-        final PacketStructure packetStructure = new PacketStructure(headerId, tClass.getSimpleName(),
-                writer,
-                reader);
+        final PacketStructure packetStructure = new PacketStructure(headerId, tClass.getSimpleName(), writer, reader);
         if (tClass.getSuperclass() == Outgoing.class)
             incomingPacketStructures.put(headerId, packetStructure);
         else

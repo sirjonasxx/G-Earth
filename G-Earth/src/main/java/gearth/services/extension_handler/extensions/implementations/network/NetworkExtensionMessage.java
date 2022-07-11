@@ -8,10 +8,30 @@ import gearth.services.packet_info.PacketInfoManager;
 
 import java.util.List;
 
+/**
+ * Represents a message send or received by G-Earth and a remote extension.
+ *
+ * @see NetworkExtensionCodec the encoding/decoding structures
+ * @see Incoming messages coming from the remote extension to G-Earth
+ * @see Outgoing messages coming from G-Earth to the remote extension
+ *
+ * @author Dorving, Jonas
+ */
 public class NetworkExtensionMessage {
 
+    /**
+     * Represents {@link  NetworkExtensionMessage messages} coming from the remote extension to G-Earth.
+     */
     public static class Incoming extends NetworkExtensionMessage {
 
+        /**
+         * This contains info about the remote extension trying to connect.
+         *
+         * Once this {@link NetworkExtensionMessage message} is received,
+         * a new {@link  NetworkExtensionClient} is created to handle the communication.
+         *
+         * @see Outgoing.InfoRequest the request.
+         */
         public static class ExtensionInfo extends Incoming {
 
             public static final int HEADER_ID = 1;
@@ -75,10 +95,20 @@ public class NetworkExtensionMessage {
             }
         }
 
+        /**
+         * Remote extension request G-Earth's flags.
+         *
+         * @see Outgoing.FlagsCheck the response.
+         */
         public static class RequestFlags extends Incoming {
             public static final int HEADER_ID = 3;
         }
 
+        /**
+         * Received a {@link HPacket} from the remote connection
+         * and forward it either to the game {@link HMessage.Direction#TOSERVER server}
+         * or game {@link  HMessage.Direction#TOCLIENT client}.
+         */
         public static class SendMessage extends Incoming {
 
             public static final int HEADER_ID = 4;
@@ -100,6 +130,11 @@ public class NetworkExtensionMessage {
             }
         }
 
+        /**
+         * TODO: add documentation.
+         *
+         * @see Outgoing.PacketToStringResponse the response.
+         */
         public static class PacketToStringRequest extends Incoming {
 
             public static final int HEADER_ID = 20;
@@ -115,6 +150,11 @@ public class NetworkExtensionMessage {
             }
         }
 
+        /**
+         * TODO: add documentation.
+         *
+         * @see Outgoing.StringToPacketResponse the response.
+         */
         public static class StringToPacketRequest extends Incoming {
 
             public static final int HEADER_ID = 21;
@@ -130,6 +170,9 @@ public class NetworkExtensionMessage {
             }
         }
 
+        /**
+         * TODO: add documentation.
+         */
         public static class ExtensionConsoleLog extends Incoming {
 
             public static final int HEADER_ID = 98;
@@ -145,6 +188,11 @@ public class NetworkExtensionMessage {
             }
         }
 
+        /**
+         * Represents a packet modified by the remote extension.
+         *
+         * @see Outgoing.PacketIntercept the ougoing message containing the original packet.
+         */
         public static class ManipulatedPacket extends Incoming {
             public static final int MANIPULATED_PACKET = 2;
             private final HMessage hMessage;
@@ -158,17 +206,34 @@ public class NetworkExtensionMessage {
             }
         }
     }
-
+    /**
+     * Represents {@link  NetworkExtensionMessage messages} coming from G-Earth to the remote extension.
+     */
     public static class Outgoing extends NetworkExtensionMessage{
 
+        /**
+         * The extension has been double-clicked from within G-Earth.
+         */
         public static class OnDoubleClick extends Outgoing {
             public static final int HEADER_ID = 1;
         }
 
+        /**
+         * Request for remote extension to send {@link Incoming.ExtensionInfo}.
+         *
+         * This is the very first message send after a connection is established.
+         *
+         * @see Incoming.ExtensionInfo the response.
+         */
         public static class InfoRequest extends Outgoing {
             public static final int HEADER_ID = 2;
         }
 
+        /**
+         * Forwards a packet intercepted by G-Earth to the remote extension.
+         *
+         * @see Incoming.ManipulatedPacket the response.
+         */
         public static class PacketIntercept extends Outgoing {
 
             public static final int HEADER_ID = 3;
@@ -184,6 +249,11 @@ public class NetworkExtensionMessage {
             }
         }
 
+        /**
+         * Contains program arguments of G-Earth.
+         *
+         * @see Incoming.RequestFlags the request.
+         */
         public static class FlagsCheck extends Outgoing {
 
             public static final int HEADER_ID = 4;
@@ -199,6 +269,11 @@ public class NetworkExtensionMessage {
             }
         }
 
+        /**
+         * Notifies remote extension that a connection to a hotel has been established.
+         *
+         * @apiNote could check this yourself as well (listen to out:4000 packet)
+         */
         public static class ConnectionStart extends Outgoing {
 
             public static final int HEADER_ID = 5;
@@ -244,10 +319,16 @@ public class NetworkExtensionMessage {
             }
         }
 
+        /**
+         * Notifies a remote extension that the connection to the hotel has been closed.
+         */
         public static class ConnectionEnd extends Outgoing {
             public static final int HEADER_ID = 6;
         }
 
+        /**
+         * Notifies a remote extension that it has been accepted by G-Earth.
+         */
         public static class Init extends Outgoing {
 
             public static final int HEADER_ID = 7;
@@ -269,6 +350,9 @@ public class NetworkExtensionMessage {
             }
         }
 
+        /**
+         * TODO: add documentation.
+         */
         public static class UpdateHostInfo extends Outgoing {
 
             public static final int HEADER_ID = 10;
@@ -284,6 +368,11 @@ public class NetworkExtensionMessage {
             }
         }
 
+        /**
+         * TODO: add documentation.
+         *
+         * @see Incoming.PacketToStringRequest the request.
+         */
         public static class PacketToStringResponse extends Outgoing {
 
             public static final int HEADER_ID = 20;
@@ -305,6 +394,11 @@ public class NetworkExtensionMessage {
             }
         }
 
+        /**
+         * TODO: add documentation.
+         *
+         * @see Incoming.StringToPacketRequest the request.
+         */
         public static class StringToPacketResponse extends Outgoing {
 
             public static final int HEADER_ID = 21;
