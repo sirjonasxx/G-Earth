@@ -230,7 +230,7 @@ public final class NetworkExtensionServer implements ExtensionProducer {
             if (msg instanceof Incoming.ExtensionInfo) {
                 if (client != null)
                     LOGGER.warn("Overriding pre-existing CLIENT for channel (client={}, channel={})", client, channel);
-                client = new NetworkExtensionClient((Incoming.ExtensionInfo) msg, channel);
+                client = new NetworkExtensionClient(channel, (Incoming.ExtensionInfo) msg);
                 if (NetworkExtensionAuthenticator.evaluate(client)) {
                     LOGGER.info("Successfully authenticated client {}", client);
                     clientAttribute.set(client);
