@@ -1,5 +1,6 @@
 package gearth.services.internal_extensions.extensionstore.application.entities.search;
 
+import gearth.GEarth;
 import gearth.services.internal_extensions.extensionstore.GExtensionStore;
 import gearth.services.internal_extensions.extensionstore.application.entities.ContentItem;
 import gearth.services.internal_extensions.extensionstore.application.entities.HOverview;
@@ -27,7 +28,7 @@ public class SearchOverview extends HOverview {
 
     @Override
     public String buttonText() {
-        return "Search";
+        return GEarth.translation.getString("ext.store.button.search");
     }
 
     @Override
@@ -74,17 +75,17 @@ public class SearchOverview extends HOverview {
 
             @Override
             public String title() {
-                return "Search";
+                return GEarth.translation.getString("ext.store.search.title");
             }
 
             @Override
             public String description() {
-                return "Find the extension that fits your needs";
+                return GEarth.translation.getString("ext.store.search.description");
             }
 
             @Override
             public String contentTitle() {
-                return "Search extensions";
+                return GEarth.translation.getString("ext.store.search.contenttitle");
             }
         };
     }

@@ -1,5 +1,6 @@
 package gearth.services.internal_extensions.extensionstore.application.entities.queriedoverviews;
 
+import gearth.GEarth;
 import gearth.misc.OSValidator;
 import gearth.services.internal_extensions.extensionstore.application.entities.HOverview;
 import gearth.services.internal_extensions.extensionstore.repository.StoreRepository;
@@ -31,17 +32,17 @@ public class ByUpdateOverview extends QueriedExtensionOverview {
 
             @Override
             public String title() {
-                return "Recently Updated";
+                return GEarth.translation.getString("ext.store.search.ordering.byupdate.title");
             }
 
             @Override
             public String description() {
-                return "Extensions that were recently updated";
+                return GEarth.translation.getString("ext.store.search.ordering.byupdate.description");
             }
 
             @Override
             public String contentTitle() {
-                return "Recently Updated";
+                return GEarth.translation.getString("ext.store.search.ordering.byupdate.contenttitle");
             }
         };
     }

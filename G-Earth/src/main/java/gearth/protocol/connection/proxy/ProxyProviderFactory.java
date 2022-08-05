@@ -108,9 +108,7 @@ public class ProxyProviderFactory {
 
                 Platform.runLater(() -> {
                     Alert alert = new Alert(Alert.AlertType.ERROR, "", ButtonType.OK);
-                    alert.getDialogPane().getChildren().add(new Label("G-Earth is already connected to this hotel.\n" +
-                            "Due to current limitations you can only connect one session per hotel to G-Earth in Raw IP mode on Windows.\n\n" +
-                            "You can bypass this by using a SOCKS proxy [Extra -> Advanced -> SOCKS]"));
+                    alert.getDialogPane().getChildren().add(new Label(GEarth.translation.getString("alert.alreadyconnected.content").replaceAll("\\\\n", System.lineSeparator())));
                     alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
                     alert.setResizable(false);
                     try {

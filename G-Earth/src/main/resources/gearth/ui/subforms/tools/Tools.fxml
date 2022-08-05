@@ -46,7 +46,7 @@
             <GridPane.margin>
                 <Insets/>
             </GridPane.margin>
-            <Label alignment="CENTER" text="Integer:">
+            <Label alignment="CENTER" text="%tab.tools.type.integer">
                 <GridPane.margin>
                     <Insets left="10.0"/>
                 </GridPane.margin>
@@ -59,7 +59,7 @@
             </TextField>
             <Button fx:id="btnEncodeInt" disable="true" maxHeight="1.7976931348623157E308"
                     maxWidth="1.7976931348623157E308" mnemonicParsing="false"
-                    onAction="#btnEncodeInt_clicked" text="Encode" GridPane.columnIndex="2"
+                    onAction="#btnEncodeInt_clicked" text="%tab.tools.button.encode" GridPane.columnIndex="2"
                     GridPane.halignment="CENTER">
                 <GridPane.margin>
                     <Insets bottom="7.0" left="5.0" right="5.0" top="7.0"/>
@@ -67,7 +67,7 @@
             </Button>
             <Button fx:id="btnDecodeInt" disable="true" maxHeight="1.7976931348623157E308"
                     maxWidth="1.7976931348623157E308" mnemonicParsing="false"
-                    onAction="#btnDecodeInt_clicked" text="Decode" GridPane.columnIndex="3"
+                    onAction="#btnDecodeInt_clicked" text="%tab.tools.button.decode" GridPane.columnIndex="3"
                     GridPane.halignment="CENTER">
                 <GridPane.margin>
                     <Insets bottom="7.0" left="5.0" right="5.0" top="7.0"/>
@@ -80,7 +80,7 @@
                 </GridPane.margin>
             </TextField>
 
-            <Label alignment="CENTER" text="Ushort:" GridPane.rowIndex="1">
+            <Label alignment="CENTER" text="%tab.tools.type.ushort" GridPane.rowIndex="1">
                 <GridPane.margin>
                     <Insets left="10.0"/>
                 </GridPane.margin>
@@ -94,7 +94,7 @@
             </TextField>
             <Button fx:id="btnEncodeUShort" disable="true" maxHeight="1.7976931348623157E308"
                     maxWidth="1.7976931348623157E308" mnemonicParsing="false"
-                    onAction="#btnEncodeUShort_clicked" text="Encode" GridPane.columnIndex="2"
+                    onAction="#btnEncodeUShort_clicked" text="%tab.tools.button.encode" GridPane.columnIndex="2"
                     GridPane.halignment="CENTER" GridPane.rowIndex="1">
                 <GridPane.margin>
                     <Insets bottom="7.0" left="5.0" right="5.0" top="7.0"/>
@@ -102,7 +102,7 @@
             </Button>
             <Button fx:id="btnDecodeUshort" disable="true" maxHeight="1.7976931348623157E308"
                     maxWidth="1.7976931348623157E308" mnemonicParsing="false"
-                    onAction="#btnDecodeUshort_clicked" text="Decode" GridPane.columnIndex="3"
+                    onAction="#btnDecodeUshort_clicked" text="%tab.tools.button.decode" GridPane.columnIndex="3"
                     GridPane.halignment="CENTER" GridPane.rowIndex="1">
                 <GridPane.margin>
                     <Insets bottom="7.0" left="5.0" right="5.0" top="7.0"/>
@@ -116,7 +116,7 @@
             </TextField>
 
         </GridPane>
-        <Label text="Encoding/decoding" textFill="#000000cc">
+        <Label text="%tab.tools.encodingdecoding" textFill="#000000cc">
             <GridPane.margin>
                 <Insets left="6.0" top="5.0"/>
             </GridPane.margin>
@@ -179,7 +179,7 @@
                 </GridPane.margin>
             </TextArea>
         </GridPane>
-        <Label text="Packet &lt;-&gt; expression" textFill="#000000cc">
+        <Label text="%tab.tools.packettoexpression" textFill="#000000cc">
             <GridPane.margin>
                 <Insets left="6.0" top="2.0"/>
             </GridPane.margin>

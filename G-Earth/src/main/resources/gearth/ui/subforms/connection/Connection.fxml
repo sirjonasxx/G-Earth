@@ -45,7 +45,7 @@
                 <rowConstraints>
                     <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                 </rowConstraints>
-                <Label text="Port:" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
+                <Label text="%tab.connection.port" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
                 <ComboBox fx:id="inpPort" disable="true" editable="true" prefWidth="183.0" GridPane.columnIndex="1">
                     <GridPane.margin>
                         <Insets right="15.0" />
@@ -60,7 +60,7 @@
                 <rowConstraints>
                     <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                 </rowConstraints>
-                <Label text="Host:" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
+                <Label text="%tab.connection.host" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
                 <ComboBox fx:id="inpHost" disable="true" editable="true" GridPane.columnIndex="1">
                     <GridPane.margin>
                         <Insets right="15.0" />
@@ -78,7 +78,7 @@
                     <RowConstraints />
                     <RowConstraints />
                 </rowConstraints>
-                <CheckBox fx:id="cbx_autodetect" mnemonicParsing="false" selected="true" text="Auto-detect" textFill="#000000a9" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                <CheckBox fx:id="cbx_autodetect" mnemonicParsing="false" selected="true" text="%tab.connection.autodetect" textFill="#000000a9" GridPane.columnIndex="1" GridPane.rowIndex="3">
                     <GridPane.margin>
                         <Insets left="-5.0" />
                     </GridPane.margin>
@@ -86,7 +86,7 @@
                         <Font size="12.0" />
                     </font>
                 </CheckBox>
-                <Button fx:id="btnConnect" alignment="CENTER" maxWidth="1.7976931348623157E308" onAction="#btnConnect_clicked" text="Connect" GridPane.halignment="CENTER" GridPane.rowIndex="3" GridPane.valignment="CENTER">
+                <Button fx:id="btnConnect" alignment="CENTER" maxWidth="1.7976931348623157E308" onAction="#btnConnect_clicked" text="%tab.connection.connect" GridPane.halignment="CENTER" GridPane.rowIndex="3" GridPane.valignment="CENTER">
                     <GridPane.margin>
                         <Insets left="15.0" right="15.0" />
                     </GridPane.margin>
@@ -114,7 +114,7 @@
                 <RowConstraints maxHeight="86.0" minHeight="10.0" prefHeight="40.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <Label text="Hotel version:" textFill="#000000cc" />
+                  <Label text="%tab.connection.version" textFill="#000000cc" />
                   <TextField fx:id="txtfield_hotelversion" editable="false" prefHeight="17.0" prefWidth="285.0" GridPane.rowIndex="1">
                      <opaqueInsets>
                         <Insets />
@@ -140,12 +140,12 @@
                   <RowConstraints minHeight="20.0" prefHeight="34.0" vgrow="SOMETIMES" />
                </rowConstraints>
                <children>
-                  <Label maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Client type:" textFill="#000000cd">
+                  <Label maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="%tab.connection.client" textFill="#000000cd">
                      <padding>
                         <Insets left="12.0" />
                      </padding>
                   </Label>
-                  <RadioButton fx:id="rd_unity" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Unity" GridPane.columnIndex="3" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS">
+                  <RadioButton fx:id="rd_unity" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="%tab.connection.client.unity" GridPane.columnIndex="3" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS">
                      <toggleGroup>
                         <ToggleGroup fx:id="tgl_clientMode" />
                      </toggleGroup>
@@ -153,12 +153,12 @@
                         <Insets />
                      </GridPane.margin>
                   </RadioButton>
-                  <RadioButton fx:id="rd_flash" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="35.0" prefWidth="111.0" selected="true" text="Flash / Air" toggleGroup="$tgl_clientMode" GridPane.columnIndex="2">
+                  <RadioButton fx:id="rd_flash" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="35.0" prefWidth="111.0" selected="true" text="%tab.connection.client.flash" toggleGroup="$tgl_clientMode" GridPane.columnIndex="2">
                      <GridPane.margin>
                         <Insets />
                      </GridPane.margin>
                   </RadioButton>
-                  <RadioButton fx:id="rd_nitro" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="22.0" prefWidth="54.0" text="Nitro" toggleGroup="$tgl_clientMode" GridPane.columnIndex="4">
+                  <RadioButton fx:id="rd_nitro" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="22.0" prefWidth="54.0" text="%tab.connection.client.nitro" toggleGroup="$tgl_clientMode" GridPane.columnIndex="4">
                      <GridPane.margin>
                         <Insets />
                      </GridPane.margin>
@@ -196,7 +196,7 @@
             <GridPane.margin>
                 <Insets bottom="14.0" left="20.0" right="20.0" />
             </GridPane.margin>
-            <Label text="Connection state:" textFill="#000000ba" GridPane.valignment="BOTTOM">
+            <Label text="%tab.connection.state" textFill="#000000ba" GridPane.valignment="BOTTOM">
                 <GridPane.margin>
                     <Insets bottom="5.0" left="2.0" />
                 </GridPane.margin>
@@ -204,7 +204,7 @@
                     <Font size="12.0" />
                 </font>
             </Label>
-            <Label fx:id="lblState" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-border-color: #888888; -fx-border-radius: 5px;" text="Not connected" textAlignment="CENTER" textFill="#000000d1" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS">
+            <Label fx:id="lblState" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-border-color: #888888; -fx-border-radius: 5px;" text="%tab.connection.state.notconnected" textAlignment="CENTER" textFill="#000000d1" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS">
                 <GridPane.margin>
                     <Insets />
                 </GridPane.margin>
@@ -225,12 +225,12 @@
             <padding>
                 <Insets bottom="7.0" top="7.0" />
             </padding>
-            <Label text="Game host:" textFill="#000000cc">
+            <Label text="%tab.connection.host" textFill="#000000cc">
                 <GridPane.margin>
                     <Insets left="10.0" />
                 </GridPane.margin>
             </Label>
-            <Label text="Port:" textFill="#000000cc" GridPane.rowIndex="1">
+            <Label text="%tab.connection.port" textFill="#000000cc" GridPane.rowIndex="1">
                 <GridPane.margin>
                     <Insets left="10.0" />
                 </GridPane.margin>

@@ -1,5 +1,6 @@
 package gearth.services.internal_extensions.extensionstore.application.entities.categories;
 
+import gearth.GEarth;
 import gearth.services.internal_extensions.extensionstore.GExtensionStore;
 import gearth.services.internal_extensions.extensionstore.application.GExtensionStoreController;
 import gearth.services.internal_extensions.extensionstore.application.WebUtils;
@@ -58,7 +59,7 @@ public class CategoryItem implements ContentItem {
                 .append("</div>")
 
                 .append("<div onclick=\"").append(id).append(".onClick()\" class=\"overview_item_msgs clickable\">")
-                .append("<div class=\"oim_top\">").append(releasesCount).append(" releases").append("</div>")
+                .append("<div class=\"oim_top\">").append(releasesCount).append(" ").append(GEarth.translation.getString("ext.store.extension.author.releases")).append("</div>")
 //                .append("<div class=\"oim_bottom\">").append(storeExtension.getFramework().getFramework().getName().replace("Native", "")).append(" </div>")
                 .append("</div>")
 

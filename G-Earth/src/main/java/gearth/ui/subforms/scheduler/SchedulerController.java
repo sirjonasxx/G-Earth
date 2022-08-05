@@ -1,6 +1,7 @@
 package gearth.ui.subforms.scheduler;
 
 import com.tulskiy.keymaster.common.Provider;
+import gearth.GEarth;
 import gearth.services.scheduler.Interval;
 import gearth.services.scheduler.Scheduler;
 import javafx.application.Platform;
@@ -56,9 +57,9 @@ public class SchedulerController extends SubForm {
         txt_packet.textProperty().addListener(event -> Platform.runLater(this::updateUI));
         txt_delay.textProperty().addListener(event -> Platform.runLater(this::updateUI));
 
-        btn_clear.setTooltip(new Tooltip("Clear all items"));
-        btn_save.setTooltip(new Tooltip("Save to file"));
-        btn_load.setTooltip(new Tooltip("Load from file"));
+        btn_clear.setTooltip(new Tooltip(GEarth.translation.getString("tab.scheduler.button.clear.tooltip")));
+        btn_save.setTooltip(new Tooltip(GEarth.translation.getString("tab.scheduler.button.save.tooltip")));
+        btn_load.setTooltip(new Tooltip(GEarth.translation.getString("tab.scheduler.button.load.tooltip")));
 
         updateUI();
 
@@ -157,7 +158,7 @@ public class SchedulerController extends SubForm {
                 rb_outgoing.setSelected(newItem.getDestinationProperty().get() == HMessage.Direction.TOSERVER);
 
                 isBeingEdited = newItem;
-                btn_addoredit.setText("Edit");
+                btn_addoredit.setText(GEarth.translation.getString("tab.scheduler.button.edit"));
                 updateUI();
                 newItem.onIsBeingUpdatedTrigger();
             }
@@ -175,7 +176,7 @@ public class SchedulerController extends SubForm {
         rb_incoming.setSelected(true);
         rb_outgoing.setSelected(false);
 
-        btn_addoredit.setText("Add");
+        btn_addoredit.setText(GEarth.translation.getString("tab.scheduler.button.add"));
         updateUI();
     }
 
@@ -203,9 +204,9 @@ public class SchedulerController extends SubForm {
 
         //Set extension filter
         FileChooser.ExtensionFilter extFilter =
-                new FileChooser.ExtensionFilter("SCHED files (*.sched)", "*.sched");
+                new FileChooser.ExtensionFilter(GEarth.translation.getString("tab.scheduler.filetype"), "*.sched");
         fileChooser.getExtensionFilters().add(extFilter);
-        fileChooser.setTitle("Save Schedule File");
+        fileChooser.setTitle(GEarth.translation.getString("tab.scheduler.button.save.windowtitle"));
 
         //Show save file dialog
         File file = fileChooser.showSaveDialog(parentController.getStage());
@@ -234,9 +235,9 @@ public class SchedulerController extends SubForm {
         List<InteractableScheduleItem> list = new ArrayList<>();
 
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Load Schedule File");
+        fileChooser.setTitle(GEarth.translation.getString("tab.scheduler.button.load.windowtitle"));
         fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Schedule Files", "*.sched"));
+                new FileChooser.ExtensionFilter(GEarth.translation.getString("tab.scheduler.filetype"), "*.sched"));
         File selectedFile = fileChooser.showOpenDialog(parentController.getStage());
         if (selectedFile != null) {
 

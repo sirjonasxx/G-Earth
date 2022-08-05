@@ -53,14 +53,12 @@ public class NitroHttpProxy {
 
         Platform.runLater(() -> {
             Alert alert = ConfirmationDialog.createAlertWithOptOut(Alert.AlertType.WARNING, ADMIN_WARNING_KEY,
-                    "Root certificate installation", null,
-                    "", "Remember my choice",
+                    GEarth.translation.getString("alert.rootcertificate.title"), null,
+                    "", GEarth.translation.getString("alert.rootcertificate.remember"),
                     ButtonType.YES, ButtonType.NO
             );
 
-            alert.getDialogPane().setContent(new Label("G-Earth detected that you do not have the root certificate authority installed.\n" +
-                    "This is required for Nitro to work, do you want to continue?\n" +
-                    "G-Earth will ask you for Administrator permission if you do so."));
+            alert.getDialogPane().setContent(new Label(GEarth.translation.getString("alert.rootcertificate.content").replaceAll("\\\\n", System.lineSeparator())));
 
             try {
                 shouldInstall.set(TitleBarController.create(alert).showAlertAndWait()

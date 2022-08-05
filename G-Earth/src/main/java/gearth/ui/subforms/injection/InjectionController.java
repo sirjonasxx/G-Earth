@@ -1,5 +1,6 @@
 package gearth.ui.subforms.injection;
 
+import gearth.GEarth;
 import gearth.misc.Cacher;
 import gearth.services.packet_info.PacketInfoManager;
 import gearth.protocol.HMessage;
@@ -52,7 +53,7 @@ public class InjectionController extends SubForm {
             }
         });
 
-        lblHistory.setTooltip(new Tooltip("Double click a packet to restore it"));
+        lblHistory.setTooltip(new Tooltip(GEarth.translation.getString("tab.injection.history.tooltip")));
 
         List<Object> rawHistory = Cacher.getList(HISTORY_CACHE_KEY);
         if (rawHistory != null) {
@@ -103,7 +104,7 @@ public class InjectionController extends SubForm {
     private void updateUI() {
         boolean dirty = false;
 
-        lbl_corrruption.setText("isCorrupted: False");
+        lbl_corrruption.setText(GEarth.translation.getString("tab.injection.corrupted.false"));
         lbl_corrruption.getStyleClass().clear();
         lbl_corrruption.getStyleClass().add("not-corrupted-label");
 
@@ -119,7 +120,7 @@ public class InjectionController extends SubForm {
         for (int i = 0; i < packets.length; i++) {
             if (packets[i].isCorrupted()) {
                 if (!dirty) {
-                    lbl_corrruption.setText("isCorrupted: True -> " + i);
+                    lbl_corrruption.setText(String.format("%s -> %d", GEarth.translation.getString("tab.injection.corrupted.true"), i));
                     lbl_corrruption.getStyleClass().clear();
                     lbl_corrruption.getStyleClass().add("corrupted-label");
                     dirty = true;
@@ -129,7 +130,7 @@ public class InjectionController extends SubForm {
         }
 
         if (dirty && packets.length == 1) {
-            lbl_corrruption.setText("isCorrupted: True"); // no index needed
+            lbl_corrruption.setText(GEarth.translation.getString("tab.injection.corrupted.true")); // no index needed
         }
 
         if (!dirty) {
@@ -147,15 +148,23 @@ public class InjectionController extends SubForm {
             btn_sendToClient.setDisable(!canSendToClient || getHConnection().getState() != HState.CONNECTED);
             btn_sendToServer.setDisable(!canSendToServer || getHConnection().getState() != HState.CONNECTED);
             if (packets.length == 1) {
-                lbl_pcktInfo.setText("header (id:" + packets[0].headerId() + ", length:" +
-                        packets[0].length() + ")");
+                lbl_pcktInfo.setText(String.format("%s (%s: %d, %s: %d)",
+                        GEarth.translation.getString("tab.injection.description.header"),
+                        GEarth.translation.getString("tab.injection.description.id"),
+                        packets[0].headerId(),
+                        GEarth.translation.getString("tab.injection.description.length"),
+                        packets[0].length()));
             }
             else {
                 lbl_pcktInfo.setText("");
             }
         } else {
             if (packets.length == 1) {
-                lbl_pcktInfo.setText("header (id:NULL, length:" + packets[0].getBytesLength()+")");
+                lbl_pcktInfo.setText(String.format("%s (%s:NULL, %s: %d)",
+                        GEarth.translation.getString("tab.injection.description.header"),
+                        GEarth.translation.getString("tab.injection.description.id"),
+                        GEarth.translation.getString("tab.injection.description.length"),
+                        packets[0].getBytesLength()));
             }
             else {
                 lbl_pcktInfo.setText("");
@@ -171,7 +180,7 @@ public class InjectionController extends SubForm {
         HPacket[] packets = parsePackets(inputPacket.getText());
         for (HPacket packet : packets) {
             getHConnection().sendToServer(packet);
-            writeToLog(Color.BLUE, "SS -> packet with id: " + packet.headerId());
+            writeToLog(Color.BLUE, String.format("SS -> %s: %d", GEarth.translation.getString("tab.injection.log.packetwithid"), packet.headerId()));
         }
 
         addToHistory(packets, inputPacket.getText(), HMessage.Direction.TOSERVER);
@@ -181,7 +190,7 @@ public class InjectionController extends SubForm {
         HPacket[] packets = parsePackets(inputPacket.getText());
         for (HPacket packet : packets) {
             getHConnection().sendToClient(packet);
-            writeToLog(Color.RED, "CS -> packet with id: " + packet.headerId());
+            writeToLog(Color.RED, String.format("CS -> %s: %d", GEarth.translation.getString("tab.injection.log.packetwithid"), packet.headerId()));
         }
 
         addToHistory(packets, inputPacket.getText(), HMessage.Direction.TOCLIENT);

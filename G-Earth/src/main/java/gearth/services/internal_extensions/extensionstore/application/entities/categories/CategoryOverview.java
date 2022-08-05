@@ -1,5 +1,6 @@
 package gearth.services.internal_extensions.extensionstore.application.entities.categories;
 
+import gearth.GEarth;
 import gearth.services.internal_extensions.extensionstore.GExtensionStore;
 import gearth.services.internal_extensions.extensionstore.application.entities.ContentItem;
 import gearth.services.internal_extensions.extensionstore.application.entities.HOverview;
@@ -57,17 +58,17 @@ public class CategoryOverview extends HOverview {
 
             @Override
             public String title() {
-                return "Categories";
+                return GEarth.translation.getString("ext.store.categories.title");
             }
 
             @Override
             public String description() {
-                return "Explore the different kinds of extensions G-Earth has to offer";
+                return GEarth.translation.getString("ext.store.categories.description");
             }
 
             @Override
             public String contentTitle() {
-                return "Categories";
+                return GEarth.translation.getString("ext.store.categories.contenttitle");
             }
         };
     }

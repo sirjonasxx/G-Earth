@@ -1,5 +1,6 @@
 package gearth.services.internal_extensions.extensionstore.application.entities.queriedoverviews;
 
+import gearth.GEarth;
 import gearth.misc.OSValidator;
 import gearth.services.internal_extensions.extensionstore.application.WebUtils;
 import gearth.services.internal_extensions.extensionstore.application.entities.HOverview;
@@ -47,7 +48,7 @@ public class CategorizedOverview extends QueriedExtensionOverview {
 
             @Override
             public String contentTitle() {
-                return "Category: " + category.getName();
+                return GEarth.translation.getString("ext.store.category") + ": " + category.getName();
             }
         };
     }

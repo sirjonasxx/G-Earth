@@ -126,7 +126,7 @@ public abstract class FlashProxyProvider implements ProxyProvider {
     protected void showInvalidConnectionError() {
         Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.ERROR, "", ButtonType.OK);
-            alert.getDialogPane().getChildren().add(new Label("You entered invalid connection information, G-Earth could not connect"));
+            alert.getDialogPane().getChildren().add(new Label(GEarth.translation.getString("alert.invalidconnection.content")));
             alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
             alert.setResizable(false);
             try {

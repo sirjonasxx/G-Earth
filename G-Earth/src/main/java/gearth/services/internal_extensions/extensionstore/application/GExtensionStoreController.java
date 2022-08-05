@@ -107,6 +107,7 @@ public class GExtensionStoreController implements Initializable {
         });
 
         webView.getEngine().load(GExtensionStoreController.class.getResource("webview/index.html").toString());
+
     }
 
 

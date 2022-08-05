@@ -1,5 +1,6 @@
 package gearth.services.internal_extensions.extensionstore.application.entities.search;
 
+import gearth.GEarth;
 import gearth.services.internal_extensions.extensionstore.GExtensionStore;
 import gearth.services.internal_extensions.extensionstore.application.GExtensionStoreController;
 import gearth.services.internal_extensions.extensionstore.application.entities.ContentItem;
@@ -92,13 +93,13 @@ public class SearchComponent implements ContentItem {
                 .append("<div class=\"searchInnerContainer\">")
 
                 .append("<div class=\"centeredFlex\">")
-                .append("<label for=\"keyword\">Search by keyword:</label>")
+                .append("<label for=\"keyword\">").append(GEarth.translation.getString("ext.store.search.bykeyword")).append(":</label>")
                 .append(String.format("<input id=\"keyword\" value=\"%s\" name=\"keyword\" class=\"inputBox\" type=\"text\" " +
                         "oninput=\"%s.setSearchKeyword(this.value);\">", searchKeyword, id))
                 .append("</div>")
 
                 .append("<div class=\"centeredFlex\">")
-                .append("<label for=\"ordering\">Extensions ordering:</label>");
+                .append("<label for=\"ordering\">").append(GEarth.translation.getString("ext.store.search.ordering")).append("</label>");
 
         // add ordering stuff
         htmlBuilder.append(String.format("<select class=\"inputBox\" name=\"ordering\" id=\"ordering\" " +
@@ -119,13 +120,13 @@ public class SearchComponent implements ContentItem {
 
                 .append("<div class=\"filterStuff\">");
 
-        addFilterBoxHtml(htmlBuilder, "Client", "Clients:", clients, id);
-        addFilterBoxHtml(htmlBuilder, "Category", "Categories:", categories, id);
-        addFilterBoxHtml(htmlBuilder, "Framework", "Frameworks:", frameworks, id);
+        addFilterBoxHtml(htmlBuilder, "Client", GEarth.translation.getString("ext.store.search.filter.clients") + ":", clients, id);
+        addFilterBoxHtml(htmlBuilder, "Category", GEarth.translation.getString("ext.store.search.filter.categories") + ":", categories, id);
+        addFilterBoxHtml(htmlBuilder, "Framework", GEarth.translation.getString("ext.store.search.filter.frameworks") + ":", frameworks, id);
 
         htmlBuilder
                 .append("</div>")
-                .append("<br><p>Info: you are automatically filtering on the OS you use</p>")
+                .append("<br><p>").append(GEarth.translation.getString("ext.store.search.info.automaticosfiltering")).append("</p>")
 
                 .append("</div>")
                 .append("</div>");

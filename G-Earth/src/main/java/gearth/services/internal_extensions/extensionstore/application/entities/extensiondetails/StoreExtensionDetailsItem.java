@@ -1,5 +1,6 @@
 package gearth.services.internal_extensions.extensionstore.application.entities.extensiondetails;
 
+import gearth.GEarth;
 import gearth.services.internal_extensions.extensionstore.GExtensionStore;
 import gearth.services.internal_extensions.extensionstore.application.GExtensionStoreController;
 import gearth.services.internal_extensions.extensionstore.application.WebUtils;
@@ -45,32 +46,32 @@ public class StoreExtensionDetailsItem implements ContentItem {
 
         contentBuilder
                 .append(String.format("*%s*", storeExtension.getTitle())).append(" - v").append(storeExtension.getVersion()).append("\n\n")
-                .append("*Description*\n").append(descriptionQuoted).append("\n \n")
-                .append("*Author(s):* ").append(storeExtension.getAuthors().stream().map(StoreExtension.Author::getName).collect(Collectors.joining(", "))).append("\n\n")
-                .append("*Categories:* ").append(storeExtension.getCategories().stream().map(ExtCategory::getName).collect(Collectors.joining(", "))).append("\n\n");
+                .append("*").append(GEarth.translation.getString("ext.store.extension.details.description")).append(":*\n").append(descriptionQuoted).append("\n \n")
+                .append("*").append(GEarth.translation.getString("ext.store.extension.details.authors")).append(":* ").append(storeExtension.getAuthors().stream().map(StoreExtension.Author::getName).collect(Collectors.joining(", "))).append("\n\n")
+                .append("*").append(GEarth.translation.getString("ext.store.extension.details.categories")).append(":* ").append(storeExtension.getCategories().stream().map(ExtCategory::getName).collect(Collectors.joining(", "))).append("\n\n");
 
-        contentBuilder.append("*Technical information*").append("\n");
+        contentBuilder.append("*").append(GEarth.translation.getString("ext.store.extension.details.technical_information")).append("*").append("\n");
 
         if(storeExtension.getReleases() != null)
-            contentBuilder.append("> Releases: --url:Click Here-").append(storeExtension.getReleases()).append("\n");
+            contentBuilder.append("> ").append(GEarth.translation.getString("ext.store.extension.details.releases")).append(": --url:").append(GEarth.translation.getString("ext.store.extension.details.click_here")).append("-").append(storeExtension.getReleases()).append("\n");
 
-        contentBuilder.append("> Language: ").append(storeExtension.getLanguage()).append("\n")
-                .append("> Source: --url:Click Here-").append(storeExtension.getSource()).append("\n")
-                .append("> Framework: ").append(storeExtension.getFramework().getFramework().getName()).append(" - v").append(storeExtension.getFramework().getVersion()).append("\n")
-                .append("> Systems: ").append(String.join(", ", storeExtension.getCompatibility().getSystems())).append("\n \n");
+        contentBuilder.append("> ").append(GEarth.translation.getString("ext.store.extension.details.language")).append(": ").append(storeExtension.getLanguage()).append("\n")
+                .append("> ").append(GEarth.translation.getString("ext.store.extension.details.source")).append(": --url:").append(GEarth.translation.getString("ext.store.extension.details.click_here")).append("-").append(storeExtension.getSource()).append("\n")
+                .append("> ").append(GEarth.translation.getString("ext.store.extension.details.framework")).append(": ").append(storeExtension.getFramework().getFramework().getName()).append(" - v").append(storeExtension.getFramework().getVersion()).append("\n")
+                .append("> ").append(GEarth.translation.getString("ext.store.extension.details.systems")).append(": ").append(String.join(", ", storeExtension.getCompatibility().getSystems())).append("\n \n");
 
-        contentBuilder.append("*Compatible clients:* ").append(String.join(", ", storeExtension.getCompatibility().getClients())).append("\n\n");
+        contentBuilder.append("*").append(GEarth.translation.getString("ext.store.extension.details.clients")).append(":* ").append(String.join(", ", storeExtension.getCompatibility().getClients())).append("\n\n");
 
         if (storeExtension.getFramework().getFramework().isInstallationRequired()) {
-            contentBuilder.append("Warning: the framework requires --url:additional installations-")
+            contentBuilder.append(GEarth.translation.getString("ext.store.extension.warning.requirement"))
                     .append(storeExtension.getFramework().getFramework().getInstallationInstructions()).append(" !\n\n");
         }
         if (!storeExtension.isStable()) {
-            contentBuilder.append("Warning: this extension has been marked unstable!\n\n");
+            contentBuilder.append(GEarth.translation.getString("ext.store.extension.warning.unstable")).append("\n\n");
         }
 
         contentBuilder.append("--startdiv--")
-                .append("\n*Screenshot: *").append("\n")
+                .append("\n*").append(GEarth.translation.getString("ext.store.extension.details.screenshot")).append(": *").append("\n")
                 .append("--img:").append(gExtensionStore.getRepository().getResourceUrl("store", "extensions", storeExtension.getTitle(), "screenshot.png"))
                 .append(" --enddiv--");
 
@@ -151,8 +152,8 @@ public class StoreExtensionDetailsItem implements ContentItem {
                 .append("<div class=\"comment_body comment_open\">")
                 .append("<div class=\"cb_author\">")
                 .append("<div class=\"cba_name\">").append(WebUtils.escapeMessage(mainAuthor.getName())).append("</div>")
-                .append("<div class=\"cba_text\">").append(mainAuthor.getReputation()).append(" reputation</div>")
-                .append("<div class=\"cba_text\">").append(mainAuthor.getExtensionsCount()).append(" releases</div>")
+                .append("<div class=\"cba_text\">").append(mainAuthor.getReputation()).append(" ").append(GEarth.translation.getString("ext.store.extension.author.reputation")).append("</div>")
+                .append("<div class=\"cba_text\">").append(mainAuthor.getExtensionsCount()).append(" ").append(GEarth.translation.getString("ext.store.extension.author.releases")).append("</div>")
                 .append("<div class=\"cba_look\"><img src=\"").append(avatarLook).append("\" alt=\"\"></div>") // todo look
                 .append("</div>")
                 .append("<div class=\"cb_content\">").append(contentsInHtml()).append("</div>")

@@ -1,5 +1,6 @@
 package gearth.services.internal_extensions.extensionstore.application.entities.queriedoverviews;
 
+import gearth.GEarth;
 import gearth.misc.OSValidator;
 import gearth.services.internal_extensions.extensionstore.application.GExtensionStoreController;
 import gearth.services.internal_extensions.extensionstore.application.entities.HOverview;
@@ -32,17 +33,17 @@ public class ByRatingOverview extends QueriedExtensionOverview {
 
             @Override
             public String title() {
-                return "Popular Extensions";
+                return GEarth.translation.getString("ext.store.search.ordering.byrating.title");
             }
 
             @Override
             public String description() {
-                return "Extensions sorted by rating";
+                return GEarth.translation.getString("ext.store.search.ordering.byrating.description");
             }
 
             @Override
             public String contentTitle() {
-                return "Popular Extensions";
+                return GEarth.translation.getString("ext.store.search.ordering.byrating.contenttitle");
             }
         };
     }

@@ -1,5 +1,6 @@
 package gearth.services.internal_extensions.extensionstore.application.entities.installed;
 
+import gearth.GEarth;
 import gearth.services.internal_extensions.extensionstore.GExtensionStore;
 import gearth.services.internal_extensions.extensionstore.application.entities.ContentItem;
 import gearth.services.internal_extensions.extensionstore.application.entities.HOverview;
@@ -30,7 +31,7 @@ public class InstalledOverview extends HOverview {
 
     @Override
     public String buttonText() {
-        return "Open folder";
+        return GEarth.translation.getString("ext.store.overview.folder");
     }
 
     @Override
@@ -75,17 +76,17 @@ public class InstalledOverview extends HOverview {
 
             @Override
             public String title() {
-                return "Installed Extensions";
+                return GEarth.translation.getString("ext.store.overview.title");
             }
 
             @Override
             public String description() {
-                return "Extensions that are already installed into G-Earth";
+                return GEarth.translation.getString("ext.store.overview.description");
             }
 
             @Override
             public String contentTitle() {
-                return "Installed extensions";
+                return GEarth.translation.getString("ext.store.overview.contenttitle");
             }
         };
     }

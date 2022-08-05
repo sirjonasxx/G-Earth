@@ -54,11 +54,11 @@ public class InfoController extends SubForm {
     public void donate(ActionEvent actionEvent) {
         String pubkey = "1GEarthEV9Ua3RcixsKTcuc1PPZd9hqri3";
 
-        Alert alert = new Alert(Alert.AlertType.INFORMATION, "Donate Bitcoins", ButtonType.OK);
-        alert.setHeaderText("Donate Bitcoins");
+        Alert alert = new Alert(Alert.AlertType.INFORMATION, GEarth.translation.getString("tab.info.donate.alert.title"), ButtonType.OK);
+        alert.setHeaderText(GEarth.translation.getString("tab.info.donate.alert.title"));
 
         VBox test = new VBox();
-        test.getChildren().add(new Label("Bitcoin public address:"));
+        test.getChildren().add(new Label(GEarth.translation.getString("tab.info.donate.alert.content")));
         TextArea pubText = new TextArea(pubkey);
         pubText.setPrefHeight(28);
         pubText.setMaxWidth(250);

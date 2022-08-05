@@ -176,20 +176,20 @@ public class ConnectionController extends SubForm {
         getHConnection().getStateObservable().addListener((oldState, newState) -> Platform.runLater(() -> {
             updateInputUI();
             if (newState == HState.NOT_CONNECTED) {
-                lblState.setText("Not connected");
-                btnConnect.setText("Connect");
+                lblState.setText(GEarth.translation.getString("tab.connection.state.notconnected"));
+                btnConnect.setText(GEarth.translation.getString("tab.connection.connect"));
                 outHost.setText("");
                 outPort.setText("");
             }
             else if (oldState == HState.NOT_CONNECTED) {
-                btnConnect.setText("Abort");
+                btnConnect.setText(GEarth.translation.getString("tab.connection.abort"));
             }
 
             if (newState == HState.CONNECTED) {
-                lblState.setText("Connected");
+                lblState.setText(GEarth.translation.getString("tab.connection.state.connected"));
             }
             if (newState == HState.WAITING_FOR_CLIENT) {
-                lblState.setText("Waiting for connection");
+                lblState.setText(GEarth.translation.getString("tab.connection.state.waiting"));
             }
 
             if (newState == HState.CONNECTED && useFlash()) {

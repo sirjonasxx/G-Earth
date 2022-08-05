@@ -1,5 +1,6 @@
 package gearth.services.internal_extensions.extensionstore.application.entities.queriedoverviews;
 
+import gearth.GEarth;
 import gearth.misc.OSValidator;
 import gearth.services.internal_extensions.extensionstore.application.GExtensionStoreController;
 import gearth.services.internal_extensions.extensionstore.application.entities.HOverview;
@@ -32,17 +33,17 @@ public class ByDateOverview extends QueriedExtensionOverview {
 
             @Override
             public String title() {
-                return "New Releases";
+                return GEarth.translation.getString("ext.store.search.ordering.bydate.title");
             }
 
             @Override
             public String description() {
-                return "Extensions that were recently added to the G-ExtensionStore";
+                return GEarth.translation.getString("ext.store.search.ordering.bydate.description");
             }
 
             @Override
             public String contentTitle() {
-                return "New Releases";
+                return GEarth.translation.getString("ext.store.search.ordering.bydate.contenttitle");
             }
         };
     }

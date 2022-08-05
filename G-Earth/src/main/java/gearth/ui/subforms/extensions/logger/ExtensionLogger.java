@@ -38,7 +38,7 @@ public class ExtensionLogger {
 
 
             stage = new Stage();
-            stage.setTitle("G-Earth | Extension Console");
+            stage.setTitle(String.format("G-Earth | %s", GEarth.translation.getString("tab.extensions.button.logs.windowtitle")));
             stage.initModality(Modality.NONE);
             stage.setAlwaysOnTop(true);
             stage.setMinHeight(235);

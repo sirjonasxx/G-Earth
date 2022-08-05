@@ -72,10 +72,10 @@ public class Rc4Obtainer {
                 System.err.println("COULD NOT FIND RC4 TABLE");
 
                 Platform.runLater(() -> {
-                    Alert alert = new Alert(Alert.AlertType.WARNING, "Something went wrong!", ButtonType.OK);
+                    Alert alert = new Alert(Alert.AlertType.WARNING, GEarth.translation.getString("alert.somethingwentwrong.title"), ButtonType.OK);
 
                     FlowPane fp = new FlowPane();
-                    Label lbl = new Label("G-Earth has experienced an issue" + System.lineSeparator() + System.lineSeparator() + "Head over to our Troubleshooting page to solve the problem:");
+                    Label lbl = new Label(GEarth.translation.getString("alert.somethingwentwrong.content").replaceAll("\\\\n", System.lineSeparator()));
                     Hyperlink link = new Hyperlink("https://github.com/sirjonasxx/G-Earth/wiki/Troubleshooting");
                     fp.getChildren().addAll(lbl, link);
                     link.setOnAction(event -> {

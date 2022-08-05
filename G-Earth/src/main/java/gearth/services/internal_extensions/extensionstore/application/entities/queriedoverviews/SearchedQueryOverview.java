@@ -1,5 +1,6 @@
 package gearth.services.internal_extensions.extensionstore.application.entities.queriedoverviews;
 
+import gearth.GEarth;
 import gearth.misc.OSValidator;
 import gearth.services.internal_extensions.extensionstore.application.entities.HOverview;
 import gearth.services.internal_extensions.extensionstore.repository.StoreRepository;
@@ -48,17 +49,17 @@ public class SearchedQueryOverview extends QueriedExtensionOverview {
 
             @Override
             public String title() {
-                return "Search";
+                return GEarth.translation.getString("ext.store.search.title");
             }
 
             @Override
             public String description() {
-                return "Find the extension that fits your needs";
+                return GEarth.translation.getString("ext.store.search.description");
             }
 
             @Override
             public String contentTitle() {
-                return "Search results";
+                return GEarth.translation.getString("ext.store.search.results");
             }
         };
     }

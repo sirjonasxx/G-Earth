@@ -1,5 +1,6 @@
 package gearth.ui.subforms.extensions;
 
+import gearth.GEarth;
 import gearth.services.extension_handler.extensions.ExtensionType;
 import gearth.services.extension_handler.extensions.GEarthExtension;
 import gearth.ui.titlebar.TitleBarController;
@@ -80,7 +81,7 @@ public class ExtensionItemContainer extends GridPane {
         add(versionLabel, 3, 0);
 
         exitButton = new ExitButton();
-        Tooltip delete = new Tooltip("Close connection with this extension");
+        Tooltip delete = new Tooltip(GEarth.translation.getString("tab.extensions.table.edit.delete.tooltip"));
         Tooltip.install(exitButton,delete);
         exitButton.show();
         clickButton = new SimpleClickButton();
@@ -89,7 +90,7 @@ public class ExtensionItemContainer extends GridPane {
         buttonsBox = new HBox(clickButton, exitButton);
 
         reloadButton = new ReloadButton();
-        Tooltip reload = new Tooltip("Restart this extension");
+        Tooltip reload = new Tooltip(GEarth.translation.getString("tab.extensions.table.edit.restart.tooltip"));
         Tooltip.install(reloadButton, reload);
         reloadButton.show();
         reloadButton.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
@@ -99,7 +100,7 @@ public class ExtensionItemContainer extends GridPane {
         });
 
         DeleteButton deleteButton = new DeleteButton();
-        Tooltip uninstall = new Tooltip("Uninstall this extension");
+        Tooltip uninstall = new Tooltip(GEarth.translation.getString("tab.extensions.table.edit.uninstall.tooltip"));
         Tooltip.install(deleteButton, uninstall);
         deleteButton.show();
         GridPane this2 = this;
@@ -110,8 +111,8 @@ public class ExtensionItemContainer extends GridPane {
 
             if (ConfirmationDialog.showDialog(uninstallKey)) {
                 Alert alert = ConfirmationDialog.createAlertWithOptOut(Alert.AlertType.CONFIRMATION, uninstallKey
-                        ,"Confirmation Dialog", null,
-                        "Are you sure want to uninstall this extension?", "Do not ask again",
+                        , GEarth.translation.getString("alert.confirmation.windowtitle"), null,
+                        GEarth.translation.getString("tab.extensions.table.edit.uninstall.confirmation"), GEarth.translation.getString("alert.confirmation.button.donotaskagain"),
                         ButtonType.YES, ButtonType.NO
                 );
 

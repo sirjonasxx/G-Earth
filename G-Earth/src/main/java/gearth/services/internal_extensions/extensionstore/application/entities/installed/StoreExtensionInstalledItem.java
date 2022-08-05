@@ -1,5 +1,6 @@
 package gearth.services.internal_extensions.extensionstore.application.entities.installed;
 
+import gearth.GEarth;
 import gearth.services.internal_extensions.extensionstore.GExtensionStore;
 import gearth.services.internal_extensions.extensionstore.application.GExtensionStoreController;
 import gearth.services.internal_extensions.extensionstore.application.WebUtils;
@@ -55,11 +56,11 @@ public class StoreExtensionInstalledItem extends StoreExtensionItem {
 
                     .append("<div class=\"overview_item_info\">")
                     .append("<div class=\"oii_name\">").append(WebUtils.escapeMessage(installedExtension.getName())).append("</div>")
-                    .append("<div class=\"oii_desc\">Not found in G-ExtensionStore</div>")
+                    .append("<div class=\"oii_desc\">").append(GEarth.translation.getString("ext.store.extension.notinstore")).append("</div>")
                     .append("</div>")
 
                     .append("<div class=\"overview_item_msgs\">")
-                    .append("<div class=\"oim_top\">").append("Version: ").append(displayVersion()).append("</div>")
+                    .append("<div class=\"oim_top\">").append(GEarth.translation.getString("ext.store.extension.version")).append(": ").append(displayVersion()).append("</div>")
                     .append("<div class=\"oim_bottom\"></div>")
                     .append("</div>")
 

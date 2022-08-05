@@ -22,6 +22,8 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import sun.misc.Cache;
 
+import java.util.Locale;
+import java.util.ResourceBundle;
 import java.util.function.Consumer;
 
 public class GEarth extends Application {
@@ -30,6 +32,7 @@ public class GEarth extends Application {
     public static String version = "1.5.2";
     public static String gitApi = "https://api.github.com/repos/sirjonasxx/G-Earth/releases/latest";
     public static ObservableObject<Theme> observableTheme;
+    public static ResourceBundle translation;
 
     private Stage stage;
     private GEarthController controller;
@@ -47,7 +50,9 @@ public class GEarth extends Application {
         main = this;
         stage = primaryStage;
 
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/gearth/ui/G-Earth.fxml"));
+        translation = ResourceBundle.getBundle("gearth.ui.translations.messages", new Locale("nl"));
+
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/gearth/ui/G-Earth.fxml"), translation);
         Parent root = loader.load();
         controller = loader.getController();
         controller.setStage(primaryStage);

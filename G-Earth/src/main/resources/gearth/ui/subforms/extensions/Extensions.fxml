@@ -31,11 +31,11 @@
                 <VBox.margin>
                     <Insets bottom="-2.0" left="-2.0" right="-2.0" top="-2.0" />
                 </VBox.margin>
-                <Label alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-text-fill: #666666; -fx-background-color: #F7F7F7;" text="Title" />
-                <Label alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-text-fill: #666666; -fx-background-color: #F7F7F7;" text="Description" GridPane.columnIndex="1" />
-                <Label alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-text-fill: #666666; -fx-background-color: #F7F7F7;" text="Author" GridPane.columnIndex="2" />
-                <Label alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-text-fill: #666666; -fx-background-color: #F7F7F7;" text="Version" GridPane.columnIndex="3" />
-                <Label alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-text-fill: #666666; -fx-background-color: #F7F7F7;" text="Edit" GridPane.columnIndex="4" />
+                <Label alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-text-fill: #666666; -fx-background-color: #F7F7F7;" text="%tab.extensions.table.title" />
+                <Label alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-text-fill: #666666; -fx-background-color: #F7F7F7;" text="%tab.extensions.table.description" GridPane.columnIndex="1" />
+                <Label alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-text-fill: #666666; -fx-background-color: #F7F7F7;" text="%tab.extensions.table.author" GridPane.columnIndex="2" />
+                <Label alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-text-fill: #666666; -fx-background-color: #F7F7F7;" text="%tab.extensions.table.version" GridPane.columnIndex="3" />
+                <Label alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-text-fill: #666666; -fx-background-color: #F7F7F7;" text="%tab.extensions.table.edit" GridPane.columnIndex="4" />
             </GridPane>
         </VBox>
     </ScrollPane>
@@ -61,19 +61,19 @@
             <rowConstraints>
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
             </rowConstraints>
-         <Button fx:id="btn_gpython" disable="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#gpythonBtnClicked" text="G-Python shell" GridPane.columnIndex="3" />
+         <Button fx:id="btn_gpython" disable="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#gpythonBtnClicked" text="%tab.extensions.button.pythonshell" GridPane.columnIndex="3" />
             <TextField fx:id="ext_port" editable="false" prefHeight="26.0" prefWidth="157.0" GridPane.columnIndex="1">
                 <GridPane.margin>
                     <Insets left="-7.0" />
                 </GridPane.margin>
             </TextField>
-            <Label maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Port:" textFill="#000000bb">
+            <Label maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="%tab.extensions.port" textFill="#000000bb">
                 <GridPane.margin>
                     <Insets left="3.0" />
                 </GridPane.margin>
             </Label>
-            <Button fx:id="btn_install" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#installBtnClicked" text="Install" GridPane.columnIndex="5" />
-         <Button fx:id="btn_viewExtensionConsole" layoutX="401.0" layoutY="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#extConsoleBtnClicked" text="View logs" GridPane.columnIndex="4" />
+            <Button fx:id="btn_install" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#installBtnClicked" text="%tab.extensions.button.install" GridPane.columnIndex="5" />
+         <Button fx:id="btn_viewExtensionConsole" layoutX="401.0" layoutY="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#extConsoleBtnClicked" text="%tab.extensions.button.logs" GridPane.columnIndex="4" />
         </GridPane>
     </GridPane>
 </GridPane>

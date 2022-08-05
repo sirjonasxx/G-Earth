@@ -1,5 +1,6 @@
 package gearth.services.internal_extensions.extensionstore.application.entities.extensiondetails;
 
+import gearth.GEarth;
 import gearth.services.extension_handler.extensions.implementations.network.NetworkExtensionsProducer;
 import gearth.services.extension_handler.extensions.implementations.network.executer.NormalExtensionRunner;
 import gearth.services.internal_extensions.extensionstore.GExtensionStore;
@@ -62,7 +63,7 @@ public class StoreExtensionDetailsOverview extends HOverview {
     public String buttonText() {
         int mode = mode();
 //        return mode == 2 ? "Update" : "Install";
-        return mode == 0 ? "Install" : (mode == 1 ? "Installed" : "Update");
+        return GEarth.translation.getString("ext.store.button." + (mode == 0 ? "install" : (mode == 1 ? "installed" : "update")));
     }
 
     @Override
@@ -91,23 +92,23 @@ public class StoreExtensionDetailsOverview extends HOverview {
 
     private void awaitPopup(String mode) {
         popup(Alert.AlertType.WARNING,
-                String.format("%s extension", mode),
-                String.format("%s extension [%s]", mode, extension.getTitle()),
-                String.format("Press \"OK\" and wait while the extension is being %sed", mode.toLowerCase()));
+                GEarth.translation.getString(String.format("ext.store.extension.status.start.%s", mode)),
+                String.format("%s [%s]", GEarth.translation.getString(String.format("ext.store.extension.status.start.%s", mode)), extension.getTitle()),
+                GEarth.translation.getString(String.format("ext.store.extension.status.start.%s.message", mode)));
     }
 
     private void successPopup(String mode) {
         popup(Alert.AlertType.INFORMATION,
-                String.format("%s completed", mode),
-                String.format("%s completed [%s]", mode, extension.getTitle()),
-                String.format("Extension %s completed successfully", mode.toLowerCase()));
+                GEarth.translation.getString(String.format("ext.store.extension.status.success.%s", mode)),
+                String.format("%s [%s]", GEarth.translation.getString(String.format("ext.store.extension.status.success.%s", mode)), extension.getTitle()),
+                GEarth.translation.getString(String.format("ext.store.extension.status.success.%s.message", mode)));
     }
 
     private void errorPopup(String mode, String error) {
         popup(Alert.AlertType.ERROR,
-                String.format("%s failed", mode),
-                String.format("%s failed [%s]", mode, extension.getTitle()),
-                String.format("%s failed with the following message: %s", mode, error));
+                GEarth.translation.getString(String.format("ext.store.extension.status.success.%s", mode)),
+                String.format("%s [%s]", GEarth.translation.getString(String.format("ext.store.extension.status.success.%s", mode)), extension.getTitle()),
+                String.format("%s: %s", GEarth.translation.getString(String.format("ext.store.extension.status.success.%s.message", mode)), error));
     }
 
     private void popup(Alert.AlertType alertType, String title, String header, String context) {
@@ -128,7 +129,7 @@ public class StoreExtensionDetailsOverview extends HOverview {
         int mode = mode();
         if (mode == 1) return;
 
-        String modeString = mode() == 0 ? "Install" : "Update";
+        String modeString = mode() == 0 ? "install" : "update";
         HOverview selff = this;
 
         StoreExtensionTools.InstallExtListener listener =  new StoreExtensionTools.InstallExtListener() {

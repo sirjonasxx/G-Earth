@@ -1,5 +1,6 @@
 package gearth.ui.subforms.extensions;
 
+import gearth.GEarth;
 import gearth.services.extension_handler.ExtensionHandler;
 import gearth.services.extension_handler.extensions.ExtensionListener;
 import gearth.services.extension_handler.extensions.implementations.network.NetworkExtensionsProducer;
@@ -80,9 +81,9 @@ public class ExtensionsController extends SubForm {
 
     public void installBtnClicked(ActionEvent actionEvent) {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Install extension");
+        fileChooser.setTitle(GEarth.translation.getString("tab.extensions.button.install.windowtitle"));
         fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("G-Earth extensions", ExecutionInfo.ALLOWEDEXTENSIONTYPES));
+                new FileChooser.ExtensionFilter(GEarth.translation.getString("tab.extensions.button.install.filetype"), ExecutionInfo.ALLOWEDEXTENSIONTYPES));
         File selectedFile = fileChooser.showOpenDialog(parentController.getStage());
         if (selectedFile != null) {
             extensionRunner.installAndRunExtension(selectedFile.getPath(), networkExtensionsProducer.getPort());
@@ -116,7 +117,7 @@ public class ExtensionsController extends SubForm {
         pythonShellLaunching = true;
         Platform.runLater(() -> btn_gpython.setDisable(true));
         GPythonShell shell = new GPythonShell(
-                "Scripting shell " + gpytonShellCounter++,
+                String.format("%s %d", GEarth.translation.getString("tab.extensions.button.pythonshell.windowtitle"),gpytonShellCounter++),
                 networkExtensionsProducer.getPort(),
                 Authenticator.generatePermanentCookie()
         );

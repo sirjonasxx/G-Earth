@@ -1,5 +1,6 @@
 package gearth.services.extension_handler.extensions.implementations.network.authentication;
 
+import gearth.GEarth;
 import gearth.misc.ConfirmationDialog;
 import gearth.services.extension_handler.extensions.implementations.network.NetworkExtension;
 import gearth.ui.titlebar.TitleBarController;
@@ -68,13 +69,12 @@ public class Authenticator {
             boolean[] done = {false};
             Platform.runLater(() -> {
                 Alert alert = ConfirmationDialog.createAlertWithOptOut(Alert.AlertType.WARNING, connectExtensionKey
-                        ,"Confirmation Dialog", null,
-                        "", "Remember my choice",
+                        , GEarth.translation.getString("alert.confirmation.windowtitle"), null,
+                        "", GEarth.translation.getString("alert.confirmation.button.remember"),
                         ButtonType.YES, ButtonType.NO
                 );
 
-                alert.getDialogPane().setContent(new Label("Extension \""+extension.getTitle()+"\" tries to connect but isn't known to G-Earth,\n" +
-                        "accept this connection?"));
+                alert.getDialogPane().setContent(new Label(String.format(GEarth.translation.getString("alert.extconnection.content"), extension.getTitle()).replaceAll("\\\\n", System.lineSeparator())));
 
                 try {
                     if (!(TitleBarController.create(alert).showAlertAndWait()

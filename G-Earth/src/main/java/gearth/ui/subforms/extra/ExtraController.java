@@ -177,12 +177,13 @@ public class ExtraController extends SubForm implements SocksConfiguration {
                 });
                 if (!GPythonVersionUtils.validInstallation()) {
                     Platform.runLater(() -> {
-                        Alert alert = new Alert(Alert.AlertType.ERROR, "G-Python installation", ButtonType.OK);
-                        alert.setTitle("G-Python installation");
+                        Alert alert = new Alert(Alert.AlertType.ERROR, GEarth.translation.getString("tab.extra.options.pythonscripting.alert.title"), ButtonType.OK);
+                        alert.setTitle(GEarth.translation.getString("tab.extra.options.pythonscripting.alert.title"));
 
                         FlowPane fp = new FlowPane();
-                        Label lbl = new Label("Before using G-Python, install the right packages using pip!" +
-                                System.lineSeparator() + System.lineSeparator() + "More information here:");
+                        Label lbl = new Label(GEarth.translation.getString("tab.extra.options.pythonscripting.alert.content") +
+                                System.lineSeparator() + System.lineSeparator() +
+                                GEarth.translation.getString("tab.extra.options.pythonscripting.alert.moreinformation"));
                         Hyperlink link = new Hyperlink(INFO_URL_GPYTHON);
                         fp.getChildren().addAll( lbl, link);
                         link.setOnAction(event -> {

@@ -37,10 +37,10 @@ public class UpdateChecker {
                         String body = (String)object.get("body");
                         boolean isForcedUpdate = body.contains("(!)");
 
-                        Alert alert = new Alert(isForcedUpdate ? Alert.AlertType.ERROR : Alert.AlertType.INFORMATION, "G-Earth is outdated!", ButtonType.OK);
+                        Alert alert = new Alert(isForcedUpdate ? Alert.AlertType.ERROR : Alert.AlertType.INFORMATION, GEarth.translation.getString("alert.outdated.title"), ButtonType.OK);
 
                         FlowPane fp = new FlowPane();
-                        Label lbl = new Label("A new version of G-Earth has been found ("+gitv+")" + System.lineSeparator()+ System.lineSeparator() + "Update to the latest version:");
+                        Label lbl = new Label(GEarth.translation.getString("alert.outdated.content.newversion") + " ("+gitv+")" + System.lineSeparator()+ System.lineSeparator() + GEarth.translation.getString("alert.outdated.content.update") + ":");
                         Hyperlink link = new Hyperlink("https://github.com/sirjonasxx/G-Earth/releases");
                         fp.getChildren().addAll( lbl, link);
                         link.setOnAction(event -> {
@@ -51,7 +51,7 @@ public class UpdateChecker {
 
 
                         WebView webView = new WebView();
-                        webView.getEngine().loadContent("<html>A new version of G-Earth has been found ("+gitv+")<br><br>Update to the latest version:<br><a href=\"https://github.com/sirjonasxx/G-Earth/releases\">https://github.com/sirjonasxx/G-Earth/releases</a></html>");
+                        webView.getEngine().loadContent(String.format("<html>%s (%s)<br><br>%s:<br><a href=\"https://github.com/sirjonasxx/G-Earth/releases\">https://github.com/sirjonasxx/G-Earth/releases</a></html>", GEarth.translation.getString("alert.outdated.content.newversion"), gitv, GEarth.translation.getString("alert.outdated.content.update")));
                         webView.setPrefSize(500, 200);
 
                         alert.setResizable(false);

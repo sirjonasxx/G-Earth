@@ -1,5 +1,6 @@
 package gearth.misc;
 
+import gearth.GEarth;
 import gearth.ui.titlebar.TitleBarController;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
@@ -47,7 +48,7 @@ public class AdminValidator {
             if (!AdminValidator.isAdmin()) {
                 Platform.runLater(() -> {
                     Alert alert = new Alert(Alert.AlertType.WARNING, "", ButtonType.OK);
-                    alert.getDialogPane().setContent(new Label("G-Earth needs admin privileges in order to work on Flash,\nplease restart G-Earth with admin permissions unless\nyou're using Unity"));
+                    alert.getDialogPane().setContent(new Label(GEarth.translation.getString("alert.adminvalidator.content").replaceAll("\\\\n", System.lineSeparator())));
                     try {
                         TitleBarController.create(alert).showAlert();
                     } catch (IOException e) {
