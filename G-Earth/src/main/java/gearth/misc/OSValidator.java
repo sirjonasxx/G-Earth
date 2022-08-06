@@ -55,7 +55,7 @@ public class OSValidator {
         if (isWindows()) {
             return "Windows";
         } else if (isMac()) {
-            return "Max";
+            return "Mac";
         } else if (isUnix()) {
             return "Linux";
         } else {
