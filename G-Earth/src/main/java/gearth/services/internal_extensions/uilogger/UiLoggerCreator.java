@@ -1,5 +1,6 @@
 package gearth.services.internal_extensions.uilogger;
 
+import gearth.GEarth;
 import gearth.extensions.InternalExtensionFormCreator;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -13,7 +14,7 @@ public class UiLoggerCreator extends InternalExtensionFormCreator<UiLogger> {
     public UiLogger createForm(Stage stage) throws Exception {
         UiLogger uiLogger = new UiLogger();
 
-        FXMLLoader loader = new FXMLLoader(UiLogger.class.getResource("UiLogger.fxml"));
+        FXMLLoader loader = new FXMLLoader(UiLogger.class.getResource("UiLogger.fxml"), GEarth.translation);
 
         Parent root = loader.load();
         stage.setTitle("G-Earth | Packet Logger");

@@ -1,6 +1,7 @@
 package gearth.services.internal_extensions.uilogger;
 
  import at.favre.lib.bytes.Bytes;
+ import gearth.GEarth;
  import gearth.misc.Cacher;
  import gearth.services.internal_extensions.uilogger.hexdumper.Hexdump;
  import gearth.services.packet_info.PacketInfo;
@@ -219,7 +220,7 @@ public class UiLoggerController implements Initializable {
 
 
         if (chkTimestamp.isSelected()) {
-            elements.add(new Element(String.format("(timestamp: %d)\n", System.currentTimeMillis()), "timestamp"));
+            elements.add(new Element(String.format("(%s: %d)\n", GEarth.translation.getString("ext.logger.element.timestamp"), System.currentTimeMillis()), "timestamp"));
         }
 
         boolean packetInfoAvailable = uiLogger.getPacketInfoManager().getPacketInfoList().size() > 0;
@@ -256,8 +257,8 @@ public class UiLoggerController implements Initializable {
             elements.add(new Element("\n", ""));
         }
 
-        if (isBlocked) elements.add(new Element("[Blocked]\n", "blocked"));
-        else if (isReplaced) elements.add(new Element("[Replaced]\n", "replaced"));
+        if (isBlocked) elements.add(new Element(String.format("[%s]\n", GEarth.translation.getString("ext.logger.element.blocked")), "blocked"));
+        else if (isReplaced) elements.add(new Element(String.format("[%s]\n", GEarth.translation.getString("ext.logger.element.replaced")), "replaced"));
 
         if (!chkReprNone.isSelected()) {
             boolean isSkipped = chkSkipBigPackets.isSelected() && (packet.length() > 4000 || (packet.length() > 1000 && chkReprHex.isSelected()));
@@ -265,7 +266,7 @@ public class UiLoggerController implements Initializable {
                     Hexdump.hexdump(packet.toBytes()) :
                     (chkReprRawHex.isSelected() ? Bytes.wrap(packet.toBytes()).encodeHex() : packet.toString());
 
-            String type = isIncoming ? "Incoming" : "Outgoing";
+            String type = isIncoming ? GEarth.translation.getString("ext.logger.element.direction.incoming") : GEarth.translation.getString("ext.logger.element.direction.outgoing");
 
             if (!chkReprHex.isSelected()) {
                 elements.add(new Element(String.format("%s[", type), type.toLowerCase()));
@@ -276,7 +277,7 @@ public class UiLoggerController implements Initializable {
             }
 
             if (isSkipped) {
-                elements.add(new Element("<packet skipped>", "skipped"));
+                elements.add(new Element(String.format("<%s>", GEarth.translation.getString("ext.logger.element.skipped")), "skipped"));
             } else
                 elements.add(new Element(packetRepresentation, String.format(chkReprHex.isSelected() ? "%sHex": "%s", type.toLowerCase())));
             elements.add(new Element("\n", ""));
@@ -343,13 +344,13 @@ public class UiLoggerController implements Initializable {
 
     public void updateLoggerInfo() {
         Platform.runLater(() -> {
-            lblViewIncoming.setText("View Incoming: " + (chkViewIncoming.isSelected() ? "True" : "False"));
-            lblViewOutgoing.setText("View Outgoing: " + (chkViewOutgoing.isSelected() ? "True" : "False"));
-            lblAutoScrolll.setText("Autoscroll: " + (chkAutoscroll.isSelected() ? "True" : "False"));
-            lblFiltered.setText("Filtered: " + filteredAmount);
+            lblViewIncoming.setText(String.format("%s: %s", GEarth.translation.getString("ext.logger.menu.view.incoming"), (chkViewIncoming.isSelected() ? "True" : "False")));
+            lblViewOutgoing.setText(String.format("%s: %s", GEarth.translation.getString("ext.logger.menu.view.outgoing"), (chkViewOutgoing.isSelected() ? "True" : "False")));
+            lblAutoScrolll.setText(String.format("%s: %s", GEarth.translation.getString("ext.logger.menu.view.autoscroll"), (chkAutoscroll.isSelected() ? "True" : "False")));
+            lblFiltered.setText(String.format("%s: %d", GEarth.translation.getString("ext.logger.state.filtered"), filteredAmount));
 
             boolean packetInfoAvailable = uiLogger.getPacketInfoManager().getPacketInfoList().size() > 0;
-            lblPacketInfo.setText("Packet info: " + (packetInfoAvailable ? "True" : "False"));
+            lblPacketInfo.setText(String.format("%s: %s", GEarth.translation.getString("ext.logger.state.packetinfo"), (packetInfoAvailable ? "True" : "False")));
         });
     }
 
@@ -389,9 +390,9 @@ public class UiLoggerController implements Initializable {
 
         //Set extension filter
         FileChooser.ExtensionFilter extFilter =
-                new FileChooser.ExtensionFilter("TXT files (*.txt)", "*.txt");
+                new FileChooser.ExtensionFilter(String.format("%s (*.txt)", GEarth.translation.getString("ext.logger.menu.packets.exportall.filetype")), "*.txt");
         fileChooser.getExtensionFilters().add(extFilter);
-        fileChooser.setTitle("Save Packets");
+        fileChooser.setTitle(GEarth.translation.getString("ext.logger.menu.packets.exportall.windowtitle"));
 
         //Show save file dialog
         File file = fileChooser.showSaveDialog(stage);
