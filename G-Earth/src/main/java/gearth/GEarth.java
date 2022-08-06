@@ -50,7 +50,7 @@ public class GEarth extends Application {
         main = this;
         stage = primaryStage;
 
-        translation = ResourceBundle.getBundle("gearth.ui.translations.messages", new Locale("fr"));
+        translation = ResourceBundle.getBundle("gearth.ui.translations.messages", new Locale("pt"));
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/gearth/ui/G-Earth.fxml"), translation);
         Parent root = loader.load();
