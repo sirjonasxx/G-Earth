@@ -3,8 +3,8 @@ package gearth.ui;
 import gearth.protocol.connection.proxy.ProxyProviderFactory;
 import gearth.protocol.connection.proxy.SocksConfiguration;
 import gearth.ui.subforms.logger.loggerdisplays.PacketLoggerFactory;
+import gearth.ui.translations.TranslatableString;
 import javafx.scene.control.*;
-import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import gearth.protocol.HConnection;
 import gearth.ui.subforms.connection.ConnectionController;
@@ -21,7 +21,7 @@ import java.util.List;
 
 public class GEarthController {
 
-    public Tab tab_Logger;
+    public Tab tab_Connection, tab_Logger, tab_Injection, tab_Tools, tab_Scheduler, tab_Extensions, tab_Extra, tab_Info;
     public TabPane tabBar;
     private Stage stage = null;
     private volatile HConnection hConnection;
@@ -67,6 +67,10 @@ public class GEarthController {
             trySetController();
         }
 
+        if (PacketLoggerFactory.usesUIlogger()) {
+            tabBar.getTabs().remove(tab_Logger);
+        }
+
         List<Tab> uiTabs = tabBar.getTabs();
         for (int i = 0; i < uiTabs.size(); i++) {
             Tab tab = uiTabs.get(i);
@@ -79,11 +83,7 @@ public class GEarthController {
             });
         }
 
-        if (PacketLoggerFactory.usesUIlogger()) {
-            tabBar.getTabs().remove(tab_Logger);
-        }
-
-
+        initLanguageBinding();
     }
 
     public void setStage(Stage stage) {
@@ -120,4 +120,13 @@ public class GEarthController {
         hConnection.abort();
     }
 
+    private void initLanguageBinding() {
+        tab_Connection.textProperty().bind(new TranslatableString("tab.connection"));
+        tab_Injection.textProperty().bind(new TranslatableString("tab.injection"));
+        tab_Tools.textProperty().bind(new TranslatableString("tab.tools"));
+        tab_Scheduler.textProperty().bind(new TranslatableString("tab.scheduler"));
+        tab_Extensions.textProperty().bind(new TranslatableString("tab.extensions"));
+        tab_Extra.textProperty().bind(new TranslatableString("tab.extra"));
+        tab_Info.textProperty().bind(new TranslatableString("tab.info"));
+    }
 }

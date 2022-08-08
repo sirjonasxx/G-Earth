@@ -7,28 +7,29 @@
 
 <VBox prefWidth="650.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gearth.ui.GEarthController">
     <TabPane id="main-tab-pane" fx:id="tabBar" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="295.0" prefWidth="650.0" tabClosingPolicy="UNAVAILABLE">
-        <Tab text="%tab.connection">
+        <Tab fx:id="tab_Connection" text="Connection">
+            <text>tab.connection</text>
             <fx:include fx:id="connection" source="subforms/connection/Connection.fxml" />
         </Tab>
         <Tab fx:id="tab_Logger" text="Logger">
             <fx:include fx:id="logger" source="subforms/logger/Logger.fxml" />
         </Tab>
-        <Tab text="%tab.injection">
+        <Tab fx:id="tab_Injection" text="Injection">
             <fx:include fx:id="injection" source="subforms/injection/Injection.fxml" />
         </Tab>
-        <Tab text="%tab.tools">
+        <Tab fx:id="tab_Tools" text="Tools">
             <fx:include fx:id="tools" source="subforms/tools/Tools.fxml" />
         </Tab>
-        <Tab text="%tab.scheduler">
+        <Tab fx:id="tab_Scheduler" text="Scheduler">
             <fx:include fx:id="scheduler" source="subforms/scheduler/Scheduler.fxml" />
         </Tab>
-        <Tab text="%tab.extensions">
+        <Tab fx:id="tab_Extensions" text="Extensions">
             <fx:include fx:id="extensions" source="subforms/extensions/Extensions.fxml" />
         </Tab>
-        <Tab text="%tab.extra">
+        <Tab fx:id="tab_Extra" text="Extra">
             <fx:include fx:id="extra" source="subforms/extra/Extra.fxml" />
         </Tab>
-        <Tab text="Info">
+        <Tab fx:id="tab_Info" text="Info">
             <fx:include fx:id="info" source="subforms/info/Info.fxml" />
         </Tab>
     </TabPane>

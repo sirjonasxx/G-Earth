@@ -5,7 +5,7 @@
 <?import javafx.scene.input.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane fx:id="borderPane" prefHeight="560.0" prefWidth="820.0" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gearth.services.internal_extensions.uilogger.UiLoggerController">
+<BorderPane fx:id="borderPane" prefHeight="560.0" prefWidth="820.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gearth.services.internal_extensions.uilogger.UiLoggerController">
     <top>
         <MenuBar BorderPane.alignment="CENTER">
          <Menu mnemonicParsing="false" text="%ext.logger.menu.window">

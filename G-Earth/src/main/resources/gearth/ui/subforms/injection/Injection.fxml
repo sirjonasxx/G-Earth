@@ -37,7 +37,7 @@
               <GridPane.margin>
                   <Insets left="13.0" right="13.0" top="4.0" />
               </GridPane.margin>
-              <Text fx:id="lbl_corrruption" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="corrupted-label" text="%tab.injection.corrupted.true">
+              <Text fx:id="lbl_corruption" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="corrupted-label" text="%tab.injection.corrupted.true">
                   <font>
                       <Font name="System Italic" size="11.0" />
                   </font>

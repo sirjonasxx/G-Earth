@@ -5,6 +5,7 @@ import gearth.misc.Cacher;
 import gearth.services.packet_info.PacketInfoManager;
 import gearth.protocol.HMessage;
 import gearth.protocol.connection.HState;
+import gearth.ui.translations.TranslatableString;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.scene.control.*;
@@ -27,7 +28,7 @@ public class InjectionController extends SubForm {
     private static final int historylimit = 69;
 
     public TextArea inputPacket;
-    public Text lbl_corrruption;
+    public Text lbl_corruption;
     public Text lbl_pcktInfo;
     public Button btn_sendToServer;
     public Button btn_sendToClient;
@@ -53,7 +54,8 @@ public class InjectionController extends SubForm {
             }
         });
 
-        lblHistory.setTooltip(new Tooltip(GEarth.translation.getString("tab.injection.history.tooltip")));
+        lblHistory.setTooltip(new Tooltip());
+        lblHistory.getTooltip().textProperty().bind(new TranslatableString("tab.injection.history.tooltip"));
 
         List<Object> rawHistory = Cacher.getList(HISTORY_CACHE_KEY);
         if (rawHistory != null) {
@@ -104,33 +106,33 @@ public class InjectionController extends SubForm {
     private void updateUI() {
         boolean dirty = false;
 
-        lbl_corrruption.setText(GEarth.translation.getString("tab.injection.corrupted.false"));
-        lbl_corrruption.getStyleClass().clear();
-        lbl_corrruption.getStyleClass().add("not-corrupted-label");
+        lbl_corruption.setText(GEarth.translation.getString("tab.injection.corrupted.false"));
+        lbl_corruption.getStyleClass().clear();
+        lbl_corruption.getStyleClass().add("not-corrupted-label");
 
         HPacket[] packets = parsePackets(inputPacket.getText());
 
         if (packets.length == 0) {
             dirty = true;
-            lbl_corrruption.setFill(Paint.valueOf("#ee0404b2"));
-            lbl_corrruption.getStyleClass().clear();
-            lbl_corrruption.getStyleClass().add("corrupted-label");
+            lbl_corruption.setFill(Paint.valueOf("#ee0404b2"));
+            lbl_corruption.getStyleClass().clear();
+            lbl_corruption.getStyleClass().add("corrupted-label");
         }
 
         for (int i = 0; i < packets.length; i++) {
             if (packets[i].isCorrupted()) {
                 if (!dirty) {
-                    lbl_corrruption.setText(String.format("%s -> %d", GEarth.translation.getString("tab.injection.corrupted.true"), i));
-                    lbl_corrruption.getStyleClass().clear();
-                    lbl_corrruption.getStyleClass().add("corrupted-label");
+                    lbl_corruption.setText(String.format("%s -> %d", GEarth.translation.getString("tab.injection.corrupted.true"), i));
+                    lbl_corruption.getStyleClass().clear();
+                    lbl_corruption.getStyleClass().add("corrupted-label");
                     dirty = true;
                 } else
-                    lbl_corrruption.setText(lbl_corrruption.getText() + ", " + i);
+                    lbl_corruption.setText(lbl_corruption.getText() + ", " + i);
             }
         }
 
         if (dirty && packets.length == 1) {
-            lbl_corrruption.setText(GEarth.translation.getString("tab.injection.corrupted.true")); // no index needed
+            lbl_corruption.setText(GEarth.translation.getString("tab.injection.corrupted.true")); // no index needed
         }
 
         if (!dirty) {
