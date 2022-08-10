@@ -17,7 +17,7 @@
                      <CheckMenuItem fx:id="chkResetOnConnect" mnemonicParsing="false" selected="true" text="Reset packetlogger" />
                  </items>
                </Menu>
-               <Menu fx:id="menu_window_onDisconnect" mnemonicParsing="false" text="%ext.logger.menu.window.ondisconnect">
+               <Menu fx:id="menu_window_onDisconnect" mnemonicParsing="false" text="On disconnect">
                  <items>
                      <CheckMenuItem fx:id="chkHideOnDisconnect" mnemonicParsing="false" selected="true" text="Hide window" />
                      <CheckMenuItem fx:id="chkResetOnDisconnect" mnemonicParsing="false" text="Reset packetlogger" />
