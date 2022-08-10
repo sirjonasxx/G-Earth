@@ -10,6 +10,7 @@ import gearth.protocol.packethandler.PayloadBuffer;
 import gearth.protocol.packethandler.flash.BufferChangeListener;
 import gearth.protocol.packethandler.flash.FlashPacketHandler;
 import gearth.ui.titlebar.TitleBarController;
+import gearth.ui.translations.LanguageBundle;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -72,10 +73,10 @@ public class Rc4Obtainer {
                 System.err.println("COULD NOT FIND RC4 TABLE");
 
                 Platform.runLater(() -> {
-                    Alert alert = new Alert(Alert.AlertType.WARNING, GEarth.translation.getString("alert.somethingwentwrong.title"), ButtonType.OK);
+                    Alert alert = new Alert(Alert.AlertType.WARNING, LanguageBundle.get("alert.somethingwentwrong.title"), ButtonType.OK);
 
                     FlowPane fp = new FlowPane();
-                    Label lbl = new Label(GEarth.translation.getString("alert.somethingwentwrong.content").replaceAll("\\\\n", System.lineSeparator()));
+                    Label lbl = new Label(LanguageBundle.get("alert.somethingwentwrong.content").replaceAll("\\\\n", System.lineSeparator()));
                     Hyperlink link = new Hyperlink("https://github.com/sirjonasxx/G-Earth/wiki/Troubleshooting");
                     fp.getChildren().addAll(lbl, link);
                     link.setOnAction(event -> {

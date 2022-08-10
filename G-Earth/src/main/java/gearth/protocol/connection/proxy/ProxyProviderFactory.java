@@ -1,6 +1,5 @@
 package gearth.protocol.connection.proxy;
 
-import gearth.GEarth;
 import gearth.misc.Cacher;
 import gearth.misc.OSValidator;
 import gearth.protocol.HConnection;
@@ -10,6 +9,7 @@ import gearth.protocol.connection.proxy.flash.NormalFlashProxyProvider;
 import gearth.protocol.connection.proxy.flash.unix.LinuxRawIpFlashProxyProvider;
 import gearth.protocol.connection.proxy.flash.windows.WindowsRawIpFlashProxyProvider;
 import gearth.ui.titlebar.TitleBarController;
+import gearth.ui.translations.LanguageBundle;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -108,7 +108,7 @@ public class ProxyProviderFactory {
 
                 Platform.runLater(() -> {
                     Alert alert = new Alert(Alert.AlertType.ERROR, "", ButtonType.OK);
-                    alert.getDialogPane().getChildren().add(new Label(GEarth.translation.getString("alert.alreadyconnected.content").replaceAll("\\\\n", System.lineSeparator())));
+                    alert.getDialogPane().getChildren().add(new Label(LanguageBundle.get("alert.alreadyconnected.content").replaceAll("\\\\n", System.lineSeparator())));
                     alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
                     alert.setResizable(false);
                     try {

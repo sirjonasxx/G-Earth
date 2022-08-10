@@ -1,9 +1,9 @@
 package gearth.services.extension_handler.extensions.implementations.network.authentication;
 
-import gearth.GEarth;
 import gearth.misc.ConfirmationDialog;
 import gearth.services.extension_handler.extensions.implementations.network.NetworkExtension;
 import gearth.ui.titlebar.TitleBarController;
+import gearth.ui.translations.LanguageBundle;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -69,12 +69,12 @@ public class Authenticator {
             boolean[] done = {false};
             Platform.runLater(() -> {
                 Alert alert = ConfirmationDialog.createAlertWithOptOut(Alert.AlertType.WARNING, connectExtensionKey
-                        , GEarth.translation.getString("alert.confirmation.windowtitle"), null,
-                        "", GEarth.translation.getString("alert.confirmation.button.remember"),
+                        , LanguageBundle.get("alert.confirmation.windowtitle"), null,
+                        "", LanguageBundle.get("alert.confirmation.button.remember"),
                         ButtonType.YES, ButtonType.NO
                 );
 
-                alert.getDialogPane().setContent(new Label(String.format(GEarth.translation.getString("alert.extconnection.content"), extension.getTitle()).replaceAll("\\\\n", System.lineSeparator())));
+                alert.getDialogPane().setContent(new Label(String.format(LanguageBundle.get("alert.extconnection.content"), extension.getTitle()).replaceAll("\\\\n", System.lineSeparator())));
 
                 try {
                     if (!(TitleBarController.create(alert).showAlertAndWait()

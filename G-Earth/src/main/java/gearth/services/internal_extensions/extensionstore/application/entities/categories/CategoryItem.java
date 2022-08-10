@@ -1,6 +1,5 @@
 package gearth.services.internal_extensions.extensionstore.application.entities.categories;
 
-import gearth.GEarth;
 import gearth.services.internal_extensions.extensionstore.GExtensionStore;
 import gearth.services.internal_extensions.extensionstore.application.GExtensionStoreController;
 import gearth.services.internal_extensions.extensionstore.application.WebUtils;
@@ -9,6 +8,7 @@ import gearth.services.internal_extensions.extensionstore.application.entities.q
 import gearth.services.internal_extensions.extensionstore.repository.StoreRepository;
 import gearth.services.internal_extensions.extensionstore.repository.models.ExtCategory;
 import gearth.services.internal_extensions.extensionstore.repository.querying.ExtensionOrdering;
+import gearth.ui.translations.LanguageBundle;
 import netscape.javascript.JSObject;
 
 import java.util.Arrays;
@@ -59,7 +59,7 @@ public class CategoryItem implements ContentItem {
                 .append("</div>")
 
                 .append("<div onclick=\"").append(id).append(".onClick()\" class=\"overview_item_msgs clickable\">")
-                .append("<div class=\"oim_top\">").append(releasesCount).append(" ").append(GEarth.translation.getString("ext.store.extension.author.releases")).append("</div>")
+                .append("<div class=\"oim_top\">").append(releasesCount).append(" ").append(LanguageBundle.get("ext.store.extension.author.releases")).append("</div>")
 //                .append("<div class=\"oim_bottom\">").append(storeExtension.getFramework().getFramework().getName().replace("Native", "")).append(" </div>")
                 .append("</div>")
 

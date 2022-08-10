@@ -77,8 +77,8 @@
                             <RowConstraints maxHeight="29.0" minHeight="29.0" prefHeight="29.0" vgrow="SOMETIMES" />
                           </rowConstraints>
                            <children>
-                              <Label fx:id="lbl_proxyIp" text="%tab.extra.options.advanced.proxy.ip" />
-                              <Label fx:id="lbl_proxyPort" text="%tab.extra.options.advanced.proxy.port" GridPane.rowIndex="1" />
+                              <Label fx:id="lbl_proxyIp" text="Proxy IP:" />
+                              <Label fx:id="lbl_proxyPort" text="Proxy port:" GridPane.rowIndex="1" />
                               <TextField fx:id="txt_socksPort" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="1">
                                  <opaqueInsets>
                                     <Insets />

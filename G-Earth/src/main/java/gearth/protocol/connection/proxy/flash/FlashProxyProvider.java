@@ -1,6 +1,5 @@
 package gearth.protocol.connection.proxy.flash;
 
-import gearth.GEarth;
 import gearth.protocol.HConnection;
 import gearth.protocol.connection.HProxy;
 import gearth.protocol.connection.HProxySetter;
@@ -12,6 +11,7 @@ import gearth.protocol.packethandler.flash.IncomingFlashPacketHandler;
 import gearth.protocol.packethandler.flash.OutgoingFlashPacketHandler;
 import gearth.protocol.packethandler.flash.FlashPacketHandler;
 import gearth.ui.titlebar.TitleBarController;
+import gearth.ui.translations.LanguageBundle;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -126,7 +126,7 @@ public abstract class FlashProxyProvider implements ProxyProvider {
     protected void showInvalidConnectionError() {
         Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.ERROR, "", ButtonType.OK);
-            alert.getDialogPane().getChildren().add(new Label(GEarth.translation.getString("alert.invalidconnection.content")));
+            alert.getDialogPane().getChildren().add(new Label(LanguageBundle.get("alert.invalidconnection.content")));
             alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
             alert.setResizable(false);
             try {

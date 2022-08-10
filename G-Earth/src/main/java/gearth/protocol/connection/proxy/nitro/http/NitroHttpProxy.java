@@ -1,11 +1,11 @@
 package gearth.protocol.connection.proxy.nitro.http;
 
-import gearth.GEarth;
 import gearth.misc.ConfirmationDialog;
 import gearth.protocol.connection.proxy.nitro.NitroConstants;
 import gearth.protocol.connection.proxy.nitro.os.NitroOsFunctions;
 import gearth.protocol.connection.proxy.nitro.os.NitroOsFunctionsFactory;
 import gearth.ui.titlebar.TitleBarController;
+import gearth.ui.translations.LanguageBundle;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -53,12 +53,12 @@ public class NitroHttpProxy {
 
         Platform.runLater(() -> {
             Alert alert = ConfirmationDialog.createAlertWithOptOut(Alert.AlertType.WARNING, ADMIN_WARNING_KEY,
-                    GEarth.translation.getString("alert.rootcertificate.title"), null,
-                    "", GEarth.translation.getString("alert.rootcertificate.remember"),
+                    LanguageBundle.get("alert.rootcertificate.title"), null,
+                    "", LanguageBundle.get("alert.rootcertificate.remember"),
                     ButtonType.YES, ButtonType.NO
             );
 
-            alert.getDialogPane().setContent(new Label(GEarth.translation.getString("alert.rootcertificate.content").replaceAll("\\\\n", System.lineSeparator())));
+            alert.getDialogPane().setContent(new Label(LanguageBundle.get("alert.rootcertificate.content").replaceAll("\\\\n", System.lineSeparator())));
 
             try {
                 shouldInstall.set(TitleBarController.create(alert).showAlertAndWait()

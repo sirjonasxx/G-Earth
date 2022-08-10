@@ -1,6 +1,5 @@
 package gearth.services.internal_extensions.extensionstore.application.entities.installed;
 
-import gearth.GEarth;
 import gearth.services.internal_extensions.extensionstore.GExtensionStore;
 import gearth.services.internal_extensions.extensionstore.application.entities.ContentItem;
 import gearth.services.internal_extensions.extensionstore.application.entities.HOverview;
@@ -8,6 +7,7 @@ import gearth.services.internal_extensions.extensionstore.repository.StoreReposi
 import gearth.services.internal_extensions.extensionstore.repository.models.StoreExtension;
 import gearth.services.internal_extensions.extensionstore.tools.InstalledExtension;
 import gearth.services.internal_extensions.extensionstore.tools.StoreExtensionTools;
+import gearth.ui.translations.LanguageBundle;
 import org.apache.maven.artifact.versioning.ComparableVersion;
 
 import java.awt.*;
@@ -31,7 +31,7 @@ public class InstalledOverview extends HOverview {
 
     @Override
     public String buttonText() {
-        return GEarth.translation.getString("ext.store.overview.folder");
+        return LanguageBundle.get("ext.store.overview.folder");
     }
 
     @Override
@@ -76,17 +76,17 @@ public class InstalledOverview extends HOverview {
 
             @Override
             public String title() {
-                return GEarth.translation.getString("ext.store.overview.title");
+                return LanguageBundle.get("ext.store.overview.title");
             }
 
             @Override
             public String description() {
-                return GEarth.translation.getString("ext.store.overview.description");
+                return LanguageBundle.get("ext.store.overview.description");
             }
 
             @Override
             public String contentTitle() {
-                return GEarth.translation.getString("ext.store.overview.contenttitle");
+                return LanguageBundle.get("ext.store.overview.contenttitle");
             }
         };
     }

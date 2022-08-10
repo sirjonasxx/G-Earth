@@ -8,6 +8,7 @@ import gearth.services.extension_handler.extensions.implementations.network.exec
 import gearth.services.internal_extensions.extensionstore.repository.StoreFetch;
 import gearth.services.internal_extensions.extensionstore.repository.StoreRepository;
 import gearth.services.internal_extensions.extensionstore.repository.models.StoreExtension;
+import gearth.ui.translations.LanguageBundle;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.artifact.versioning.ComparableVersion;
 import org.json.JSONArray;
@@ -137,29 +138,29 @@ public class StoreExtensionTools {
 
                         } catch (IOException e) {
                             e.printStackTrace();
-                            listener.fail("Error while unzipping");
+                            listener.fail(LanguageBundle.get("ext.store.fail.unzip"));
                             removeExtension(path);
                         }
 
                     } catch (MalformedURLException e) {
-                        listener.fail("Invalid extension URL");
+                        listener.fail(LanguageBundle.get("ext.store.fail.invalidurl"));
                         try {
                             removeExtension(path); // cleanup
                         } catch (IOException ignore) { }
                     } catch (IOException e) {
-                        listener.fail("Extension not available in repository");
+                        listener.fail(LanguageBundle.get("ext.store.fail.notavailable"));
                         try {
                             removeExtension(path); // cleanup
                         } catch (IOException ignore) { }
                     }
                 }
                 else {
-                    listener.fail("Something went wrong creating the extension directory, does the extension already exist?");
+                    listener.fail(LanguageBundle.get("ext.store.fail.alreadyexists"));
                     // don't do cleanup since you might not want removal of current extension files
                 }
             }
             else {
-                listener.fail("Extension wasn't found");
+                listener.fail(LanguageBundle.get("ext.store.fail.notfound"));
             }
 
         }).start();
@@ -233,8 +234,7 @@ public class StoreExtensionTools {
                 }
             }
         } catch (Exception e) {
-            listener.fail("Something went wrong with uninstalling the extension, make sure to disconnect" +
-                    " the extension if it was still running.");
+            listener.fail(LanguageBundle.get("ext.store.fail.uninstall"));
             return;
         }
 

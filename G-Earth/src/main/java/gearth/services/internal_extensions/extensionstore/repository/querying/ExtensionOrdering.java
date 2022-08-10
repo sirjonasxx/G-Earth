@@ -1,27 +1,29 @@
 package gearth.services.internal_extensions.extensionstore.repository.querying;
 
+import gearth.ui.translations.LanguageBundle;
+
 public enum ExtensionOrdering {
 
-    RATING("Rating"),
-    ALPHABETICAL("Alphabetical"),
-    LAST_UPDATED("Last updated"),
-    NEW_RELEASES("New releases");
+    RATING("ext.store.ordering.rating"),
+    ALPHABETICAL("ext.store.ordering.alphabetical"),
+    LAST_UPDATED("ext.store.ordering.lastupdated"),
+    NEW_RELEASES("ext.store.ordering.newreleases");
 
 
 
-    private String orderName;
+    private String orderKey;
 
-    ExtensionOrdering(String orderName) {
-        this.orderName = orderName;
+    ExtensionOrdering(String orderKey) {
+        this.orderKey = orderKey;
     }
 
     public String getOrderName() {
-        return orderName;
+        return LanguageBundle.get(orderKey);
     }
 
     public static ExtensionOrdering fromString(String text) {
         for (ExtensionOrdering b : ExtensionOrdering.values()) {
-            if (b.orderName.equalsIgnoreCase(text)) {
+            if (LanguageBundle.get(b.orderKey).equalsIgnoreCase(text)) {
                 return b;
             }
         }

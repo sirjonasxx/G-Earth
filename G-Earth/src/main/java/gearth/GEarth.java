@@ -3,15 +3,12 @@ package gearth;
 import gearth.misc.AdminValidator;
 import gearth.misc.Cacher;
 import gearth.misc.UpdateChecker;
-import gearth.misc.listenerpattern.Observable;
 import gearth.misc.listenerpattern.ObservableObject;
 import gearth.ui.GEarthController;
-import gearth.ui.subforms.logger.loggerdisplays.PacketLogger;
 import gearth.ui.themes.Theme;
 import gearth.ui.themes.ThemeFactory;
 import gearth.ui.titlebar.TitleBarConfig;
 import gearth.ui.titlebar.TitleBarController;
-import gearth.ui.translations.LanguageBundle;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -28,7 +25,6 @@ public class GEarth extends Application {
     public static String version = "1.5.2";
     public static String gitApi = "https://api.github.com/repos/sirjonasxx/G-Earth/releases/latest";
     public static ObservableObject<Theme> observableTheme;
-    public static LanguageBundle translation;
 
     private Stage stage;
     private GEarthController controller;
@@ -46,9 +42,7 @@ public class GEarth extends Application {
         main = this;
         stage = primaryStage;
 
-        translation = new LanguageBundle();
-
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/gearth/ui/G-Earth.fxml"), translation);
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/gearth/ui/G-Earth.fxml"));
         Parent root = loader.load();
         controller = loader.getController();
         controller.setStage(primaryStage);

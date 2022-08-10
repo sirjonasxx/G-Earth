@@ -6,6 +6,7 @@ import gearth.services.internal_extensions.extensionstore.application.entities.C
 import gearth.services.internal_extensions.extensionstore.application.entities.HOverview;
 import gearth.services.internal_extensions.extensionstore.repository.StoreRepository;
 import gearth.services.internal_extensions.extensionstore.repository.models.ExtCategory;
+import gearth.ui.translations.LanguageBundle;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -58,17 +59,17 @@ public class CategoryOverview extends HOverview {
 
             @Override
             public String title() {
-                return GEarth.translation.getString("ext.store.categories.title");
+                return LanguageBundle.get("ext.store.categories.title");
             }
 
             @Override
             public String description() {
-                return GEarth.translation.getString("ext.store.categories.description");
+                return LanguageBundle.get("ext.store.categories.description");
             }
 
             @Override
             public String contentTitle() {
-                return GEarth.translation.getString("ext.store.categories.contenttitle");
+                return LanguageBundle.get("ext.store.categories.contenttitle");
             }
         };
     }

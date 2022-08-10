@@ -14,7 +14,7 @@ public class UiLoggerCreator extends InternalExtensionFormCreator<UiLogger> {
     public UiLogger createForm(Stage stage) throws Exception {
         UiLogger uiLogger = new UiLogger();
 
-        FXMLLoader loader = new FXMLLoader(UiLogger.class.getResource("UiLogger.fxml"), GEarth.translation);
+        FXMLLoader loader = new FXMLLoader(UiLogger.class.getResource("UiLogger.fxml"));
 
         Parent root = loader.load();
         stage.setTitle("G-Earth | Packet Logger");

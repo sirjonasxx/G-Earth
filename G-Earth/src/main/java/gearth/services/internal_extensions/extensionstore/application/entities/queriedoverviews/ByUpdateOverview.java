@@ -1,11 +1,11 @@
 package gearth.services.internal_extensions.extensionstore.application.entities.queriedoverviews;
 
-import gearth.GEarth;
 import gearth.misc.OSValidator;
 import gearth.services.internal_extensions.extensionstore.application.entities.HOverview;
 import gearth.services.internal_extensions.extensionstore.repository.StoreRepository;
 import gearth.services.internal_extensions.extensionstore.repository.models.StoreExtension;
 import gearth.services.internal_extensions.extensionstore.repository.querying.ExtensionOrdering;
+import gearth.ui.translations.LanguageBundle;
 
 import java.util.Collections;
 import java.util.List;
@@ -32,17 +32,17 @@ public class ByUpdateOverview extends QueriedExtensionOverview {
 
             @Override
             public String title() {
-                return GEarth.translation.getString("ext.store.search.ordering.byupdate.title");
+                return LanguageBundle.get("ext.store.search.ordering.byupdate.title");
             }
 
             @Override
             public String description() {
-                return GEarth.translation.getString("ext.store.search.ordering.byupdate.description");
+                return LanguageBundle.get("ext.store.search.ordering.byupdate.description");
             }
 
             @Override
             public String contentTitle() {
-                return GEarth.translation.getString("ext.store.search.ordering.byupdate.contenttitle");
+                return LanguageBundle.get("ext.store.search.ordering.byupdate.contenttitle");
             }
         };
     }

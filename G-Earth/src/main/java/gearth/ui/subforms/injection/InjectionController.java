@@ -5,6 +5,7 @@ import gearth.misc.Cacher;
 import gearth.services.packet_info.PacketInfoManager;
 import gearth.protocol.HMessage;
 import gearth.protocol.connection.HState;
+import gearth.ui.translations.LanguageBundle;
 import gearth.ui.translations.TranslatableString;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -182,7 +183,7 @@ public class InjectionController extends SubForm {
         HPacket[] packets = parsePackets(inputPacket.getText());
         for (HPacket packet : packets) {
             getHConnection().sendToServer(packet);
-            writeToLog(Color.BLUE, String.format("SS -> %s: %d", GEarth.translation.getString("tab.injection.log.packetwithid"), packet.headerId()));
+            writeToLog(Color.BLUE, String.format("SS -> %s: %d", LanguageBundle.get("tab.injection.log.packetwithid"), packet.headerId()));
         }
 
         addToHistory(packets, inputPacket.getText(), HMessage.Direction.TOSERVER);
@@ -192,7 +193,7 @@ public class InjectionController extends SubForm {
         HPacket[] packets = parsePackets(inputPacket.getText());
         for (HPacket packet : packets) {
             getHConnection().sendToClient(packet);
-            writeToLog(Color.RED, String.format("CS -> %s: %d", GEarth.translation.getString("tab.injection.log.packetwithid"), packet.headerId()));
+            writeToLog(Color.RED, String.format("CS -> %s: %d", LanguageBundle.get("tab.injection.log.packetwithid"), packet.headerId()));
         }
 
         addToHistory(packets, inputPacket.getText(), HMessage.Direction.TOCLIENT);

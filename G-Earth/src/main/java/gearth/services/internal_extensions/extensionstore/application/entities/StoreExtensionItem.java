@@ -10,6 +10,7 @@ import gearth.services.internal_extensions.extensionstore.application.entities.e
 import gearth.services.internal_extensions.extensionstore.application.entities.queriedoverviews.CategorizedOverview;
 import gearth.services.internal_extensions.extensionstore.repository.StoreRepository;
 import gearth.services.internal_extensions.extensionstore.repository.models.StoreExtension;
+import gearth.ui.translations.LanguageBundle;
 import netscape.javascript.JSObject;
 
 public class StoreExtensionItem implements ContentItem {
@@ -57,12 +58,12 @@ public class StoreExtensionItem implements ContentItem {
 
                 .append("<div class=\"overview_item_info\">")
                 .append("<div onclick=\"").append(id).append(".onClick()\" class=\"oii_name clickable\">").append(WebUtils.escapeMessage(storeExtension.getTitle())).append("</div>")
-                .append("<div class=\"oii_desc\">").append(String.format(GEarth.translation.getString("ext.store.extension.madeby"), storeExtension.getAuthors().get(0).getName())).append(", ").append(String.format(GEarth.translation.getString("ext.store.extension.lastupdated"), WebUtils.elapsedSince(storeExtension.getUpdateDate()))).append("</div>")
+                .append("<div class=\"oii_desc\">").append(String.format(LanguageBundle.get("ext.store.extension.madeby"), storeExtension.getAuthors().get(0).getName())).append(", ").append(String.format(LanguageBundle.get("ext.store.extension.lastupdated"), WebUtils.elapsedSince(storeExtension.getUpdateDate()))).append("</div>")
                 .append("</div>")
 
                 .append("<div onclick=\"").append(id).append(".onClick()\" class=\"overview_item_msgs clickable\">")
-                .append("<div class=\"oim_top\">").append(GEarth.translation.getString("ext.store.extension.version")).append(": ").append(displayVersion()).append("</div>")
-                .append("<div class=\"oim_bottom\">").append(GEarth.translation.getString("ext.store.extension.rating")).append(": ").append(storeExtension.getRating()).append("</div>")
+                .append("<div class=\"oim_top\">").append(LanguageBundle.get("ext.store.extension.version")).append(": ").append(displayVersion()).append("</div>")
+                .append("<div class=\"oim_bottom\">").append(LanguageBundle.get("ext.store.extension.rating")).append(": ").append(storeExtension.getRating()).append("</div>")
 //                .append("<div class=\"oim_bottom\">").append(storeExtension.getFramework().getFramework().getName().replace("Native", "")).append(" </div>")
                 .append("</div>")
 

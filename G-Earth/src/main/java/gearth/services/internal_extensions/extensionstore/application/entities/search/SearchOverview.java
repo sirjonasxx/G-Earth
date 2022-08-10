@@ -1,12 +1,12 @@
 package gearth.services.internal_extensions.extensionstore.application.entities.search;
 
-import gearth.GEarth;
 import gearth.services.internal_extensions.extensionstore.GExtensionStore;
 import gearth.services.internal_extensions.extensionstore.application.entities.ContentItem;
 import gearth.services.internal_extensions.extensionstore.application.entities.HOverview;
 import gearth.services.internal_extensions.extensionstore.application.entities.extensiondetails.StoreExtensionDetailsOverview;
 import gearth.services.internal_extensions.extensionstore.application.entities.queriedoverviews.SearchedQueryOverview;
 import gearth.services.internal_extensions.extensionstore.repository.StoreRepository;
+import gearth.ui.translations.LanguageBundle;
 
 import java.util.Collections;
 import java.util.List;
@@ -28,7 +28,7 @@ public class SearchOverview extends HOverview {
 
     @Override
     public String buttonText() {
-        return GEarth.translation.getString("ext.store.button.search");
+        return LanguageBundle.get("ext.store.button.search");
     }
 
     @Override
@@ -75,17 +75,17 @@ public class SearchOverview extends HOverview {
 
             @Override
             public String title() {
-                return GEarth.translation.getString("ext.store.search.title");
+                return LanguageBundle.get("ext.store.search.title");
             }
 
             @Override
             public String description() {
-                return GEarth.translation.getString("ext.store.search.description");
+                return LanguageBundle.get("ext.store.search.description");
             }
 
             @Override
             public String contentTitle() {
-                return GEarth.translation.getString("ext.store.search.contenttitle");
+                return LanguageBundle.get("ext.store.search.contenttitle");
             }
         };
     }

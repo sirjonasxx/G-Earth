@@ -1,12 +1,11 @@
 package gearth.misc;
 
-import gearth.GEarth;
 import gearth.ui.titlebar.TitleBarController;
+import gearth.ui.translations.LanguageBundle;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
-import javafx.scene.layout.Region;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -48,7 +47,7 @@ public class AdminValidator {
             if (!AdminValidator.isAdmin()) {
                 Platform.runLater(() -> {
                     Alert alert = new Alert(Alert.AlertType.WARNING, "", ButtonType.OK);
-                    alert.getDialogPane().setContent(new Label(GEarth.translation.getString("alert.adminvalidator.content").replaceAll("\\\\n", System.lineSeparator())));
+                    alert.getDialogPane().setContent(new Label(LanguageBundle.get("alert.adminvalidator.content").replaceAll("\\\\n", System.lineSeparator())));
                     try {
                         TitleBarController.create(alert).showAlert();
                     } catch (IOException e) {

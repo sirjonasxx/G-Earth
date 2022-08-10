@@ -11,6 +11,7 @@ import gearth.services.g_python.GPythonVersionUtils;
 import gearth.ui.SubForm;
 import gearth.ui.subforms.info.InfoController;
 import gearth.ui.titlebar.TitleBarController;
+import gearth.ui.translations.LanguageBundle;
 import gearth.ui.translations.TranslatableString;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -181,13 +182,13 @@ public class ExtraController extends SubForm implements SocksConfiguration {
                 });
                 if (!GPythonVersionUtils.validInstallation()) {
                     Platform.runLater(() -> {
-                        Alert alert = new Alert(Alert.AlertType.ERROR, GEarth.translation.getString("tab.extra.options.pythonscripting.alert.title"), ButtonType.OK);
-                        alert.setTitle(GEarth.translation.getString("tab.extra.options.pythonscripting.alert.title"));
+                        Alert alert = new Alert(Alert.AlertType.ERROR, LanguageBundle.get("tab.extra.options.pythonscripting.alert.title"), ButtonType.OK);
+                        alert.setTitle(LanguageBundle.get("tab.extra.options.pythonscripting.alert.title"));
 
                         FlowPane fp = new FlowPane();
-                        Label lbl = new Label(GEarth.translation.getString("tab.extra.options.pythonscripting.alert.content") +
+                        Label lbl = new Label(LanguageBundle.get("tab.extra.options.pythonscripting.alert.content") +
                                 System.lineSeparator() + System.lineSeparator() +
-                                GEarth.translation.getString("tab.extra.options.pythonscripting.alert.moreinformation"));
+                                LanguageBundle.get("tab.extra.options.pythonscripting.alert.moreinformation"));
                         Hyperlink link = new Hyperlink(INFO_URL_GPYTHON);
                         fp.getChildren().addAll( lbl, link);
                         link.setOnAction(event -> {
