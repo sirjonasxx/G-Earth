@@ -34,6 +34,9 @@ public class InjectionController extends SubForm {
     public Button btn_sendToClient;
     public ListView<InjectedPackets> history;
     public Label lblHistory;
+    public Hyperlink lnk_clearHistory;
+
+    private TranslatableString corruption, pcktInfo;
 
     protected void onParentSet() {
         getHConnection().getStateObservable().addListener((oldState, newState) -> Platform.runLater(this::updateUI));
@@ -54,15 +57,14 @@ public class InjectionController extends SubForm {
             }
         });
 
-        lblHistory.setTooltip(new Tooltip());
-        lblHistory.getTooltip().textProperty().bind(new TranslatableString("tab.injection.history.tooltip"));
-
         List<Object> rawHistory = Cacher.getList(HISTORY_CACHE_KEY);
         if (rawHistory != null) {
             List<InjectedPackets> history = rawHistory.stream()
                     .map(o -> (String)o).limit(historylimit - 1).map(InjectedPackets::new).collect(Collectors.toList());
             updateHistoryView(history);
         }
+
+        initLanguageBinding();
     }
 
     private static boolean isPacketIncomplete(String line) {
@@ -106,7 +108,7 @@ public class InjectionController extends SubForm {
     private void updateUI() {
         boolean dirty = false;
 
-        lbl_corruption.setText(GEarth.translation.getString("tab.injection.corrupted.false"));
+        corruption.setKey(1, "tab.injection.corrupted.false");
         lbl_corruption.getStyleClass().clear();
         lbl_corruption.getStyleClass().add("not-corrupted-label");
 
@@ -122,17 +124,18 @@ public class InjectionController extends SubForm {
         for (int i = 0; i < packets.length; i++) {
             if (packets[i].isCorrupted()) {
                 if (!dirty) {
-                    lbl_corruption.setText(String.format("%s -> %d", GEarth.translation.getString("tab.injection.corrupted.true"), i));
+                    corruption.setFormat("%s: %s -> " + i);
+                    corruption.setKey(1, "tab.injection.corrupted.true");
                     lbl_corruption.getStyleClass().clear();
                     lbl_corruption.getStyleClass().add("corrupted-label");
                     dirty = true;
                 } else
-                    lbl_corruption.setText(lbl_corruption.getText() + ", " + i);
+                    corruption.setFormat(corruption.getFormat() + ", " + i);
             }
         }
 
         if (dirty && packets.length == 1) {
-            lbl_corruption.setText(GEarth.translation.getString("tab.injection.corrupted.true")); // no index needed
+            corruption.setFormatAndKeys("%s: %s", "tab.injection.corrupted", "tab.injection.corrupted.true");
         }
 
         if (!dirty) {
@@ -150,26 +153,23 @@ public class InjectionController extends SubForm {
             btn_sendToClient.setDisable(!canSendToClient || getHConnection().getState() != HState.CONNECTED);
             btn_sendToServer.setDisable(!canSendToServer || getHConnection().getState() != HState.CONNECTED);
             if (packets.length == 1) {
-                lbl_pcktInfo.setText(String.format("%s (%s: %d, %s: %d)",
-                        GEarth.translation.getString("tab.injection.description.header"),
-                        GEarth.translation.getString("tab.injection.description.id"),
-                        packets[0].headerId(),
-                        GEarth.translation.getString("tab.injection.description.length"),
-                        packets[0].length()));
+                pcktInfo.setFormatAndKeys("%s (%s: " + packets[0].headerId() + ", %s: " + packets[0].length() + ")",
+                        "tab.injection.description.header",
+                        "tab.injection.description.id",
+                        "tab.injection.description.length");
             }
             else {
                 lbl_pcktInfo.setText("");
             }
         } else {
             if (packets.length == 1) {
-                lbl_pcktInfo.setText(String.format("%s (%s:NULL, %s: %d)",
-                        GEarth.translation.getString("tab.injection.description.header"),
-                        GEarth.translation.getString("tab.injection.description.id"),
-                        GEarth.translation.getString("tab.injection.description.length"),
-                        packets[0].getBytesLength()));
+                pcktInfo.setFormatAndKeys("%s (%s:NULL, %s: " + packets[0].getBytesLength() + ")",
+                        "tab.injection.description.header",
+                        "tab.injection.description.id",
+                        "tab.injection.description.length");
             }
             else {
-                lbl_pcktInfo.setText("");
+                pcktInfo.setFormatAndKeys("");
             }
 
             btn_sendToClient.setDisable(true);
@@ -233,6 +233,23 @@ public class InjectionController extends SubForm {
     public void clearHistoryClick(ActionEvent actionEvent) {
         Cacher.put(HISTORY_CACHE_KEY, new ArrayList<>());
         updateHistoryView(new ArrayList<>());
+    }
+
+    private void initLanguageBinding() {
+        lblHistory.textProperty().bind(new TranslatableString("%s", "tab.injection.history"));
+        lblHistory.setTooltip(new Tooltip());
+        lblHistory.getTooltip().textProperty().bind(new TranslatableString("%s", "tab.injection.history.tooltip"));
+
+        corruption = new TranslatableString("%s: %s", "tab.injection.corrupted", "tab.injection.corrupted.true");
+        lbl_corruption.textProperty().bind(corruption);
+
+        pcktInfo = new TranslatableString("%s (%s:NULL, %s:0)", "tab.injection.description.header", "tab.injection.description.id", "tab.injection.description.length");
+        lbl_pcktInfo.textProperty().bind(pcktInfo);
+
+        btn_sendToServer.textProperty().bind(new TranslatableString("%s", "tab.injection.send.toserver"));
+        btn_sendToClient.textProperty().bind(new TranslatableString("%s", "tab.injection.send.toclient"));
+
+        lnk_clearHistory.textProperty().bind(new TranslatableString("%s", "tab.injection.history.clear"));
     }
 
     public static void main(String[] args) {

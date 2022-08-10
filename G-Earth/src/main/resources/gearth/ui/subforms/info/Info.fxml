@@ -20,22 +20,22 @@
                <Font size="18.0" />
             </font>
          </Label>
-         <Label layoutX="260.0" layoutY="57.0" text="%tab.info.description" textFill="#000000b2">
+         <Label fx:id="lbl_description" layoutX="260.0" layoutY="57.0" text="Habbo packet manipulator for Linux, Windows &amp; Mac" textFill="#000000b2">
             <font>
                <Font size="14.0" />
             </font>
          </Label>
-         <Label layoutX="260.0" layoutY="92.0" text="%tab.info.createdby" textFill="#000000b2">
+         <Label fx:id="lbl_createdBy" layoutX="260.0" layoutY="92.0" text="Created by:" textFill="#000000b2">
             <font>
                <Font name="System Bold" size="14.0" />
             </font>
          </Label>
-         <Label layoutX="344.0" layoutY="92.0" text="sirjonasxx" textFill="#000000b2">
+         <Label layoutX="363.0" layoutY="92.0" text="sirjonasxx" textFill="#000000b2">
             <font>
                <Font size="14.0" />
             </font>
          </Label>
-         <Label layoutX="260.0" layoutY="124.0" text="%tab.info.contributors" textFill="#000000b2">
+         <Label fx:id="lbl_contrib" layoutX="260.0" layoutY="124.0" text="Contributors:" textFill="#000000b2">
             <font>
                <Font name="System Bold" size="14.0" />
             </font>
@@ -75,7 +75,7 @@
                <Font size="14.0" />
             </font>
          </Label>
-         <Label layoutX="491.0" layoutY="92.0" text="%tab.info.links" textFill="#000000b2">
+         <Label fx:id="lbl_links" layoutX="491.0" layoutY="92.0" text="Links:" textFill="#000000b2">
             <font>
                <Font name="System Bold" size="14.0" />
             </font>
@@ -85,7 +85,7 @@
          <Hyperlink fx:id="link_g_tanji" layoutX="487.0" layoutY="152.0" text="Github - Tanji" />
          <Hyperlink fx:id="link_d_gearth" layoutX="487.0" layoutY="172.0" text="Discord - G-Earth" />
          <Hyperlink fx:id="link_g_store" layoutX="487.0" layoutY="212.0" text="G-ExtensionStore" />
-         <Button layoutX="537.0" layoutY="14.0" mnemonicParsing="false" onAction="#donate" prefHeight="20.0" prefWidth="100.0" text="%tab.info.donate" />
+         <Button fx:id="btn_donate" layoutX="537.0" layoutY="14.0" mnemonicParsing="false" onAction="#donate" prefHeight="20.0" prefWidth="100.0" text="Donate BTC" />
          <Hyperlink fx:id="link_t_gearth" layoutX="487.0" layoutY="192.0" text="Twitter - G-Earth" />
          <!--<Hyperlink fx:id="link_d_bonnie" layoutX="400.0" layoutY="221.0" text="Discord - BonnieScripting (pt/br)" />-->
       </children>

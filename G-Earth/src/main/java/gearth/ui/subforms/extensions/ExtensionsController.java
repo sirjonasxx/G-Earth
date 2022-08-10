@@ -11,6 +11,8 @@ import gearth.services.extension_handler.extensions.implementations.network.exec
 import gearth.services.g_python.GPythonShell;
 import gearth.ui.SubForm;
 import gearth.ui.subforms.extensions.logger.ExtensionLogger;
+import gearth.ui.translations.LanguageBundle;
+import gearth.ui.translations.TranslatableString;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.scene.control.*;
@@ -40,12 +42,14 @@ public class ExtensionsController extends SubForm {
     private NetworkExtensionsProducer networkExtensionsProducer; // needed for port
     private ExtensionLogger extensionLogger = null;
 
-
+    public Label lbl_tableTitle, lbl_tableDesc, lbl_tableAuthor, lbl_tableVersion, lbl_tableEdit, lbl_port;
 
 
     public void initialize() {
         scroller.widthProperty().addListener(observable -> header_ext.setPrefWidth(scroller.getWidth()));
         extensionLogger = new ExtensionLogger();
+
+        initLanguageBinding();
     }
 
     protected void onParentSet() {
@@ -81,9 +85,9 @@ public class ExtensionsController extends SubForm {
 
     public void installBtnClicked(ActionEvent actionEvent) {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle(GEarth.translation.getString("tab.extensions.button.install.windowtitle"));
+        fileChooser.setTitle(LanguageBundle.get("tab.extensions.button.install.windowtitle"));
         fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter(GEarth.translation.getString("tab.extensions.button.install.filetype"), ExecutionInfo.ALLOWEDEXTENSIONTYPES));
+                new FileChooser.ExtensionFilter(LanguageBundle.get("tab.extensions.button.install.filetype"), ExecutionInfo.ALLOWEDEXTENSIONTYPES));
         File selectedFile = fileChooser.showOpenDialog(parentController.getStage());
         if (selectedFile != null) {
             extensionRunner.installAndRunExtension(selectedFile.getPath(), networkExtensionsProducer.getPort());
@@ -117,7 +121,7 @@ public class ExtensionsController extends SubForm {
         pythonShellLaunching = true;
         Platform.runLater(() -> btn_gpython.setDisable(true));
         GPythonShell shell = new GPythonShell(
-                String.format("%s %d", GEarth.translation.getString("tab.extensions.button.pythonshell.windowtitle"),gpytonShellCounter++),
+                String.format("%s %d", LanguageBundle.get("tab.extensions.button.pythonshell.windowtitle"),gpytonShellCounter++),
                 networkExtensionsProducer.getPort(),
                 Authenticator.generatePermanentCookie()
         );
@@ -129,5 +133,19 @@ public class ExtensionsController extends SubForm {
 
     public ExtensionHandler getExtensionHandler() {
         return extensionHandler;
+    }
+
+    private void initLanguageBinding() {
+        lbl_tableTitle.textProperty().bind(new TranslatableString("%s", "tab.extensions.table.title"));
+        lbl_tableDesc.textProperty().bind(new TranslatableString("%s", "tab.extensions.table.description"));
+        lbl_tableAuthor.textProperty().bind(new TranslatableString("%s", "tab.extensions.table.author"));
+        lbl_tableVersion.textProperty().bind(new TranslatableString("%s", "tab.extensions.table.version"));
+        lbl_tableEdit.textProperty().bind(new TranslatableString("%s", "tab.extensions.table.edit"));
+
+        lbl_port.textProperty().bind(new TranslatableString("%s:", "tab.extensions.port"));
+
+        btn_gpython.textProperty().bind(new TranslatableString("%s", "tab.extensions.button.pythonshell"));
+        btn_viewExtensionConsole.textProperty().bind(new TranslatableString("%s", "tab.extensions.button.logs"));
+        btn_install.textProperty().bind(new TranslatableString("%s", "tab.extensions.button.install"));
     }
 }

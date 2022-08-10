@@ -31,11 +31,11 @@
                 <VBox.margin>
                     <Insets bottom="-2.0" left="-2.0" right="-2.0" top="-2.0" />
                 </VBox.margin>
-                <Label alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-text-fill: #666666; -fx-background-color: #F7F7F7;" text="%tab.scheduler.table.index" />
-                <Label alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-text-fill: #666666; -fx-background-color: #F7F7F7;" text="%tab.scheduler.table.packet" GridPane.columnIndex="1" />
-                <Label alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-text-fill: #666666; -fx-background-color: #F7F7F7;" text="%tab.scheduler.table.interval" GridPane.columnIndex="2" />
-                <Label alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-text-fill: #666666; -fx-background-color: #F7F7F7;" text="%tab.scheduler.table.destination" GridPane.columnIndex="3" />
-                <Label alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-text-fill: #666666; -fx-background-color: #F7F7F7;" text="%tab.scheduler.table.edit" GridPane.columnIndex="4" />
+                <Label fx:id="lbl_tableIndex" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-text-fill: #666666; -fx-background-color: #F7F7F7;" text="Index" />
+                <Label fx:id="lbl_tablePacket" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-text-fill: #666666; -fx-background-color: #F7F7F7;" text="Packet" GridPane.columnIndex="1" />
+                <Label fx:id="lbl_tableInterval" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-text-fill: #666666; -fx-background-color: #F7F7F7;" text="Interval" GridPane.columnIndex="2" />
+                <Label fx:id="lbl_tableDest" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-text-fill: #666666; -fx-background-color: #F7F7F7;" text="Destination" GridPane.columnIndex="3" />
+                <Label fx:id="lbl_tableEdit" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-text-fill: #666666; -fx-background-color: #F7F7F7;" text="Edit" GridPane.columnIndex="4" />
             </GridPane>
         </VBox>
     </ScrollPane>
@@ -67,14 +67,14 @@
                     <Insets left="-7.0" />
                 </GridPane.margin>
             </TextField>
-            <Label maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="%tab.scheduler.setup.packet" textFill="#000000bb">
+            <Label fx:id="lbl_setupPacket" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Packet:" textFill="#000000bb">
                 <GridPane.margin>
                     <Insets left="3.0" />
                 </GridPane.margin>
             </Label>
-            <Button fx:id="btn_clear" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#clearBtnClicked" text="%tab.scheduler.button.clear" GridPane.columnIndex="3" />
-            <Button fx:id="btn_save" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#saveBtnClicked" text="%tab.scheduler.button.save" GridPane.columnIndex="4" />
-            <Button fx:id="btn_load" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#loadBtnClicked" text="%tab.scheduler.button.load" GridPane.columnIndex="5" />
+            <Button fx:id="btn_clear" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#clearBtnClicked" text="Clear" GridPane.columnIndex="3" />
+            <Button fx:id="btn_save" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#saveBtnClicked" text="S" GridPane.columnIndex="4" />
+            <Button fx:id="btn_load" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#loadBtnClicked" text="L" GridPane.columnIndex="5" />
         </GridPane>
         <GridPane prefHeight="33.0" prefWidth="502.0" GridPane.rowIndex="1">
             <columnConstraints>
@@ -96,17 +96,17 @@
                     <Insets right="5.0" />
                 </GridPane.margin>
             </TextField>
-            <Label maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="%tab.scheduler.setup.interval" textFill="#000000bb">
+            <Label fx:id="lbl_setupInterval" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Interval:" textFill="#000000bb">
                 <GridPane.margin>
                     <Insets left="3.0" />
                 </GridPane.margin>
             </Label>
-            <Button fx:id="btn_addoredit" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#scheduleBtnClicked" text="%tab.scheduler.button.add" GridPane.columnIndex="4">
+            <Button fx:id="btn_addoredit" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#scheduleBtnClicked" text="Add" GridPane.columnIndex="4">
                 <GridPane.margin>
                     <Insets bottom="2.0" left="5.0" top="2.0" />
                 </GridPane.margin>
             </Button>
-            <RadioButton fx:id="rb_incoming" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="%tab.scheduler.direction.in" GridPane.columnIndex="2">
+            <RadioButton fx:id="rb_incoming" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="In" GridPane.columnIndex="2">
                 <GridPane.margin>
                     <Insets left="5.0" />
                 </GridPane.margin>
@@ -114,12 +114,12 @@
                     <ToggleGroup fx:id="scheduler_dest" />
                 </toggleGroup>
             </RadioButton>
-            <RadioButton fx:id="rb_outgoing" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="%tab.scheduler.direction.out" toggleGroup="$scheduler_dest" GridPane.columnIndex="3">
+            <RadioButton fx:id="rb_outgoing" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Out" toggleGroup="$scheduler_dest" GridPane.columnIndex="3">
                 <GridPane.margin>
                     <Insets left="5.0" />
                 </GridPane.margin>
             </RadioButton>
-         <CheckBox fx:id="cbx_hotkeys" mnemonicParsing="false" text="%tab.scheduler.hotkeys" textFill="#4d4d4d" GridPane.columnIndex="5">
+         <CheckBox fx:id="cbx_hotkeys" mnemonicParsing="false" text="Enable hotkeys (Ctrl+Shift+Index)" textFill="#4d4d4d" GridPane.columnIndex="5">
             <GridPane.margin>
                <Insets left="32.0" />
             </GridPane.margin>

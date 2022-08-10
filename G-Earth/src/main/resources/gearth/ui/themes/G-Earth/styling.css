@@ -1015,11 +1015,11 @@ VBox > .split-menu-button.last > .arrow-button {
 }
 
 #language-picker .context-menu {
-    -fx-padding: 5 0 5 0;
+    -fx-padding: 0;
 }
 
 #language-picker .context-menu .menu-item {
-    -fx-padding: 5 0 5 5;
+    -fx-padding: 10 0 0 5;
 }
 
 #language-picker .label {

@@ -4,6 +4,8 @@ import gearth.GEarth;
 import gearth.services.extension_handler.extensions.ExtensionType;
 import gearth.services.extension_handler.extensions.GEarthExtension;
 import gearth.ui.titlebar.TitleBarController;
+import gearth.ui.translations.LanguageBundle;
+import gearth.ui.translations.TranslatableString;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -81,7 +83,8 @@ public class ExtensionItemContainer extends GridPane {
         add(versionLabel, 3, 0);
 
         exitButton = new ExitButton();
-        Tooltip delete = new Tooltip(GEarth.translation.getString("tab.extensions.table.edit.delete.tooltip"));
+        Tooltip delete = new Tooltip();
+        delete.textProperty().bind(new TranslatableString("%s", "tab.extensions.table.edit.delete.tooltip"));
         Tooltip.install(exitButton,delete);
         exitButton.show();
         clickButton = new SimpleClickButton();
@@ -90,7 +93,8 @@ public class ExtensionItemContainer extends GridPane {
         buttonsBox = new HBox(clickButton, exitButton);
 
         reloadButton = new ReloadButton();
-        Tooltip reload = new Tooltip(GEarth.translation.getString("tab.extensions.table.edit.restart.tooltip"));
+        Tooltip reload = new Tooltip();
+        reload.textProperty().bind(new TranslatableString("%s", "tab.extensions.table.edit.restart.tooltip"));
         Tooltip.install(reloadButton, reload);
         reloadButton.show();
         reloadButton.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
@@ -100,8 +104,6 @@ public class ExtensionItemContainer extends GridPane {
         });
 
         DeleteButton deleteButton = new DeleteButton();
-        Tooltip uninstall = new Tooltip(GEarth.translation.getString("tab.extensions.table.edit.uninstall.tooltip"));
-        Tooltip.install(deleteButton, uninstall);
         deleteButton.show();
         GridPane this2 = this;
 
@@ -111,8 +113,8 @@ public class ExtensionItemContainer extends GridPane {
 
             if (ConfirmationDialog.showDialog(uninstallKey)) {
                 Alert alert = ConfirmationDialog.createAlertWithOptOut(Alert.AlertType.CONFIRMATION, uninstallKey
-                        , GEarth.translation.getString("alert.confirmation.windowtitle"), null,
-                        GEarth.translation.getString("tab.extensions.table.edit.uninstall.confirmation"), GEarth.translation.getString("alert.confirmation.button.donotaskagain"),
+                        , LanguageBundle.get("alert.confirmation.windowtitle"), null,
+                        LanguageBundle.get("tab.extensions.table.edit.uninstall.confirmation"), LanguageBundle.get("alert.confirmation.button.donotaskagain"),
                         ButtonType.YES, ButtonType.NO
                 );
 
@@ -217,5 +219,9 @@ public class ExtensionItemContainer extends GridPane {
             return item.getFileName();
         }
         return null;
+    }
+
+    private void initLanguageBinding() {
+
     }
 }

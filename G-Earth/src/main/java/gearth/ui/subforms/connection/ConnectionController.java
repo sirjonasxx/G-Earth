@@ -49,6 +49,8 @@ public class ConnectionController extends SubForm {
 
     private volatile int initcount = 0;
 
+    private TranslatableString connect, state;
+
     public void initialize() {
 
         Constants.UNITY_PACKETS = rd_unity.isSelected();
@@ -179,20 +181,20 @@ public class ConnectionController extends SubForm {
         getHConnection().getStateObservable().addListener((oldState, newState) -> Platform.runLater(() -> {
             updateInputUI();
             if (newState == HState.NOT_CONNECTED) {
-                lblState.textProperty().bind(ConnectionState.NOTCONNECTED.value);
-                btnConnect.textProperty().bind(ConnectButton.CONNECT.value);
+                state.setKey(0, "tab.connection.state.notconnected");
+                connect.setKey(0, "tab.connection.button.connect");
                 outHost.setText("");
                 outPort.setText("");
             }
             else if (oldState == HState.NOT_CONNECTED) {
-                btnConnect.textProperty().bind(ConnectButton.ABORT.value);
+                connect.setKey(0, "tab.connection.button.abort");
             }
 
             if (newState == HState.CONNECTED) {
-                lblState.textProperty().bind(ConnectionState.CONNECTED.value);
+                state.setKey(0, "tab.connection.state.connected");
             }
             if (newState == HState.WAITING_FOR_CLIENT) {
-                lblState.textProperty().bind(ConnectionState.WAITING.value);
+                state.setKey(0, "tab.connection.state.waiting");
             }
 
             if (newState == HState.CONNECTED && useFlash()) {
@@ -318,44 +320,23 @@ public class ConnectionController extends SubForm {
         return false;
     }
 
-    private enum ConnectButton {
-        CONNECT ("tab.connection.button.connect"),
-        ABORT ("tab.connection.button.abort");
-
-        public final TranslatableString value;
-
-        ConnectButton(String key) {
-            this.value = new TranslatableString(key);
-        }
-    }
-
-    private enum ConnectionState {
-        CONNECTED ("tab.connection.state.connected"),
-        NOTCONNECTED ("tab.connection.state.notconnected"),
-        WAITING ("tab.connection.state.waiting");
-
-        public final TranslatableString value;
-
-        ConnectionState(String key) {
-            this.value = new TranslatableString(key);
-        }
-    }
-
     private void initLanguageBinding() {
-        TranslatableString port = new TranslatableString("tab.connection.port");
-        TranslatableString host = new TranslatableString("tab.connection.host");
+        TranslatableString port = new TranslatableString("%s", "tab.connection.port");
+        TranslatableString host = new TranslatableString("%s", "tab.connection.host");
         lblInpPort.textProperty().bind(port);
         lblInpHost.textProperty().bind(host);
         lblPort.textProperty().bind(port);
         lblHost.textProperty().bind(host);
-        cbx_autodetect.textProperty().bind(new TranslatableString("tab.connection.autodetect"));
-        btnConnect.textProperty().bind(ConnectButton.CONNECT.value);
-        lblHotelVersion.textProperty().bind(new TranslatableString("tab.connection.version"));
-        lblClient.textProperty().bind(new TranslatableString("tab.connection.client"));
-        rd_unity.textProperty().bind(new TranslatableString("tab.connection.client.unity"));
-        rd_flash.textProperty().bind(new TranslatableString("tab.connection.client.flash"));
-        rd_nitro.textProperty().bind(new TranslatableString("tab.connection.client.nitro"));
-        lblStateHead.textProperty().bind(new TranslatableString("tab.connection.state"));
-        lblState.textProperty().bind(ConnectionState.NOTCONNECTED.value);
+        cbx_autodetect.textProperty().bind(new TranslatableString("%s", "tab.connection.autodetect"));
+        connect = new TranslatableString("%s", "tab.connection.button.connect");
+        btnConnect.textProperty().bind(connect);
+        lblHotelVersion.textProperty().bind(new TranslatableString("%s", "tab.connection.version"));
+        lblClient.textProperty().bind(new TranslatableString("%s", "tab.connection.client"));
+        rd_unity.textProperty().bind(new TranslatableString("%s", "tab.connection.client.unity"));
+        rd_flash.textProperty().bind(new TranslatableString("%s", "tab.connection.client.flash"));
+        rd_nitro.textProperty().bind(new TranslatableString("%s", "tab.connection.client.nitro"));
+        lblStateHead.textProperty().bind(new TranslatableString("%s", "tab.connection.state"));
+        state = new TranslatableString("%s", "tab.connection.state.notconnected");
+        lblState.textProperty().bind(state);
     }
 }

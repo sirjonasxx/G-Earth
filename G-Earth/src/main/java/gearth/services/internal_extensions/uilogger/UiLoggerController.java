@@ -1,14 +1,15 @@
 package gearth.services.internal_extensions.uilogger;
 
  import at.favre.lib.bytes.Bytes;
- import gearth.GEarth;
  import gearth.misc.Cacher;
  import gearth.services.internal_extensions.uilogger.hexdumper.Hexdump;
  import gearth.services.packet_info.PacketInfo;
  import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 import gearth.ui.subforms.logger.loggerdisplays.PacketLogger;
-import javafx.application.Platform;
+ import gearth.ui.translations.LanguageBundle;
+ import gearth.ui.translations.TranslatableString;
+ import javafx.application.Platform;
 import javafx.event.ActionEvent;
  import javafx.fxml.Initializable;
  import javafx.scene.control.*;
@@ -40,7 +41,7 @@ public class UiLoggerController implements Initializable {
     public CheckMenuItem chkViewIncoming;
     public CheckMenuItem chkViewOutgoing;
     public CheckMenuItem chkDisplayStructure;
-    public Label lblAutoScrolll;
+    public Label lblAutoScroll;
     public CheckMenuItem chkAutoscroll;
     public CheckMenuItem chkSkipBigPackets;
     public CheckMenuItem chkMessageName;
@@ -72,6 +73,7 @@ public class UiLoggerController implements Initializable {
     public RadioMenuItem chkReprHex;
     public RadioMenuItem chkReprRawHex;
     public RadioMenuItem chkReprNone;
+    public MenuItem menuItem_clear, menuItem_exportAll;
 
     private Map<Integer, LinkedList<Long>> filterTimestamps = new HashMap<>();
 
@@ -86,6 +88,11 @@ public class UiLoggerController implements Initializable {
 
     private List<MenuItem> allMenuItems = new ArrayList<>();
     private UiLogger uiLogger;
+
+    public Menu menu_window, menu_window_onConnect, menu_window_onDisconnect, menu_view, menu_packets,
+            menu_packets_details, menu_packets_details_byteRep, menu_packets_details_message, menu_packets_antiSpam;
+
+    private TranslatableString viewIncoming, viewOutgoing, autoScroll, packetInfo, filtered;
 
     private boolean isSelected(MenuItem item) {
         if (item instanceof CheckMenuItem) {
@@ -158,6 +165,8 @@ public class UiLoggerController implements Initializable {
                 appendLater.clear();
             }
         }
+
+        initLanguageBinding();
     }
 
     private static String cleanTextContent(String text) {
@@ -220,7 +229,7 @@ public class UiLoggerController implements Initializable {
 
 
         if (chkTimestamp.isSelected()) {
-            elements.add(new Element(String.format("(%s: %d)\n", GEarth.translation.getString("ext.logger.element.timestamp"), System.currentTimeMillis()), "timestamp"));
+            elements.add(new Element(String.format("(%s: %d)\n", LanguageBundle.get("ext.logger.element.timestamp"), System.currentTimeMillis()), "timestamp"));
         }
 
         boolean packetInfoAvailable = uiLogger.getPacketInfoManager().getPacketInfoList().size() > 0;
@@ -257,8 +266,8 @@ public class UiLoggerController implements Initializable {
             elements.add(new Element("\n", ""));
         }
 
-        if (isBlocked) elements.add(new Element(String.format("[%s]\n", GEarth.translation.getString("ext.logger.element.blocked")), "blocked"));
-        else if (isReplaced) elements.add(new Element(String.format("[%s]\n", GEarth.translation.getString("ext.logger.element.replaced")), "replaced"));
+        if (isBlocked) elements.add(new Element(String.format("[%s]\n", LanguageBundle.get("ext.logger.element.blocked")), "blocked"));
+        else if (isReplaced) elements.add(new Element(String.format("[%s]\n", LanguageBundle.get("ext.logger.element.replaced")), "replaced"));
 
         if (!chkReprNone.isSelected()) {
             boolean isSkipped = chkSkipBigPackets.isSelected() && (packet.length() > 4000 || (packet.length() > 1000 && chkReprHex.isSelected()));
@@ -266,7 +275,7 @@ public class UiLoggerController implements Initializable {
                     Hexdump.hexdump(packet.toBytes()) :
                     (chkReprRawHex.isSelected() ? Bytes.wrap(packet.toBytes()).encodeHex() : packet.toString());
 
-            String type = isIncoming ? GEarth.translation.getString("ext.logger.element.direction.incoming") : GEarth.translation.getString("ext.logger.element.direction.outgoing");
+            String type = isIncoming ? LanguageBundle.get("ext.logger.element.direction.incoming") : LanguageBundle.get("ext.logger.element.direction.outgoing");
 
             if (!chkReprHex.isSelected()) {
                 elements.add(new Element(String.format("%s[", type), type.toLowerCase()));
@@ -277,7 +286,7 @@ public class UiLoggerController implements Initializable {
             }
 
             if (isSkipped) {
-                elements.add(new Element(String.format("<%s>", GEarth.translation.getString("ext.logger.element.skipped")), "skipped"));
+                elements.add(new Element(String.format("<%s>", LanguageBundle.get("ext.logger.element.skipped")), "skipped"));
             } else
                 elements.add(new Element(packetRepresentation, String.format(chkReprHex.isSelected() ? "%sHex": "%s", type.toLowerCase())));
             elements.add(new Element("\n", ""));
@@ -344,13 +353,13 @@ public class UiLoggerController implements Initializable {
 
     public void updateLoggerInfo() {
         Platform.runLater(() -> {
-            lblViewIncoming.setText(String.format("%s: %s", GEarth.translation.getString("ext.logger.menu.view.incoming"), (chkViewIncoming.isSelected() ? "True" : "False")));
-            lblViewOutgoing.setText(String.format("%s: %s", GEarth.translation.getString("ext.logger.menu.view.outgoing"), (chkViewOutgoing.isSelected() ? "True" : "False")));
-            lblAutoScrolll.setText(String.format("%s: %s", GEarth.translation.getString("ext.logger.menu.view.autoscroll"), (chkAutoscroll.isSelected() ? "True" : "False")));
-            lblFiltered.setText(String.format("%s: %d", GEarth.translation.getString("ext.logger.state.filtered"), filteredAmount));
+            viewIncoming.setKey(1, "ext.logger.state." + (chkViewIncoming.isSelected() ? "true" : "false"));
+            viewIncoming.setKey(1, "ext.logger.state." + (chkViewOutgoing.isSelected() ? "true" : "false"));
+            autoScroll.setKey(1, "ext.logger.state." + (chkAutoscroll.isSelected() ? "true" : "false"));
+            filtered.setFormat("%s: " + filteredAmount);
 
             boolean packetInfoAvailable = uiLogger.getPacketInfoManager().getPacketInfoList().size() > 0;
-            lblPacketInfo.setText(String.format("%s: %s", GEarth.translation.getString("ext.logger.state.packetinfo"), (packetInfoAvailable ? "True" : "False")));
+            packetInfo.setKey(1, "ext.logger.state." + (packetInfoAvailable ? "true" : "false"));
         });
     }
 
@@ -390,9 +399,9 @@ public class UiLoggerController implements Initializable {
 
         //Set extension filter
         FileChooser.ExtensionFilter extFilter =
-                new FileChooser.ExtensionFilter(String.format("%s (*.txt)", GEarth.translation.getString("ext.logger.menu.packets.exportall.filetype")), "*.txt");
+                new FileChooser.ExtensionFilter(String.format("%s (*.txt)", LanguageBundle.get("ext.logger.menu.packets.exportall.filetype")), "*.txt");
         fileChooser.getExtensionFilters().add(extFilter);
-        fileChooser.setTitle(GEarth.translation.getString("ext.logger.menu.packets.exportall.windowtitle"));
+        fileChooser.setTitle(LanguageBundle.get("ext.logger.menu.packets.exportall.windowtitle"));
 
         //Show save file dialog
         File file = fileChooser.showSaveDialog(stage);
@@ -416,5 +425,63 @@ public class UiLoggerController implements Initializable {
 
     public void init(UiLogger uiLogger) {
         this.uiLogger = uiLogger;
+    }
+
+    private void initLanguageBinding() {
+        menu_window.textProperty().bind(new TranslatableString("%s", "ext.logger.menu.window"));
+        chkAlwaysOnTop.textProperty().bind(new TranslatableString("%s", "ext.logger.menu.window.alwaysontop"));
+
+        menu_window_onConnect.textProperty().bind(new TranslatableString("%s", "ext.logger.menu.window.onconnect"));
+        chkOpenOnConnect.textProperty().bind(new TranslatableString("%s", "ext.logger.menu.window.onconnect.openwindow"));
+        chkResetOnConnect.textProperty().bind(new TranslatableString("%s", "ext.logger.menu.window.onconnect.reset"));
+
+        menu_window_onDisconnect.textProperty().bind(new TranslatableString("%s", "ext.logger.menu.window.ondisconnect"));
+        chkHideOnDisconnect.textProperty().bind(new TranslatableString("%s", "ext.logger.menu.window.ondisconnect.hidewindow"));
+        chkResetOnDisconnect.textProperty().bind(new TranslatableString("%s", "ext.logger.menu.window.ondisconnect.reset"));
+
+        menu_view.textProperty().bind(new TranslatableString("%s", "ext.logger.menu.view"));
+        chkViewIncoming.textProperty().bind(new TranslatableString("%s", "ext.logger.menu.view.incoming"));
+        chkViewOutgoing.textProperty().bind(new TranslatableString("%s", "ext.logger.menu.view.outgoing"));
+        chkAutoscroll.textProperty().bind(new TranslatableString("%s", "ext.logger.menu.view.autoscroll"));
+        menuItem_clear.textProperty().bind(new TranslatableString("%s", "ext.logger.menu.view.cleartext"));
+
+        menu_packets.textProperty().bind(new TranslatableString("%s", "ext.logger.menu.packets"));
+        menu_packets_details.textProperty().bind(new TranslatableString("%s", "ext.logger.menu.packets.displaydetails"));
+        chkDisplayStructure.textProperty().bind(new TranslatableString("%s", "ext.logger.menu.packets.displaydetails.structure"));
+        chkTimestamp.textProperty().bind(new TranslatableString("%s", "ext.logger.menu.packets.displaydetails.timestamp"));
+
+        menu_packets_details_byteRep.textProperty().bind(new TranslatableString("%s", "ext.logger.menu.packets.displaydetails.byterep"));
+        chkReprLegacy.textProperty().bind(new TranslatableString("%s", "ext.logger.menu.packets.displaydetails.byterep.legacy"));
+        chkReprHex.textProperty().bind(new TranslatableString("%s", "ext.logger.menu.packets.displaydetails.byterep.hexdump"));
+        chkReprRawHex.textProperty().bind(new TranslatableString("%s", "ext.logger.menu.packets.displaydetails.byterep.rawhex"));
+        chkReprNone.textProperty().bind(new TranslatableString("%s", "ext.logger.menu.packets.displaydetails.byterep.none"));
+
+        menu_packets_details_message.textProperty().bind(new TranslatableString("%s", "ext.logger.menu.packets.displaydetails.message"));
+        chkMessageHash.textProperty().bind(new TranslatableString("%s", "ext.logger.menu.packets.displaydetails.message.hash"));
+        chkMessageName.textProperty().bind(new TranslatableString("%s", "ext.logger.menu.packets.displaydetails.message.name"));
+        chkMessageId.textProperty().bind(new TranslatableString("%s", "ext.logger.menu.packets.displaydetails.message.id"));
+
+        menu_packets_antiSpam.textProperty().bind(new TranslatableString("%s", "ext.logger.menu.packets.antispam"));
+        chkAntiSpam_none.textProperty().bind(new TranslatableString("%s", "ext.logger.menu.packets.antispam.none"));
+        chkAntiSpam_low.textProperty().bind(new TranslatableString("%s", "ext.logger.menu.packets.antispam.low"));
+        chkAntiSpam_medium.textProperty().bind(new TranslatableString("%s", "ext.logger.menu.packets.antispam.med"));
+        chkAntiSpam_high.textProperty().bind(new TranslatableString("%s", "ext.logger.menu.packets.antispam.high"));
+        chkAntiSpam_ultra.textProperty().bind(new TranslatableString("%s", "ext.logger.menu.packets.antispam.ultra"));
+
+        chkSkipBigPackets.textProperty().bind(new TranslatableString("%s", "ext.logger.menu.packets.skipbig"));
+
+        menuItem_exportAll.textProperty().bind(new TranslatableString("%s", "ext.logger.menu.packets.exportall"));
+
+        viewIncoming = new TranslatableString("%s: %s", "ext.logger.menu.view.incoming", "ext.logger.state.true");
+        viewOutgoing = new TranslatableString("%s: %s", "ext.logger.menu.view.outgoing", "ext.logger.state.true");
+        autoScroll = new TranslatableString("%s: %s", "ext.logger.menu.view.autoscroll", "ext.logger.state.true");
+        packetInfo = new TranslatableString("%s: %s", "ext.logger.state.packetinfo", "ext.logger.state.false");
+        filtered = new TranslatableString("%s: 0", "ext.logger.state.filtered");
+
+        lblViewIncoming.textProperty().bind(viewIncoming);
+        lblViewOutgoing.textProperty().bind(viewOutgoing);
+        lblAutoScroll.textProperty().bind(autoScroll);
+        lblPacketInfo.textProperty().bind(packetInfo);
+        lblFiltered.textProperty().bind(filtered);
     }
 }

@@ -2,6 +2,7 @@ package gearth.ui.translations;
 
 import gearth.GEarth;
 import gearth.misc.Cacher;
+import gearth.services.internal_extensions.extensionstore.application.GExtensionStoreController;
 import gearth.ui.themes.Theme;
 
 import java.util.Enumeration;
@@ -41,6 +42,7 @@ public class LanguageBundle extends ResourceBundle {
     public static void setLanguage(Language lang) {
         current = lang;
         requireUpdate.forEach(TranslatableString::trigger);
+        GExtensionStoreController.reloadPage();
         Cacher.put(LANGUAGE_CACHE_KEY, current.toString());
     }
 

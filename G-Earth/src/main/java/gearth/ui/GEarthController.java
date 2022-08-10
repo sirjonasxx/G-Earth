@@ -121,12 +121,12 @@ public class GEarthController {
     }
 
     private void initLanguageBinding() {
-        tab_Connection.textProperty().bind(new TranslatableString("tab.connection"));
-        tab_Injection.textProperty().bind(new TranslatableString("tab.injection"));
-        tab_Tools.textProperty().bind(new TranslatableString("tab.tools"));
-        tab_Scheduler.textProperty().bind(new TranslatableString("tab.scheduler"));
-        tab_Extensions.textProperty().bind(new TranslatableString("tab.extensions"));
-        tab_Extra.textProperty().bind(new TranslatableString("tab.extra"));
-        tab_Info.textProperty().bind(new TranslatableString("tab.info"));
+        tab_Connection.textProperty().bind(new TranslatableString("%s", "tab.connection"));
+        tab_Injection.textProperty().bind(new TranslatableString("%s", "tab.injection"));
+        tab_Tools.textProperty().bind(new TranslatableString("%s", "tab.tools"));
+        tab_Scheduler.textProperty().bind(new TranslatableString("%s", "tab.scheduler"));
+        tab_Extensions.textProperty().bind(new TranslatableString("%s", "tab.extensions"));
+        tab_Extra.textProperty().bind(new TranslatableString("%s", "tab.extra"));
+        tab_Info.textProperty().bind(new TranslatableString("%s", "tab.info"));
     }
 }

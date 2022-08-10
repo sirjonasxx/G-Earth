@@ -4,8 +4,11 @@ import com.tulskiy.keymaster.common.Provider;
 import gearth.GEarth;
 import gearth.services.scheduler.Interval;
 import gearth.services.scheduler.Scheduler;
+import gearth.ui.translations.LanguageBundle;
+import gearth.ui.translations.TranslatableString;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
@@ -49,6 +52,9 @@ public class SchedulerController extends SubForm {
 
     private Scheduler<InteractableScheduleItem> scheduler = null;
 
+    private TranslatableString addoredit;
+    public Label lbl_tableIndex, lbl_tablePacket, lbl_tableInterval, lbl_tableDest, lbl_tableEdit, lbl_setupPacket, lbl_setupInterval;
+
 
     public void initialize() {
         scrollpane.widthProperty().addListener(observable -> header.setPrefWidth(scrollpane.getWidth()));
@@ -56,10 +62,6 @@ public class SchedulerController extends SubForm {
 
         txt_packet.textProperty().addListener(event -> Platform.runLater(this::updateUI));
         txt_delay.textProperty().addListener(event -> Platform.runLater(this::updateUI));
-
-        btn_clear.setTooltip(new Tooltip(GEarth.translation.getString("tab.scheduler.button.clear.tooltip")));
-        btn_save.setTooltip(new Tooltip(GEarth.translation.getString("tab.scheduler.button.save.tooltip")));
-        btn_load.setTooltip(new Tooltip(GEarth.translation.getString("tab.scheduler.button.load.tooltip")));
 
         updateUI();
 
@@ -77,6 +79,8 @@ public class SchedulerController extends SubForm {
             provider.register(KeyStroke.getKeyStroke("control shift " + ii[0]), hotKey -> switchPauseHotkey(ii[0]));
         }
         System.setErr(err);
+
+        initLanguageBinding();
     }
 
     @Override
@@ -158,7 +162,7 @@ public class SchedulerController extends SubForm {
                 rb_outgoing.setSelected(newItem.getDestinationProperty().get() == HMessage.Direction.TOSERVER);
 
                 isBeingEdited = newItem;
-                btn_addoredit.setText(GEarth.translation.getString("tab.scheduler.button.edit"));
+                addoredit.setKey(0, "tab.scheduler.button.edit");
                 updateUI();
                 newItem.onIsBeingUpdatedTrigger();
             }
@@ -176,7 +180,7 @@ public class SchedulerController extends SubForm {
         rb_incoming.setSelected(true);
         rb_outgoing.setSelected(false);
 
-        btn_addoredit.setText(GEarth.translation.getString("tab.scheduler.button.add"));
+        addoredit.setKey(0, "tab.scheduler.button.add");
         updateUI();
     }
 
@@ -204,9 +208,9 @@ public class SchedulerController extends SubForm {
 
         //Set extension filter
         FileChooser.ExtensionFilter extFilter =
-                new FileChooser.ExtensionFilter(GEarth.translation.getString("tab.scheduler.filetype"), "*.sched");
+                new FileChooser.ExtensionFilter(LanguageBundle.get("tab.scheduler.filetype"), "*.sched");
         fileChooser.getExtensionFilters().add(extFilter);
-        fileChooser.setTitle(GEarth.translation.getString("tab.scheduler.button.save.windowtitle"));
+        fileChooser.setTitle(LanguageBundle.get("tab.scheduler.button.save.windowtitle"));
 
         //Show save file dialog
         File file = fileChooser.showSaveDialog(parentController.getStage());
@@ -235,9 +239,9 @@ public class SchedulerController extends SubForm {
         List<InteractableScheduleItem> list = new ArrayList<>();
 
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle(GEarth.translation.getString("tab.scheduler.button.load.windowtitle"));
+        fileChooser.setTitle(LanguageBundle.get("tab.scheduler.button.load.windowtitle"));
         fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter(GEarth.translation.getString("tab.scheduler.filetype"), "*.sched"));
+                new FileChooser.ExtensionFilter(LanguageBundle.get("tab.scheduler.filetype"), "*.sched"));
         File selectedFile = fileChooser.showOpenDialog(parentController.getStage());
         if (selectedFile != null) {
 
@@ -262,5 +266,36 @@ public class SchedulerController extends SubForm {
 
         load(list);
 
+    }
+
+    private void initLanguageBinding() {
+        addoredit = new TranslatableString("%s", "tab.scheduler.button.add");
+        btn_addoredit.textProperty().bind(addoredit);
+
+        btn_clear.textProperty().bind(new TranslatableString("%s", "tab.scheduler.button.clear"));
+        btn_clear.setTooltip(new Tooltip());
+        btn_clear.getTooltip().textProperty().bind(new TranslatableString("%s", "tab.scheduler.button.clear.tooltip"));
+
+        btn_save.textProperty().bind(new TranslatableString("%s", "tab.scheduler.button.save"));
+        btn_save.setTooltip(new Tooltip());
+        btn_save.getTooltip().textProperty().bind(new TranslatableString("%s", "tab.scheduler.button.save.tooltip"));
+
+        btn_load.textProperty().bind(new TranslatableString("%s", "tab.scheduler.button.load"));
+        btn_load.setTooltip(new Tooltip());
+        btn_load.getTooltip().textProperty().bind(new TranslatableString("%s", "tab.scheduler.button.load.tooltip"));
+
+        lbl_tableIndex.textProperty().bind(new TranslatableString("%s", "tab.scheduler.table.index"));
+        lbl_tablePacket.textProperty().bind(new TranslatableString("%s", "tab.scheduler.table.packet"));
+        lbl_tableInterval.textProperty().bind(new TranslatableString("%s", "tab.scheduler.table.interval"));
+        lbl_tableDest.textProperty().bind(new TranslatableString("%s", "tab.scheduler.table.destination"));
+        lbl_tableEdit.textProperty().bind(new TranslatableString("%s", "tab.scheduler.table.edit"));
+
+        lbl_setupPacket.textProperty().bind(new TranslatableString("%s:", "tab.scheduler.setup.packet"));
+        lbl_setupInterval.textProperty().bind(new TranslatableString("%s:", "tab.scheduler.setup.interval"));
+
+        rb_incoming.textProperty().bind(new TranslatableString("%s", "tab.scheduler.direction.in"));
+        rb_outgoing.textProperty().bind(new TranslatableString("%s", "tab.scheduler.direction.out"));
+
+        cbx_hotkeys.textProperty().bind(new TranslatableString("%s", "tab.scheduler.hotkeys"));
     }
 }

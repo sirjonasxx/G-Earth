@@ -78,13 +78,10 @@
                     <RowConstraints />
                     <RowConstraints />
                 </rowConstraints>
-                <CheckBox fx:id="cbx_autodetect" mnemonicParsing="false" selected="true" text="Auto-detect" textFill="#000000a9" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                <CheckBox fx:id="cbx_autodetect" mnemonicParsing="false" selected="true" text="Auto-detect" textAlignment="CENTER" textFill="#000000a9" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="3">
                     <GridPane.margin>
                         <Insets left="-5.0" />
                     </GridPane.margin>
-                    <font>
-                        <Font size="12.0" />
-                    </font>
                 </CheckBox>
                 <Button fx:id="btnConnect" alignment="CENTER" maxWidth="1.7976931348623157E308" onAction="#btnConnect_clicked" text="Connect" GridPane.halignment="CENTER" GridPane.rowIndex="3" GridPane.valignment="CENTER">
                     <GridPane.margin>
