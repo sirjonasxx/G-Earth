@@ -4,7 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<GridPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="258.0" prefWidth="650.0" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gearth.ui.subforms.extra.ExtraController">
+<GridPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="258.0" prefWidth="650.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gearth.ui.subforms.extra.ExtraController">
     <columnConstraints>
         <ColumnConstraints hgrow="SOMETIMES" maxWidth="331.0" minWidth="10.0" prefWidth="318.0" />
         <ColumnConstraints hgrow="SOMETIMES" maxWidth="390.0" minWidth="10.0" prefWidth="247.0" />
@@ -16,7 +16,7 @@
       <AnchorPane prefHeight="262.0" prefWidth="318.0">
          <children>
             <CheckBox fx:id="cbx_alwaysOnTop" layoutX="14.0" layoutY="232.0" mnemonicParsing="false" text="Always on top" />
-            <Hyperlink fx:id="url_troubleshooting" layoutX="223.0" layoutY="232.0" text="Troubleshooting" />
+            <Hyperlink fx:id="url_troubleshooting" alignment="CENTER_RIGHT" layoutX="170.0" layoutY="232.0" prefWidth="150.0" text="Troubleshooting" />
             <Label fx:id="lbl_notepad" layoutX="14.0" layoutY="8.0" text="Notepad:" textFill="#000000bd" />
             <TextArea fx:id="txtarea_notepad" layoutX="11.0" layoutY="31.0" prefHeight="197.0" prefWidth="312.0" />
          </children>
