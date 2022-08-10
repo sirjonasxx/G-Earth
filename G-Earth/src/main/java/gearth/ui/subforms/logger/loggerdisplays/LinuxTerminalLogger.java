@@ -24,7 +24,7 @@ class LinuxTerminalLogger extends SimpleTerminalLogger {
         colorizePackets.put("INJECTED", "[32m");
         colorizePackets.put("SKIPPED", (char) 27 + "[36m");
         colorizePackets.put("EXPRESSION", (char) 27 + "[36m");
-        colorizePackets.put("DEFAULT", (char) 27 + "[0m");
+        colorizePackets.put("ENGLISH", (char) 27 + "[0m");
     }
 
     @Override
@@ -55,7 +55,7 @@ class LinuxTerminalLogger extends SimpleTerminalLogger {
                 packet.toString()
         );
 
-        output.append(colorizePackets.get("DEFAULT"));
+        output.append(colorizePackets.get("ENGLISH"));
 
         System.out.println(output.toString());
     }
@@ -67,7 +67,7 @@ class LinuxTerminalLogger extends SimpleTerminalLogger {
             System.out.println(
                     colorizePackets.get("EXPRESSION") +
                             expr +
-                            colorizePackets.get("DEFAULT")
+                            colorizePackets.get("ENGLISH")
             );
         }
     }

@@ -1,9 +1,7 @@
 package gearth.ui.translations;
 
-import gearth.GEarth;
 import gearth.misc.Cacher;
 import gearth.services.internal_extensions.extensionstore.application.GExtensionStoreController;
-import gearth.ui.themes.Theme;
 
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -20,7 +18,7 @@ public class LanguageBundle extends ResourceBundle {
         try {
             current = Language.valueOf((String) Cacher.get(LANGUAGE_CACHE_KEY));
         } catch (Exception e) {
-            current = Language.DEFAULT;
+            current = Language.ENGLISH;
             Cacher.put(LANGUAGE_CACHE_KEY, current.toString());
         }
     }

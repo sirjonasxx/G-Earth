@@ -98,7 +98,7 @@ public class PauseResumeButton extends StackPane{
 //        this.imageOnHover = new Image(getClass().getResourceAsStream(imageOnHoverPath));
 //        this.imageView = new ImageView();
 //
-//        setCursor(Cursor.DEFAULT);
+//        setCursor(Cursor.ENGLISH);
 //        getChildren().add(imageView);
 //        setOnMouseEntered(onMouseHover);
 //        setOnMouseExited(onMouseHoverDone);

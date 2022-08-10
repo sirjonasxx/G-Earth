@@ -6,12 +6,15 @@ import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.image.ImageView;
 
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.Locale;
+import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 
 public enum Language {
-    DEFAULT     ("en"),
+    ENGLISH     ("en"),
     DUTCH       ("nl"),
     FRENCH      ("fr"),
     GERMAN      ("de"),
@@ -26,7 +29,19 @@ public enum Language {
 
     Language(String locale) {
         this.locale = locale;
-        messages = ResourceBundle.getBundle("gearth.ui.translations.messages", new Locale(locale));
+
+        ResourceBundle resBundle;
+        try {
+            InputStream stream = Language.class.getResourceAsStream(String.format("/gearth/ui/translations/messages_%s.properties", locale));
+            InputStreamReader isr = new InputStreamReader(stream, StandardCharsets.UTF_8);
+            resBundle = new PropertyResourceBundle(isr);
+        } catch (Exception e) {
+            System.out.printf("/gearth/ui/translations/messages_%s.properties%n", locale);
+            System.out.println("Couldn't load language file: " + locale);
+            resBundle = null;
+        }
+
+        this.messages = resBundle;
     }
 
     public MenuItem asMenuItem() {
