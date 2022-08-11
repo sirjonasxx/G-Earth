@@ -69,4 +69,14 @@ public enum Language {
                 .map(Language::asMenuItem)
                 .toArray(MenuItem[]::new);
     }
+
+    public static Language getSystemLanguage() {
+        String locale = System.getProperty("user.language");
+        System.out.println(locale);
+        for (Language l : values())
+            if (l.locale.equals(locale))
+                return l;
+
+        return ENGLISH;
+    }
 }

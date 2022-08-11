@@ -18,7 +18,7 @@ public class LanguageBundle extends ResourceBundle {
         try {
             current = Language.valueOf((String) Cacher.get(LANGUAGE_CACHE_KEY));
         } catch (Exception e) {
-            current = Language.ENGLISH;
+            current = Language.getSystemLanguage();
             Cacher.put(LANGUAGE_CACHE_KEY, current.toString());
         }
     }
