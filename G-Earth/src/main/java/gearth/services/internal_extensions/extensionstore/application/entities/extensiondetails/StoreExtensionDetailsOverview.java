@@ -93,9 +93,9 @@ public class StoreExtensionDetailsOverview extends HOverview {
 
     private void awaitPopup(String mode) {
         popup(Alert.AlertType.WARNING,
-                LanguageBundle.get(String.format("ext.store.extension.status.start.%s", mode)),
-                String.format("%s [%s]", LanguageBundle.get(String.format("ext.store.extension.status.start.%s", mode)), extension.getTitle()),
-                LanguageBundle.get(String.format("ext.store.extension.status.start.%s.message", mode)));
+                LanguageBundle.get(String.format("ext.store.extension.status.await.%s", mode)),
+                String.format("%s [%s]", LanguageBundle.get(String.format("ext.store.extension.status.await.%s", mode)), extension.getTitle()),
+                LanguageBundle.get(String.format("ext.store.extension.status.await.%s.message", mode)));
     }
 
     private void successPopup(String mode) {
