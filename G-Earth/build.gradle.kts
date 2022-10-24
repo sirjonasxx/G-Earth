@@ -1,9 +1,12 @@
 import org.gradle.internal.os.OperatingSystem
 
 plugins {
+    kotlin("jvm") version "1.6.10"
+    kotlin("plugin.serialization") version "1.6.10"
     id("org.beryx.runtime") version "1.12.5"
     id("org.openjfx.javafxplugin") version "0.0.11"
     `java-library`
+    `maven-publish`
 }
 
 description = "G-Earth"
@@ -32,6 +35,7 @@ dependencies {
     implementation("org.json:json:20190722")
     implementation("org.jsoup:jsoup:1.14.2")
     implementation("org.slf4j:slf4j-jdk14:2.0.0-alpha0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.3")
 }
 
 java {
@@ -56,7 +60,16 @@ application {
     mainClass.set("gearth.GEarthLauncher")
     applicationName = "G-Earth"
 }
-
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            groupId = "dorving"
+            artifactId = "gearth"
+            version = "1.5.3"
+            from(components["java"])
+        }
+    }
+}
 runtime {
     addModules(
         "java.datatransfer", "java.desktop", "java.prefs",

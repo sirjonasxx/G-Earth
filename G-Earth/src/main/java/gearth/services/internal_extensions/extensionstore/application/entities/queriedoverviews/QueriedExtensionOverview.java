@@ -33,7 +33,9 @@ public abstract class QueriedExtensionOverview extends HOverview {
 
     @Override
     public List<? extends ContentItem> getContentItems() {
-        return query(startIndex, limit).stream().map(StoreExtensionItem::new).collect(Collectors.toList());
+        final List<StoreExtension> extensions = query(startIndex, limit);
+        System.out.println("found "+extensions.size()+" extensions");
+        return extensions.stream().map(StoreExtensionItem::new).collect(Collectors.toList());
     }
 
     @Override

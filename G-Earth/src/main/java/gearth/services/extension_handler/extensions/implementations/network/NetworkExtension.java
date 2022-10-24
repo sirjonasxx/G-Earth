@@ -76,13 +76,15 @@ public class NetworkExtension extends GEarthExtension {
                             byte side = message.readByte();
                             int byteLength = message.readInteger();
                             byte[] packetAsByteArray = message.readBytes(byteLength);
-
                             HPacket packet = new HPacket(packetAsByteArray);
                             if (!packet.isCorrupted()) {
+                                log("Forwarding incoming packet (packet="+packet+")");
                                 sendMessage(
                                         side == 0 ? HMessage.Direction.TOCLIENT : HMessage.Direction.TOSERVER,
                                         packet
                                 );
+                            } else {
+                                log("Received corrupted packet (packet="+packet+")");
                             }
                         }
                         else if (message.headerId() == NetworkExtensionInfo.INCOMING_MESSAGES_IDS.MANIPULATEDPACKET) {

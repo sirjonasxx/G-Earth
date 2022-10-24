@@ -1,8 +1,10 @@
 package gearth.services.extension_handler.extensions;
 
+import gearth.extensions.InternalExtensionBuilder;
 import gearth.misc.HostInfo;
 import gearth.misc.listenerpattern.Observable;
 import gearth.misc.listenerpattern.SynchronizedObservable;
+import gearth.services.extension_handler.extensions.implementations.network.NetworkExtension;
 import gearth.services.packet_info.PacketInfoManager;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
@@ -11,6 +13,13 @@ import gearth.services.extension_handler.extensions.listeners.OmRemoveClickListe
 import gearth.services.extension_handler.extensions.listeners.OnClickListener;
 import gearth.services.extension_handler.extensions.listeners.OnDeleteListener;
 
+/**
+ * Represents a type of extension created with one of the extension APIs.
+ *
+ * @see NetworkExtension         extensions connecting to G-Earth from a different process.
+ * @see InternalExtensionBuilder internal extensions (JAR files) that follow
+ *                               the same communication protocol as {@link NetworkExtension network extensions}.
+ */
 public abstract class GEarthExtension {
 
 

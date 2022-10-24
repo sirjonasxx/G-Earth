@@ -1,5 +1,7 @@
 package gearth.services.extension_handler.extensions.implementations.network;
 
+import gearth.Configuration;
+import gearth.ConfigurationKt;
 import gearth.protocol.HPacket;
 import gearth.services.extension_handler.extensions.extensionproducers.ExtensionProducer;
 import gearth.services.extension_handler.extensions.extensionproducers.ExtensionProducerObserver;
@@ -31,6 +33,7 @@ public class NetworkExtensionsProducer implements ExtensionProducer {
             port++;
         }
 
+        final Configuration configuration = ConfigurationKt.configuration(port);
 
         new Thread(() -> {
             try {

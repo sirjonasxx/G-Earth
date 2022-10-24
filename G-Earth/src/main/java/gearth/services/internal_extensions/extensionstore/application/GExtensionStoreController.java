@@ -5,7 +5,6 @@ import gearth.services.internal_extensions.extensionstore.application.entities.C
 import gearth.services.internal_extensions.extensionstore.application.entities.HOverview;
 import gearth.services.internal_extensions.extensionstore.application.entities.categories.CategoryOverview;
 import gearth.services.internal_extensions.extensionstore.application.entities.installed.InstalledOverview;
-import gearth.services.internal_extensions.extensionstore.application.entities.queriedoverviews.ByDateOverview;
 import gearth.services.internal_extensions.extensionstore.application.entities.queriedoverviews.ByRatingOverview;
 import gearth.services.internal_extensions.extensionstore.application.entities.queriedoverviews.ByUpdateOverview;
 import gearth.services.internal_extensions.extensionstore.application.entities.search.SearchOverview;
@@ -55,10 +54,10 @@ public class GExtensionStoreController implements Initializable {
                 Element seach_link = webView.getEngine().getDocument().getElementById("search_page");
 
                 Map<Element, Supplier<HOverview>> hOverviewSupplier = new HashMap<>();
-                hOverviewSupplier.put(by_update_link, () -> new ByUpdateOverview(null, 0, GExtensionStore.PAGESIZE, getStoreRepository()));
-                hOverviewSupplier.put(by_rating_link, () -> new ByRatingOverview(null, 0, GExtensionStore.PAGESIZE, getStoreRepository()));
-                hOverviewSupplier.put(by_category_link, () -> new CategoryOverview(null, 0, GExtensionStore.PAGESIZE, getStoreRepository()));
-                hOverviewSupplier.put(installed_link, () -> new InstalledOverview(null, 0, GExtensionStore.PAGESIZE, getStoreRepository()));
+                hOverviewSupplier.put(by_update_link, () -> new ByUpdateOverview(null, 0, GExtensionStore.MAX_PAGES, getStoreRepository()));
+                hOverviewSupplier.put(by_rating_link, () -> new ByRatingOverview(null, 0, GExtensionStore.MAX_PAGES, getStoreRepository()));
+                hOverviewSupplier.put(by_category_link, () -> new CategoryOverview(null, 0, GExtensionStore.MAX_PAGES, getStoreRepository()));
+                hOverviewSupplier.put(installed_link, () -> new InstalledOverview(null, 0, GExtensionStore.MAX_PAGES, getStoreRepository()));
                 hOverviewSupplier.put(seach_link, () -> new SearchOverview(null, getStoreRepository()));
 
                 Arrays.asList(by_update_link, by_rating_link, by_category_link, installed_link, seach_link).forEach(l ->
@@ -74,18 +73,18 @@ public class GExtensionStoreController implements Initializable {
 
                 Map<Element, Supplier<Integer>> newStartIndex = new HashMap<>();
                 newStartIndex.put(first_btn, () -> 0);
-                newStartIndex.put(prev_btn, () -> getCurrentOverview().getStartIndex() - GExtensionStore.PAGESIZE);
-                newStartIndex.put(next_btn, () -> getCurrentOverview().getStartIndex() + GExtensionStore.PAGESIZE);
+                newStartIndex.put(prev_btn, () -> getCurrentOverview().getStartIndex() - GExtensionStore.MAX_PAGES);
+                newStartIndex.put(next_btn, () -> getCurrentOverview().getStartIndex() + GExtensionStore.MAX_PAGES);
                 newStartIndex.put(last_btn, () -> {
-                    int lastPageSize = getCurrentOverview().getMaxAmount() % GExtensionStore.PAGESIZE;
-                    if (lastPageSize == 0) lastPageSize = GExtensionStore.PAGESIZE;
+                    int lastPageSize = getCurrentOverview().getMaxAmount() % GExtensionStore.MAX_PAGES;
+                    if (lastPageSize == 0) lastPageSize = GExtensionStore.MAX_PAGES;
                     return getCurrentOverview().getMaxAmount() - lastPageSize;
                 });
 
                 Arrays.asList(first_btn, prev_btn, next_btn, last_btn).forEach(l ->
                     ((EventTarget) l).addEventListener("click", event ->{
                         if (!initialized || l.getAttribute("class").contains("gdisabled")) return;
-                        overwriteCurrentOverview(getCurrentOverview().getNewPage(newStartIndex.get(l).get(), GExtensionStore.PAGESIZE));
+                        overwriteCurrentOverview(getCurrentOverview().getNewPage(newStartIndex.get(l).get(), GExtensionStore.MAX_PAGES));
                         }, true));
 
 
@@ -164,7 +163,7 @@ public class GExtensionStoreController implements Initializable {
                 WebUtils.removeClass(last_btn, "gdisabled");
 
                 boolean isLast = overview.getMaxAmount() <= overview.getAmount() + overview.getStartIndex();
-                boolean isFirst = overview.getStartIndex() < GExtensionStore.PAGESIZE;
+                boolean isFirst = overview.getStartIndex() < GExtensionStore.MAX_PAGES;
                 if (isLast) {
                     WebUtils.addClass(next_btn, "gdisabled");
                     WebUtils.addClass(last_btn, "gdisabled");
@@ -173,8 +172,8 @@ public class GExtensionStoreController implements Initializable {
                     WebUtils.addClass(first_btn, "gdisabled");
                     WebUtils.addClass(prev_btn, "gdisabled");
                 }
-                int thispage = Math.max(1, 1 + (overview.getStartIndex() / GExtensionStore.PAGESIZE));
-                int lastpage = Math.max(1, 1 + ((overview.getMaxAmount() - 1) / GExtensionStore.PAGESIZE));
+                int thispage = Math.max(1, 1 + (overview.getStartIndex() / GExtensionStore.MAX_PAGES));
+                int lastpage = Math.max(1, 1 + ((overview.getMaxAmount() - 1) / GExtensionStore.MAX_PAGES));
                 webView.getEngine().executeScript("document.getElementById('paging_lbl').innerHTML = '" + thispage + " / " + lastpage + "';");
 
 
@@ -211,7 +210,7 @@ public class GExtensionStoreController implements Initializable {
 
     private void onFullInitialize() {
         initialized = true;
-        setRootOverview(new ByUpdateOverview(null, 0, GExtensionStore.PAGESIZE, getStoreRepository()));
+        setRootOverview(new ByUpdateOverview(null, 0, GExtensionStore.MAX_PAGES, getStoreRepository()));
     }
 
     public void gExtensionStore(GExtensionStore gExtensionStore) {

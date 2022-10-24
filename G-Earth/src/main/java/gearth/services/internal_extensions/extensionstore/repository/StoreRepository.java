@@ -43,7 +43,14 @@ public class StoreRepository {
 
         String queryLower = queryString.toLowerCase();
 
-        Stream<StoreExtension> stream = getExtensions().stream()
+        final List<StoreExtension> extensions = getExtensions();
+        for (StoreExtension extension : extensions) {
+            System.out.println(extension.getTitle());
+            for (String system : extension.getCompatibility().getSystems()) {
+                System.out.println(system);
+            }
+        }
+        Stream<StoreExtension> stream = extensions.stream()
                 .filter(ext -> ext.getTitle().toLowerCase().contains(queryLower) || ext.getDescription().toLowerCase().contains(queryLower)
                         || ext.getAuthors().stream().anyMatch(author -> author.getName().toLowerCase().contains(queryLower)
                         || author.getUsername() != null && author.getUsername().toLowerCase().contains(queryLower))

@@ -3,7 +3,6 @@ package gearth.services.internal_extensions.extensionstore;
 import gearth.extensions.ExtensionForm;
 import gearth.extensions.ExtensionInfo;
 import gearth.services.internal_extensions.extensionstore.application.GExtensionStoreController;
-import gearth.services.internal_extensions.extensionstore.application.entities.queriedoverviews.ByDateOverview;
 import gearth.services.internal_extensions.extensionstore.repository.StoreFetch;
 import gearth.services.internal_extensions.extensionstore.repository.StoreRepository;
 import javafx.application.HostServices;
@@ -16,7 +15,7 @@ import javafx.application.HostServices;
 )
 public class GExtensionStore extends ExtensionForm {
 
-    public static final int PAGESIZE = 20;
+    public static final int MAX_PAGES = 20;
 
     private StoreRepository repository = null;
     private GExtensionStoreController extensionStoreController = null;

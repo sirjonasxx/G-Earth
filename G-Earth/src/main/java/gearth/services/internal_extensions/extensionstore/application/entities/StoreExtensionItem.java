@@ -1,12 +1,9 @@
 package gearth.services.internal_extensions.extensionstore.application.entities;
 
-import gearth.protocol.HMessage;
-import gearth.protocol.HPacket;
 import gearth.services.internal_extensions.extensionstore.GExtensionStore;
 import gearth.services.internal_extensions.extensionstore.application.GExtensionStoreController;
 import gearth.services.internal_extensions.extensionstore.application.WebUtils;
 import gearth.services.internal_extensions.extensionstore.application.entities.extensiondetails.StoreExtensionDetailsOverview;
-import gearth.services.internal_extensions.extensionstore.application.entities.queriedoverviews.CategorizedOverview;
 import gearth.services.internal_extensions.extensionstore.repository.StoreRepository;
 import gearth.services.internal_extensions.extensionstore.repository.models.StoreExtension;
 import netscape.javascript.JSObject;
@@ -25,7 +22,7 @@ public class StoreExtensionItem implements ContentItem {
                 new StoreExtensionDetailsOverview(
                         gExtensionStore.getController().getCurrentOverview(),
                         0,
-                        GExtensionStore.PAGESIZE,
+                        GExtensionStore.MAX_PAGES,
                         storeExtension,
                         gExtensionStore.getRepository()
                 )

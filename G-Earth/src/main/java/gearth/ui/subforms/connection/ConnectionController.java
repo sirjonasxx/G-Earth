@@ -1,12 +1,14 @@
 package gearth.ui.subforms.connection;
 
 import gearth.GEarth;
+import gearth.PropertiesKt;
 import gearth.misc.Cacher;
 import gearth.protocol.connection.HClient;
 import gearth.protocol.connection.HState;
 import gearth.protocol.connection.proxy.ProxyProviderFactory;
 import gearth.services.Constants;
 import javafx.application.Platform;
+import javafx.beans.property.BooleanProperty;
 import javafx.event.ActionEvent;
 import javafx.scene.control.*;
 import gearth.protocol.HConnection;
@@ -36,6 +38,10 @@ public class ConnectionController extends SubForm {
     public TextField txtfield_hotelversion;
 
     private final Object lock = new Object();
+    public TextField outEmail;
+    public TextField outPassword;
+    public Button loginButton;
+
     private volatile int fullyInitialized = 0;
 
 
@@ -158,6 +164,13 @@ public class ConnectionController extends SubForm {
         inpPort.setDisable(getHConnection().getState() != HState.NOT_CONNECTED || cbx_autodetect.isSelected());
 
         cbx_autodetect.setDisable(!useFlash());
+        if (useFlash()) {
+            final BooleanProperty autoConnectProperty = PropertiesKt.getAutoConnectSelected();
+            cbx_autodetect.selectedProperty().bindBidirectional(autoConnectProperty);
+            if (autoConnectProperty.get())
+                btnConnect_clicked(null);
+        }
+
         outHost.setDisable(!useFlash());
         outPort.setDisable(!useFlash());
 
