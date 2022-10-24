@@ -13,13 +13,14 @@ description = "G-Earth"
 
 repositories {
     mavenCentral()
+    maven("https://jitpack.io")
 }
 
 /**
  * TODO: move dependency version declarations to different gradle file
  */
 dependencies {
-    implementation(files("libs/G-Wasm-Minimal-1.0.3.jar"))
+    implementation("com.github.dorving:G-Wasm:minimal-SNAPSHOT")
     implementation("at.favre.lib:bytes:1.5.0")
     implementation("com.github.tulskiy:jkeymaster:1.3")
     implementation("com.github.ganskef:littleproxy-mitm:1.1.0")
@@ -40,7 +41,7 @@ dependencies {
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17
-    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
 javafx {
@@ -60,16 +61,29 @@ application {
     mainClass.set("gearth.GEarthLauncher")
     applicationName = "G-Earth"
 }
+
+val copyGMem by tasks.registering(Copy::class) {
+    from(file("$projectDir/src/main/resources/build/mac/G-Mem"))
+    into("$buildDir/classes/java")
+    shouldRunAfter(tasks.getByName("jar"))
+}
+
+tasks.getByName("assemble") {
+
+    dependsOn(copyGMem)
+}
+
 publishing {
     publications {
         create<MavenPublication>("maven") {
-            groupId = "dorving"
+            groupId = "karth.gearth"
             artifactId = "gearth"
-            version = "1.5.3"
+            version = "1.5.2"
             from(components["java"])
         }
     }
 }
+
 runtime {
     addModules(
         "java.datatransfer", "java.desktop", "java.prefs",
