@@ -25,7 +25,7 @@ public class NitroProxyProvider implements ProxyProvider, NitroHttpProxyServerCa
     private final AtomicBoolean abortLock;
 
     private String originalWebsocketUrl;
-    private String originalOriginUrl;
+    private String originalCookies;
 
     public NitroProxyProvider(HProxySetter proxySetter, HStateSetter stateSetter, HConnection connection) {
         this.proxySetter = proxySetter;
@@ -40,12 +40,15 @@ public class NitroProxyProvider implements ProxyProvider, NitroHttpProxyServerCa
         return originalWebsocketUrl;
     }
 
-    public String getOriginalOriginUrl() {
-        return originalOriginUrl;
+    public String getOriginalCookies() {
+        return originalCookies;
     }
 
     @Override
     public void start() throws IOException {
+        originalWebsocketUrl = null;
+        originalCookies = null;
+
         connection.getStateObservable().addListener(this);
 
         if (!nitroHttpProxy.start()) {
@@ -97,9 +100,13 @@ public class NitroProxyProvider implements ProxyProvider, NitroHttpProxyServerCa
     @Override
     public String replaceWebsocketServer(String configUrl, String websocketUrl) {
         originalWebsocketUrl = websocketUrl;
-        originalOriginUrl = extractOriginUrl(configUrl);
 
         return String.format("ws://127.0.0.1:%d", NitroConstants.WEBSOCKET_PORT);
+    }
+
+    @Override
+    public void setOriginCookies(String cookieHeaderValue) {
+        originalCookies = cookieHeaderValue;
     }
 
     @Override
@@ -114,16 +121,5 @@ public class NitroProxyProvider implements ProxyProvider, NitroHttpProxyServerCa
         if (newState == HState.ABORTING) {
             abort();
         }
-    }
-
-    private static String extractOriginUrl(String url) {
-        try {
-            final URI uri = new URI(url);
-            return String.format("%s://%s/", uri.getScheme(), uri.getHost());
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
-
-        return null;
     }
 }

@@ -5,15 +5,25 @@ import gearth.protocol.HMessage;
 import gearth.protocol.connection.proxy.nitro.NitroConstants;
 import gearth.protocol.packethandler.PacketHandler;
 import gearth.protocol.packethandler.nitro.NitroPacketHandler;
+import org.eclipse.jetty.websocket.api.extensions.ExtensionConfig;
+import org.eclipse.jetty.websocket.common.extensions.compress.PerMessageDeflateExtension;
+import org.eclipse.jetty.websocket.jsr356.JsrExtension;
 
 import javax.websocket.*;
 import java.io.IOException;
 import java.net.URI;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class NitroWebsocketServer extends Endpoint implements NitroSession {
+
+    private static final HashSet<String> SKIP_HEADERS = new HashSet<>(Arrays.asList(
+            "Sec-WebSocket-Extensions",
+            "Sec-WebSocket-Key",
+            "Sec-WebSocket-Version",
+            "Host",
+            "Connection",
+            "Upgrade"
+    ));
 
     private final PacketHandler packetHandler;
     private final NitroWebsocketClient client;
@@ -24,18 +34,25 @@ public class NitroWebsocketServer extends Endpoint implements NitroSession {
         this.packetHandler = new NitroPacketHandler(HMessage.Direction.TOCLIENT, client, connection.getExtensionHandler(), connection.getTrafficObservables());
     }
 
-    public void connect(String websocketUrl, String originUrl) throws IOException {
+    public void connect(String websocketUrl, Map<String, List<String>> clientHeaders) throws IOException {
         try {
             ClientEndpointConfig.Builder builder = ClientEndpointConfig.Builder.create();
 
-            if (originUrl != null) {
-                builder.configurator(new ClientEndpointConfig.Configurator() {
-                    @Override
-                    public void beforeRequest(Map<String, List<String>> headers) {
-                        headers.put("Origin", Collections.singletonList(originUrl));
-                    }
-                });
-            }
+            builder.extensions(Collections.singletonList(new JsrExtension(new ExtensionConfig("permessage-deflate;client_max_window_bits"))));
+
+            builder.configurator(new ClientEndpointConfig.Configurator() {
+                @Override
+                public void beforeRequest(Map<String, List<String>> headers) {
+                    clientHeaders.forEach((key, value) -> {
+                        if (SKIP_HEADERS.contains(key)) {
+                            return;
+                        }
+
+                        headers.remove(key);
+                        headers.put(key, value);
+                    });
+                }
+            });
 
             ClientEndpointConfig config = builder.build();
 

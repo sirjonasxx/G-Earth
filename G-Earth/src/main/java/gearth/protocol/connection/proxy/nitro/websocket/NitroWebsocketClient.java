@@ -6,10 +6,18 @@ import gearth.protocol.connection.*;
 import gearth.protocol.connection.proxy.nitro.NitroConstants;
 import gearth.protocol.connection.proxy.nitro.NitroProxyProvider;
 import gearth.protocol.packethandler.nitro.NitroPacketHandler;
+import org.eclipse.jetty.websocket.common.WebSocketSession;
+import org.eclipse.jetty.websocket.jsr356.JsrSession;
+import org.eclipse.jetty.websocket.servlet.ServletUpgradeRequest;
 
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @ServerEndpoint(value = "/")
@@ -23,7 +31,7 @@ public class NitroWebsocketClient implements NitroSession {
     private final NitroPacketHandler packetHandler;
     private final AtomicBoolean shutdownLock;
 
-    private Session activeSession = null;
+    private JsrSession activeSession = null;
 
     public NitroWebsocketClient(HProxySetter proxySetter, HStateSetter stateSetter, HConnection connection, NitroProxyProvider proxyProvider) {
         this.proxySetter = proxySetter;
@@ -36,11 +44,19 @@ public class NitroWebsocketClient implements NitroSession {
     }
 
     @OnOpen
-    public void onOpen(Session session) throws IOException {
-        activeSession = session;
+    public void onOpen(Session session) throws Exception {
+        activeSession = (JsrSession) session;
         activeSession.setMaxBinaryMessageBufferSize(NitroConstants.WEBSOCKET_BUFFER_SIZE);
 
-        server.connect(proxyProvider.getOriginalWebsocketUrl(), proxyProvider.getOriginalOriginUrl());
+        // Set proper headers to spoof being a real client.
+        final Map<String, List<String>> headers = new HashMap<>(activeSession.getUpgradeRequest().getHeaders());
+
+        if (proxyProvider.getOriginalCookies() != null) {
+            headers.put("Cookie", Collections.singletonList(proxyProvider.getOriginalCookies()));
+        }
+
+        // Connect to origin server.
+        server.connect(proxyProvider.getOriginalWebsocketUrl(), headers);
 
         final HProxy proxy = new HProxy(HClient.NITRO, "", "", -1, -1, "");
 
@@ -89,7 +105,7 @@ public class NitroWebsocketClient implements NitroSession {
 
         try {
             activeSession.close();
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         } finally {
             activeSession = null;
