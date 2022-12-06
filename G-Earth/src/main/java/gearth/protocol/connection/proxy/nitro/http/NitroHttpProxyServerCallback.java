@@ -11,4 +11,9 @@ public interface NitroHttpProxyServerCallback {
      */
     String replaceWebsocketServer(String configUrl, String websocketUrl);
 
+    /**
+     * Sets the parsed cookies for the origin WebSocket connection.
+     */
+    void setOriginCookies(String cookieHeaderValue);
+
 }

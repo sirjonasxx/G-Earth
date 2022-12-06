@@ -7,6 +7,10 @@ import io.netty.util.CharsetUtil;
 import org.littleshoot.proxy.HttpFiltersAdapter;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,6 +19,17 @@ public class NitroHttpProxyFilter extends HttpFiltersAdapter {
     private static final String NitroConfigSearch = "\"socket.url\"";
     private static final String NitroClientSearch = "configurationUrls:";
     private static final Pattern NitroConfigPattern = Pattern.compile("\"socket\\.url\":.?\"(wss?://.*?)\"", Pattern.MULTILINE);
+
+    // https://developers.cloudflare.com/fundamentals/get-started/reference/cloudflare-cookies/
+    private static final HashSet<String> CloudflareCookies = new HashSet<>(Arrays.asList(
+            "__cflb",
+            "__cf_bm",
+            "cf_ob_info",
+            "cf_use_ob",
+            "__cfwaitingroom",
+            "__cfruid",
+            "cf_clearance"
+    ));
 
     private static final String HeaderAcceptEncoding = "Accept-Encoding";
     private static final String HeaderAge = "Age";
@@ -27,6 +42,7 @@ public class NitroHttpProxyFilter extends HttpFiltersAdapter {
 
     private final NitroHttpProxyServerCallback callback;
     private final String url;
+    private String cookies;
 
     public NitroHttpProxyFilter(HttpRequest originalRequest, ChannelHandlerContext ctx, NitroHttpProxyServerCallback callback, String url) {
         super(originalRequest, ctx);
@@ -58,6 +74,9 @@ public class NitroHttpProxyFilter extends HttpFiltersAdapter {
 
             // Disable caching.
             stripCacheHeaders(headers);
+
+            // Find relevant cookies for the WebSocket connection.
+            this.cookies = parseCookies(request);
         }
 
         return super.clientToProxyRequest(httpObject);
@@ -77,13 +96,15 @@ public class NitroHttpProxyFilter extends HttpFiltersAdapter {
 
                 if (matcher.find()) {
                     final String originalWebsocket = matcher.group(1);
-                    final String replacementWebsocket = callback.replaceWebsocketServer(url, originalWebsocket);
+                    final String replacementWebsocket = callback.replaceWebsocketServer(this.url, originalWebsocket);
 
                     if (replacementWebsocket != null) {
                         responseBody = responseBody.replace(originalWebsocket, replacementWebsocket);
                         responseModified = true;
                     }
                 }
+
+                callback.setOriginCookies(this.cookies);
             }
 
             // Apply changes.
@@ -98,6 +119,32 @@ public class NitroHttpProxyFilter extends HttpFiltersAdapter {
         }
 
         return httpObject;
+    }
+
+    /**
+     * Check if cookies from the request need to be recorded for the websocket connection to the origin server.
+     */
+    private String parseCookies(final HttpRequest request) {
+        final List<String> result = new ArrayList<>();
+        final List<String> cookieHeaders = request.headers().getAll("Cookie");
+
+        for (final String cookieHeader : cookieHeaders) {
+            final String[] cookies = cookieHeader.split(";");
+
+            for (final String cookie : cookies) {
+                final String[] parts = cookie.trim().split("=");
+
+                if (CloudflareCookies.contains(parts[0])) {
+                    result.add(cookie.trim());
+                }
+            }
+        }
+
+        if (result.size() == 0) {
+            return null;
+        }
+
+        return String.join("; ", result);
     }
 
     /**
@@ -148,5 +195,4 @@ public class NitroHttpProxyFilter extends HttpFiltersAdapter {
         headers.remove(HeaderIfModifiedSince);
         headers.remove(HeaderLastModified);
     }
-
 }
