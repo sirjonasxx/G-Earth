@@ -6,8 +6,9 @@ import gearth.protocol.connection.proxy.nitro.NitroConstants;
 import gearth.protocol.packethandler.PacketHandler;
 import gearth.protocol.packethandler.nitro.NitroPacketHandler;
 import org.eclipse.jetty.websocket.api.extensions.ExtensionConfig;
-import org.eclipse.jetty.websocket.common.extensions.compress.PerMessageDeflateExtension;
 import org.eclipse.jetty.websocket.jsr356.JsrExtension;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.websocket.*;
 import java.io.IOException;
@@ -15,6 +16,8 @@ import java.net.URI;
 import java.util.*;
 
 public class NitroWebsocketServer extends Endpoint implements NitroSession {
+
+    private static final Logger logger = LoggerFactory.getLogger(NitroWebsocketServer.class);
 
     private static final HashSet<String> SKIP_HEADERS = new HashSet<>(Arrays.asList(
             "Sec-WebSocket-Extensions",
@@ -36,6 +39,8 @@ public class NitroWebsocketServer extends Endpoint implements NitroSession {
 
     public void connect(String websocketUrl, Map<String, List<String>> clientHeaders) throws IOException {
         try {
+            logger.info("Connecting to origin websocket at {}", websocketUrl);
+
             ClientEndpointConfig.Builder builder = ClientEndpointConfig.Builder.create();
 
             builder.extensions(Collections.singletonList(new JsrExtension(new ExtensionConfig("permessage-deflate;client_max_window_bits"))));
@@ -57,6 +62,8 @@ public class NitroWebsocketServer extends Endpoint implements NitroSession {
             ClientEndpointConfig config = builder.build();
 
             ContainerProvider.getWebSocketContainer().connectToServer(this, config, URI.create(websocketUrl));
+
+            logger.info("Connected to origin websocket");
         } catch (DeploymentException e) {
             throw new IOException("Failed to deploy websocket client", e);
         }

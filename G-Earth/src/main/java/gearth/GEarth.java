@@ -48,7 +48,13 @@ public class GEarth extends Application {
         stage = primaryStage;
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/gearth/ui/G-Earth.fxml"));
-        Parent root = loader.load();
+        Parent root;
+        try {
+            root = loader.load();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
         controller = loader.getController();
         controller.setStage(primaryStage);
         stage.initStyle(StageStyle.TRANSPARENT);
