@@ -106,6 +106,7 @@ public class NitroHttpProxy {
                     .withPort(NitroConstants.HTTP_PORT)
                     .withManInTheMiddle(new NitroCertificateSniffingManager(authority))
                     .withFiltersSource(new NitroHttpProxyFilterSource(serverCallback))
+                    .withTransparent(true)
                     .start();
 
             if (!initializeCertificate()) {

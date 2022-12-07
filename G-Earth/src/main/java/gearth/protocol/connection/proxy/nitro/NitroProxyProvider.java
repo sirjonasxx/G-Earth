@@ -24,6 +24,7 @@ public class NitroProxyProvider implements ProxyProvider, NitroHttpProxyServerCa
     private final NitroWebsocketProxy nitroWebsocketProxy;
     private final AtomicBoolean abortLock;
 
+    private int websocketPort;
     private String originalWebsocketUrl;
     private String originalCookies;
 
@@ -63,6 +64,8 @@ public class NitroProxyProvider implements ProxyProvider, NitroHttpProxyServerCa
             return;
         }
 
+        websocketPort = nitroWebsocketProxy.getPort();
+
         stateSetter.setState(HState.WAITING_FOR_CLIENT);
     }
 
@@ -101,7 +104,7 @@ public class NitroProxyProvider implements ProxyProvider, NitroHttpProxyServerCa
     public String replaceWebsocketServer(String configUrl, String websocketUrl) {
         originalWebsocketUrl = websocketUrl;
 
-        return String.format("ws://127.0.0.1:%d", NitroConstants.WEBSOCKET_PORT);
+        return String.format("ws://127.0.0.1:%d", websocketPort);
     }
 
     @Override
