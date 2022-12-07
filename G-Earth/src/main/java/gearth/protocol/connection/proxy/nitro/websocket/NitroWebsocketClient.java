@@ -6,14 +6,13 @@ import gearth.protocol.connection.*;
 import gearth.protocol.connection.proxy.nitro.NitroConstants;
 import gearth.protocol.connection.proxy.nitro.NitroProxyProvider;
 import gearth.protocol.packethandler.nitro.NitroPacketHandler;
-import org.eclipse.jetty.websocket.common.WebSocketSession;
 import org.eclipse.jetty.websocket.jsr356.JsrSession;
-import org.eclipse.jetty.websocket.servlet.ServletUpgradeRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -22,6 +21,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 @ServerEndpoint(value = "/")
 public class NitroWebsocketClient implements NitroSession {
+
+    private static final Logger logger = LoggerFactory.getLogger(NitroWebsocketClient.class);
 
     private final HProxySetter proxySetter;
     private final HStateSetter stateSetter;
@@ -45,6 +46,8 @@ public class NitroWebsocketClient implements NitroSession {
 
     @OnOpen
     public void onOpen(Session session) throws Exception {
+        logger.info("WebSocket connection accepted");
+
         activeSession = (JsrSession) session;
         activeSession.setMaxBinaryMessageBufferSize(NitroConstants.WEBSOCKET_BUFFER_SIZE);
 
