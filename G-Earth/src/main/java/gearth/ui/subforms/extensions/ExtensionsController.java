@@ -113,6 +113,10 @@ public class ExtensionsController extends SubForm {
         }
     }
 
+    public void setLocalInstallingEnabled(boolean enabled) {
+        btn_install.setDisable(!enabled);
+    }
+
 
     private volatile int gpytonShellCounter = 1;
     private volatile boolean pythonShellLaunching = false;

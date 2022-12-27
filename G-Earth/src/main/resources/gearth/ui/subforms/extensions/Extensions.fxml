@@ -4,7 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<GridPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="258.0" prefWidth="650.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gearth.ui.subforms.extensions.ExtensionsController">
+<GridPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="258.0" prefWidth="650.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gearth.ui.subforms.extensions.ExtensionsController">
     <columnConstraints>
         <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="277.0" />
     </columnConstraints>
@@ -72,7 +72,7 @@
                     <Insets left="3.0" />
                 </GridPane.margin>
             </Label>
-            <Button fx:id="btn_install" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#installBtnClicked" text="Install" GridPane.columnIndex="5" />
+            <Button fx:id="btn_install" disable="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#installBtnClicked" text="Install" GridPane.columnIndex="5" />
          <Button fx:id="btn_viewExtensionConsole" layoutX="401.0" layoutY="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#extConsoleBtnClicked" text="View logs" GridPane.columnIndex="4" />
         </GridPane>
     </GridPane>

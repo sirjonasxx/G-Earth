@@ -1,6 +1,8 @@
 package gearth.protocol;
 
 import gearth.misc.listenerpattern.Observable;
+import gearth.protocol.connection.packetsafety.PacketSafetyManager;
+import gearth.protocol.connection.packetsafety.SafePacketsContainer;
 import gearth.protocol.connection.proxy.nitro.NitroProxyProvider;
 import gearth.services.packet_info.PacketInfoManager;
 import gearth.protocol.connection.HClient;
@@ -30,6 +32,8 @@ public class HConnection {
     private ProxyProviderFactory proxyProviderFactory;
     private ProxyProvider proxyProvider = null;
 
+    private volatile boolean developerMode = false;
+
     public HConnection() {
         HConnection selff = this;
         proxyProviderFactory = new ProxyProviderFactory(
@@ -37,6 +41,8 @@ public class HConnection {
                 selff::setState,
                 this
         );
+
+        PacketSafetyManager.PACKET_SAFETY_MANAGER.initialize(this);
     }
 
     public HState getState() {
@@ -147,30 +153,47 @@ public class HConnection {
 
 
     public boolean sendToClient(HPacket packet) {
-        HProxy proxy = this.proxy;
-        if (proxy == null) return false;
-
-        if (!packet.isPacketComplete()) {
-            PacketInfoManager packetInfoManager = getPacketInfoManager();
-            packet.completePacket(packetInfoManager);
-
-            if (!packet.isPacketComplete() || !packet.canSendToClient()) return false;
-        }
-
+        if (!canSendPacket(HMessage.Direction.TOCLIENT, packet)) return false;
         return proxy.sendToClient(packet);
     }
+
     public boolean sendToServer(HPacket packet) {
+        if (!canSendPacket(HMessage.Direction.TOSERVER, packet)) return false;
+        return proxy.sendToServer(packet);
+    }
+
+    private boolean canSendPacket(HMessage.Direction direction, HPacket packet) {
+        return isPacketSendingAllowed(direction, packet) && (developerMode || isPacketSendingSafe(direction, packet));
+    }
+
+    public boolean isPacketSendingAllowed(HMessage.Direction direction, HPacket packet) {
         HProxy proxy = this.proxy;
         if (proxy == null) return false;
+
+        if (packet.isCorrupted()) return false;
 
         if (!packet.isPacketComplete()) {
             PacketInfoManager packetInfoManager = getPacketInfoManager();
             packet.completePacket(packetInfoManager);
 
-            if (!packet.isPacketComplete() || !packet.canSendToServer()) return false;
+            return packet.isPacketComplete() &&
+                    (packet.canSendToClient() || direction != HMessage.Direction.TOCLIENT) &&
+                    (packet.canSendToServer() || direction != HMessage.Direction.TOSERVER);
         }
 
-        return proxy.sendToServer(packet);
+        return true;
+    }
+
+    public boolean isPacketSendingSafe(HMessage.Direction direction, HPacket packet) {
+        String hotelVersion = proxy.getHotelVersion();
+        if (hotelVersion == null) return false;
+
+        SafePacketsContainer packetsContainer = PacketSafetyManager.PACKET_SAFETY_MANAGER.getPacketContainer(hotelVersion);
+        return packetsContainer.isPacketSafe(packet.headerId(), direction);
+    }
+
+    public void setDeveloperMode(boolean developerMode) {
+        this.developerMode = developerMode;
     }
 
     public String getClientHost() {
@@ -205,7 +228,7 @@ public class HConnection {
         if (proxy == null) {
             return null;
         }
-        return proxy.gethClient();
+        return proxy.getHClient();
     }
 
     public PacketInfoManager getPacketInfoManager() {

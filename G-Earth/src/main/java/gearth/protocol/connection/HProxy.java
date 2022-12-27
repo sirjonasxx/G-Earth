@@ -1,6 +1,9 @@
 package gearth.protocol.connection;
 
 import gearth.protocol.HPacket;
+import gearth.protocol.connection.packetsafety.PacketSafetyManager;
+import gearth.protocol.connection.packetsafety.SafePacketsContainer;
+import gearth.services.packet_info.PacketInfo;
 import gearth.services.packet_info.PacketInfoManager;
 import gearth.protocol.packethandler.PacketHandler;
 
@@ -45,6 +48,11 @@ public class HProxy {
         this.hotelVersion = hotelVersion;
         this.clientIdentifier = clientIdentifier;
         this.packetInfoManager = PacketInfoManager.fromHotelVersion(hotelVersion, hClient);
+
+        SafePacketsContainer packetsContainer = PacketSafetyManager.PACKET_SAFETY_MANAGER.getPacketContainer(hotelVersion);
+        for (PacketInfo packetInfo : packetInfoManager.getPacketInfoList()) {
+            packetsContainer.validateSafePacket(packetInfo.getHeaderId(), packetInfo.getDestination());
+        }
     }
 
     public boolean sendToServer(HPacket packet) {
@@ -101,7 +109,7 @@ public class HProxy {
         return hotelVersion;
     }
 
-    public HClient gethClient() {
+    public HClient getHClient() {
         return hClient;
     }
 
