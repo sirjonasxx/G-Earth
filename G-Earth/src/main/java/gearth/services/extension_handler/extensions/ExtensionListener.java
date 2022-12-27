@@ -9,7 +9,7 @@ public abstract class ExtensionListener {
     protected void manipulatedPacket(HMessage hMessage) {}
     protected void flagsRequest() {}
     protected void sendMessage(HMessage.Direction direction, HPacket packet) {}
-    protected void log(String text) {}
+    public void log(String text) {}
     protected void hasClosed() {}
 
     protected void packetToStringRequest(HPacket packet) {}

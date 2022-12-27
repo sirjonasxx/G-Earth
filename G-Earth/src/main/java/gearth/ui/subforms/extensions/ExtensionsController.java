@@ -75,7 +75,7 @@ public class ExtensionsController extends SubForm {
 
         extensionHandler.getObservable().addListener(e -> e.getExtensionObservable().addListener(new ExtensionListener() {
             @Override
-            protected void log(String text) {
+            public void log(String text) {
                 extensionLogger.log(text);
             }
         }));
