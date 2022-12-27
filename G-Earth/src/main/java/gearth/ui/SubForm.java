@@ -33,6 +33,9 @@ public class SubForm {
     }
 
     protected HConnection getHConnection() {
+        if (parentController == null) {
+            return null;
+        }
         return parentController.getHConnection();
     }
     protected void writeToLog(javafx.scene.paint.Color color, String text) {

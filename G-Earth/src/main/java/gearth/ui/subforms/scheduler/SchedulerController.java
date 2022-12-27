@@ -1,6 +1,10 @@
 package gearth.ui.subforms.scheduler;
 
 import com.tulskiy.keymaster.common.Provider;
+import gearth.extensions.parsers.HDirection;
+import gearth.protocol.HConnection;
+import gearth.protocol.StateChangeListener;
+import gearth.protocol.connection.HState;
 import gearth.services.scheduler.Interval;
 import gearth.services.scheduler.Scheduler;
 import gearth.ui.translations.LanguageBundle;
@@ -19,6 +23,7 @@ import javax.swing.*;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * Created by Jonas on 06/04/18.
@@ -61,8 +66,6 @@ public class SchedulerController extends SubForm {
         txt_packet.textProperty().addListener(event -> Platform.runLater(this::updateUI));
         txt_delay.textProperty().addListener(event -> Platform.runLater(this::updateUI));
 
-        updateUI();
-
         //register hotkeys
         //disable some output things
         PrintStream err = System.err;
@@ -85,6 +88,9 @@ public class SchedulerController extends SubForm {
     @Override
     protected void onParentSet() {
         scheduler = new Scheduler<>(getHConnection());
+        getHConnection().onDeveloperModeChange(developMode -> updateUI());
+        getHConnection().getStateObservable().addListener((oldState, newState) -> updateUI());
+        updateUI();
     }
 
     private void switchPauseHotkey(int index) {
@@ -104,7 +110,14 @@ public class SchedulerController extends SubForm {
     }
 
     private void updateUI() {
-        btn_addoredit.setDisable(!Interval.isValid(txt_delay.getText()) || new HPacket(txt_packet.getText()).isCorrupted());
+        HConnection connection = getHConnection();
+        if (connection == null) return;
+
+        HMessage.Direction direction = rb_incoming.isSelected() ? HMessage.Direction.TOCLIENT : HMessage.Direction.TOSERVER;
+        HPacket packet = new HPacket(txt_packet.getText());
+        boolean isPacketOk = connection.canSendPacket(direction, packet);
+
+        btn_addoredit.setDisable(!Interval.isValid(txt_delay.getText()) || !isPacketOk);
     }
 
     public void scheduleBtnClicked(ActionEvent actionEvent) {

@@ -38,6 +38,7 @@ public class InjectionController extends SubForm {
     private TranslatableString corruption, pcktInfo;
 
     protected void onParentSet() {
+        getHConnection().onDeveloperModeChange(developMode -> updateUI());
         getHConnection().getStateObservable().addListener((oldState, newState) -> Platform.runLater(this::updateUI));
 
         inputPacket.textProperty().addListener(event -> Platform.runLater(this::updateUI));

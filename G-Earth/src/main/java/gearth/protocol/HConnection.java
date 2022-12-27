@@ -15,6 +15,7 @@ import gearth.protocol.connection.proxy.unity.UnityProxyProvider;
 import gearth.services.extension_handler.ExtensionHandler;
 
 import java.io.IOException;
+import java.util.function.Consumer;
 
 public class HConnection {
 
@@ -25,6 +26,7 @@ public class HConnection {
 
     private volatile Object[] trafficObservables = {new Observable<TrafficListener>(), new Observable<TrafficListener>(), new Observable<TrafficListener>()};
     private volatile Observable<StateChangeListener> stateObservable = new Observable<>();
+    private volatile Observable<Consumer<Boolean>> developerModeChangeObservable = new Observable<>();
 
     private volatile HState state = HState.NOT_CONNECTED;
     private volatile HProxy proxy = null;
@@ -196,6 +198,11 @@ public class HConnection {
 
     public void setDeveloperMode(boolean developerMode) {
         this.developerMode = developerMode;
+        developerModeChangeObservable.fireEvent(listener -> listener.accept(developerMode));
+    }
+
+    public void onDeveloperModeChange(Consumer<Boolean> onChange) {
+        developerModeChangeObservable.addListener(onChange);
     }
 
     public String getClientHost() {

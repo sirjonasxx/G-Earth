@@ -266,7 +266,6 @@ public class ExtraController extends SubForm implements SocksConfiguration {
     private void setDevelopMode(boolean enabled) {
         cbx_develop.setSelected(enabled);
         getHConnection().setDeveloperMode(enabled);
-        parentController.extensionsController.setLocalInstallingEnabled(enabled);
     }
 
     public void adminCbxClick(ActionEvent actionEvent) {
