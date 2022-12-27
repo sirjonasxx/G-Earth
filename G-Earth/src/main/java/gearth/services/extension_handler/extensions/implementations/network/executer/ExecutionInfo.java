@@ -8,39 +8,39 @@ import java.util.Map;
 /**
  * Created by Jonas on 22/09/18.
  */
-public class ExecutionInfo {
+public final class ExecutionInfo {
 
-    private static Map<String, String[]> extensionTypeToExecutionCommand;
-    public final static List<String> ALLOWEDEXTENSIONTYPES;
-    public final static String EXTENSIONSDIRECTORY = "Extensions";
+    private static final Map<String, String[]> EXTENSION_TYPE_TO_EXECUTION_COMMAND;
+
+    public final static List<String> ALLOWED_EXTENSION_TYPES;
+    public final static String EXTENSIONS_DIRECTORY = "Extensions";
 
     static {
-        extensionTypeToExecutionCommand = new HashMap<>();
-        extensionTypeToExecutionCommand.put("*.jar", new String[]{"java", "-jar", "{path}"});
-        extensionTypeToExecutionCommand.put("*.py", new String[]{"python", "{path}"});
-        extensionTypeToExecutionCommand.put("*.py3", new String[]{"python3", "{path}"});
-        extensionTypeToExecutionCommand.put("*.sh", new String[]{"{path}"});
-        extensionTypeToExecutionCommand.put("*.exe", new String[]{"{path}"});
-        extensionTypeToExecutionCommand.put("*.js", new String[]{"node", "{path}"});
 
-        String[] extraArgs = {"-p", "{port}", "-f", "{filename}", "-c", "{cookie}"};
-        for(String type : extensionTypeToExecutionCommand.keySet()) {
-            String[] commandShort = extensionTypeToExecutionCommand.get(type);
-            String[] combined = new String[extraArgs.length + commandShort.length];
+        EXTENSION_TYPE_TO_EXECUTION_COMMAND = new HashMap<>();
+        EXTENSION_TYPE_TO_EXECUTION_COMMAND.put("*.jar", new String[]{"java", "-jar", "{path}"});
+        EXTENSION_TYPE_TO_EXECUTION_COMMAND.put("*.py", new String[]{"python", "{path}"});
+        EXTENSION_TYPE_TO_EXECUTION_COMMAND.put("*.py3", new String[]{"python3", "{path}"});
+        EXTENSION_TYPE_TO_EXECUTION_COMMAND.put("*.sh", new String[]{"{path}"});
+        EXTENSION_TYPE_TO_EXECUTION_COMMAND.put("*.exe", new String[]{"{path}"});
+        EXTENSION_TYPE_TO_EXECUTION_COMMAND.put("*.js", new String[]{"node", "{path}"});
+
+        final String[] extraArgs = {"-p", "{port}", "-f", "{filename}", "-c", "{cookie}"};
+
+        for(String type : EXTENSION_TYPE_TO_EXECUTION_COMMAND.keySet()) {
+
+            final String[] commandShort = EXTENSION_TYPE_TO_EXECUTION_COMMAND.get(type);
+            final String[] combined = new String[extraArgs.length + commandShort.length];
             System.arraycopy(commandShort, 0, combined, 0, commandShort.length);
             System.arraycopy(extraArgs, 0, combined, commandShort.length, extraArgs.length);
 
-            extensionTypeToExecutionCommand.put(
-                    type,
-                    combined
-                    );
+            EXTENSION_TYPE_TO_EXECUTION_COMMAND.put(type, combined);
         }
 
-        ALLOWEDEXTENSIONTYPES = new ArrayList<>(extensionTypeToExecutionCommand.keySet());
+        ALLOWED_EXTENSION_TYPES = new ArrayList<>(EXTENSION_TYPE_TO_EXECUTION_COMMAND.keySet());
     }
 
     public static String[] getExecutionCommand(String type) {
-        return extensionTypeToExecutionCommand.get(type);
+        return EXTENSION_TYPE_TO_EXECUTION_COMMAND.get(type);
     }
-
 }

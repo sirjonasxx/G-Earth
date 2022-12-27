@@ -1,10 +1,9 @@
 package gearth.ui.subforms.extensions;
 
-import gearth.GEarth;
 import gearth.services.extension_handler.ExtensionHandler;
 import gearth.services.extension_handler.extensions.ExtensionListener;
-import gearth.services.extension_handler.extensions.implementations.network.NetworkExtensionsProducer;
-import gearth.services.extension_handler.extensions.implementations.network.authentication.Authenticator;
+import gearth.services.extension_handler.extensions.implementations.network.NetworkExtensionServer;
+import gearth.services.extension_handler.extensions.implementations.network.NetworkExtensionAuthenticator;
 import gearth.services.extension_handler.extensions.implementations.network.executer.ExecutionInfo;
 import gearth.services.extension_handler.extensions.implementations.network.executer.ExtensionRunner;
 import gearth.services.extension_handler.extensions.implementations.network.executer.ExtensionRunnerFactory;
@@ -39,7 +38,7 @@ public class ExtensionsController extends SubForm {
 
     private ExtensionRunner extensionRunner = null;
     private ExtensionHandler extensionHandler;
-    private NetworkExtensionsProducer networkExtensionsProducer; // needed for port
+    private NetworkExtensionServer networkExtensionsProducer; // needed for port
     private ExtensionLogger extensionLogger = null;
 
     public Label lbl_tableTitle, lbl_tableDesc, lbl_tableAuthor, lbl_tableVersion, lbl_tableEdit, lbl_port;
@@ -61,8 +60,8 @@ public class ExtensionsController extends SubForm {
 
         //noinspection OptionalGetWithoutIsPresent
         networkExtensionsProducer
-                = (NetworkExtensionsProducer) extensionHandler.getExtensionProducers().stream()
-                .filter(producer1 -> producer1 instanceof NetworkExtensionsProducer)
+                = (NetworkExtensionServer) extensionHandler.getExtensionProducers().stream()
+                .filter(producer1 -> producer1 instanceof NetworkExtensionServer)
                 .findFirst().get();
 
 
@@ -87,7 +86,7 @@ public class ExtensionsController extends SubForm {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle(LanguageBundle.get("tab.extensions.button.install.windowtitle"));
         fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter(LanguageBundle.get("tab.extensions.button.install.filetype"), ExecutionInfo.ALLOWEDEXTENSIONTYPES));
+                new FileChooser.ExtensionFilter(LanguageBundle.get("tab.extensions.button.install.filetype"), ExecutionInfo.ALLOWED_EXTENSION_TYPES));
         File selectedFile = fileChooser.showOpenDialog(parentController.getStage());
         if (selectedFile != null) {
             extensionRunner.installAndRunExtension(selectedFile.getPath(), networkExtensionsProducer.getPort());
@@ -123,7 +122,7 @@ public class ExtensionsController extends SubForm {
         GPythonShell shell = new GPythonShell(
                 String.format("%s %d", LanguageBundle.get("tab.extensions.button.pythonshell.windowtitle"),gpytonShellCounter++),
                 networkExtensionsProducer.getPort(),
-                Authenticator.generatePermanentCookie()
+                NetworkExtensionAuthenticator.generatePermanentCookie()
         );
         shell.launch((b) -> {
             pythonShellLaunching = false;

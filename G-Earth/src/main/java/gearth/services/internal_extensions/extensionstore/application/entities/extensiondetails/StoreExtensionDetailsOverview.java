@@ -1,8 +1,6 @@
 package gearth.services.internal_extensions.extensionstore.application.entities.extensiondetails;
 
-import gearth.GEarth;
-import gearth.services.extension_handler.extensions.implementations.network.NetworkExtensionsProducer;
-import gearth.services.extension_handler.extensions.implementations.network.executer.NormalExtensionRunner;
+import gearth.services.extension_handler.extensions.extensionproducers.ExtensionProducerFactory;
 import gearth.services.internal_extensions.extensionstore.GExtensionStore;
 import gearth.services.internal_extensions.extensionstore.application.GExtensionStoreController;
 import gearth.services.internal_extensions.extensionstore.application.WebUtils;
@@ -16,13 +14,11 @@ import gearth.ui.titlebar.TitleBarController;
 import gearth.ui.translations.LanguageBundle;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
 import org.apache.maven.artifact.versioning.ComparableVersion;
 import org.w3c.dom.Element;
 
 import java.io.IOException;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -137,7 +133,7 @@ public class StoreExtensionDetailsOverview extends HOverview {
             @Override
             public void success(String installationFolder) {
                 Platform.runLater(() -> successPopup(modeString));
-                StoreExtensionTools.executeExtension(installationFolder, NetworkExtensionsProducer.extensionPort);
+                StoreExtensionTools.executeExtension(installationFolder, ExtensionProducerFactory.getExtensionServer().getPort());
             }
 
             @Override
