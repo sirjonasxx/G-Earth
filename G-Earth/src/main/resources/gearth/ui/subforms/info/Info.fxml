@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<GridPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="258.0" prefWidth="650.0" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gearth.ui.subforms.info.InfoController">
+<GridPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="258.0" prefWidth="650.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gearth.ui.subforms.info.InfoController">
     <columnConstraints>
         <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="332.0" />
     </columnConstraints>
@@ -87,6 +87,11 @@
          <Hyperlink fx:id="link_g_store" layoutX="487.0" layoutY="212.0" text="G-ExtensionStore" />
          <Button fx:id="btn_donate" layoutX="537.0" layoutY="14.0" mnemonicParsing="false" onAction="#donate" prefHeight="20.0" prefWidth="100.0" text="Donate BTC" />
          <Hyperlink fx:id="link_t_gearth" layoutX="487.0" layoutY="192.0" text="Twitter - G-Earth" />
+         <Label layoutX="363.0" layoutY="204.0" text="Dorving" textFill="#000000b2">
+            <font>
+               <Font size="14.0" />
+            </font>
+         </Label>
          <!--<Hyperlink fx:id="link_d_bonnie" layoutX="400.0" layoutY="221.0" text="Discord - BonnieScripting (pt/br)" />-->
       </children>
    </AnchorPane>
