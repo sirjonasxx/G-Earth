@@ -121,7 +121,7 @@ public class HPacket implements StringifyAble {
     }
 
     public void completePacket(PacketInfoManager packetInfoManager) {
-        if (isCorrupted() || identifier == null) return;
+        if (isCorrupted() || identifier == null || packetInfoManager == null) return;
 
         PacketInfo packetInfo = packetInfoManager.getPacketInfoFromName(identifierDirection, identifier);
         if (packetInfo == null) {
@@ -718,7 +718,15 @@ public class HPacket implements StringifyAble {
 
     public String toExpression() {
         if (isCorrupted()) return "";
-        return PacketStringUtils.predictedExpression(this, null);
+        return PacketStringUtils.predictedExpression(this, dummyPacketInfo());
+    }
+
+    /**
+     * Provides dummy packet information for a packet that hasn't been completed with headerId yet
+     */
+    private PacketInfo dummyPacketInfo() {
+        if (isPacketComplete()) return null;
+        return new PacketInfo(identifierDirection, -1, "", identifier, null, "");
     }
 
     public void setBytes(byte[] bytes) {

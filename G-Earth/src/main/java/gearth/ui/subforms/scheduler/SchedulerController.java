@@ -1,14 +1,12 @@
 package gearth.ui.subforms.scheduler;
 
 import com.tulskiy.keymaster.common.Provider;
-import gearth.GEarth;
 import gearth.services.scheduler.Interval;
 import gearth.services.scheduler.Scheduler;
 import gearth.ui.translations.LanguageBundle;
 import gearth.ui.translations.TranslatableString;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
@@ -28,7 +26,7 @@ import java.util.List;
 public class SchedulerController extends SubForm {
 
     private static final Interval defaultInterval = new Interval(0, 500);
-    private static final HPacket defaultPacket = new HPacket(0);
+    private static final HPacket defaultPacket = new HPacket("Chat", HMessage.Direction.TOCLIENT, -1, "Frank loves G-Earth", 0, 33, 0, 0);
 
     public VBox schedulecontainer;
     public GridPane header;
@@ -81,6 +79,7 @@ public class SchedulerController extends SubForm {
         System.setErr(err);
 
         initLanguageBinding();
+        setInputDefault(true);
     }
 
     @Override
@@ -130,7 +129,7 @@ public class SchedulerController extends SubForm {
             isBeingEdited.isUpdatedTrigger();
 
             isBeingEdited = null;
-            setInputDefault();
+            setInputDefault(false);
         }
 
     }
@@ -142,7 +141,7 @@ public class SchedulerController extends SubForm {
 
         newItem.onDelete(() -> {
             if (isBeingEdited == newItem) {
-                setInputDefault();
+                setInputDefault(false);
                 isBeingEdited = null;
             }
             scheduler.remove(newItem);
@@ -167,16 +166,16 @@ public class SchedulerController extends SubForm {
                 newItem.onIsBeingUpdatedTrigger();
             }
             else {
-                setInputDefault();
+                setInputDefault(false);
                 isBeingEdited.isUpdatedTrigger();
                 isBeingEdited = null;
             }
         });
     }
 
-    private void setInputDefault() {
+    private void setInputDefault(boolean showDummyPacket) {
         txt_delay.setText(defaultInterval.toString());
-        txt_packet.setText(defaultPacket.toString());
+        txt_packet.setText(showDummyPacket ? defaultPacket.toExpression() : "");
         rb_incoming.setSelected(true);
         rb_outgoing.setSelected(false);
 
