@@ -1,10 +1,10 @@
 package gearth.ui.subforms.injection;
 
-import gearth.GEarth;
 import gearth.misc.Cacher;
-import gearth.services.packet_info.PacketInfoManager;
+import gearth.protocol.HConnection;
 import gearth.protocol.HMessage;
-import gearth.protocol.connection.HState;
+import gearth.protocol.HPacket;
+import gearth.ui.SubForm;
 import gearth.ui.translations.LanguageBundle;
 import gearth.ui.translations.TranslatableString;
 import javafx.application.Platform;
@@ -14,8 +14,6 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Text;
-import gearth.protocol.HPacket;
-import gearth.ui.SubForm;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -109,6 +107,7 @@ public class InjectionController extends SubForm {
     private void updateUI() {
         boolean dirty = false;
 
+        corruption.setFormat("%s: %s");
         corruption.setKey(1, "tab.injection.corrupted.false");
         lbl_corruption.getStyleClass().clear();
         lbl_corruption.getStyleClass().add("not-corrupted-label");
@@ -140,27 +139,45 @@ public class InjectionController extends SubForm {
         }
 
         if (!dirty) {
-            PacketInfoManager packetInfoManager = getHConnection().getPacketInfoManager();
 
-            for (HPacket packet : packets) {
-                packet.completePacket(packetInfoManager);
-            }
+            HConnection connection = getHConnection();
 
             boolean canSendToClient = Arrays.stream(packets).allMatch(packet ->
-                    packet.isPacketComplete() && packet.canSendToClient());
+                    connection.canSendPacket(HMessage.Direction.TOCLIENT, packet));
             boolean canSendToServer = Arrays.stream(packets).allMatch(packet ->
-                    packet.isPacketComplete() && packet.canSendToServer());
+                    connection.canSendPacket(HMessage.Direction.TOSERVER, packet));
 
-            btn_sendToClient.setDisable(!canSendToClient || getHConnection().getState() != HState.CONNECTED);
-            btn_sendToServer.setDisable(!canSendToServer || getHConnection().getState() != HState.CONNECTED);
+            btn_sendToClient.setDisable(!canSendToClient);
+            btn_sendToServer.setDisable(!canSendToServer);
+
+            // mark packet sending unsafe if there is any packet that is unsafe for both TOSERVER and TOCLIENT
+            boolean isUnsafe = Arrays.stream(packets).anyMatch(packet ->
+                    !connection.isPacketSendingSafe(HMessage.Direction.TOCLIENT, packet) &&
+                            !connection.isPacketSendingSafe(HMessage.Direction.TOSERVER, packet));
+
             if (packets.length == 1) {
-                pcktInfo.setFormatAndKeys("%s (%s: " + packets[0].headerId() + ", %s: " + packets[0].length() + ")",
-                        "tab.injection.description.header",
-                        "tab.injection.description.id",
-                        "tab.injection.description.length");
+                HPacket packet = packets[0];
+                if (isUnsafe) {
+                    pcktInfo.setFormatAndKeys("%s (%s: " + packet.headerId() + ", %s: " + packet.length() + "), %s",
+                            "tab.injection.description.header",
+                            "tab.injection.description.id",
+                            "tab.injection.description.length",
+                            "tab.injection.description.unsafe");
+                }
+                else {
+                    pcktInfo.setFormatAndKeys("%s (%s: " + packet.headerId() + ", %s: " + packet.length() + ")",
+                            "tab.injection.description.header",
+                            "tab.injection.description.id",
+                            "tab.injection.description.length");
+                }
             }
             else {
-                lbl_pcktInfo.setText("");
+                if (isUnsafe) {
+                    pcktInfo.setFormatAndKeys("%s", "tab.injection.description.unsafe");
+                }
+                else {
+                    pcktInfo.setFormatAndKeys("");
+                }
             }
         } else {
             if (packets.length == 1) {

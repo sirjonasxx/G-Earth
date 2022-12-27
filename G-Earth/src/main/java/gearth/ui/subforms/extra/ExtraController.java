@@ -132,11 +132,15 @@ public class ExtraController extends SubForm implements SocksConfiguration {
     }
 
     private void saveSocksConfig() {
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put(SOCKS_IP, getSocksHost());
-        jsonObject.put(SOCKS_PORT, getSocksPort());
-//        jsonObject.put(IGNORE_ONCE, cbx_socksUseIfNeeded.isSelected());
-        Cacher.put(SOCKS_CACHE_KEY, jsonObject);
+        if (txt_socksIp.getText().contains(":")) {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put(SOCKS_IP, getSocksHost());
+            jsonObject.put(SOCKS_PORT, getSocksPort());
+            Cacher.put(SOCKS_CACHE_KEY, jsonObject);
+        }
+        else {
+            Cacher.remove(SOCKS_CACHE_KEY);
+        }
     }
 
     private void updateAdvancedUI() {
@@ -160,7 +164,11 @@ public class ExtraController extends SubForm implements SocksConfiguration {
 
     @Override
     public int getSocksPort() {
-        return Integer.parseInt(txt_socksIp.getText().split(":")[1]);
+        String socksString = txt_socksIp.getText();
+        if (socksString.contains(":")) {
+            return Integer.parseInt(socksString.split(":")[1]);
+        }
+        return 1337;
     }
 
     @Override

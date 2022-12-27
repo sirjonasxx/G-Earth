@@ -162,14 +162,15 @@ public class HConnection {
         return proxy.sendToServer(packet);
     }
 
-    private boolean canSendPacket(HMessage.Direction direction, HPacket packet) {
+    public boolean canSendPacket(HMessage.Direction direction, HPacket packet) {
         return isPacketSendingAllowed(direction, packet) && (developerMode || isPacketSendingSafe(direction, packet));
     }
 
     public boolean isPacketSendingAllowed(HMessage.Direction direction, HPacket packet) {
+        if (state != HState.CONNECTED) return false;
+
         HProxy proxy = this.proxy;
         if (proxy == null) return false;
-
         if (packet.isCorrupted()) return false;
 
         if (!packet.isPacketComplete()) {
@@ -185,8 +186,9 @@ public class HConnection {
     }
 
     public boolean isPacketSendingSafe(HMessage.Direction direction, HPacket packet) {
+        if (proxy == null) return true; // do not mark unsafe, but won't pass "isPacketSendingAllowed()" check
         String hotelVersion = proxy.getHotelVersion();
-        if (hotelVersion == null) return false;
+        if (hotelVersion == null) return true;
 
         SafePacketsContainer packetsContainer = PacketSafetyManager.PACKET_SAFETY_MANAGER.getPacketContainer(hotelVersion);
         return packetsContainer.isPacketSafe(packet.headerId(), direction);
