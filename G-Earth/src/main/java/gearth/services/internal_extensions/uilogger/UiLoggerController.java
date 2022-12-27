@@ -275,12 +275,15 @@ public class UiLoggerController implements Initializable {
                     Hexdump.hexdump(packet.toBytes()) :
                     (chkReprRawHex.isSelected() ? Bytes.wrap(packet.toBytes()).encodeHex() : packet.toString());
 
-            String type = isIncoming ? LanguageBundle.get("ext.logger.element.direction.incoming") : LanguageBundle.get("ext.logger.element.direction.outgoing");
+            String packetType = isIncoming ? "incoming" : "outgoing";
+            String type = isIncoming ?
+                    LanguageBundle.get("ext.logger.element.direction.incoming") :
+                    LanguageBundle.get("ext.logger.element.direction.outgoing");
 
             if (!chkReprHex.isSelected()) {
-                elements.add(new Element(String.format("%s[", type), type.toLowerCase()));
+                elements.add(new Element(String.format("%s[", type), packetType));
                 elements.add(new Element(String.valueOf(packet.headerId()), ""));
-                elements.add(new Element("]", type.toLowerCase()));
+                elements.add(new Element("]", packetType));
 
                 elements.add(new Element(" -> ", ""));
             }
@@ -288,7 +291,7 @@ public class UiLoggerController implements Initializable {
             if (isSkipped) {
                 elements.add(new Element(String.format("<%s>", LanguageBundle.get("ext.logger.element.skipped")), "skipped"));
             } else
-                elements.add(new Element(packetRepresentation, String.format(chkReprHex.isSelected() ? "%sHex": "%s", type.toLowerCase())));
+                elements.add(new Element(packetRepresentation, String.format(chkReprHex.isSelected() ? "%sHex": "%s", packetType)));
             elements.add(new Element("\n", ""));
         }
 
