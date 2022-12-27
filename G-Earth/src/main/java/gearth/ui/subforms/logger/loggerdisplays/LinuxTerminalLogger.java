@@ -55,7 +55,7 @@ class LinuxTerminalLogger extends SimpleTerminalLogger {
                 packet.toString()
         );
 
-        output.append(colorizePackets.get("DEFAULT"));
+        output.append(colorizePackets.get("ENGLISH"));
 
         System.out.println(output.toString());
     }
@@ -67,7 +67,7 @@ class LinuxTerminalLogger extends SimpleTerminalLogger {
             System.out.println(
                     colorizePackets.get("EXPRESSION") +
                             expr +
-                            colorizePackets.get("DEFAULT")
+                            colorizePackets.get("ENGLISH")
             );
         }
     }

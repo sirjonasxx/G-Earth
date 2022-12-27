@@ -11,6 +11,8 @@ import gearth.services.g_python.GPythonVersionUtils;
 import gearth.ui.SubForm;
 import gearth.ui.subforms.info.InfoController;
 import gearth.ui.titlebar.TitleBarController;
+import gearth.ui.translations.LanguageBundle;
+import gearth.ui.translations.TranslatableString;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.scene.control.*;
@@ -59,6 +61,7 @@ public class ExtraController extends SubForm implements SocksConfiguration {
     public TextField txt_socksPort;
     public TextField txt_socksIp;
     public CheckBox cbx_admin;
+    public Label lbl_notepad, lbl_proxyIp, lbl_proxyPort;
 
     private AdminService adminService;
 
@@ -92,6 +95,8 @@ public class ExtraController extends SubForm implements SocksConfiguration {
         cbx_useSocks.selectedProperty().addListener(observable -> grd_socksInfo.setDisable(!cbx_useSocks.isSelected()));
 
         ProxyProviderFactory.setSocksConfig(this);
+
+        initLanguageBinding();
     }
 
     @Override
@@ -177,12 +182,13 @@ public class ExtraController extends SubForm implements SocksConfiguration {
                 });
                 if (!GPythonVersionUtils.validInstallation()) {
                     Platform.runLater(() -> {
-                        Alert alert = new Alert(Alert.AlertType.ERROR, "G-Python installation", ButtonType.OK);
-                        alert.setTitle("G-Python installation");
+                        Alert alert = new Alert(Alert.AlertType.ERROR, LanguageBundle.get("tab.extra.options.pythonscripting.alert.title"), ButtonType.OK);
+                        alert.setTitle(LanguageBundle.get("tab.extra.options.pythonscripting.alert.title"));
 
                         FlowPane fp = new FlowPane();
-                        Label lbl = new Label("Before using G-Python, install the right packages using pip!" +
-                                System.lineSeparator() + System.lineSeparator() + "More information here:");
+                        Label lbl = new Label(LanguageBundle.get("tab.extra.options.pythonscripting.alert.content") +
+                                System.lineSeparator() + System.lineSeparator() +
+                                LanguageBundle.get("tab.extra.options.pythonscripting.alert.moreinformation"));
                         Hyperlink link = new Hyperlink(INFO_URL_GPYTHON);
                         fp.getChildren().addAll( lbl, link);
                         link.setOnAction(event -> {
@@ -218,5 +224,23 @@ public class ExtraController extends SubForm implements SocksConfiguration {
     public void adminCbxClick(ActionEvent actionEvent) {
         adminService.setEnabled(cbx_admin.isSelected());
 
+    }
+
+    private void initLanguageBinding() {
+        url_troubleshooting.textProperty().bind(new TranslatableString("%s", "tab.extra.troubleshooting"));
+
+        lbl_notepad.textProperty().bind(new TranslatableString("%s:", "tab.extra.notepad"));
+        lbl_proxyIp.textProperty().bind(new TranslatableString("%s:", "tab.extra.options.advanced.proxy.ip"));
+        lbl_proxyPort.textProperty().bind(new TranslatableString("%s:", "tab.extra.options.advanced.proxy.port"));
+
+        cbx_alwaysOnTop.textProperty().bind(new TranslatableString("%s", "tab.extra.options.alwaysontop"));
+
+        cbx_admin.textProperty().bind(new TranslatableString("%s", "tab.extra.options.staffpermissions"));
+        cbx_gpython.textProperty().bind(new TranslatableString("%s", "tab.extra.options.pythonscripting"));
+        cbx_advanced.textProperty().bind(new TranslatableString("%s", "tab.extra.options.advanced"));
+
+        cbx_useSocks.textProperty().bind(new TranslatableString("%s", "tab.extra.options.advanced.socks"));
+        cbx_disableDecryption.textProperty().bind(new TranslatableString("%s", "tab.extra.options.advanced.disabledecryption"));
+        cbx_debug.textProperty().bind(new TranslatableString("%s", "tab.extra.options.advanced.debugstdout"));
     }
 }

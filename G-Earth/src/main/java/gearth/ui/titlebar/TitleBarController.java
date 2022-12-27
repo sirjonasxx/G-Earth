@@ -2,16 +2,18 @@ package gearth.ui.titlebar;
 
 import gearth.GEarth;
 import gearth.ui.themes.ThemeFactory;
+import gearth.ui.translations.Language;
+import gearth.ui.translations.LanguageBundle;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
@@ -19,6 +21,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.stage.WindowEvent;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -30,6 +33,7 @@ public class TitleBarController {
     public ImageView titleIcon;
     public ImageView themeBtn;
     public ImageView minimizeBtn;
+    public MenuButton languagePicker;
 
     private Stage stage;
     private TitleBarConfig config;
@@ -83,6 +87,9 @@ public class TitleBarController {
         stage.titleProperty().addListener((i) -> controller.setTitle(stage.getTitle()));
         controller.setTitle(stage.getTitle());
 
+        controller.languagePicker.getItems().addAll(Language.getMenuItems());
+        controller.languagePicker.setGraphic(LanguageBundle.getLanguage().getIcon());
+
         stage.getIcons().addListener((InvalidationListener) observable -> controller.updateIcon());
         controller.updateIcon();
 
@@ -96,9 +103,14 @@ public class TitleBarController {
 
             if (!config.displayThemePicker()) {
                 ((GridPane) controller.themeBtn.getParent()).getChildren().remove(controller.themeBtn);
+                ((GridPane) controller.languagePicker.getParent()).getChildren().remove(controller.languagePicker);
             }
         });
         return controller;
+    }
+
+    private static void initLanguagePicker() {
+
     }
 
     public void updateIcon() {
@@ -158,5 +170,4 @@ public class TitleBarController {
         }
         return Optional.empty();
     }
-
 }

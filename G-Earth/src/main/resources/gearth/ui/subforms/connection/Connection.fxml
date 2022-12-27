@@ -45,7 +45,7 @@
                 <rowConstraints>
                     <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                 </rowConstraints>
-                <Label text="Port:" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
+                <Label fx:id="lblInpPort" text="Port:" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
                 <ComboBox fx:id="inpPort" disable="true" editable="true" prefWidth="183.0" GridPane.columnIndex="1">
                     <GridPane.margin>
                         <Insets right="15.0" />
@@ -60,7 +60,7 @@
                 <rowConstraints>
                     <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                 </rowConstraints>
-                <Label text="Host:" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
+                <Label fx:id="lblInpHost" text="Host:" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
                 <ComboBox fx:id="inpHost" disable="true" editable="true" GridPane.columnIndex="1">
                     <GridPane.margin>
                         <Insets right="15.0" />
@@ -78,13 +78,10 @@
                     <RowConstraints />
                     <RowConstraints />
                 </rowConstraints>
-                <CheckBox fx:id="cbx_autodetect" mnemonicParsing="false" selected="true" text="Auto-detect" textFill="#000000a9" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                <CheckBox fx:id="cbx_autodetect" mnemonicParsing="false" selected="true" text="Auto-detect" textAlignment="CENTER" textFill="#000000a9" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="3">
                     <GridPane.margin>
                         <Insets left="-5.0" />
                     </GridPane.margin>
-                    <font>
-                        <Font size="12.0" />
-                    </font>
                 </CheckBox>
                 <Button fx:id="btnConnect" alignment="CENTER" maxWidth="1.7976931348623157E308" onAction="#btnConnect_clicked" text="Connect" GridPane.halignment="CENTER" GridPane.rowIndex="3" GridPane.valignment="CENTER">
                     <GridPane.margin>
@@ -114,7 +111,7 @@
                 <RowConstraints maxHeight="86.0" minHeight="10.0" prefHeight="40.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <Label text="Hotel version:" textFill="#000000cc" />
+                  <Label fx:id="lblHotelVersion" text="Hotel version:" textFill="#000000cc" />
                   <TextField fx:id="txtfield_hotelversion" editable="false" prefHeight="17.0" prefWidth="285.0" GridPane.rowIndex="1">
                      <opaqueInsets>
                         <Insets />
@@ -140,10 +137,13 @@
                   <RowConstraints minHeight="20.0" prefHeight="34.0" vgrow="SOMETIMES" />
                </rowConstraints>
                <children>
-                  <Label maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Client type:" textFill="#000000cd">
+                  <Label fx:id="lblClient" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="22.0" prefWidth="94.0" text="Client type:" textFill="#000000cd">
                      <padding>
-                        <Insets left="12.0" />
+                        <Insets left="8.0" />
                      </padding>
+                     <GridPane.margin>
+                        <Insets right="-20.0" />
+                     </GridPane.margin>
                   </Label>
                   <RadioButton fx:id="rd_unity" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Unity" GridPane.columnIndex="3" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS">
                      <toggleGroup>
@@ -196,7 +196,7 @@
             <GridPane.margin>
                 <Insets bottom="14.0" left="20.0" right="20.0" />
             </GridPane.margin>
-            <Label text="Connection state:" textFill="#000000ba" GridPane.valignment="BOTTOM">
+            <Label fx:id="lblStateHead" text="Connection state:" textFill="#000000ba" GridPane.valignment="BOTTOM">
                 <GridPane.margin>
                     <Insets bottom="5.0" left="2.0" />
                 </GridPane.margin>
@@ -225,12 +225,12 @@
             <padding>
                 <Insets bottom="7.0" top="7.0" />
             </padding>
-            <Label text="Game host:" textFill="#000000cc">
+            <Label fx:id="lblHost" text="Host:" textFill="#000000cc">
                 <GridPane.margin>
                     <Insets left="10.0" />
                 </GridPane.margin>
             </Label>
-            <Label text="Port:" textFill="#000000cc" GridPane.rowIndex="1">
+            <Label fx:id="lblPort" text="Port:" textFill="#000000cc" GridPane.rowIndex="1">
                 <GridPane.margin>
                     <Insets left="10.0" />
                 </GridPane.margin>

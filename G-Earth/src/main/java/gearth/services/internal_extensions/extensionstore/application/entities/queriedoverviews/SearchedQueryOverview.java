@@ -5,6 +5,7 @@ import gearth.services.internal_extensions.extensionstore.application.entities.H
 import gearth.services.internal_extensions.extensionstore.repository.StoreRepository;
 import gearth.services.internal_extensions.extensionstore.repository.models.StoreExtension;
 import gearth.services.internal_extensions.extensionstore.repository.querying.ExtensionOrdering;
+import gearth.ui.translations.LanguageBundle;
 
 import java.util.Collections;
 import java.util.List;
@@ -48,17 +49,17 @@ public class SearchedQueryOverview extends QueriedExtensionOverview {
 
             @Override
             public String title() {
-                return "Search";
+                return LanguageBundle.get("ext.store.search.title");
             }
 
             @Override
             public String description() {
-                return "Find the extension that fits your needs";
+                return LanguageBundle.get("ext.store.search.description");
             }
 
             @Override
             public String contentTitle() {
-                return "Search results";
+                return LanguageBundle.get("ext.store.search.results");
             }
         };
     }

@@ -46,7 +46,7 @@
             <GridPane.margin>
                 <Insets/>
             </GridPane.margin>
-            <Label alignment="CENTER" text="Integer:">
+            <Label fx:id="lbl_integer" alignment="CENTER" text="Integer:">
                 <GridPane.margin>
                     <Insets left="10.0"/>
                 </GridPane.margin>
@@ -80,7 +80,7 @@
                 </GridPane.margin>
             </TextField>
 
-            <Label alignment="CENTER" text="Ushort:" GridPane.rowIndex="1">
+            <Label fx:id="lbl_uShort" alignment="CENTER" text="Ushort:" GridPane.rowIndex="1">
                 <GridPane.margin>
                     <Insets left="10.0"/>
                 </GridPane.margin>
@@ -116,7 +116,7 @@
             </TextField>
 
         </GridPane>
-        <Label text="Encoding/decoding" textFill="#000000cc">
+        <Label fx:id="lbl_encodingDecoding" text="Encoding/Decoding" textFill="#000000cc">
             <GridPane.margin>
                 <Insets left="6.0" top="5.0"/>
             </GridPane.margin>
@@ -179,7 +179,7 @@
                 </GridPane.margin>
             </TextArea>
         </GridPane>
-        <Label text="Packet &lt;-&gt; expression" textFill="#000000cc">
+        <Label fx:id="lbl_packetToExpression" text="Packet &lt;-&gt; Expression" textFill="#000000cc">
             <GridPane.margin>
                 <Insets left="6.0" top="2.0"/>
             </GridPane.margin>

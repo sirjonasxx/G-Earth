@@ -1,8 +1,10 @@
 package gearth.ui.subforms.tools;
 
 import gearth.services.packet_info.PacketInfoManager;
+import gearth.ui.translations.TranslatableString;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
@@ -26,6 +28,8 @@ public class ToolsController extends SubForm {
     public TextArea txt_packetArea;
     public Button btn_toPacket;
     public TextArea txt_exprArea;
+
+    public Label lbl_integer, lbl_uShort, lbl_encodingDecoding, lbl_packetToExpression;
 
     //TODO: toExpression() without bytelength limit for this use only
 
@@ -115,6 +119,7 @@ public class ToolsController extends SubForm {
             }
         });
 
+        initLanguageBinding();
     }
 
     public void btnEncodeInt_clicked(ActionEvent actionEvent) {
@@ -155,5 +160,21 @@ public class ToolsController extends SubForm {
 
     public void btn_toPacket_clicked(ActionEvent actionEvent) {
         txt_packetArea.setText(parseToPacket(txt_exprArea.getText()).toString());
+    }
+
+    private void initLanguageBinding() {
+        lbl_integer.textProperty().bind(new TranslatableString("%s:", "tab.tools.type.integer"));
+        lbl_uShort.textProperty().bind(new TranslatableString("%s:", "tab.tools.type.ushort"));
+
+        TranslatableString encode = new TranslatableString("%s", "tab.tools.button.encode");
+        TranslatableString decode = new TranslatableString("%s", "tab.tools.button.decode");
+        btnEncodeInt.textProperty().bind(encode);
+        btnEncodeUShort.textProperty().bind(encode);
+        btnDecodeInt.textProperty().bind(decode);
+        btnDecodeUshort.textProperty().bind(decode);
+
+        lbl_encodingDecoding.textProperty().bind(new TranslatableString("%s/%s", "tab.tools.encoding", "tab.tools.decoding"));
+
+        lbl_packetToExpression.textProperty().bind(new TranslatableString("%s <-> %s", "tab.tools.packet", "tab.tools.expression"));
     }
 }

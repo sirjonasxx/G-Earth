@@ -6,6 +6,7 @@ import gearth.protocol.connection.HClient;
 import gearth.protocol.connection.HState;
 import gearth.protocol.connection.proxy.ProxyProviderFactory;
 import gearth.services.Constants;
+import gearth.ui.translations.TranslatableString;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.scene.control.*;
@@ -29,7 +30,7 @@ public class ConnectionController extends SubForm {
     public ComboBox<String> inpPort;
     public ComboBox<String> inpHost;
     public Button btnConnect;
-    public Label lblState;
+    public Label lblInpPort, lblInpHost, lblPort, lblHost, lblHotelVersion, lblClient, lblStateHead, lblState;
     public TextField outHost;
     public TextField outPort;
     public CheckBox cbx_autodetect;
@@ -47,6 +48,8 @@ public class ConnectionController extends SubForm {
     public GridPane grd_clientSelection;
 
     private volatile int initcount = 0;
+
+    private TranslatableString connect, state;
 
     public void initialize() {
 
@@ -131,6 +134,8 @@ public class ConnectionController extends SubForm {
         synchronized (this) {
             tryMaybeConnectOnInit();
         }
+
+        initLanguageBinding();
     }
 
 
@@ -176,20 +181,20 @@ public class ConnectionController extends SubForm {
         getHConnection().getStateObservable().addListener((oldState, newState) -> Platform.runLater(() -> {
             updateInputUI();
             if (newState == HState.NOT_CONNECTED) {
-                lblState.setText("Not connected");
-                btnConnect.setText("Connect");
+                state.setKey(0, "tab.connection.state.notconnected");
+                connect.setKey(0, "tab.connection.button.connect");
                 outHost.setText("");
                 outPort.setText("");
             }
             else if (oldState == HState.NOT_CONNECTED) {
-                btnConnect.setText("Abort");
+                connect.setKey(0, "tab.connection.button.abort");
             }
 
             if (newState == HState.CONNECTED) {
-                lblState.setText("Connected");
+                state.setKey(0, "tab.connection.state.connected");
             }
             if (newState == HState.WAITING_FOR_CLIENT) {
-                lblState.setText("Waiting for connection");
+                state.setKey(0, "tab.connection.state.waiting");
             }
 
             if (newState == HState.CONNECTED && useFlash()) {
@@ -313,5 +318,25 @@ public class ConnectionController extends SubForm {
         }
 
         return false;
+    }
+
+    private void initLanguageBinding() {
+        TranslatableString port = new TranslatableString("%s", "tab.connection.port");
+        TranslatableString host = new TranslatableString("%s", "tab.connection.host");
+        lblInpPort.textProperty().bind(port);
+        lblInpHost.textProperty().bind(host);
+        lblPort.textProperty().bind(port);
+        lblHost.textProperty().bind(host);
+        cbx_autodetect.textProperty().bind(new TranslatableString("%s", "tab.connection.autodetect"));
+        connect = new TranslatableString("%s", "tab.connection.button.connect");
+        btnConnect.textProperty().bind(connect);
+        lblHotelVersion.textProperty().bind(new TranslatableString("%s", "tab.connection.version"));
+        lblClient.textProperty().bind(new TranslatableString("%s", "tab.connection.client"));
+        rd_unity.textProperty().bind(new TranslatableString("%s", "tab.connection.client.unity"));
+        rd_flash.textProperty().bind(new TranslatableString("%s", "tab.connection.client.flash"));
+        rd_nitro.textProperty().bind(new TranslatableString("%s", "tab.connection.client.nitro"));
+        lblStateHead.textProperty().bind(new TranslatableString("%s", "tab.connection.state"));
+        state = new TranslatableString("%s", "tab.connection.state.notconnected");
+        lblState.textProperty().bind(state);
     }
 }
