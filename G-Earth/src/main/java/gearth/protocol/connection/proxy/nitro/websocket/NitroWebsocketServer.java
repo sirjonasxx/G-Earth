@@ -5,6 +5,8 @@ import gearth.protocol.HMessage;
 import gearth.protocol.connection.proxy.nitro.NitroConstants;
 import gearth.protocol.packethandler.PacketHandler;
 import gearth.protocol.packethandler.nitro.NitroPacketHandler;
+import org.eclipse.jetty.client.HttpClient;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.WebSocketListener;
 import org.eclipse.jetty.websocket.client.ClientUpgradeRequest;
@@ -12,8 +14,13 @@ import org.eclipse.jetty.websocket.client.WebSocketClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
 import java.net.URI;
+import java.security.SecureRandom;
+import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -45,10 +52,7 @@ public class NitroWebsocketServer implements WebSocketListener, NitroSession {
         try {
             logger.info("Building origin websocket connection ({})", websocketUrl);
 
-            final WebSocketClient client = new WebSocketClient();
-
-            client.setMaxBinaryMessageBufferSize(NitroConstants.WEBSOCKET_BUFFER_SIZE);
-            client.setMaxTextMessageBufferSize(NitroConstants.WEBSOCKET_BUFFER_SIZE);
+            final WebSocketClient client = createWebSocketClient();
 
             final ClientUpgradeRequest request = new ClientUpgradeRequest();
 
@@ -128,5 +132,48 @@ public class NitroWebsocketServer implements WebSocketListener, NitroSession {
 
         // Shutdown.
         client.shutdownProxy();
+    }
+
+    private SSLContext createSSLContext() {
+        final TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
+            public X509Certificate[] getAcceptedIssuers() {
+                return new X509Certificate[0];
+            }
+
+            @Override
+            public void checkClientTrusted(X509Certificate[] certs, String authType) {
+            }
+
+            @Override
+            public void checkServerTrusted(X509Certificate[] certs, String authType) {
+            }
+        }};
+
+        try {
+            final SSLContext sslContext = SSLContext.getInstance("TLS");
+
+            sslContext.init(null, trustAllCerts, new SecureRandom());
+
+            return sslContext;
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to setup ssl context", e);
+        }
+    }
+
+    private HttpClient createHttpClient() {
+        final SslContextFactory.Client factory = new SslContextFactory.Client();
+
+        factory.setSslContext(createSSLContext());
+
+        return new HttpClient(factory);
+    }
+
+    private WebSocketClient createWebSocketClient() {
+        final WebSocketClient client = new WebSocketClient(createHttpClient());
+
+        client.setMaxBinaryMessageBufferSize(NitroConstants.WEBSOCKET_BUFFER_SIZE);
+        client.setMaxTextMessageBufferSize(NitroConstants.WEBSOCKET_BUFFER_SIZE);
+
+        return client;
     }
 }
