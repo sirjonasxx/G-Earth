@@ -5,17 +5,21 @@ import gearth.protocol.HMessage;
 import gearth.protocol.connection.proxy.nitro.NitroConstants;
 import gearth.protocol.packethandler.PacketHandler;
 import gearth.protocol.packethandler.nitro.NitroPacketHandler;
-import org.eclipse.jetty.websocket.api.extensions.ExtensionConfig;
-import org.eclipse.jetty.websocket.jsr356.JsrExtension;
+import org.eclipse.jetty.websocket.api.Session;
+import org.eclipse.jetty.websocket.api.WebSocketListener;
+import org.eclipse.jetty.websocket.client.ClientUpgradeRequest;
+import org.eclipse.jetty.websocket.client.WebSocketClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.websocket.*;
 import java.io.IOException;
 import java.net.URI;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 
-public class NitroWebsocketServer extends Endpoint implements NitroSession {
+public class NitroWebsocketServer implements WebSocketListener, NitroSession {
 
     private static final Logger logger = LoggerFactory.getLogger(NitroWebsocketServer.class);
 
@@ -39,64 +43,32 @@ public class NitroWebsocketServer extends Endpoint implements NitroSession {
 
     public void connect(String websocketUrl, Map<String, List<String>> clientHeaders) throws IOException {
         try {
-            logger.info("Connecting to origin websocket at {}", websocketUrl);
+            logger.info("Building origin websocket connection ({})", websocketUrl);
 
-            ClientEndpointConfig.Builder builder = ClientEndpointConfig.Builder.create();
+            final WebSocketClient client = new WebSocketClient();
 
-            builder.extensions(Collections.singletonList(new JsrExtension(new ExtensionConfig("permessage-deflate;client_max_window_bits"))));
+            client.setMaxBinaryMessageBufferSize(NitroConstants.WEBSOCKET_BUFFER_SIZE);
+            client.setMaxTextMessageBufferSize(NitroConstants.WEBSOCKET_BUFFER_SIZE);
 
-            builder.configurator(new ClientEndpointConfig.Configurator() {
-                @Override
-                public void beforeRequest(Map<String, List<String>> headers) {
-                    clientHeaders.forEach((key, value) -> {
-                        if (SKIP_HEADERS.contains(key)) {
-                            return;
-                        }
+            final ClientUpgradeRequest request = new ClientUpgradeRequest();
 
-                        headers.remove(key);
-                        headers.put(key, value);
-                    });
+            clientHeaders.forEach((key, value) -> {
+                if (SKIP_HEADERS.contains(key)) {
+                    return;
                 }
+
+                request.setHeader(key, value);
             });
 
-            ClientEndpointConfig config = builder.build();
+            logger.info("Connecting to origin websocket at {}", websocketUrl);
 
-            ContainerProvider.getWebSocketContainer().connectToServer(this, config, URI.create(websocketUrl));
+            client.start();
+            client.connect(this, URI.create(websocketUrl), request);
 
             logger.info("Connected to origin websocket");
-        } catch (DeploymentException e) {
-            throw new IOException("Failed to deploy websocket client", e);
+        } catch (Exception e) {
+            throw new IOException("Failed to start websocket client to origin " + websocketUrl, e);
         }
-    }
-
-    @Override
-    public void onOpen(Session session, EndpointConfig config) {
-        this.activeSession = session;
-        this.activeSession.setMaxBinaryMessageBufferSize(NitroConstants.WEBSOCKET_BUFFER_SIZE);
-        this.activeSession.addMessageHandler(new MessageHandler.Whole<byte[]>() {
-            @Override
-            public void onMessage(byte[] message) {
-                try {
-                    packetHandler.act(message);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-    }
-
-    @Override
-    public void onClose(Session session, CloseReason closeReason) {
-        // Hotel closed connection.
-        client.shutdownProxy();
-    }
-
-    @Override
-    public void onError(Session session, Throwable throwable) {
-        throwable.printStackTrace();
-
-        // Shutdown.
-        client.shutdownProxy();
     }
 
     @Override
@@ -118,10 +90,43 @@ public class NitroWebsocketServer extends Endpoint implements NitroSession {
 
         try {
             activeSession.close();
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         } finally {
             activeSession = null;
         }
+    }
+
+    @Override
+    public void onWebSocketBinary(byte[] bytes, int i, int i1) {
+        try {
+            packetHandler.act(bytes);
+        } catch (IOException e) {
+            logger.error("Failed to handle packet", e);
+        }
+    }
+
+    @Override
+    public void onWebSocketText(String s) {
+        logger.warn("Received text message from hotel");
+    }
+
+    @Override
+    public void onWebSocketClose(int i, String s) {
+        // Hotel closed connection.
+        client.shutdownProxy();
+    }
+
+    @Override
+    public void onWebSocketConnect(org.eclipse.jetty.websocket.api.Session session) {
+        activeSession = session;
+    }
+
+    @Override
+    public void onWebSocketError(Throwable throwable) {
+        throwable.printStackTrace();
+
+        // Shutdown.
+        client.shutdownProxy();
     }
 }

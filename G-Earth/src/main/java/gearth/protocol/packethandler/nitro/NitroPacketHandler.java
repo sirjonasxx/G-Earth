@@ -6,12 +6,16 @@ import gearth.protocol.connection.proxy.nitro.websocket.NitroSession;
 import gearth.protocol.packethandler.PacketHandler;
 import gearth.protocol.packethandler.PayloadBuffer;
 import gearth.services.extension_handler.ExtensionHandler;
+import org.eclipse.jetty.websocket.api.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.websocket.Session;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
 public class NitroPacketHandler extends PacketHandler {
+
+    private static final Logger logger = LoggerFactory.getLogger(NitroPacketHandler.class);
 
     private final HMessage.Direction direction;
     private final NitroSession session;
@@ -39,7 +43,13 @@ public class NitroPacketHandler extends PacketHandler {
             buffer = buffer.clone();
         }
 
-        localSession.getAsyncRemote().sendBinary(ByteBuffer.wrap(buffer));
+        try {
+            localSession.getRemote().sendBytes(ByteBuffer.wrap(buffer));
+        } catch (IOException e) {
+            logger.error("Error sending packet to nitro client", e);
+            return false;
+        }
+
         return true;
     }
 
