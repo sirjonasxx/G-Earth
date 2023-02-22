@@ -29,14 +29,10 @@ body:
     required: false
 - type: input
   attributes:
-    label: Environment
+    label: Operating System
     description: |
       examples:
-        - **OS**: Ubuntu 20.04
-        - **Java**: 19.0.2
-    value: |
-        - OS:
-        - Java:
+        Windows 11
   validations:
     required: true
 - type: checkboxes
