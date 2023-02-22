@@ -1,6 +1,6 @@
 package gearth.protocol.connection.proxy.nitro.websocket;
 
-import javax.websocket.Session;
+import org.eclipse.jetty.websocket.api.Session;
 
 public interface NitroSession {
 
