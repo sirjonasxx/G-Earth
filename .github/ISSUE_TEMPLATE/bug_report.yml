@@ -1,0 +1,45 @@
+name: 🐞 Bug
+description: File a bug/issue
+body:
+- type: checkboxes
+  attributes:
+    label: Is there an existing issue for this?
+    description: |
+      Please search to see if an [issue](https://github.com/sirjonasxx/G-Earth/issues) already exists for the bug you encountered.
+      Don't forget to look at the [troubleshooting](https://github.com/sirjonasxx/G-Earth/wiki/Troubleshooting) too
+    options:
+    - label: I have searched the existing issues
+      required: true
+- type: textarea
+  attributes:
+    label: Current Behavior
+    description: A concise description of what you're experiencing.
+  validations:
+    required: false
+- type: textarea
+  attributes:
+    label: Steps To Reproduce
+    description: Steps to reproduce the behavior.
+    placeholder: |
+      1. In this environment...
+      2. With this config...
+      3. Run '...'
+      4. See error...
+  validations:
+    required: false
+- type: input
+  attributes:
+    label: Operating System
+    description: |
+      examples:
+        Windows 11
+  validations:
+    required: true
+- type: checkboxes
+  attributes:
+    label: Client type
+    options:
+      - label: "Air (Habbo)"
+      - label: "Unity (Habbo)"
+      - label: "Flash (Retro)"
+      - label: "Nitro (Retro)"
