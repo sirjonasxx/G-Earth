@@ -27,7 +27,7 @@ body:
       4. See error...
   validations:
     required: false
-- type: textarea
+- type: input
   attributes:
     label: Environment
     description: |
