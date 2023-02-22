@@ -3,9 +3,9 @@ description: File a bug/issue
 body:
 - type: checkboxes
   attributes:
-    label: Is there an [existing issue](https://github.com/sirjonasxx/G-Earth/issues) for this?
+    label: Is there an existing issue for this?
     description: |
-      Please search to see if an issue already exists for the bug you encountered.
+      Please search to see if an [issue](https://github.com/sirjonasxx/G-Earth/issues) already exists for the bug you encountered.
       Don't forget to look at the [troubleshooting](https://github.com/sirjonasxx/G-Earth/wiki/Troubleshooting) too
     options:
     - label: I have searched the existing issues
@@ -37,7 +37,6 @@ body:
     value: |
         - OS:
         - Java:
-    render: markdown
   validations:
     required: true
 - type: checkboxes
@@ -48,5 +47,4 @@ body:
       - label: "Unity (Habbo)"
       - label: "Flash (Retro)"
       - label: "Nitro (Retro)"
-  validations:
-      required: true
+          required: true
