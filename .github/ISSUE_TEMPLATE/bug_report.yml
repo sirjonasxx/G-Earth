@@ -43,7 +43,7 @@ body:
   attributes:
     label: Client type
     options:
-      required: true
+        required: true
       - label: "Air (Habbo)"
       - label: "Unity (Habbo)"
       - label: "Flash (Retro)"
