@@ -47,4 +47,5 @@ body:
       - label: "Unity (Habbo)"
       - label: "Flash (Retro)"
       - label: "Nitro (Retro)"
-    required: true
+        required: true
+
