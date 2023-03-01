@@ -20,7 +20,7 @@ import java.util.function.Consumer;
 public class HConnection {
 
     public static volatile boolean DECRYPTPACKETS = true;
-    public static volatile boolean DEBUG = false;
+    public static volatile boolean DEBUG = true;
 
     private volatile ExtensionHandler extensionHandler = null;
 
@@ -254,5 +254,13 @@ public class HConnection {
 
     public ProxyProvider getProxyProvider() {
         return proxyProvider;
+    }
+
+    @Override
+    public String toString() {
+        return "HConnection{" +
+                "state=" + state +
+                ", proxy=" + proxy +
+                '}';
     }
 }

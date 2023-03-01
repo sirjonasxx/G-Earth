@@ -18,6 +18,8 @@ import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Region;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -25,7 +27,9 @@ import java.util.List;
 
 public class Rc4Obtainer {
 
-    public static final boolean DEBUG = false;
+    private static final Logger LOGGER = LoggerFactory.getLogger(Rc4Obtainer.class);
+
+    public static final boolean DEBUG = true;
 
     private final HabboClient client;
     private List<FlashPacketHandler> flashPacketHandlers;
@@ -58,8 +62,7 @@ public class Rc4Obtainer {
         new Thread(() -> {
 
             long startTime = System.currentTimeMillis();
-            if (DEBUG) System.out.println("[+] send encrypted");
-
+            LOGGER.debug("[+] send encrypted");
             boolean worked = false;
             int i = 0;
             while (!worked && i < 4) {
@@ -70,8 +73,7 @@ public class Rc4Obtainer {
             }
 
             if (!worked) {
-                System.err.println("COULD NOT FIND RC4 TABLE");
-
+                LOGGER.error("COULD NOT FIND RC4 TABLE");
                 Platform.runLater(() -> {
                     Alert alert = new Alert(Alert.AlertType.WARNING, LanguageBundle.get("alert.somethingwentwrong.title"), ButtonType.OK);
 
@@ -90,14 +92,13 @@ public class Rc4Obtainer {
                     try {
                         TitleBarController.create(alert).showAlert();
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        LOGGER.error("Failed to create error alert", e);
                     }
                 });
             }
 
             final long endTime = System.currentTimeMillis();
-            if (DEBUG)
-                System.out.println("Cracked RC4 in " + (endTime - startTime) + "ms");
+            LOGGER.debug("Cracked RC4 in " + (endTime - startTime) + "ms");
 
             flashPacketHandlers.forEach(FlashPacketHandler::unblock);
         }).start();

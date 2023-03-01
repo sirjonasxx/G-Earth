@@ -16,7 +16,7 @@ import java.util.List;
 
 public abstract class FlashPacketHandler extends PacketHandler {
 
-    protected static final boolean DEBUG = false;
+    protected static final boolean DEBUG = true;
 
     private volatile OutputStream out;
     private volatile boolean isTempBlocked = false;

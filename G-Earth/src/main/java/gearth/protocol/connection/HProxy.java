@@ -116,4 +116,21 @@ public class HProxy {
     public PacketInfoManager getPacketInfoManager() {
         return packetInfoManager;
     }
+
+    @Override
+    public String toString() {
+        return "HProxy{" +
+                "hClient=" + hClient +
+                ", input_domain='" + input_domain + '\'' +
+                ", actual_domain='" + actual_domain + '\'' +
+                ", actual_port=" + actual_port +
+                ", intercept_port=" + intercept_port +
+                ", intercept_host='" + intercept_host + '\'' +
+                ", proxy_server=" + proxy_server +
+                ", inHandler=" + inHandler +
+                ", outHandler=" + outHandler +
+                ", hotelVersion='" + hotelVersion + '\'' +
+                ", clientIdentifier='" + clientIdentifier + '\'' +
+                '}';
+    }
 }
