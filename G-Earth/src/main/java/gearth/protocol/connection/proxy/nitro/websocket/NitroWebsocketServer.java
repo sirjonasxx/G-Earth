@@ -5,15 +5,39 @@ import gearth.protocol.HMessage;
 import gearth.protocol.connection.proxy.nitro.NitroConstants;
 import gearth.protocol.packethandler.PacketHandler;
 import gearth.protocol.packethandler.nitro.NitroPacketHandler;
+import org.eclipse.jetty.client.HttpClient;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
+import org.eclipse.jetty.websocket.api.Session;
+import org.eclipse.jetty.websocket.api.WebSocketListener;
+import org.eclipse.jetty.websocket.client.ClientUpgradeRequest;
+import org.eclipse.jetty.websocket.client.WebSocketClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.websocket.*;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
 import java.net.URI;
-import java.util.Collections;
+import java.security.SecureRandom;
+import java.security.cert.X509Certificate;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-public class NitroWebsocketServer extends Endpoint implements NitroSession {
+public class NitroWebsocketServer implements WebSocketListener, NitroSession {
+
+    private static final Logger logger = LoggerFactory.getLogger(NitroWebsocketServer.class);
+
+    private static final HashSet<String> SKIP_HEADERS = new HashSet<>(Arrays.asList(
+            "Sec-WebSocket-Extensions",
+            "Sec-WebSocket-Key",
+            "Sec-WebSocket-Version",
+            "Host",
+            "Connection",
+            "Upgrade"
+    ));
 
     private final PacketHandler packetHandler;
     private final NitroWebsocketClient client;
@@ -24,55 +48,31 @@ public class NitroWebsocketServer extends Endpoint implements NitroSession {
         this.packetHandler = new NitroPacketHandler(HMessage.Direction.TOCLIENT, client, connection.getExtensionHandler(), connection.getTrafficObservables());
     }
 
-    public void connect(String websocketUrl, String originUrl) throws IOException {
+    public void connect(String websocketUrl, Map<String, List<String>> clientHeaders) throws IOException {
         try {
-            ClientEndpointConfig.Builder builder = ClientEndpointConfig.Builder.create();
+            logger.info("Building origin websocket connection ({})", websocketUrl);
 
-            if (originUrl != null) {
-                builder.configurator(new ClientEndpointConfig.Configurator() {
-                    @Override
-                    public void beforeRequest(Map<String, List<String>> headers) {
-                        headers.put("Origin", Collections.singletonList(originUrl));
-                    }
-                });
-            }
+            final WebSocketClient client = createWebSocketClient();
 
-            ClientEndpointConfig config = builder.build();
+            final ClientUpgradeRequest request = new ClientUpgradeRequest();
 
-            ContainerProvider.getWebSocketContainer().connectToServer(this, config, URI.create(websocketUrl));
-        } catch (DeploymentException e) {
-            throw new IOException("Failed to deploy websocket client", e);
-        }
-    }
-
-    @Override
-    public void onOpen(Session session, EndpointConfig config) {
-        this.activeSession = session;
-        this.activeSession.setMaxBinaryMessageBufferSize(NitroConstants.WEBSOCKET_BUFFER_SIZE);
-        this.activeSession.addMessageHandler(new MessageHandler.Whole<byte[]>() {
-            @Override
-            public void onMessage(byte[] message) {
-                try {
-                    packetHandler.act(message);
-                } catch (IOException e) {
-                    e.printStackTrace();
+            clientHeaders.forEach((key, value) -> {
+                if (SKIP_HEADERS.contains(key)) {
+                    return;
                 }
-            }
-        });
-    }
 
-    @Override
-    public void onClose(Session session, CloseReason closeReason) {
-        // Hotel closed connection.
-        client.shutdownProxy();
-    }
+                request.setHeader(key, value);
+            });
 
-    @Override
-    public void onError(Session session, Throwable throwable) {
-        throwable.printStackTrace();
+            logger.info("Connecting to origin websocket at {}", websocketUrl);
 
-        // Shutdown.
-        client.shutdownProxy();
+            client.start();
+            client.connect(this, URI.create(websocketUrl), request);
+
+            logger.info("Connected to origin websocket");
+        } catch (Exception e) {
+            throw new IOException("Failed to start websocket client to origin " + websocketUrl, e);
+        }
     }
 
     @Override
@@ -94,10 +94,86 @@ public class NitroWebsocketServer extends Endpoint implements NitroSession {
 
         try {
             activeSession.close();
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         } finally {
             activeSession = null;
         }
+    }
+
+    @Override
+    public void onWebSocketBinary(byte[] bytes, int i, int i1) {
+        try {
+            packetHandler.act(bytes);
+        } catch (IOException e) {
+            logger.error("Failed to handle packet", e);
+        }
+    }
+
+    @Override
+    public void onWebSocketText(String s) {
+        logger.warn("Received text message from hotel");
+    }
+
+    @Override
+    public void onWebSocketClose(int i, String s) {
+        // Hotel closed connection.
+        client.shutdownProxy();
+    }
+
+    @Override
+    public void onWebSocketConnect(org.eclipse.jetty.websocket.api.Session session) {
+        activeSession = session;
+    }
+
+    @Override
+    public void onWebSocketError(Throwable throwable) {
+        throwable.printStackTrace();
+
+        // Shutdown.
+        client.shutdownProxy();
+    }
+
+    private SSLContext createSSLContext() {
+        final TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
+            public X509Certificate[] getAcceptedIssuers() {
+                return new X509Certificate[0];
+            }
+
+            @Override
+            public void checkClientTrusted(X509Certificate[] certs, String authType) {
+            }
+
+            @Override
+            public void checkServerTrusted(X509Certificate[] certs, String authType) {
+            }
+        }};
+
+        try {
+            final SSLContext sslContext = SSLContext.getInstance("TLS");
+
+            sslContext.init(null, trustAllCerts, new SecureRandom());
+
+            return sslContext;
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to setup ssl context", e);
+        }
+    }
+
+    private HttpClient createHttpClient() {
+        final SslContextFactory.Client factory = new SslContextFactory.Client();
+
+        factory.setSslContext(createSSLContext());
+
+        return new HttpClient(factory);
+    }
+
+    private WebSocketClient createWebSocketClient() {
+        final WebSocketClient client = new WebSocketClient(createHttpClient());
+
+        client.setMaxBinaryMessageBufferSize(NitroConstants.WEBSOCKET_BUFFER_SIZE);
+        client.setMaxTextMessageBufferSize(NitroConstants.WEBSOCKET_BUFFER_SIZE);
+
+        return client;
     }
 }

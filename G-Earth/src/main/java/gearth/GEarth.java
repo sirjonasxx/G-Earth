@@ -22,7 +22,7 @@ import javafx.stage.StageStyle;
 public class GEarth extends Application {
 
     public static GEarth main;
-    public static String version = "1.5.2";
+    public static String version = "1.5.3";
     public static String gitApi = "https://api.github.com/repos/sirjonasxx/G-Earth/releases/latest";
     public static ObservableObject<Theme> observableTheme;
 
@@ -43,7 +43,13 @@ public class GEarth extends Application {
         stage = primaryStage;
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/gearth/ui/G-Earth.fxml"));
-        Parent root = loader.load();
+        Parent root;
+        try {
+            root = loader.load();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
         controller = loader.getController();
         controller.setStage(primaryStage);
         stage.initStyle(StageStyle.TRANSPARENT);

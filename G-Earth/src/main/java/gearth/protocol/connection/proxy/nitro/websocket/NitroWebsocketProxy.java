@@ -3,10 +3,11 @@ package gearth.protocol.connection.proxy.nitro.websocket;
 import gearth.protocol.HConnection;
 import gearth.protocol.connection.HProxySetter;
 import gearth.protocol.connection.HStateSetter;
-import gearth.protocol.connection.proxy.nitro.NitroConstants;
 import gearth.protocol.connection.proxy.nitro.NitroProxyProvider;
+import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainerInitializer;
@@ -28,7 +29,7 @@ public class NitroWebsocketProxy {
         this.stateSetter = stateSetter;
         this.connection = connection;
         this.proxyProvider = proxyProvider;
-        this.server = new Server(NitroConstants.WEBSOCKET_PORT);
+        this.server = new Server(0);
     }
 
     public boolean start() {
@@ -54,6 +55,12 @@ public class NitroWebsocketProxy {
         }
         
         return false;
+    }
+
+    public int getPort() {
+        final ServerConnector serverConnector = (ServerConnector) server.getConnectors()[0];
+
+        return serverConnector.getLocalPort();
     }
 
     public void stop() {

@@ -1,17 +1,15 @@
 package gearth.protocol.connection.proxy.nitro.http;
 
-import gearth.GEarth;
 import gearth.misc.ConfirmationDialog;
 import gearth.protocol.connection.proxy.nitro.NitroConstants;
 import gearth.protocol.connection.proxy.nitro.os.NitroOsFunctions;
 import gearth.protocol.connection.proxy.nitro.os.NitroOsFunctionsFactory;
 import gearth.ui.titlebar.TitleBarController;
+import gearth.ui.translations.LanguageBundle;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
-import javafx.stage.Stage;
 import org.littleshoot.proxy.HttpProxyServer;
 import org.littleshoot.proxy.impl.DefaultHttpProxyServer;
 import org.littleshoot.proxy.mitm.Authority;
@@ -53,14 +51,12 @@ public class NitroHttpProxy {
 
         Platform.runLater(() -> {
             Alert alert = ConfirmationDialog.createAlertWithOptOut(Alert.AlertType.WARNING, ADMIN_WARNING_KEY,
-                    "Root certificate installation", null,
-                    "", "Remember my choice",
+                    LanguageBundle.get("alert.rootcertificate.title"), null,
+                    "", LanguageBundle.get("alert.rootcertificate.remember"),
                     ButtonType.YES, ButtonType.NO
             );
 
-            alert.getDialogPane().setContent(new Label("G-Earth detected that you do not have the root certificate authority installed.\n" +
-                    "This is required for Nitro to work, do you want to continue?\n" +
-                    "G-Earth will ask you for Administrator permission if you do so."));
+            alert.getDialogPane().setContent(new Label(LanguageBundle.get("alert.rootcertificate.content").replaceAll("\\\\n", System.lineSeparator())));
 
             try {
                 shouldInstall.set(TitleBarController.create(alert).showAlertAndWait()
@@ -109,6 +105,7 @@ public class NitroHttpProxy {
                     .withPort(NitroConstants.HTTP_PORT)
                     .withManInTheMiddle(new NitroCertificateSniffingManager(authority))
                     .withFiltersSource(new NitroHttpProxyFilterSource(serverCallback))
+                    .withTransparent(true)
                     .start();
 
             if (!initializeCertificate()) {

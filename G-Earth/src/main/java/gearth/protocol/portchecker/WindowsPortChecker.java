@@ -18,7 +18,7 @@ public class WindowsPortChecker implements PortChecker{
     }
 
     private String getProcessNameFromPid(String pid) throws IOException {
-        String task = getCommandOutput(new String[] {"tasklist /fi \"pid eq " + pid + "\" /nh /fo:CSV"});
+        String task = getCommandOutput(new String[] {"cmd", "/c", "tasklist", "/fi", String.format("pid eq %s", pid) ,"/nh", "/fo:CSV"});
         int index = task.indexOf(',');
         return task.substring(0, index);
     }

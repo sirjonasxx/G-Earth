@@ -1,5 +1,7 @@
 package gearth.services.internal_extensions.extensionstore.application;
 
+import gearth.GEarth;
+import gearth.ui.translations.LanguageBundle;
 import org.w3c.dom.Element;
 
 import java.time.LocalDateTime;
@@ -43,19 +45,19 @@ public class WebUtils {
     }
 
     public static String elapsedTime(long time) {
-        if (time < 60) return time + (time == 1 ? " second" : " seconds");
+        if (time < 60) return time + " " + LanguageBundle.get("ext.store.elapsedtime.second." + (time == 1 ? "single": "multiple"));
         time = time/60;
-        if (time < 60) return time + (time == 1 ? " minute" : " minutes");
+        if (time < 60) return time + " " + LanguageBundle.get("ext.store.elapsedtime.minute." + (time == 1 ? "single": "multiple"));
         time = time/60;
-        if (time < 24) return time + (time == 1 ? " hour" : " hours");
+        if (time < 24) return time + " " + LanguageBundle.get("ext.store.elapsedtime.hour." + (time == 1 ? "single": "multiple"));
         long days = time/24;
-        if (days < 7) return days + (days == 1 ? " day" : " days");
+        if (days < 7) return days + " " + LanguageBundle.get("ext.store.elapsedtime.day." + (days == 1 ? "single": "multiple"));
         long weeks = days/7;
-        if (weeks < 6) return weeks + (weeks == 1 ? " week" : " weeks");
+        if (weeks < 6) return weeks + " " + LanguageBundle.get("ext.store.elapsedtime.week." + (weeks == 1 ? "single": "multiple"));
         long months = days/31;
-        if (months < 12) return months + (months == 1 ? " month" : " months");
+        if (months < 12) return months + " " + LanguageBundle.get("ext.store.elapsedtime.month." + (months == 1 ? "single": "multiple"));
         long years = days/365;
-        return years + (years == 1 ? " year" : " years");
+        return years + " " + LanguageBundle.get("ext.store.elapsedtime.year." + (years == 1 ? "single": "multiple"));
     }
 
     public static String escapeMessage(String text) {

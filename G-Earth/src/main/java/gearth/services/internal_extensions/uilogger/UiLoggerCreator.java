@@ -1,5 +1,6 @@
 package gearth.services.internal_extensions.uilogger;
 
+import gearth.GEarth;
 import gearth.extensions.InternalExtensionFormCreator;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;

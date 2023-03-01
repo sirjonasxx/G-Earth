@@ -200,11 +200,18 @@ public class ExtensionHandler {
 
                     @Override
                     public void sendMessage(HMessage.Direction direction, HPacket packet) {
+                        boolean success;
                         if (direction == HMessage.Direction.TOCLIENT) {
-                            hConnection.sendToClient(packet);
+                            success = hConnection.sendToClient(packet);
                         }
                         else {
-                            hConnection.sendToServer(packet);
+                            success = hConnection.sendToServer(packet);
+                        }
+
+                        if (!success && hConnection.isPacketSendingAllowed(direction, packet) && !hConnection.isPacketSendingSafe(direction, packet)) {
+                            extension.getExtensionObservable().fireEvent(extensionListener ->
+                                    extensionListener.log(String.format("Extension %s attempted to send an unsafe packet, but had no permission",
+                                            extension.getTitle())));
                         }
                     }
 

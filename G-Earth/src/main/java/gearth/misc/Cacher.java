@@ -85,6 +85,11 @@ public class Cacher {
         object.put(key, val);
         updateCache(object, cache_filename);
     }
+    public static void remove(String key, String cache_filename) {
+        JSONObject object = getCacheContents(cache_filename);
+        if (object.has(key)) object.remove(key);
+        updateCache(object, cache_filename);
+    }
     public static Object get(String key, String cache_filename) {
         JSONObject object = getCacheContents(cache_filename);
         if (object.has(key)) return object.get(key);
@@ -112,6 +117,9 @@ public class Cacher {
     }
     public static void put(String key, Object val) {
         put(key, val, DEFAULT_CACHE_FILENAME);
+    }
+    public static void remove(String key) {
+        remove(key, DEFAULT_CACHE_FILENAME);
     }
     public static Object get(String key) {
         return get(key, DEFAULT_CACHE_FILENAME);

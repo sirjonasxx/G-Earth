@@ -54,7 +54,7 @@ public class LinuxRawIpFlashProxyProvider extends FlashProxyProvider {
 
                 maybeAddMapping();
 
-                if (HConnection.DEBUG) System.out.println("Added mapping for raw IP");
+                logger.debug("Added mapping for raw IP");
 
                 ServerSocket proxy_server = new ServerSocket(proxy.getIntercept_port(), 10, InetAddress.getByName(proxy.getIntercept_host()));
                 proxy.initProxy(proxy_server);
@@ -62,10 +62,10 @@ public class LinuxRawIpFlashProxyProvider extends FlashProxyProvider {
                 stateSetter.setState(HState.WAITING_FOR_CLIENT);
                 while ((hConnection.getState() == HState.WAITING_FOR_CLIENT) && !proxy_server.isClosed())	{
                     try {
-                        if (HConnection.DEBUG) System.out.println("try accept proxy");
+                        logger.debug("Trying to accept a new proxy from {}", proxy_server);
                         Socket client = proxy_server.accept();
 
-                        if (HConnection.DEBUG) System.out.println("accepted a proxy");
+                        logger.debug("Accepted a proxy {}", client);
 
                         new Thread(() -> {
                             try {
@@ -82,7 +82,7 @@ public class LinuxRawIpFlashProxyProvider extends FlashProxyProvider {
 
 
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error("An unexpected exception occurred in proxy listener", e);
             }
         }).start();
     }
@@ -114,7 +114,7 @@ public class LinuxRawIpFlashProxyProvider extends FlashProxyProvider {
             try {
                 proxy.getProxy_server().close();
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error("Failed to close proxy server", e);
             }
         }
     }
@@ -136,6 +136,7 @@ public class LinuxRawIpFlashProxyProvider extends FlashProxyProvider {
             }
             catch (SocketTimeoutException e) {
                 showInvalidConnectionError();
+                logger.error("Connection to proxy {} timed out", proxy, e);
                 return false;
             }
 
@@ -151,7 +152,7 @@ public class LinuxRawIpFlashProxyProvider extends FlashProxyProvider {
             createSocksProxyThread(client);
         }
         else if (preConnectedServerConnections.isEmpty()) {
-            if (HConnection.DEBUG) System.out.println("pre-made server connections ran out of stock");
+            logger.error("pre-made server connections ran out of stock");
         }
         else {
             startProxyThread(client, preConnectedServerConnections.poll(), proxy);
@@ -165,6 +166,7 @@ public class LinuxRawIpFlashProxyProvider extends FlashProxyProvider {
             maybeRemoveMapping();
             stateSetter.setState(HState.NOT_CONNECTED);
             showInvalidConnectionError();
+            logger.error("Failed to create socks proxy thread because configuration is null");
             return;
         }
 
@@ -177,7 +179,7 @@ public class LinuxRawIpFlashProxyProvider extends FlashProxyProvider {
             maybeRemoveMapping();
             stateSetter.setState(HState.NOT_CONNECTED);
             showInvalidConnectionError();
-            e.printStackTrace();
+            logger.error("Failed to create socks proxy thread", e);
         }
     }
 
@@ -188,7 +190,5 @@ public class LinuxRawIpFlashProxyProvider extends FlashProxyProvider {
 
     protected void maybeRemoveMapping() {
         ipMapper.deleteMapping(proxy.getActual_domain(), proxy.getActual_port(), proxy.getIntercept_port());
-
     }
-
 }

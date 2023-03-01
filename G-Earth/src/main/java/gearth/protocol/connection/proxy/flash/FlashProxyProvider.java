@@ -1,6 +1,5 @@
 package gearth.protocol.connection.proxy.flash;
 
-import gearth.GEarth;
 import gearth.protocol.HConnection;
 import gearth.protocol.connection.HProxy;
 import gearth.protocol.connection.HProxySetter;
@@ -8,17 +7,18 @@ import gearth.protocol.connection.HState;
 import gearth.protocol.connection.HStateSetter;
 import gearth.protocol.connection.proxy.ProxyProvider;
 import gearth.protocol.memory.Rc4Obtainer;
+import gearth.protocol.packethandler.flash.FlashPacketHandler;
 import gearth.protocol.packethandler.flash.IncomingFlashPacketHandler;
 import gearth.protocol.packethandler.flash.OutgoingFlashPacketHandler;
-import gearth.protocol.packethandler.flash.FlashPacketHandler;
 import gearth.ui.titlebar.TitleBarController;
+import gearth.ui.translations.LanguageBundle;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
 import javafx.scene.layout.Region;
-import javafx.stage.Stage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -27,6 +27,7 @@ import java.util.concurrent.Semaphore;
 
 public abstract class FlashProxyProvider implements ProxyProvider {
 
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
     protected final HProxySetter proxySetter;
     protected final HStateSetter stateSetter;
     protected final HConnection hConnection;
@@ -47,7 +48,8 @@ public abstract class FlashProxyProvider implements ProxyProvider {
         client.setSoTimeout(0);
         server.setSoTimeout(0);
 
-        if (HConnection.DEBUG) System.out.println(server.getLocalAddress().getHostAddress() + ": " + server.getLocalPort());
+        logger.debug("Starting proxy thread at {}:{}", server.getLocalAddress().getHostAddress(), server.getLocalPort());
+
         Rc4Obtainer rc4Obtainer = new Rc4Obtainer(hConnection);
 
         OutgoingFlashPacketHandler outgoingHandler = new OutgoingFlashPacketHandler(server.getOutputStream(), hConnection.getTrafficObservables(), hConnection.getExtensionHandler());
@@ -73,13 +75,13 @@ public abstract class FlashProxyProvider implements ProxyProvider {
         try	{
             if (!server.isClosed()) server.close();
             if (!client.isClosed()) client.close();
-            if (HConnection.DEBUG) System.out.println("STOP");
+            logger.debug("Closed server {} and client {}, dataStreams {}", server, client, datastream);
             if (datastream[0]) {
                 onConnectEnd();
             };
         }
         catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Failed to gracefully stop", e);
         }
     }
 
@@ -95,8 +97,7 @@ public abstract class FlashProxyProvider implements ProxyProvider {
                 }
             }
             catch (IOException ignore) {
-//                System.err.println(packetHandler instanceof IncomingPacketHandler ? "incoming" : "outgoing");
-//                ignore.printStackTrace();
+//                logger.error("Failed to read input stream from socket {}",  socket, ignore);
             } finally {
                 abort.release();
             }
@@ -126,15 +127,14 @@ public abstract class FlashProxyProvider implements ProxyProvider {
     protected void showInvalidConnectionError() {
         Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.ERROR, "", ButtonType.OK);
-            alert.getDialogPane().getChildren().add(new Label("You entered invalid connection information, G-Earth could not connect"));
+            alert.getDialogPane().getChildren().add(new Label(LanguageBundle.get("alert.invalidconnection.content")));
             alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
             alert.setResizable(false);
             try {
                 TitleBarController.create(alert).showAlert();
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error("Failed to create invalid connection error alert", e);
             }
         });
     }
-
 }

@@ -4,6 +4,7 @@ import gearth.GEarth;
 import gearth.ui.titlebar.DefaultTitleBarConfig;
 import gearth.ui.titlebar.GEarthThemedTitleBarConfig;
 import gearth.ui.titlebar.TitleBarController;
+import gearth.ui.translations.TranslatableString;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -38,7 +39,7 @@ public class ExtensionLogger {
 
 
             stage = new Stage();
-            stage.setTitle("G-Earth | Extension Console");
+            stage.titleProperty().bind(new TranslatableString("G-Earth | %s", "tab.extensions.button.logs.windowtitle"));
             stage.initModality(Modality.NONE);
             stage.setAlwaysOnTop(true);
             stage.setMinHeight(235);

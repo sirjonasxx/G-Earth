@@ -1,6 +1,5 @@
 package gearth.protocol.connection.proxy.flash;
 
-import gearth.GEarth;
 import gearth.misc.Cacher;
 import gearth.protocol.HConnection;
 import gearth.protocol.connection.*;
@@ -14,8 +13,6 @@ import gearth.ui.titlebar.TitleBarController;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
-import javafx.scene.image.Image;
-import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.*;
@@ -25,7 +22,6 @@ import java.util.List;
 public class NormalFlashProxyProvider extends FlashProxyProvider {
 
     private List<String> potentialHosts;
-
 
     private static final HostReplacer hostsReplacer = HostReplacerFactory.get();
     private volatile boolean hostRedirected = false;
@@ -113,7 +109,7 @@ public class NormalFlashProxyProvider extends FlashProxyProvider {
                     try {
                         TitleBarController.create(a).showAlertAndWait();
                     } catch (IOException ex) {
-                        ex.printStackTrace();
+                        logger.error("Failed to create port in use error alert", ex);
                     }
                 });
                 throw new IOException(e);
@@ -128,8 +124,7 @@ public class NormalFlashProxyProvider extends FlashProxyProvider {
                             Socket client = proxy_server.accept();
                             proxy = potentialProxy;
                             closeAllProxies(proxy);
-                            if (HConnection.DEBUG) System.out.println("accepted a proxy");
-
+                            logger.debug("Accepted proxy {}, starting proxy thread (useSocks={})",proxy, useSocks);
                             new Thread(() -> {
                                 try {
                                     Socket server;
@@ -152,18 +147,14 @@ public class NormalFlashProxyProvider extends FlashProxyProvider {
                                     // should only happen when SOCKS configured badly
                                     showInvalidConnectionError();
                                     abort();
-                                    e.printStackTrace();
+                                    logger.error("Failed to configure SOCKS proxy", e);
                                 }
                                 catch (InterruptedException | IOException e) {
-                                    // TODO Auto-generated catch block
-                                    e.printStackTrace();
+                                    logger.error("An unexpected exception occurred", e);
                                 }
                             }).start();
-
-
                         } catch (IOException e1) {
-                            // TODO Auto-generated catch block
-//                                e1.printStackTrace();
+                            logger.error("An unexpected exception occurred", e1);
                         }
                     }
                 } catch (Exception e) {
@@ -171,10 +162,7 @@ public class NormalFlashProxyProvider extends FlashProxyProvider {
                 }
             }).start();
         }
-
-
-        if (HConnection.DEBUG) System.out.println("done waiting for clients with: " + hConnection.getState() );
-
+        logger.debug("Done waiting for clients with connection state {}", hConnection.getState());
     }
 
     @Override
@@ -233,12 +221,10 @@ public class NormalFlashProxyProvider extends FlashProxyProvider {
                     try {
                         proxy.getProxy_server().close();
                     } catch (IOException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
+                        logger.error("Failed to close all proxies", e);
                     }
                 }
             }
         }
-//        potentialProxies = Collections.singletonList(except);
     }
 }

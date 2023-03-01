@@ -23,6 +23,7 @@ import java.util.*;
 import java.util.function.Supplier;
 
 public class GExtensionStoreController implements Initializable {
+    private static GExtensionStoreController instance;
 
     private GExtensionStore extensionStore = null;
 
@@ -37,6 +38,8 @@ public class GExtensionStoreController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        instance = this;
+
         webView = new WebView();
         borderPane.setCenter(webView);
 
@@ -106,6 +109,7 @@ public class GExtensionStoreController implements Initializable {
         });
 
         webView.getEngine().load(GExtensionStoreController.class.getResource("webview/index.html").toString());
+
     }
 
 
@@ -235,5 +239,9 @@ public class GExtensionStoreController implements Initializable {
 
     public String getContentItemsContainer() {
         return contentItemsContainer;
+    }
+
+    public static void reloadPage() {
+        instance.webView.getEngine().reload();
     }
 }

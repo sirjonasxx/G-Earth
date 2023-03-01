@@ -5,6 +5,7 @@ import gearth.services.internal_extensions.extensionstore.application.entities.H
 import gearth.services.internal_extensions.extensionstore.repository.StoreRepository;
 import gearth.services.internal_extensions.extensionstore.repository.models.StoreExtension;
 import gearth.services.internal_extensions.extensionstore.repository.querying.ExtensionOrdering;
+import gearth.ui.translations.LanguageBundle;
 
 import java.util.Collections;
 import java.util.List;
@@ -31,17 +32,17 @@ public class ByUpdateOverview extends QueriedExtensionOverview {
 
             @Override
             public String title() {
-                return "Recently Updated";
+                return LanguageBundle.get("ext.store.search.ordering.byupdate.title");
             }
 
             @Override
             public String description() {
-                return "Extensions that were recently updated";
+                return LanguageBundle.get("ext.store.search.ordering.byupdate.description");
             }
 
             @Override
             public String contentTitle() {
-                return "Recently Updated";
+                return LanguageBundle.get("ext.store.search.ordering.byupdate.contenttitle");
             }
         };
     }

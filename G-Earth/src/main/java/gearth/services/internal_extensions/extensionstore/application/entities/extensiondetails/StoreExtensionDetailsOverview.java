@@ -1,7 +1,6 @@
 package gearth.services.internal_extensions.extensionstore.application.entities.extensiondetails;
 
-import gearth.services.extension_handler.extensions.implementations.network.NetworkExtensionsProducer;
-import gearth.services.extension_handler.extensions.implementations.network.executer.NormalExtensionRunner;
+import gearth.services.extension_handler.extensions.extensionproducers.ExtensionProducerFactory;
 import gearth.services.internal_extensions.extensionstore.GExtensionStore;
 import gearth.services.internal_extensions.extensionstore.application.GExtensionStoreController;
 import gearth.services.internal_extensions.extensionstore.application.WebUtils;
@@ -12,15 +11,14 @@ import gearth.services.internal_extensions.extensionstore.repository.models.Stor
 import gearth.services.internal_extensions.extensionstore.tools.InstalledExtension;
 import gearth.services.internal_extensions.extensionstore.tools.StoreExtensionTools;
 import gearth.ui.titlebar.TitleBarController;
+import gearth.ui.translations.LanguageBundle;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
 import org.apache.maven.artifact.versioning.ComparableVersion;
 import org.w3c.dom.Element;
 
 import java.io.IOException;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -62,7 +60,7 @@ public class StoreExtensionDetailsOverview extends HOverview {
     public String buttonText() {
         int mode = mode();
 //        return mode == 2 ? "Update" : "Install";
-        return mode == 0 ? "Install" : (mode == 1 ? "Installed" : "Update");
+        return LanguageBundle.get("ext.store.button." + (mode == 0 ? "install" : (mode == 1 ? "installed" : "update")));
     }
 
     @Override
@@ -91,23 +89,23 @@ public class StoreExtensionDetailsOverview extends HOverview {
 
     private void awaitPopup(String mode) {
         popup(Alert.AlertType.WARNING,
-                String.format("%s extension", mode),
-                String.format("%s extension [%s]", mode, extension.getTitle()),
-                String.format("Press \"OK\" and wait while the extension is being %sed", mode.toLowerCase()));
+                LanguageBundle.get(String.format("ext.store.extension.status.await.%s", mode)),
+                String.format("%s [%s]", LanguageBundle.get(String.format("ext.store.extension.status.await.%s", mode)), extension.getTitle()),
+                LanguageBundle.get(String.format("ext.store.extension.status.await.%s.message", mode)));
     }
 
     private void successPopup(String mode) {
         popup(Alert.AlertType.INFORMATION,
-                String.format("%s completed", mode),
-                String.format("%s completed [%s]", mode, extension.getTitle()),
-                String.format("Extension %s completed successfully", mode.toLowerCase()));
+                LanguageBundle.get(String.format("ext.store.extension.status.success.%s", mode)),
+                String.format("%s [%s]", LanguageBundle.get(String.format("ext.store.extension.status.success.%s", mode)), extension.getTitle()),
+                LanguageBundle.get(String.format("ext.store.extension.status.success.%s.message", mode)));
     }
 
     private void errorPopup(String mode, String error) {
         popup(Alert.AlertType.ERROR,
-                String.format("%s failed", mode),
-                String.format("%s failed [%s]", mode, extension.getTitle()),
-                String.format("%s failed with the following message: %s", mode, error));
+                LanguageBundle.get(String.format("ext.store.extension.status.success.%s", mode)),
+                String.format("%s [%s]", LanguageBundle.get(String.format("ext.store.extension.status.success.%s", mode)), extension.getTitle()),
+                String.format("%s: %s", LanguageBundle.get(String.format("ext.store.extension.status.success.%s.message", mode)), error));
     }
 
     private void popup(Alert.AlertType alertType, String title, String header, String context) {
@@ -128,14 +126,14 @@ public class StoreExtensionDetailsOverview extends HOverview {
         int mode = mode();
         if (mode == 1) return;
 
-        String modeString = mode() == 0 ? "Install" : "Update";
+        String modeString = mode() == 0 ? "install" : "update";
         HOverview selff = this;
 
         StoreExtensionTools.InstallExtListener listener =  new StoreExtensionTools.InstallExtListener() {
             @Override
             public void success(String installationFolder) {
                 Platform.runLater(() -> successPopup(modeString));
-                StoreExtensionTools.executeExtension(installationFolder, NetworkExtensionsProducer.extensionPort);
+                StoreExtensionTools.executeExtension(installationFolder, ExtensionProducerFactory.getExtensionServer().getPort());
             }
 
             @Override

@@ -2,14 +2,16 @@ package gearth.ui.subforms.extensions;
 
 import gearth.services.extension_handler.ExtensionHandler;
 import gearth.services.extension_handler.extensions.ExtensionListener;
-import gearth.services.extension_handler.extensions.implementations.network.NetworkExtensionsProducer;
-import gearth.services.extension_handler.extensions.implementations.network.authentication.Authenticator;
+import gearth.services.extension_handler.extensions.implementations.network.NetworkExtensionServer;
+import gearth.services.extension_handler.extensions.implementations.network.NetworkExtensionAuthenticator;
 import gearth.services.extension_handler.extensions.implementations.network.executer.ExecutionInfo;
 import gearth.services.extension_handler.extensions.implementations.network.executer.ExtensionRunner;
 import gearth.services.extension_handler.extensions.implementations.network.executer.ExtensionRunnerFactory;
 import gearth.services.g_python.GPythonShell;
 import gearth.ui.SubForm;
 import gearth.ui.subforms.extensions.logger.ExtensionLogger;
+import gearth.ui.translations.LanguageBundle;
+import gearth.ui.translations.TranslatableString;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.scene.control.*;
@@ -36,15 +38,17 @@ public class ExtensionsController extends SubForm {
 
     private ExtensionRunner extensionRunner = null;
     private ExtensionHandler extensionHandler;
-    private NetworkExtensionsProducer networkExtensionsProducer; // needed for port
+    private NetworkExtensionServer networkExtensionsProducer; // needed for port
     private ExtensionLogger extensionLogger = null;
 
-
+    public Label lbl_tableTitle, lbl_tableDesc, lbl_tableAuthor, lbl_tableVersion, lbl_tableEdit, lbl_port;
 
 
     public void initialize() {
         scroller.widthProperty().addListener(observable -> header_ext.setPrefWidth(scroller.getWidth()));
         extensionLogger = new ExtensionLogger();
+
+        initLanguageBinding();
     }
 
     protected void onParentSet() {
@@ -56,8 +60,8 @@ public class ExtensionsController extends SubForm {
 
         //noinspection OptionalGetWithoutIsPresent
         networkExtensionsProducer
-                = (NetworkExtensionsProducer) extensionHandler.getExtensionProducers().stream()
-                .filter(producer1 -> producer1 instanceof NetworkExtensionsProducer)
+                = (NetworkExtensionServer) extensionHandler.getExtensionProducers().stream()
+                .filter(producer1 -> producer1 instanceof NetworkExtensionServer)
                 .findFirst().get();
 
 
@@ -71,18 +75,20 @@ public class ExtensionsController extends SubForm {
 
         extensionHandler.getObservable().addListener(e -> e.getExtensionObservable().addListener(new ExtensionListener() {
             @Override
-            protected void log(String text) {
+            public void log(String text) {
                 extensionLogger.log(text);
             }
         }));
+
+        getHConnection().onDeveloperModeChange(this::setLocalInstallingEnabled);
     }
 
 
     public void installBtnClicked(ActionEvent actionEvent) {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Install extension");
+        fileChooser.setTitle(LanguageBundle.get("tab.extensions.button.install.windowtitle"));
         fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("G-Earth extensions", ExecutionInfo.ALLOWEDEXTENSIONTYPES));
+                new FileChooser.ExtensionFilter(LanguageBundle.get("tab.extensions.button.install.filetype"), ExecutionInfo.ALLOWED_EXTENSION_TYPES));
         File selectedFile = fileChooser.showOpenDialog(parentController.getStage());
         if (selectedFile != null) {
             extensionRunner.installAndRunExtension(selectedFile.getPath(), networkExtensionsProducer.getPort());
@@ -109,6 +115,9 @@ public class ExtensionsController extends SubForm {
         }
     }
 
+    public void setLocalInstallingEnabled(boolean enabled) {
+        btn_install.setDisable(!enabled);
+    }
 
     private volatile int gpytonShellCounter = 1;
     private volatile boolean pythonShellLaunching = false;
@@ -116,9 +125,9 @@ public class ExtensionsController extends SubForm {
         pythonShellLaunching = true;
         Platform.runLater(() -> btn_gpython.setDisable(true));
         GPythonShell shell = new GPythonShell(
-                "Scripting shell " + gpytonShellCounter++,
+                String.format("%s %d", LanguageBundle.get("tab.extensions.button.pythonshell.windowtitle"),gpytonShellCounter++),
                 networkExtensionsProducer.getPort(),
-                Authenticator.generatePermanentCookie()
+                NetworkExtensionAuthenticator.generatePermanentCookie()
         );
         shell.launch((b) -> {
             pythonShellLaunching = false;
@@ -128,5 +137,19 @@ public class ExtensionsController extends SubForm {
 
     public ExtensionHandler getExtensionHandler() {
         return extensionHandler;
+    }
+
+    private void initLanguageBinding() {
+        lbl_tableTitle.textProperty().bind(new TranslatableString("%s", "tab.extensions.table.title"));
+        lbl_tableDesc.textProperty().bind(new TranslatableString("%s", "tab.extensions.table.description"));
+        lbl_tableAuthor.textProperty().bind(new TranslatableString("%s", "tab.extensions.table.author"));
+        lbl_tableVersion.textProperty().bind(new TranslatableString("%s", "tab.extensions.table.version"));
+        lbl_tableEdit.textProperty().bind(new TranslatableString("%s", "tab.extensions.table.edit"));
+
+        lbl_port.textProperty().bind(new TranslatableString("%s:", "tab.extensions.port"));
+
+        btn_gpython.textProperty().bind(new TranslatableString("%s", "tab.extensions.button.pythonshell"));
+        btn_viewExtensionConsole.textProperty().bind(new TranslatableString("%s", "tab.extensions.button.logs"));
+        btn_install.textProperty().bind(new TranslatableString("%s", "tab.extensions.button.install"));
     }
 }

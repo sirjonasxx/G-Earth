@@ -6,6 +6,7 @@ import gearth.services.internal_extensions.extensionstore.application.WebUtils;
 import gearth.services.internal_extensions.extensionstore.application.entities.StoreExtensionItem;
 import gearth.services.internal_extensions.extensionstore.repository.models.StoreExtension;
 import gearth.services.internal_extensions.extensionstore.tools.InstalledExtension;
+import gearth.ui.translations.LanguageBundle;
 import org.apache.maven.artifact.versioning.ComparableVersion;
 
 public class StoreExtensionInstalledItem extends StoreExtensionItem {
@@ -55,11 +56,11 @@ public class StoreExtensionInstalledItem extends StoreExtensionItem {
 
                     .append("<div class=\"overview_item_info\">")
                     .append("<div class=\"oii_name\">").append(WebUtils.escapeMessage(installedExtension.getName())).append("</div>")
-                    .append("<div class=\"oii_desc\">Not found in G-ExtensionStore</div>")
+                    .append("<div class=\"oii_desc\">").append(LanguageBundle.get("ext.store.extension.notinstore")).append("</div>")
                     .append("</div>")
 
                     .append("<div class=\"overview_item_msgs\">")
-                    .append("<div class=\"oim_top\">").append("Version: ").append(displayVersion()).append("</div>")
+                    .append("<div class=\"oim_top\">").append(LanguageBundle.get("ext.store.extension.version")).append(": ").append(displayVersion()).append("</div>")
                     .append("<div class=\"oim_bottom\"></div>")
                     .append("</div>")
 

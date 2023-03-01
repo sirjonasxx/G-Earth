@@ -1006,3 +1006,71 @@ VBox > .split-menu-button.last > .arrow-button {
 .scroll-pane {
     -fx-background-color: white;
 }
+
+#language-picker {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 0;
+}
+
+#language-picker .context-menu {
+    -fx-padding: 0;
+}
+
+#language-picker .context-menu .menu-item {
+    -fx-padding: 10 0 0 5;
+}
+
+#language-picker .label {
+    -fx-padding: 0;
+    -fx-max-width: 0;
+}
+
+#language-picker .arrow,
+#language-picker .arrow-button {
+    -fx-opacity: 0;
+    -fx-max-width: 0;
+    -fx-padding: 0;
+}
+
+#language-picker .menu-item .label {
+    -fx-max-width: 0;
+    -fx-padding: 0;
+    -fx-label-padding: 0;
+}
+
+.language-icon.en {
+    -fx-image: url("lang/EN.png");
+}
+
+.language-icon.nl {
+    -fx-image: url("lang/NL.png");
+}
+
+.language-icon.fr {
+    -fx-image: url("lang/FR.png");
+}
+
+.language-icon.es {
+    -fx-image: url("lang/ES.png");
+}
+
+.language-icon.de {
+    -fx-image: url("lang/DE.png");
+}
+
+.language-icon.tr {
+    -fx-image: url("lang/TR.png");
+}
+
+.language-icon.pt {
+    -fx-image: url("lang/PT.png");
+}
+
+.language-icon.fi {
+    -fx-image: url("lang/FI.png");
+}
+
+.language-icon.it {
+    -fx-image: url("lang/IT.png");
+}

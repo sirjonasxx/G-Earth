@@ -1,10 +1,12 @@
 package gearth.ui.subforms.injection;
 
+import gearth.GEarth;
 import gearth.misc.StringifyAble;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 import gearth.services.packet_info.PacketInfo;
 import gearth.services.packet_info.PacketInfoManager;
+import gearth.ui.translations.LanguageBundle;
 import org.json.JSONObject;
 
 import java.util.HashMap;
@@ -19,7 +21,7 @@ public class InjectedPackets implements StringifyAble {
     public InjectedPackets(String packetsAsString, int amountPackets, PacketInfoManager packetInfoManager, HMessage.Direction direction) {
         String description;
         if (amountPackets > 1) {
-            description = String.format("(packets: %d, length: %d)", amountPackets, packetsAsString.length());
+            description = String.format("(%s: %d, %s: %d)", LanguageBundle.get("tab.injection.description.packets"), amountPackets, LanguageBundle.get("tab.injection.description.length"), packetsAsString.length());
         }
         else { // assume 1 packet
             HPacket packet = new HPacket(packetsAsString);
@@ -40,7 +42,7 @@ public class InjectedPackets implements StringifyAble {
                 description = String.format("%s", identifier);
             }
             else {
-                description = String.format("(id: %d, length: %d)", packet.headerId(), packet.length());
+                description = String.format("(%s: %d, %s: %d)", LanguageBundle.get("tab.injection.description.id"), packet.headerId(), LanguageBundle.get("tab.injection.description.length"), packet.length());
             }
         }
 

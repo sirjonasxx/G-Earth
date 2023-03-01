@@ -1,9 +1,12 @@
 package gearth.ui.subforms.injection;
 
 import gearth.misc.Cacher;
-import gearth.services.packet_info.PacketInfoManager;
+import gearth.protocol.HConnection;
 import gearth.protocol.HMessage;
-import gearth.protocol.connection.HState;
+import gearth.protocol.HPacket;
+import gearth.ui.SubForm;
+import gearth.ui.translations.LanguageBundle;
+import gearth.ui.translations.TranslatableString;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.scene.control.*;
@@ -11,8 +14,6 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Text;
-import gearth.protocol.HPacket;
-import gearth.ui.SubForm;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,14 +27,18 @@ public class InjectionController extends SubForm {
     private static final int historylimit = 69;
 
     public TextArea inputPacket;
-    public Text lbl_corrruption;
+    public Text lbl_corruption;
     public Text lbl_pcktInfo;
     public Button btn_sendToServer;
     public Button btn_sendToClient;
     public ListView<InjectedPackets> history;
     public Label lblHistory;
+    public Hyperlink lnk_clearHistory;
+
+    private TranslatableString corruption, pcktInfo;
 
     protected void onParentSet() {
+        getHConnection().onDeveloperModeChange(developMode -> updateUI());
         getHConnection().getStateObservable().addListener((oldState, newState) -> Platform.runLater(this::updateUI));
 
         inputPacket.textProperty().addListener(event -> Platform.runLater(this::updateUI));
@@ -52,14 +57,14 @@ public class InjectionController extends SubForm {
             }
         });
 
-        lblHistory.setTooltip(new Tooltip("Double click a packet to restore it"));
-
         List<Object> rawHistory = Cacher.getList(HISTORY_CACHE_KEY);
         if (rawHistory != null) {
             List<InjectedPackets> history = rawHistory.stream()
                     .map(o -> (String)o).limit(historylimit - 1).map(InjectedPackets::new).collect(Collectors.toList());
             updateHistoryView(history);
         }
+
+        initLanguageBinding();
     }
 
     private static boolean isPacketIncomplete(String line) {
@@ -103,62 +108,87 @@ public class InjectionController extends SubForm {
     private void updateUI() {
         boolean dirty = false;
 
-        lbl_corrruption.setText("isCorrupted: False");
-        lbl_corrruption.getStyleClass().clear();
-        lbl_corrruption.getStyleClass().add("not-corrupted-label");
+        corruption.setFormat("%s: %s");
+        corruption.setKey(1, "tab.injection.corrupted.false");
+        lbl_corruption.getStyleClass().clear();
+        lbl_corruption.getStyleClass().add("not-corrupted-label");
 
         HPacket[] packets = parsePackets(inputPacket.getText());
 
         if (packets.length == 0) {
             dirty = true;
-            lbl_corrruption.setFill(Paint.valueOf("#ee0404b2"));
-            lbl_corrruption.getStyleClass().clear();
-            lbl_corrruption.getStyleClass().add("corrupted-label");
+            lbl_corruption.setFill(Paint.valueOf("#ee0404b2"));
+            lbl_corruption.getStyleClass().clear();
+            lbl_corruption.getStyleClass().add("corrupted-label");
         }
 
         for (int i = 0; i < packets.length; i++) {
             if (packets[i].isCorrupted()) {
                 if (!dirty) {
-                    lbl_corrruption.setText("isCorrupted: True -> " + i);
-                    lbl_corrruption.getStyleClass().clear();
-                    lbl_corrruption.getStyleClass().add("corrupted-label");
+                    corruption.setFormat("%s: %s -> " + i);
+                    corruption.setKey(1, "tab.injection.corrupted.true");
+                    lbl_corruption.getStyleClass().clear();
+                    lbl_corruption.getStyleClass().add("corrupted-label");
                     dirty = true;
                 } else
-                    lbl_corrruption.setText(lbl_corrruption.getText() + ", " + i);
+                    corruption.setFormat(corruption.getFormat() + ", " + i);
             }
         }
 
         if (dirty && packets.length == 1) {
-            lbl_corrruption.setText("isCorrupted: True"); // no index needed
+            corruption.setFormatAndKeys("%s: %s", "tab.injection.corrupted", "tab.injection.corrupted.true");
         }
 
         if (!dirty) {
-            PacketInfoManager packetInfoManager = getHConnection().getPacketInfoManager();
 
-            for (HPacket packet : packets) {
-                packet.completePacket(packetInfoManager);
-            }
+            HConnection connection = getHConnection();
 
             boolean canSendToClient = Arrays.stream(packets).allMatch(packet ->
-                    packet.isPacketComplete() && packet.canSendToClient());
+                    connection.canSendPacket(HMessage.Direction.TOCLIENT, packet));
             boolean canSendToServer = Arrays.stream(packets).allMatch(packet ->
-                    packet.isPacketComplete() && packet.canSendToServer());
+                    connection.canSendPacket(HMessage.Direction.TOSERVER, packet));
 
-            btn_sendToClient.setDisable(!canSendToClient || getHConnection().getState() != HState.CONNECTED);
-            btn_sendToServer.setDisable(!canSendToServer || getHConnection().getState() != HState.CONNECTED);
+            btn_sendToClient.setDisable(!canSendToClient);
+            btn_sendToServer.setDisable(!canSendToServer);
+
+            // mark packet sending unsafe if there is any packet that is unsafe for both TOSERVER and TOCLIENT
+            boolean isUnsafe = Arrays.stream(packets).anyMatch(packet ->
+                    !connection.isPacketSendingSafe(HMessage.Direction.TOCLIENT, packet) &&
+                            !connection.isPacketSendingSafe(HMessage.Direction.TOSERVER, packet));
+
             if (packets.length == 1) {
-                lbl_pcktInfo.setText("header (id:" + packets[0].headerId() + ", length:" +
-                        packets[0].length() + ")");
+                HPacket packet = packets[0];
+                if (isUnsafe) {
+                    pcktInfo.setFormatAndKeys("%s (%s: " + packet.headerId() + ", %s: " + packet.length() + "), %s",
+                            "tab.injection.description.header",
+                            "tab.injection.description.id",
+                            "tab.injection.description.length",
+                            "tab.injection.description.unsafe");
+                }
+                else {
+                    pcktInfo.setFormatAndKeys("%s (%s: " + packet.headerId() + ", %s: " + packet.length() + ")",
+                            "tab.injection.description.header",
+                            "tab.injection.description.id",
+                            "tab.injection.description.length");
+                }
             }
             else {
-                lbl_pcktInfo.setText("");
+                if (isUnsafe) {
+                    pcktInfo.setFormatAndKeys("%s", "tab.injection.description.unsafe");
+                }
+                else {
+                    pcktInfo.setFormatAndKeys("");
+                }
             }
         } else {
             if (packets.length == 1) {
-                lbl_pcktInfo.setText("header (id:NULL, length:" + packets[0].getBytesLength()+")");
+                pcktInfo.setFormatAndKeys("%s (%s:NULL, %s: " + packets[0].getBytesLength() + ")",
+                        "tab.injection.description.header",
+                        "tab.injection.description.id",
+                        "tab.injection.description.length");
             }
             else {
-                lbl_pcktInfo.setText("");
+                pcktInfo.setFormatAndKeys("");
             }
 
             btn_sendToClient.setDisable(true);
@@ -171,7 +201,7 @@ public class InjectionController extends SubForm {
         HPacket[] packets = parsePackets(inputPacket.getText());
         for (HPacket packet : packets) {
             getHConnection().sendToServer(packet);
-            writeToLog(Color.BLUE, "SS -> packet with id: " + packet.headerId());
+            writeToLog(Color.BLUE, String.format("SS -> %s: %d", LanguageBundle.get("tab.injection.log.packetwithid"), packet.headerId()));
         }
 
         addToHistory(packets, inputPacket.getText(), HMessage.Direction.TOSERVER);
@@ -181,7 +211,7 @@ public class InjectionController extends SubForm {
         HPacket[] packets = parsePackets(inputPacket.getText());
         for (HPacket packet : packets) {
             getHConnection().sendToClient(packet);
-            writeToLog(Color.RED, "CS -> packet with id: " + packet.headerId());
+            writeToLog(Color.RED, String.format("CS -> %s: %d", LanguageBundle.get("tab.injection.log.packetwithid"), packet.headerId()));
         }
 
         addToHistory(packets, inputPacket.getText(), HMessage.Direction.TOCLIENT);
@@ -222,6 +252,23 @@ public class InjectionController extends SubForm {
     public void clearHistoryClick(ActionEvent actionEvent) {
         Cacher.put(HISTORY_CACHE_KEY, new ArrayList<>());
         updateHistoryView(new ArrayList<>());
+    }
+
+    private void initLanguageBinding() {
+        lblHistory.textProperty().bind(new TranslatableString("%s", "tab.injection.history"));
+        lblHistory.setTooltip(new Tooltip());
+        lblHistory.getTooltip().textProperty().bind(new TranslatableString("%s", "tab.injection.history.tooltip"));
+
+        corruption = new TranslatableString("%s: %s", "tab.injection.corrupted", "tab.injection.corrupted.true");
+        lbl_corruption.textProperty().bind(corruption);
+
+        pcktInfo = new TranslatableString("%s (%s:NULL, %s:0)", "tab.injection.description.header", "tab.injection.description.id", "tab.injection.description.length");
+        lbl_pcktInfo.textProperty().bind(pcktInfo);
+
+        btn_sendToServer.textProperty().bind(new TranslatableString("%s", "tab.injection.send.toserver"));
+        btn_sendToClient.textProperty().bind(new TranslatableString("%s", "tab.injection.send.toclient"));
+
+        lnk_clearHistory.textProperty().bind(new TranslatableString("%s", "tab.injection.history.clear"));
     }
 
     public static void main(String[] args) {

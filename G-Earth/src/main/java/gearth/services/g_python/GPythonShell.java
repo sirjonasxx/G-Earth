@@ -3,6 +3,7 @@ package gearth.services.g_python;
 import gearth.GEarth;
 import gearth.ui.subforms.extra.ExtraController;
 import gearth.ui.titlebar.TitleBarController;
+import gearth.ui.translations.LanguageBundle;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -170,13 +171,11 @@ public class GPythonShell {
 
     private void showError() {
         Platform.runLater(() -> {
-            Alert alert = new Alert(Alert.AlertType.ERROR, "G-Python error", ButtonType.OK);
-            alert.setTitle("G-Python error");
+            Alert alert = new Alert(Alert.AlertType.ERROR, LanguageBundle.get("alert.gpythonerror.title"), ButtonType.OK);
+            alert.setTitle(LanguageBundle.get("alert.gpythonerror.title"));
 
             FlowPane fp = new FlowPane();
-            Label lbl = new Label("Something went wrong launching the G-Python shell," +
-                    System.lineSeparator() + "are you sure you followed the installation guide correctly?" +
-                    System.lineSeparator() + System.lineSeparator() + "More information here:");
+            Label lbl = new Label(LanguageBundle.get("alert.gpythonerror.content").replaceAll("\\\\n", System.lineSeparator()));
             Hyperlink link = new Hyperlink(ExtraController.INFO_URL_GPYTHON);
             fp.getChildren().addAll(lbl, link);
             link.setOnAction(event -> {

@@ -5,54 +5,59 @@
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 
-<GridPane id="title-bar" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gearth.ui.titlebar.TitleBarController">
+<GridPane id="title-bar" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gearth.ui.titlebar.TitleBarController">
   <columnConstraints>
-      <ColumnConstraints hgrow="SOMETIMES" />
+    <ColumnConstraints hgrow="SOMETIMES" />
     <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" />
-      <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" />
+    <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" />
   </columnConstraints>
   <rowConstraints>
     <RowConstraints maxHeight="25.0" minHeight="25.0" prefHeight="25.0" vgrow="SOMETIMES" />
   </rowConstraints>
-   <children>
-    <ImageView fx:id="minimizeBtn" id="minimize-button" fitHeight="25.0" fitWidth="50.0" onMouseClicked="#handleMinimizeAction" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="1">
-        <image>
-            <Image url="@files/minimizeButton.png" />
-        </image>
+  <children>
+    <ImageView id="minimize-button" fx:id="minimizeBtn" fitHeight="25.0" fitWidth="50.0" onMouseClicked="#handleMinimizeAction" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="1">
+      <image>
+        <Image url="@files/minimizeButton.png" />
+      </image>
     </ImageView>
     <ImageView id="close-button" fitHeight="25.0" fitWidth="50.0" onMouseClicked="#handleCloseAction" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="2">
-        <image>
-            <Image url="@files/closeButton.png" />
-        </image>
+      <image>
+        <Image url="@files/closeButton.png" />
+      </image>
     </ImageView>
-      <GridPane maxHeight="25.0" maxWidth="1.7976931348623157E308" minHeight="25.0" minWidth="-Infinity" onMouseDragged="#handleMovementAction" onMousePressed="#handleClickAction" onMouseReleased="#handleClickReleaseAction" prefHeight="25.0">
-        <columnConstraints>
-          <ColumnConstraints hgrow="SOMETIMES" maxWidth="7.0" minWidth="7.0" prefWidth="7.0" />
-          <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" />
-            <ColumnConstraints hgrow="ALWAYS" />
-            <ColumnConstraints maxWidth="-Infinity" />
-            <ColumnConstraints maxWidth="7.0" minWidth="7.0" prefWidth="7.0" />
-        </columnConstraints>
-        <rowConstraints>
-          <RowConstraints maxHeight="25.0" minHeight="25.0" prefHeight="25.0" vgrow="SOMETIMES" />
-        </rowConstraints>
-         <children>
-          <ImageView id="icon" fx:id="titleIcon" fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="1">
-              <image>
-                  <Image url="@../themes/G-Earth/logoSmall.png" />
-              </image>
-          </ImageView>
-          <Label fx:id="titleLabel" text="Placeholder" GridPane.columnIndex="2">
-              <padding>
-                  <Insets left="2.0" />
-              </padding>
-          </Label>
-          <ImageView fx:id="themeBtn" id="theme-button" fitHeight="20.0" fitWidth="38.0" onMouseClicked="#toggleTheme" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="3">
-              <image>
-                  <Image url="@../themes/G-Earth/themeButton.png" />
-              </image>
-            </ImageView>
-         </children>
-      </GridPane>
-   </children>
+    <GridPane maxHeight="25.0" maxWidth="1.7976931348623157E308" minHeight="25.0" minWidth="-Infinity" onMouseDragged="#handleMovementAction" onMousePressed="#handleClickAction" onMouseReleased="#handleClickReleaseAction" prefHeight="25.0">
+      <columnConstraints>
+        <ColumnConstraints hgrow="SOMETIMES" maxWidth="7.0" minWidth="7.0" prefWidth="7.0" />
+        <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" />
+        <ColumnConstraints hgrow="ALWAYS" />
+        <ColumnConstraints maxWidth="-Infinity" />
+        <ColumnConstraints maxWidth="-Infinity" />
+        <ColumnConstraints maxWidth="7.0" minWidth="7.0" prefWidth="7.0" />
+      </columnConstraints>
+      <rowConstraints>
+        <RowConstraints maxHeight="25.0" minHeight="25.0" prefHeight="25.0" vgrow="SOMETIMES" />
+      </rowConstraints>
+      <children>
+        <ImageView id="icon" fx:id="titleIcon" fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="1">
+          <image>
+            <Image url="@../themes/G-Earth/logoSmall.png" />
+          </image>
+        </ImageView>
+        <Label fx:id="titleLabel" text="Placeholder" GridPane.columnIndex="2">
+          <padding>
+            <Insets left="2.0" />
+          </padding>
+        </Label>
+        <MenuButton id="language-picker" fx:id="languagePicker" alignment="CENTER" contentDisplay="CENTER" graphicTextGap="0.0" mnemonicParsing="false" translateX="-5.0" GridPane.columnIndex="3">
+          <items>
+          </items>
+        </MenuButton>
+        <ImageView id="theme-button" fx:id="themeBtn" fitHeight="20.0" fitWidth="38.0" onMouseClicked="#toggleTheme" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="4">
+          <image>
+            <Image url="@../themes/G-Earth/themeButton.png" />
+          </image>
+        </ImageView>
+      </children>
+    </GridPane>
+  </children>
 </GridPane>
