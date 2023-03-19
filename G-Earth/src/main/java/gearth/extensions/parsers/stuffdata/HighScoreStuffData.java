@@ -9,7 +9,9 @@ public class HighScoreStuffData extends StuffDataBase {
     public final static int IDENTIFIER = 6;
 
     private String legacyString = "";
+    // ['perteam', 'mostwins', 'classic', 'fastesttime', 'longesttime']
     private int scoreType = 0;
+    // ['alltime', 'daily', 'weekly', 'monthly']
     private int clearType = 0;
     private HighScoreData[] entries = {};
 
