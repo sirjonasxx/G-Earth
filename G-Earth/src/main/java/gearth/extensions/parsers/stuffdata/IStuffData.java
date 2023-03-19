@@ -8,28 +8,28 @@ public interface IStuffData {
         StuffDataBase stuffData = null;
 
         switch (a & 255) {
-            case 0:
+            case LegacyStuffData.IDENTIFIER:
                 stuffData = new LegacyStuffData();
                 break;
-            case 1:
+            case MapStuffData.IDENTIFIER:
                 stuffData = new MapStuffData();
                 break;
-            case 2:
+            case StringArrayStuffData.IDENTIFIER:
                 stuffData = new StringArrayStuffData();
                 break;
-            case 3:
+            case VoteResultStuffData.IDENTIFIER:
                 stuffData = new VoteResultStuffData();
                 break;
-            case 4:
+            case EmptyStuffData.IDENTIFIER:
                 stuffData = new EmptyStuffData();
                 break;
-            case 5:
+            case IntArrayStuffData.IDENTIFIER:
                 stuffData = new IntArrayStuffData();
                 break;
-            case 6:
+            case HighScoreStuffData.IDENTIFIER:
                 stuffData = new HighScoreStuffData();
                 break;
-            case 7:
+            case CrackableStuffData.IDENTIFIER:
                 stuffData = new CrackableStuffData();
                 break;
         }
