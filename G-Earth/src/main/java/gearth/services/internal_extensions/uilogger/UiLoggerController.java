@@ -357,7 +357,7 @@ public class UiLoggerController implements Initializable {
     public void updateLoggerInfo() {
         Platform.runLater(() -> {
             viewIncoming.setKey(1, "ext.logger.state." + (chkViewIncoming.isSelected() ? "true" : "false"));
-            viewIncoming.setKey(1, "ext.logger.state." + (chkViewOutgoing.isSelected() ? "true" : "false"));
+            viewOutgoing.setKey(1, "ext.logger.state." + (chkViewOutgoing.isSelected() ? "true" : "false"));
             autoScroll.setKey(1, "ext.logger.state." + (chkAutoscroll.isSelected() ? "true" : "false"));
             filtered.setFormat("%s: " + filteredAmount);
 
