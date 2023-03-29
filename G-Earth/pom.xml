@@ -299,6 +299,12 @@
             <artifactId>logback-classic</artifactId>
             <version>${logback.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.dustinredmond.fxtrayicon</groupId>
+            <artifactId>FXTrayIcon</artifactId>
+            <version>4.0.1</version>
+        </dependency>
+
     </dependencies>
 
     <repositories>

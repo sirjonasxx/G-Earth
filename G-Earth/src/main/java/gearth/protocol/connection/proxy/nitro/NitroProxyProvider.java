@@ -9,6 +9,8 @@ import gearth.protocol.connection.proxy.ProxyProvider;
 import gearth.protocol.connection.proxy.nitro.http.NitroHttpProxy;
 import gearth.protocol.connection.proxy.nitro.http.NitroHttpProxyServerCallback;
 import gearth.protocol.connection.proxy.nitro.websocket.NitroWebsocketProxy;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,7 +18,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class NitroProxyProvider implements ProxyProvider, NitroHttpProxyServerCallback, StateChangeListener {
+public class NitroProxyProvider implements ProxyProvider, NitroHttpProxyServerCallback, ChangeListener<HState> {
 
     private static final Logger logger = LoggerFactory.getLogger(NitroProxyProvider.class);
 
@@ -53,7 +55,7 @@ public class NitroProxyProvider implements ProxyProvider, NitroHttpProxyServerCa
         originalWebsocketUrl = null;
         originalCookies = null;
 
-        connection.getStateObservable().addListener(this);
+        connection.stateProperty().addListener(this);
 
         logger.info("Starting http proxy");
 
@@ -112,7 +114,7 @@ public class NitroProxyProvider implements ProxyProvider, NitroHttpProxyServerCa
 
             stateSetter.setState(HState.NOT_CONNECTED);
 
-            connection.getStateObservable().removeListener(this);
+            connection.stateProperty().removeListener(this);
 
             logger.info("Nitro proxy stopped");
         }).start();
@@ -131,16 +133,15 @@ public class NitroProxyProvider implements ProxyProvider, NitroHttpProxyServerCa
     }
 
     @Override
-    public void stateChanged(HState oldState, HState newState) {
-        if (oldState == HState.WAITING_FOR_CLIENT && newState == HState.CONNECTED) {
+    public void changed(ObservableValue<? extends HState> observable, HState oldValue, HState newValue) {
+        if (oldValue == HState.WAITING_FOR_CLIENT && newValue == HState.CONNECTED) {
             // Unregister but do not stop http proxy.
             // We are not stopping the http proxy because some requests might still require it to be running.
             nitroHttpProxy.pause();
         }
 
         // Catch setState ABORTING inside NitroWebsocketClient.
-        if (newState == HState.ABORTING) {
+        if (newValue == HState.ABORTING)
             abort();
-        }
     }
 }

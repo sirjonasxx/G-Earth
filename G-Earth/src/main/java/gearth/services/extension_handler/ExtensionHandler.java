@@ -1,7 +1,6 @@
 package gearth.services.extension_handler;
 
 import gearth.GEarth;
-import gearth.misc.HostInfo;
 import gearth.misc.listenerpattern.Observable;
 import gearth.protocol.HConnection;
 import gearth.protocol.HMessage;
@@ -12,14 +11,15 @@ import gearth.services.extension_handler.extensions.GEarthExtension;
 import gearth.services.extension_handler.extensions.extensionproducers.ExtensionProducer;
 import gearth.services.extension_handler.extensions.extensionproducers.ExtensionProducerFactory;
 import gearth.services.extension_handler.extensions.extensionproducers.ExtensionProducerObserver;
-import gearth.ui.themes.Theme;
+import gearth.ui.GEarthProperties;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.util.Pair;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.function.Consumer;
 
-public class ExtensionHandler {
+public class ExtensionHandler implements ChangeListener<HState> {
 
     private final List<GEarthExtension> gEarthExtensions = new ArrayList<>();
     private final HConnection hConnection;
@@ -47,38 +47,13 @@ public class ExtensionHandler {
     }
 
     private void initialize() {
-        GEarth.getThemeObservable().addListener(theme -> {
+        GEarthProperties.hostInfoBinding.addListener(((observable1, oldValue, newValue) -> {
             synchronized (gEarthExtensions) {
-                for (GEarthExtension extension : gEarthExtensions) {
-                    extension.updateHostInfo(getHostInfo());
-                }
+                gEarthExtensions.forEach(extension -> extension.updateHostInfo(newValue));
             }
-        });
+        }));
 
-        hConnection.getStateObservable().addListener((oldState, newState) -> {
-            if (newState == HState.CONNECTED) {
-                synchronized (gEarthExtensions) {
-                    for (GEarthExtension extension : gEarthExtensions) {
-                        extension.connectionStart(
-                                hConnection.getDomain(),
-                                hConnection.getServerPort(),
-                                hConnection.getHotelVersion(),
-                                hConnection.getClientIdentifier(),
-                                hConnection.getClientType(),
-                                hConnection.getPacketInfoManager()
-                        );
-                    }
-                }
-            }
-            if (oldState == HState.CONNECTED) {
-                synchronized (gEarthExtensions) {
-                    for (GEarthExtension extension : gEarthExtensions) {
-                        extension.connectionEnd();
-                    }
-                }
-            }
-        });
-
+        hConnection.stateProperty().addListener(this);
         extensionProducers = ExtensionProducerFactory.getAll();
         extensionProducers.forEach(extensionProducer -> extensionProducer.startProducing(createExtensionProducerObserver()));
     }
@@ -259,7 +234,7 @@ public class ExtensionHandler {
                 extension.getClickedObservable().addListener(extension::doubleclick);
                 observable.fireEvent(l -> l.onExtensionConnect(extension));
 
-                extension.init(hConnection.getState() == HState.CONNECTED, getHostInfo());
+                extension.init(hConnection.getState() == HState.CONNECTED, GEarthProperties.getHostInfo());
                 if (hConnection.getState() == HState.CONNECTED) {
                     extension.connectionStart(
                             hConnection.getDomain(),
@@ -274,16 +249,6 @@ public class ExtensionHandler {
         };
     }
 
-    private HostInfo getHostInfo() {
-        HashMap<String, String> attributes = new HashMap<>();
-        attributes.put("theme", GEarth.getTheme().title());
-        return new HostInfo(
-                "G-Earth",
-                GEarth.version,
-                attributes
-        );
-    }
-
     public List<ExtensionProducer> getExtensionProducers() {
         return extensionProducers;
     }
@@ -296,5 +261,26 @@ public class ExtensionHandler {
         extensionProducers.add(producer);
     }
 
-
+    @Override
+    public void changed(ObservableValue<? extends HState> observable, HState oldValue, HState newValue) {
+        if (newValue == HState.CONNECTED) {
+            synchronized (gEarthExtensions) {
+                for (GEarthExtension extension : gEarthExtensions) {
+                    extension.connectionStart(
+                            hConnection.getDomain(),
+                            hConnection.getServerPort(),
+                            hConnection.getHotelVersion(),
+                            hConnection.getClientIdentifier(),
+                            hConnection.getClientType(),
+                            hConnection.getPacketInfoManager()
+                    );
+                }
+            }
+        }
+        if (oldValue == HState.CONNECTED) {
+            synchronized (gEarthExtensions) {
+                gEarthExtensions.forEach(GEarthExtension::connectionEnd);
+            }
+        }
+    }
 }

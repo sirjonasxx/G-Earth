@@ -1,6 +1,10 @@
 package gearth.misc;
 
 import gearth.GEarth;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.Property;
+import javafx.beans.property.StringProperty;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -10,6 +14,8 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * Created by Jonas on 28/09/18.
@@ -129,5 +135,37 @@ public class Cacher {
     }
     public static void clear() {
          clear(DEFAULT_CACHE_FILENAME);
+    }
+
+    public static <E extends Enum<E>> void ifEnumPresent(String key, Class<E> enumClass, Consumer<E> consumer) {
+        if (getCacheContents().has(key)) {
+            final E value = getCacheContents().getEnum(enumClass, key);
+            consumer.accept(value);
+        }
+    }
+    public static <E extends Enum<E>> void bindEnum(String key, Class<E> enumClass, ObjectProperty<E> valueProperty) {
+        if (getCacheContents().has(key)) {
+            final E value = getCacheContents().getEnum(enumClass, key);
+            valueProperty.set(value);
+        }
+        valueProperty.addListener((observable, oldValue, newValue) -> put(key, newValue));
+    }
+
+    public static void bindString(String key, StringProperty valueProperty) {
+        bind(key, valueProperty, getCacheContents()::getString);
+    }
+    public static void bindNumber(String key, Property<Number> valueProperty) {
+        bind(key, valueProperty, getCacheContents()::getNumber);
+    }
+    public static void bindBoolean(String key, BooleanProperty valueProperty) {
+        bind(key, valueProperty, getCacheContents()::getBoolean);
+    }
+    public static void bindJSONObject(String key, ObjectProperty<JSONObject> valueProperty) {
+        bind(key, valueProperty, getCacheContents()::getJSONObject);
+    }
+    private static <T> void bind(String key, Property<T> valueProperty, Function<String, T> reader) {
+        if (getCacheContents().has(key))
+            valueProperty.setValue(reader.apply(key));
+        valueProperty.addListener((observable, oldValue, newValue) -> put(key, newValue));
     }
 }

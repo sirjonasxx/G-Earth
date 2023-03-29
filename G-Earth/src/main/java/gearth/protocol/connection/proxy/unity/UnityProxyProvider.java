@@ -1,18 +1,21 @@
 package gearth.protocol.connection.proxy.unity;
 
 import gearth.protocol.HConnection;
-import gearth.protocol.StateChangeListener;
 import gearth.protocol.connection.HProxySetter;
 import gearth.protocol.connection.HState;
 import gearth.protocol.connection.HStateSetter;
 import gearth.protocol.connection.proxy.ProxyProvider;
 import gearth.services.unity_tools.GUnityFileServer;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainerInitializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.websocket.server.ServerContainer;
 import javax.websocket.server.ServerEndpointConfig;
@@ -22,6 +25,9 @@ import static gearth.services.unity_tools.GUnityFileServer.FILESERVER_PORT;
 
 public class UnityProxyProvider implements ProxyProvider {
 
+    private final static Logger LOGGER = LoggerFactory.getLogger(UnityProxyProvider.class);
+
+    public static final int PORT_REQUESTER_SERVER_PORT = 9039;
     private final HProxySetter proxySetter;
     private final HStateSetter stateSetter;
     private final HConnection hConnection;
@@ -34,7 +40,6 @@ public class UnityProxyProvider implements ProxyProvider {
         this.hConnection = hConnection;
     }
 
-
     @Override
     public void start() throws IOException {
         // https://happyhyppo.ro/2016/03/21/minimal-websockets-communication-with-javajetty-and-angularjs/
@@ -45,13 +50,13 @@ public class UnityProxyProvider implements ProxyProvider {
             while (fail && port < 9100) {
                 try {
                     packetHandlerServer = new Server(port);
-                    ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
+                    final ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
                     context.setContextPath("/ws");
 
-                    HandlerList handlers = new HandlerList();
+                    final HandlerList handlers = new HandlerList();
                     handlers.setHandlers(new Handler[] { context });
 
-                    ServerContainer wscontainer = WebSocketServerContainerInitializer.configureContext(context);
+                    final ServerContainer wscontainer = WebSocketServerContainerInitializer.configureContext(context);
                     wscontainer.addEndpoint(ServerEndpointConfig.Builder
                             .create(UnityCommunicator.class, "/packethandler") // the endpoint url
                             .configurator(new UnityCommunicatorConfig(proxySetter, stateSetter, hConnection, this))
@@ -65,10 +70,8 @@ public class UnityProxyProvider implements ProxyProvider {
                 }
             }
 
-            if (fail) {
+            if (fail)
                 throw new Exception();
-            }
-
 
             startPortRequestServer(port);
             startUnityFileServer();
@@ -79,17 +82,16 @@ public class UnityProxyProvider implements ProxyProvider {
             try {
                 packetHandlerServer.stop();
             } catch (Exception ex) {
-                ex.printStackTrace();
+                LOGGER.error("Failed to close packet handler server", ex);
             }
-            e.printStackTrace();
+            LOGGER.error("Failed to connect to unity proxy", e);
         }
     }
 
     @Override
     public synchronized void abort() {
-        if (packetHandlerServer == null) {
+        if (packetHandlerServer == null)
             return;
-        }
 
         final Server abortThis = packetHandlerServer;
         stateSetter.setState(HState.ABORTING);
@@ -97,7 +99,7 @@ public class UnityProxyProvider implements ProxyProvider {
             try {
                 abortThis.stop();
             } catch (Exception e) {
-                e.printStackTrace();
+                LOGGER.error("Failed to abort", e);
             } finally {
                 stateSetter.setState(HState.NOT_CONNECTED);
             }
@@ -106,43 +108,30 @@ public class UnityProxyProvider implements ProxyProvider {
     }
 
     private void startUnityFileServer() throws Exception {
-        Server server = new Server(FILESERVER_PORT);
-        ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
+        final Server server = new Server(FILESERVER_PORT);
+        final ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
         context.setContextPath("/");
-
         context.addServlet(new ServletHolder(new GUnityFileServer()), "/*");
 
-        HandlerList handlers = new HandlerList();
+        final HandlerList handlers = new HandlerList();
         handlers.setHandlers(new Handler[] { context });
         server.setHandler(handlers);
 
         server.start();
-        StateChangeListener fileServerCloser = new StateChangeListener() {
-            @Override
-            public void stateChanged(HState oldState, HState newState) {
-                if (oldState == HState.WAITING_FOR_CLIENT || newState == HState.NOT_CONNECTED) {
-                    hConnection.getStateObservable().removeListener(this);
-                    try {
-                        server.stop();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        };
-        hConnection.getStateObservable().addListener(fileServerCloser);
+
+        stopServerOnDisconnect(server);
     }
 
     private void startPortRequestServer(int packetHandlerPort) throws Exception {
-        Server portRequestServer = new Server(9039);
-        ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
+        final Server portRequestServer = new Server(PORT_REQUESTER_SERVER_PORT);
+        final ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
         context.setContextPath("/ws");
 
-        HandlerList handlers = new HandlerList();
+        final HandlerList handlers = new HandlerList();
         handlers.setHandlers(new Handler[] { context });
         portRequestServer.setHandler(handlers);
 
-        ServerContainer wscontainer = WebSocketServerContainerInitializer.configureContext(context);
+        final ServerContainer wscontainer = WebSocketServerContainerInitializer.configureContext(context);
         wscontainer.addEndpoint(ServerEndpointConfig.Builder
                 .create(PortRequester.class, "/portrequest") // the endpoint url
                 .configurator(new PortRequesterConfig(packetHandlerPort))
@@ -150,19 +139,22 @@ public class UnityProxyProvider implements ProxyProvider {
 
         portRequestServer.start();
 
-        StateChangeListener portRequesterCloser = new StateChangeListener() {
+        stopServerOnDisconnect(portRequestServer);
+    }
+
+    private void stopServerOnDisconnect(Server server) {
+        hConnection.stateProperty().addListener(new ChangeListener<HState>() {
             @Override
-            public void stateChanged(HState oldState, HState newState) {
-                if (oldState == HState.WAITING_FOR_CLIENT || newState == HState.NOT_CONNECTED) {
-                    hConnection.getStateObservable().removeListener(this);
+            public void changed(ObservableValue<? extends HState> observable, HState oldValue, HState newValue) {
+                if (oldValue == HState.WAITING_FOR_CLIENT || newValue == HState.NOT_CONNECTED) {
+                    hConnection.stateProperty().removeListener(this);
                     try {
-                        portRequestServer.stop();
+                        server.stop();
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        LOGGER.error("Failed to stop server {}", server, e);
                     }
                 }
             }
-        };
-        hConnection.getStateObservable().addListener(portRequesterCloser);
+        });
     }
 }

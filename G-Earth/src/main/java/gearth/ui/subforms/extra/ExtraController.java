@@ -1,25 +1,25 @@
 package gearth.ui.subforms.extra;
 
 import gearth.GEarth;
-import gearth.misc.Cacher;
-import gearth.protocol.HConnection;
+import gearth.misc.BindingsUtil;
 import gearth.protocol.connection.HState;
 import gearth.protocol.connection.proxy.ProxyProviderFactory;
 import gearth.protocol.connection.proxy.SocksConfiguration;
 import gearth.services.always_admin.AdminService;
 import gearth.services.g_python.GPythonVersionUtils;
+import gearth.ui.GEarthProperties;
 import gearth.ui.SubForm;
 import gearth.ui.subforms.info.InfoController;
 import gearth.ui.titlebar.TitleBarController;
 import gearth.ui.translations.LanguageBundle;
 import gearth.ui.translations.TranslatableString;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.scene.control.*;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Region;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -30,16 +30,6 @@ import java.util.Optional;
 public class ExtraController extends SubForm implements SocksConfiguration {
 
     public static final String INFO_URL_GPYTHON = "https://github.com/sirjonasxx/G-Earth/wiki/G-Python-qtConsole";
-
-    public static final String NOTEPAD_CACHE_KEY = "notepad_text";
-    public static final String DEVELOP_CACHE_KEY = "develop_mode";
-    public static final String ALWAYS_ADMIN_KEY = "always_admin";
-    public static final String SOCKS_CACHE_KEY = "socks_config";
-    public static final String GPYTHON_CACHE_KEY = "use_gpython";
-
-    public static final String SOCKS_IP = "ip";
-    public static final String SOCKS_PORT = "port";
-//    public static final String IGNORE_ONCE = "ignore_once";
 
 
     public TextArea txtarea_notepad;
@@ -69,31 +59,22 @@ public class ExtraController extends SubForm implements SocksConfiguration {
         url_troubleshooting.setTooltip(new Tooltip("https://github.com/sirjonasxx/G-Earth/wiki/Troubleshooting"));
         InfoController.activateHyperlink(url_troubleshooting);
 
-        String notepadInitValue = (String)Cacher.get(NOTEPAD_CACHE_KEY);
-        if (notepadInitValue != null) {
-            txtarea_notepad.setText(notepadInitValue);
-        }
+        BindingsUtil.setAndBindBiDirectional(txtarea_notepad.textProperty(), GEarthProperties.notesProperty);
 
-        if (Cacher.getCacheContents().has(SOCKS_CACHE_KEY)) {
-            JSONObject socksInitValue = Cacher.getCacheContents().getJSONObject(SOCKS_CACHE_KEY);
-            txt_socksIp.setText(socksInitValue.getString(SOCKS_IP) + ":" + socksInitValue.getInt(SOCKS_PORT));
-//            cbx_socksUseIfNeeded.setSelected(socksInitValue.getBoolean(IGNORE_ONCE));
-        }
+        txt_socksIp.textProperty().set(GEarthProperties.getSocksHost()+":"+GEarthProperties.getSocksPort());
+        GEarthProperties.socksHostProperty.bind(Bindings.createStringBinding(this::getSocksHost, txt_socksIp.textProperty()));
+        GEarthProperties.socksPortProperty.bind(Bindings.createIntegerBinding(this::getSocksPort, txt_socksIp.textProperty()));
+        grd_socksInfo.disableProperty().bind(GEarthProperties.enableSocksProperty.not());
 
-        if (Cacher.getCacheContents().has(GPYTHON_CACHE_KEY)) {
-            cbx_gpython.setSelected(Cacher.getCacheContents().getBoolean(GPYTHON_CACHE_KEY));
-        }
-
-        if (Cacher.getCacheContents().has(ALWAYS_ADMIN_KEY)) {
-            cbx_admin.setSelected(Cacher.getCacheContents().getBoolean(ALWAYS_ADMIN_KEY));
-        }
-
-        cbx_debug.selectedProperty().addListener(observable -> HConnection.DEBUG = cbx_debug.isSelected());
-        cbx_disableDecryption.selectedProperty().addListener(observable -> HConnection.DECRYPTPACKETS = !cbx_disableDecryption.isSelected());
-
-        cbx_useSocks.selectedProperty().addListener(observable -> grd_socksInfo.setDisable(!cbx_useSocks.isSelected()));
-
+        BindingsUtil.setAndBindBiDirectional(cbx_useSocks.selectedProperty(), GEarthProperties.enableSocksProperty);
         ProxyProviderFactory.setSocksConfig(this);
+
+        BindingsUtil.setAndBindBiDirectional(cbx_debug.selectedProperty(), GEarthProperties.enableDebugProperty);
+        BindingsUtil.setAndBindBiDirectional(cbx_disableDecryption.selectedProperty(), GEarthProperties.disablePacketDecryptionProperty);
+        BindingsUtil.setAndBindBiDirectional(cbx_alwaysOnTop.selectedProperty(), GEarthProperties.alwaysOnTopProperty);
+        BindingsUtil.setAndBindBiDirectional(cbx_develop.selectedProperty(), GEarthProperties.enableDeveloperModeProperty);
+        BindingsUtil.setAndBindBiDirectional(cbx_admin.selectedProperty(), GEarthProperties.alwaysAdminProperty);
+        BindingsUtil.setAndBindBiDirectional(cbx_gpython.selectedProperty(), GEarthProperties.enableGPythonProperty);
 
         initLanguageBinding();
     }
@@ -102,45 +83,14 @@ public class ExtraController extends SubForm implements SocksConfiguration {
     protected void onParentSet() {
         adminService = new AdminService(cbx_admin.isSelected(), getHConnection());
         getHConnection().addTrafficListener(1, message -> adminService.onMessage(message));
-        getHConnection().getStateObservable().addListener((oldState, newState) -> {if (newState == HState.CONNECTED) adminService.onConnect();});
-
-        parentController.getStage().setAlwaysOnTop(cbx_alwaysOnTop.isSelected());
-        cbx_alwaysOnTop.selectedProperty().addListener(observable -> parentController.getStage().setAlwaysOnTop(cbx_alwaysOnTop.isSelected()));
-
-        cbx_advanced.selectedProperty().addListener(observable -> updateAdvancedUI());
-        getHConnection().getStateObservable().addListener((oldState, newState) -> {
-            if (oldState == HState.NOT_CONNECTED || newState == HState.NOT_CONNECTED) {
+        getHConnection().stateProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue == HState.CONNECTED)
+                adminService.onConnect();
+            if (oldValue == HState.NOT_CONNECTED || newValue == HState.NOT_CONNECTED)
                 updateAdvancedUI();
-            }
         });
-
-        if (Cacher.getCacheContents().has(DEVELOP_CACHE_KEY)) {
-            boolean inDevelopMode = Cacher.getCacheContents().getBoolean(DEVELOP_CACHE_KEY);
-            setDevelopMode(inDevelopMode);
-        }
-
+        cbx_advanced.selectedProperty().addListener(observable -> updateAdvancedUI());
         updateAdvancedUI();
-    }
-
-    @Override
-    protected void onExit() {
-        Cacher.put(NOTEPAD_CACHE_KEY, txtarea_notepad.getText());
-        Cacher.put(GPYTHON_CACHE_KEY, cbx_gpython.isSelected());
-        Cacher.put(ALWAYS_ADMIN_KEY, cbx_admin.isSelected());
-        Cacher.put(DEVELOP_CACHE_KEY, cbx_develop.isSelected());
-        saveSocksConfig();
-    }
-
-    private void saveSocksConfig() {
-        if (txt_socksIp.getText().contains(":")) {
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put(SOCKS_IP, getSocksHost());
-            jsonObject.put(SOCKS_PORT, getSocksPort());
-            Cacher.put(SOCKS_CACHE_KEY, jsonObject);
-        }
-        else {
-            Cacher.remove(SOCKS_CACHE_KEY);
-        }
     }
 
     private void updateAdvancedUI() {
@@ -158,7 +108,6 @@ public class ExtraController extends SubForm implements SocksConfiguration {
 
     @Override
     public boolean useSocks() {
-        saveSocksConfig();
         return cbx_useSocks.isSelected();
     }
 
@@ -265,7 +214,6 @@ public class ExtraController extends SubForm implements SocksConfiguration {
 
     private void setDevelopMode(boolean enabled) {
         cbx_develop.setSelected(enabled);
-        getHConnection().setDeveloperMode(enabled);
     }
 
     public void adminCbxClick(ActionEvent actionEvent) {

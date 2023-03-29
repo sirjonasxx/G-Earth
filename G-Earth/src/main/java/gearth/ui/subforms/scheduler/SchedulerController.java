@@ -7,9 +7,12 @@ import gearth.protocol.StateChangeListener;
 import gearth.protocol.connection.HState;
 import gearth.services.scheduler.Interval;
 import gearth.services.scheduler.Scheduler;
+import gearth.ui.GEarthProperties;
 import gearth.ui.translations.LanguageBundle;
 import gearth.ui.translations.TranslatableString;
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
+import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
@@ -88,8 +91,9 @@ public class SchedulerController extends SubForm {
     @Override
     protected void onParentSet() {
         scheduler = new Scheduler<>(getHConnection());
-        getHConnection().onDeveloperModeChange(developMode -> updateUI());
-        getHConnection().getStateObservable().addListener((oldState, newState) -> updateUI());
+        final InvalidationListener updateUI = observable -> Platform.runLater(this::updateUI);
+        GEarthProperties.enableDeveloperModeProperty.addListener(updateUI);
+        getHConnection().stateProperty().addListener(updateUI);
         updateUI();
     }
 

@@ -1,19 +1,19 @@
 package gearth.ui.subforms.connection;
 
 import gearth.GEarth;
-import gearth.misc.Cacher;
+import gearth.misc.BindingsUtil;
+import gearth.protocol.HConnection;
 import gearth.protocol.connection.HClient;
 import gearth.protocol.connection.HState;
 import gearth.protocol.connection.proxy.ProxyProviderFactory;
 import gearth.services.Constants;
+import gearth.ui.GEarthProperties;
 import gearth.ui.translations.TranslatableString;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.scene.control.*;
-import gearth.protocol.HConnection;
 import gearth.ui.SubForm;
 import javafx.scene.layout.GridPane;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -21,11 +21,6 @@ import java.util.List;
 import java.util.Set;
 
 public class ConnectionController extends SubForm {
-
-    private final String CONNECTION_INFO_CACHE_KEY = "last_connection_settings";
-    private final String AUTODETECT_CACHE = "auto_detect";
-    private final String HOST_CACHE = "host";
-    private final String PORT_CACHE = "port";
 
     public ComboBox<String> inpPort;
     public ComboBox<String> inpHost;
@@ -40,7 +35,6 @@ public class ConnectionController extends SubForm {
     private volatile int fullyInitialized = 0;
 
 
-    public static final String CLIENT_CACHE_KEY = "last_client_mode";
     public ToggleGroup tgl_clientMode;
     public RadioButton rd_unity;
     public RadioButton rd_flash;
@@ -59,38 +53,16 @@ public class ConnectionController extends SubForm {
             Constants.UNITY_PACKETS = rd_unity.isSelected();
         });
 
-        if (Cacher.getCacheContents().has(CLIENT_CACHE_KEY)) {
-            switch (Cacher.getCacheContents().getEnum(HClient.class, CLIENT_CACHE_KEY)) {
-                case FLASH:
-                    rd_flash.setSelected(true);
-                    break;
-                case UNITY:
-                    rd_unity.setSelected(true);
-                    break;
-                case NITRO:
-                    rd_nitro.setSelected(true);
-                    break;
-            }
-        }
+        GEarthProperties.clientTypeProperty
+                .addListener((observable, oldValue, newValue) -> selectClientType(newValue));
+        selectClientType(GEarthProperties.clientTypeProperty.getValue());
 
+        cbx_autodetect.selectedProperty().addListener(observable -> updateInputUI());
+        inpPort.getEditor().textProperty().addListener(observable -> updateInputUI());
 
-        Object object;
-        String hostRemember = null;
-        String portRemember = null;
-        if ((object = Cacher.get(CONNECTION_INFO_CACHE_KEY)) != null) {
-            JSONObject connectionSettings = (JSONObject) object;
-            boolean autoDetect = connectionSettings.getBoolean(AUTODETECT_CACHE);
-            hostRemember = connectionSettings.getString(HOST_CACHE);
-            portRemember = connectionSettings.getInt(PORT_CACHE) + "";
-            cbx_autodetect.setSelected(autoDetect);
-        }
-
-        inpPort.getEditor().textProperty().addListener(observable -> {
-            updateInputUI();
-        });
-        cbx_autodetect.selectedProperty().addListener(observable -> {
-            updateInputUI();
-        });
+        BindingsUtil.setAndBindBiDirectional(cbx_autodetect.selectedProperty(), GEarthProperties.autoDetectProperty);
+        BindingsUtil.setAndBindBiDirectional(outHost.textProperty(), GEarthProperties.hostProperty);
+        BindingsUtil.setAndBindBiDirectional(outPort.textProperty(), GEarthProperties.portProperty);
 
         List<String> knownHosts = ProxyProviderFactory.autoDetectHosts;
         Set<String> hosts = new HashSet<>();
@@ -110,6 +82,8 @@ public class ConnectionController extends SubForm {
 
         int hostSelectIndex = 0;
         int portSelectIndex = 0;
+        final String hostRemember = GEarthProperties.hostProperty.get();
+        final String portRemember = Integer.toString(GEarthProperties.portProperty.get());
         if (hostRemember != null) {
             hostSelectIndex = hostsSorted.indexOf(hostRemember);
             portSelectIndex = portsSorted.indexOf(portRemember);
@@ -138,15 +112,31 @@ public class ConnectionController extends SubForm {
         initLanguageBinding();
     }
 
+    private void selectClientType(HClient newValue) {
+        switch (newValue) {
+            case FLASH:
+                rd_flash.setSelected(true);
+                break;
+            case UNITY:
+                rd_unity.setSelected(true);
+                break;
+            case NITRO:
+                rd_nitro.setSelected(true);
+                break;
+        }
+    }
 
 
     private void updateInputUI() {
         if (parentController == null) return;
 
-        grd_clientSelection.setDisable(getHConnection().getState() != HState.NOT_CONNECTED);
-        txtfield_hotelversion.setText(getHConnection().getHotelVersion());
+        final HConnection hConnection = getHConnection();
+        final HState hConnectionState = hConnection.getState();
 
-        btnConnect.setDisable(getHConnection().getState() == HState.PREPARING || getHConnection().getState() == HState.ABORTING);
+        grd_clientSelection.setDisable(hConnectionState != HState.NOT_CONNECTED);
+        txtfield_hotelversion.setText(hConnection.getHotelVersion());
+
+        btnConnect.setDisable(hConnectionState == HState.PREPARING || hConnectionState == HState.ABORTING);
 
 
         if (!cbx_autodetect.isSelected() && !btnConnect.isDisable() && useFlash()) {
@@ -159,15 +149,15 @@ public class ConnectionController extends SubForm {
             }
         }
 
-        inpHost.setDisable(getHConnection().getState() != HState.NOT_CONNECTED || cbx_autodetect.isSelected());
-        inpPort.setDisable(getHConnection().getState() != HState.NOT_CONNECTED || cbx_autodetect.isSelected());
+        inpHost.setDisable(hConnectionState != HState.NOT_CONNECTED || cbx_autodetect.isSelected());
+        inpPort.setDisable(hConnectionState != HState.NOT_CONNECTED || cbx_autodetect.isSelected());
 
         cbx_autodetect.setDisable(!useFlash());
         outHost.setDisable(!useFlash());
         outPort.setDisable(!useFlash());
 
-        inpHost.setDisable(!useFlash() || getHConnection().getState() != HState.NOT_CONNECTED || cbx_autodetect.isSelected());
-        inpPort.setDisable(!useFlash() || getHConnection().getState() != HState.NOT_CONNECTED || cbx_autodetect.isSelected());
+        inpHost.setDisable(!useFlash() || hConnectionState != HState.NOT_CONNECTED || cbx_autodetect.isSelected());
+        inpPort.setDisable(!useFlash() || hConnectionState != HState.NOT_CONNECTED || cbx_autodetect.isSelected());
     }
 
     public void onParentSet(){
@@ -178,37 +168,28 @@ public class ConnectionController extends SubForm {
             }
         }
 
-        getHConnection().getStateObservable().addListener((oldState, newState) -> Platform.runLater(() -> {
+        getHConnection().stateProperty().addListener((observable, oldValue, newValue) -> Platform.runLater(() -> {
             updateInputUI();
-            if (newState == HState.NOT_CONNECTED) {
+            if (newValue == HState.NOT_CONNECTED) {
                 state.setKey(0, "tab.connection.state.notconnected");
                 connect.setKey(0, "tab.connection.button.connect");
                 outHost.setText("");
                 outPort.setText("");
             }
-            else if (oldState == HState.NOT_CONNECTED) {
+            else if (oldValue == HState.NOT_CONNECTED)
                 connect.setKey(0, "tab.connection.button.abort");
-            }
-
-            if (newState == HState.CONNECTED) {
+            if (newValue == HState.CONNECTED)
                 state.setKey(0, "tab.connection.state.connected");
-            }
-            if (newState == HState.WAITING_FOR_CLIENT) {
+            if (newValue == HState.WAITING_FOR_CLIENT)
                 state.setKey(0, "tab.connection.state.waiting");
+            if (newValue == HState.CONNECTED && useFlash()) {
+                final String host = getHConnection().getDomain();
+                final int port = getHConnection().getServerPort();
+                outHost.setText(host);
+                outPort.setText(Integer.toString(port));
+                GEarthProperties.hostProperty.set(host);
+                GEarthProperties.portProperty.set(port);
             }
-
-            if (newState == HState.CONNECTED && useFlash()) {
-                outHost.setText(getHConnection().getDomain());
-                outPort.setText(getHConnection().getServerPort()+"");
-
-                JSONObject connectionSettings = new JSONObject();
-                connectionSettings.put(AUTODETECT_CACHE, cbx_autodetect.isSelected());
-                connectionSettings.put(HOST_CACHE, inpHost.getEditor().getText());
-                connectionSettings.put(PORT_CACHE, Integer.parseInt(inpPort.getEditor().getText()));
-
-                Cacher.put(CONNECTION_INFO_CACHE_KEY, connectionSettings);
-            }
-
         }));
 
         Platform.runLater(this::updateInputUI);
@@ -234,9 +215,11 @@ public class ConnectionController extends SubForm {
                 String port = GEarth.getArgument("--port");
                 if (host != null && port != null) {
                     Platform.runLater(() -> {
-                        if (!inpHost.getItems().contains(host)) inpHost.getItems().add(host);
+                        if (!inpHost.getItems().contains(host))
+                            inpHost.getItems().add(host);
                         inpHost.getSelectionModel().select(host);
-                        if (!inpPort.getItems().contains(port)) inpPort.getItems().add(port);
+                        if (!inpPort.getItems().contains(port))
+                            inpPort.getItems().add(port);
                         inpPort.getSelectionModel().select(port);
                         cbx_autodetect.setSelected(false);
                     });
@@ -275,12 +258,9 @@ public class ConnectionController extends SubForm {
                 } else if (isClientMode(HClient.NITRO)) {
                     getHConnection().startNitro();
                 }
-
-
-                if (HConnection.DEBUG) System.out.println("connecting");
+                if (GEarthProperties.isDebugModeEnabled())
+                    System.out.println("connecting");
             }).start();
-
-
         }
         else {
             getHConnection().abort();
@@ -289,13 +269,10 @@ public class ConnectionController extends SubForm {
 
     @Override
     protected void onExit() {
-        if (rd_flash.isSelected()) {
-            Cacher.put(CLIENT_CACHE_KEY, HClient.FLASH);
-        } else if (rd_unity.isSelected()) {
-            Cacher.put(CLIENT_CACHE_KEY, HClient.UNITY);
-        } else if (rd_nitro.isSelected()) {
-            Cacher.put(CLIENT_CACHE_KEY, HClient.NITRO);
-        }
+        GEarthProperties.clientTypeProperty.set(
+                rd_flash.isSelected() ? HClient.FLASH
+                        : rd_unity.isSelected() ? HClient.UNITY
+                        : HClient.NITRO);
         getHConnection().abort();
     }
 

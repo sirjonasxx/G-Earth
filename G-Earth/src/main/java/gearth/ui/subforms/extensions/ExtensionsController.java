@@ -8,6 +8,7 @@ import gearth.services.extension_handler.extensions.implementations.network.exec
 import gearth.services.extension_handler.extensions.implementations.network.executer.ExtensionRunner;
 import gearth.services.extension_handler.extensions.implementations.network.executer.ExtensionRunnerFactory;
 import gearth.services.g_python.GPythonShell;
+import gearth.ui.GEarthProperties;
 import gearth.ui.SubForm;
 import gearth.ui.subforms.extensions.logger.ExtensionLogger;
 import gearth.ui.translations.LanguageBundle;
@@ -48,6 +49,8 @@ public class ExtensionsController extends SubForm {
         scroller.widthProperty().addListener(observable -> header_ext.setPrefWidth(scroller.getWidth()));
         extensionLogger = new ExtensionLogger();
 
+        btn_install.disableProperty().bind(GEarthProperties.enableDeveloperModeProperty.not());
+
         initLanguageBinding();
     }
 
@@ -79,8 +82,6 @@ public class ExtensionsController extends SubForm {
                 extensionLogger.log(text);
             }
         }));
-
-        getHConnection().onDeveloperModeChange(this::setLocalInstallingEnabled);
     }
 
 

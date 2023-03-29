@@ -2,19 +2,14 @@ package gearth.extensions;
 
 import gearth.misc.HostInfo;
 import gearth.misc.listenerpattern.Observable;
-import gearth.misc.listenerpattern.ObservableObject;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 import gearth.services.packet_info.PacketInfo;
 import gearth.services.packet_info.PacketInfoManager;
 import javafx.beans.property.ObjectProperty;
-import org.reactfx.util.Lists;
+import javafx.beans.property.SimpleObjectProperty;
 
 import java.util.*;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.stream.Stream;
 
 public abstract class ExtensionBase extends IExtension {
 
@@ -33,10 +28,11 @@ public abstract class ExtensionBase extends IExtension {
 
 
     volatile PacketInfoManager packetInfoManager = PacketInfoManager.EMPTY;
-    ObservableObject<HostInfo> observableHostInfo = new ObservableObject<>(null);
+
+    ObjectProperty<HostInfo> hostInfoProperty = new SimpleObjectProperty<>();
 
     void updateHostInfo(HostInfo hostInfo) {
-        observableHostInfo.setObject(hostInfo);
+        hostInfoProperty.set(hostInfo);
     }
 
     /**
@@ -67,7 +63,7 @@ public abstract class ExtensionBase extends IExtension {
      * @param messageListener the callback
      */
     public void intercept(HMessage.Direction direction, String hashOrName, MessageListener messageListener) {
-        Map<String, List<MessageListener>> listeners =
+        final Map<String, List<MessageListener>> listeners =
                 direction == HMessage.Direction.TOCLIENT ?
                         hashOrNameIncomingListeners :
                         hashOrNameOutgoingListeners;
@@ -197,6 +193,6 @@ public abstract class ExtensionBase extends IExtension {
     }
 
     public HostInfo getHostInfo() {
-        return observableHostInfo.getObject();
+        return hostInfoProperty.get();
     }
 }

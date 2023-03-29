@@ -7,6 +7,7 @@ import gearth.protocol.connection.proxy.ProxyProviderFactory;
 import gearth.protocol.connection.proxy.SocksConfiguration;
 import gearth.protocol.hostreplacer.ipmapping.IpMapper;
 import gearth.protocol.hostreplacer.ipmapping.IpMapperFactory;
+import gearth.ui.GEarthProperties;
 
 import java.io.IOException;
 import java.net.*;
@@ -54,7 +55,7 @@ public class LinuxRawIpFlashProxyProvider extends FlashProxyProvider {
 
                 maybeAddMapping();
 
-                if (HConnection.DEBUG) System.out.println("Added mapping for raw IP");
+                if (GEarthProperties.isDebugModeEnabled()) System.out.println("Added mapping for raw IP");
 
                 ServerSocket proxy_server = new ServerSocket(proxy.getIntercept_port(), 10, InetAddress.getByName(proxy.getIntercept_host()));
                 proxy.initProxy(proxy_server);
@@ -62,10 +63,10 @@ public class LinuxRawIpFlashProxyProvider extends FlashProxyProvider {
                 stateSetter.setState(HState.WAITING_FOR_CLIENT);
                 while ((hConnection.getState() == HState.WAITING_FOR_CLIENT) && !proxy_server.isClosed())	{
                     try {
-                        if (HConnection.DEBUG) System.out.println("try accept proxy");
+                        if (GEarthProperties.isDebugModeEnabled()) System.out.println("try accept proxy");
                         Socket client = proxy_server.accept();
 
-                        if (HConnection.DEBUG) System.out.println("accepted a proxy");
+                        if (GEarthProperties.isDebugModeEnabled()) System.out.println("accepted a proxy");
 
                         new Thread(() -> {
                             try {
@@ -151,7 +152,7 @@ public class LinuxRawIpFlashProxyProvider extends FlashProxyProvider {
             createSocksProxyThread(client);
         }
         else if (preConnectedServerConnections.isEmpty()) {
-            if (HConnection.DEBUG) System.out.println("pre-made server connections ran out of stock");
+            if (GEarthProperties.isDebugModeEnabled()) System.out.println("pre-made server connections ran out of stock");
         }
         else {
             startProxyThread(client, preConnectedServerConnections.poll(), proxy);

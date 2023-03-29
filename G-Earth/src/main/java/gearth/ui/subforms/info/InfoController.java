@@ -1,23 +1,26 @@
 package gearth.ui.subforms.info;
 
 import gearth.GEarth;
+import gearth.ui.GEarthProperties;
 import gearth.ui.titlebar.TitleBarController;
 import gearth.ui.translations.LanguageBundle;
 import gearth.ui.translations.TranslatableString;
 import javafx.event.ActionEvent;
+import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import gearth.ui.SubForm;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
-import javafx.scene.web.WebView;
 
 import java.io.IOException;
+import java.net.URL;
+import java.util.ResourceBundle;
 
 /**
  * Created by Jonas on 06/04/18.
  */
-public class InfoController extends SubForm {
+public class InfoController extends SubForm implements Initializable {
     public ImageView img_logo;
     public Hyperlink link_darkbox;
     public Hyperlink link_g_gearth;
@@ -38,7 +41,12 @@ public class InfoController extends SubForm {
         });
     }
 
-    public void initialize() {
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+
+        img_logo.imageProperty().bind(GEarthProperties.logoImageBinding);
+        version.textProperty().bind(GEarthProperties.themeTitleBinding);
+
         link_darkbox.setTooltip(new Tooltip("https://darkbox.nl"));
         link_d_gearth.setTooltip(new Tooltip("https://discord.gg/AVkcF8y"));
         link_g_gearth.setTooltip(new Tooltip("https://github.com/sirjonasxx/G-Earth"));
@@ -87,4 +95,5 @@ public class InfoController extends SubForm {
 
         btn_donate.textProperty().bind(new TranslatableString("%s", "tab.info.donate"));
     }
+
 }

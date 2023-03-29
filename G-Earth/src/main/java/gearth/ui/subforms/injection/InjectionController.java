@@ -4,10 +4,14 @@ import gearth.misc.Cacher;
 import gearth.protocol.HConnection;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
+import gearth.ui.GEarthProperties;
 import gearth.ui.SubForm;
 import gearth.ui.translations.LanguageBundle;
 import gearth.ui.translations.TranslatableString;
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
+import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseButton;
@@ -38,10 +42,10 @@ public class InjectionController extends SubForm {
     private TranslatableString corruption, pcktInfo;
 
     protected void onParentSet() {
-        getHConnection().onDeveloperModeChange(developMode -> updateUI());
-        getHConnection().getStateObservable().addListener((oldState, newState) -> Platform.runLater(this::updateUI));
-
-        inputPacket.textProperty().addListener(event -> Platform.runLater(this::updateUI));
+        final InvalidationListener updateUI = observable -> Platform.runLater(this::updateUI);
+        GEarthProperties.enableDeveloperModeProperty.addListener(updateUI);
+        getHConnection().stateProperty().addListener(updateUI);
+        inputPacket.textProperty().addListener(updateUI);
     }
 
     public void initialize() {

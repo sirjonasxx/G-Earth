@@ -10,15 +10,14 @@ import gearth.protocol.memory.Rc4Obtainer;
 import gearth.protocol.packethandler.flash.IncomingFlashPacketHandler;
 import gearth.protocol.packethandler.flash.OutgoingFlashPacketHandler;
 import gearth.protocol.packethandler.flash.FlashPacketHandler;
+import gearth.ui.GEarthProperties;
 import gearth.ui.titlebar.TitleBarController;
 import gearth.ui.translations.LanguageBundle;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
 import javafx.scene.layout.Region;
-import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -47,7 +46,7 @@ public abstract class FlashProxyProvider implements ProxyProvider {
         client.setSoTimeout(0);
         server.setSoTimeout(0);
 
-        if (HConnection.DEBUG) System.out.println(server.getLocalAddress().getHostAddress() + ": " + server.getLocalPort());
+        if (GEarthProperties.isDebugModeEnabled()) System.out.println(server.getLocalAddress().getHostAddress() + ": " + server.getLocalPort());
         Rc4Obtainer rc4Obtainer = new Rc4Obtainer(hConnection);
 
         OutgoingFlashPacketHandler outgoingHandler = new OutgoingFlashPacketHandler(server.getOutputStream(), hConnection.getTrafficObservables(), hConnection.getExtensionHandler());
@@ -73,7 +72,7 @@ public abstract class FlashProxyProvider implements ProxyProvider {
         try	{
             if (!server.isClosed()) server.close();
             if (!client.isClosed()) client.close();
-            if (HConnection.DEBUG) System.out.println("STOP");
+            if (GEarthProperties.isDebugModeEnabled()) System.out.println("STOP");
             if (datastream[0]) {
                 onConnectEnd();
             };
