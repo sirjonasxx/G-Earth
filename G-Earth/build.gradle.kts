@@ -12,18 +12,25 @@ plugins {
 description = "G-Earth"
 
 repositories {
+    mavenLocal()
     mavenCentral()
-    maven("https://jitpack.io")
+//    maven("https://jitpack.io")
 }
 
 /**
  * TODO: move dependency version declarations to different gradle file
  */
 dependencies {
-    implementation("com.github.dorving:G-Wasm:minimal-SNAPSHOT")
+    implementation(project(":G-Wasm"))
+//    implementation("com.github.dorving:G-Wasm:minimal-SNAPSHOT")
     implementation("at.favre.lib:bytes:1.5.0")
-    implementation("com.github.tulskiy:jkeymaster:1.3")
-    implementation("com.github.ganskef:littleproxy-mitm:1.1.0")
+    implementation("com.github.tulskiy:jkeymaster:1.3") {
+        exclude("org.slf4j", "slf4j-api")
+    }
+    implementation("com.github.ganskef:littleproxy-mitm:1.1.0") {
+        exclude("org.slf4j", "slf4j-api")
+        exclude("org.slf4j", "slf4j-log4j12")
+    }
     implementation("commons-io:commons-io:2.10.0")
     implementation("javax.websocket:javax.websocket-api:1.1")
     implementation("org.apache.maven:maven-artifact:3.6.3")
@@ -31,12 +38,15 @@ dependencies {
     implementation("org.eclipse.jetty.websocket:javax-websocket-server-impl:9.4.43.v20210629")   {
         exclude("javax.websocket", "javax.websocket-client-api")
     }
+    implementation("com.dustinredmond.fxtrayicon:FXTrayIcon:4.0.1")
     implementation("org.eclipse.jetty:jetty-http:9.4.43.v20210629")
     implementation("org.fxmisc.richtext:richtextfx:0.10.5")
     implementation("org.json:json:20190722")
     implementation("org.jsoup:jsoup:1.14.2")
-    implementation("org.slf4j:slf4j-jdk14:2.0.0-alpha0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.3")
+//    implementation("org.slf4j:slf4j-jdk14:2.0.0-alpha0")
+    implementation("ch.qos.logback:logback-core:1.3.5")
+    implementation("ch.qos.logback:logback-classic:1.3.5")
 }
 
 java {
@@ -74,11 +84,14 @@ tasks.getByName("assemble") {
 }
 
 publishing {
+    repositories {
+        maven("/Users/stanvanderbend/.m2/repository")
+    }
     publications {
         create<MavenPublication>("maven") {
             groupId = "karth.gearth"
             artifactId = "gearth"
-            version = "1.5.2"
+            version = "1.5.3"
             from(components["java"])
         }
     }

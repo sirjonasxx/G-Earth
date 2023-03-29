@@ -6,3 +6,4 @@
 
 rootProject.name = "G-Earth-Parent"
 include(":G-Earth")
+include(":G-Wasm")
