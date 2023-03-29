@@ -25,7 +25,7 @@ public class MacOSHabboClient extends HabboClient {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MacOSHabboClient.class);
 
-    private static final String G_MEM_EXECUTABLE_FILE_NAME = "/g_mem_mac";
+    private static final String G_MEM_EXECUTABLE_FILE_NAME = "/G-Mem";
 
     /**
      * The header id (opcode) of the packet that contains the value for the {@link #production} field.

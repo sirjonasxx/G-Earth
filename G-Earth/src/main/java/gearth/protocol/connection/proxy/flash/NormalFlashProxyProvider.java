@@ -9,10 +9,8 @@ import gearth.protocol.hostreplacer.hostsfile.HostReplacer;
 import gearth.protocol.hostreplacer.hostsfile.HostReplacerFactory;
 import gearth.protocol.portchecker.PortChecker;
 import gearth.protocol.portchecker.PortCheckerFactory;
-import gearth.ui.titlebar.TitleBarController;
-import javafx.application.Platform;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
+import gearth.ui.alert.AlertUtil;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.net.*;
@@ -21,16 +19,14 @@ import java.util.List;
 
 public class NormalFlashProxyProvider extends FlashProxyProvider {
 
-    private List<String> potentialHosts;
-
+    private final List<String> potentialHosts;
     private static final HostReplacer hostsReplacer = HostReplacerFactory.get();
     private volatile boolean hostRedirected = false;
 
-    private volatile List<HProxy> potentialProxies = new ArrayList<>();
+    private final List<HProxy> potentialProxies = new ArrayList<>();
     private volatile HProxy proxy = null;
 
-    private boolean useSocks;
-
+    private final boolean useSocks;
 
     public NormalFlashProxyProvider(HProxySetter proxySetter, HStateSetter stateSetter, HConnection hConnection, List<String> potentialHosts, boolean useSocks) {
         super(proxySetter, stateSetter, hConnection);
@@ -38,13 +34,12 @@ public class NormalFlashProxyProvider extends FlashProxyProvider {
         this.useSocks = useSocks;
     }
 
-
     @Override
     public void start() throws IOException {
         if (hConnection.getState() != HState.NOT_CONNECTED) {
             return;
         }
-
+        logger.debug("Starting...");
         prepare();
         addToHosts();
         launchProxy();
@@ -53,7 +48,7 @@ public class NormalFlashProxyProvider extends FlashProxyProvider {
 
     private void prepare() {
         stateSetter.setState(HState.PREPARING);
-
+        logger.debug("Preparing with {} potential hosts", potentialHosts);
         List<String> willremove = new ArrayList<>();
         int c = 0;
         for (String host : potentialHosts) {
@@ -94,44 +89,27 @@ public class NormalFlashProxyProvider extends FlashProxyProvider {
     private void launchProxy() throws IOException {
         stateSetter.setState(HState.WAITING_FOR_CLIENT);
 
-        for (int c = 0; c < potentialProxies.size(); c++) {
-            HProxy potentialProxy = potentialProxies.get(c);
+        logger.debug("Waiting for clients, potentialProxies={}", potentialProxies);
+        for (HProxy potentialProxy : potentialProxies) {
 
-            ServerSocket proxy_server;
-            try {
-                proxy_server = new ServerSocket(potentialProxy.getIntercept_port(), 10, InetAddress.getByName(potentialProxy.getIntercept_host()));
-            } catch (BindException e) {
-                PortChecker portChecker = PortCheckerFactory.getPortChecker();
-                String processName = portChecker.getProcessUsingPort(potentialProxy.getIntercept_port());
-                Platform.runLater(() -> {
-                    Alert a = new Alert(Alert.AlertType.ERROR, "The port is in use by " + processName,
-                            ButtonType.OK);
-                    try {
-                        TitleBarController.create(a).showAlertAndWait();
-                    } catch (IOException ex) {
-                        logger.error("Failed to create port in use error alert", ex);
-                    }
-                });
-                throw new IOException(e);
-            }
-            potentialProxy.initProxy(proxy_server);
+            final ServerSocket proxyServer = createProxyServer(potentialProxy);
+            potentialProxy.initProxy(proxyServer);
 
-            new Thread(() -> {
-                try  {
+            final Thread thread = new Thread(() -> {
+                try {
                     Thread.sleep(30);
-                    while ((hConnection.getState() == HState.WAITING_FOR_CLIENT) && !proxy_server.isClosed())	{
+                    while ((hConnection.getState() == HState.WAITING_FOR_CLIENT) && !proxyServer.isClosed()) {
                         try {
-                            Socket client = proxy_server.accept();
+                            Socket client = proxyServer.accept();
                             proxy = potentialProxy;
                             closeAllProxies(proxy);
-                            logger.debug("Accepted proxy {}, starting proxy thread (useSocks={})",proxy, useSocks);
+                            logger.debug("Accepted proxy {}, starting proxy thread (useSocks={})", proxy, useSocks);
                             new Thread(() -> {
                                 try {
                                     Socket server;
                                     if (!useSocks) {
-                                         server = new Socket(proxy.getActual_domain(), proxy.getActual_port());
-                                    }
-                                    else {
+                                        server = new Socket(proxy.getActual_domain(), proxy.getActual_port());
+                                    } else {
                                         SocksConfiguration configuration = ProxyProviderFactory.getSocksConfig();
                                         if (configuration == null) {
                                             showInvalidConnectionError();
@@ -148,30 +126,49 @@ public class NormalFlashProxyProvider extends FlashProxyProvider {
                                     showInvalidConnectionError();
                                     abort();
                                     logger.error("Failed to configure SOCKS proxy", e);
-                                }
-                                catch (InterruptedException | IOException e) {
+                                } catch (InterruptedException | IOException e) {
                                     logger.error("An unexpected exception occurred", e);
                                 }
                             }).start();
-                        } catch (IOException e1) {
-                            logger.error("An unexpected exception occurred", e1);
+                        } catch (SocketException exception) {
+                            logger.error("An unexpected exception occurred: {}", exception.getLocalizedMessage());
+
+                        } catch (IOException exception) {
+                            logger.error("An unexpected exception occurred", exception);
                         }
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    logger.error("An unexpected error occurred", e);
+                } finally {
+                    logger.debug("Stopped");
                 }
-            }).start();
+            });
+            thread.setName("ProxyServerThread ("+ potentialProxy.getInput_domain()+") -> ("+potentialProxy.getActual_domain()+")");
+            thread.start();
         }
-        logger.debug("Done waiting for clients with connection state {}", hConnection.getState());
+    }
+
+    @NotNull
+    private static ServerSocket createProxyServer(HProxy potentialProxy) throws IOException {
+        final ServerSocket proxy_server;
+        try {
+            proxy_server = new ServerSocket(potentialProxy.getIntercept_port(), 10, InetAddress.getByName(potentialProxy.getIntercept_host()));
+        } catch (BindException e) {
+            final PortChecker portChecker = PortCheckerFactory.getPortChecker();
+            final String processName = portChecker.getProcessUsingPort(potentialProxy.getIntercept_port());
+            AlertUtil.showAlertAndWait("The port is in use by " + processName);
+            throw new IOException(e);
+        }
+        return proxy_server;
     }
 
     @Override
     public void abort() {
         stateSetter.setState(HState.ABORTING);
+        logger.debug("Aborting... hostRedirected={}", hostRedirected);
         if (hostRedirected)	{
             removeFromHosts();
         }
-
         clearAllProxies();
         super.abort();
     }
@@ -197,15 +194,10 @@ public class NormalFlashProxyProvider extends FlashProxyProvider {
         hostRedirected = true;
     }
     private void removeFromHosts(){
-        List<String> linesTemp = new ArrayList<>();
-        for (HProxy proxy : potentialProxies) {
-            linesTemp.add(proxy.getIntercept_host() + " " + proxy.getInput_domain());
-        }
-
-        String[] lines = new String[linesTemp.size()];
-        for (int i = 0; i < linesTemp.size(); i++) {
-            lines[i] = linesTemp.get(i);
-        }
+        final String[] lines = potentialProxies.stream()
+                .map(proxy -> proxy.getIntercept_host() + " " + proxy.getInput_domain())
+                .toArray(String[]::new);
+        logger.debug("Removing {} lines from hosts file (lines={})", lines.length, lines);
         hostsReplacer.removeRedirect(lines);
         hostRedirected = false;
     }

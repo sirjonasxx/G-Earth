@@ -37,6 +37,7 @@ public class StoreExtensionTools {
     public final static String EXTENSIONS_PATH = Paths.get(NormalExtensionRunner.JAR_PATH, ExecutionInfo.EXTENSIONS_DIRECTORY).toString();
 
 
+
     public static void executeExtension(String extensionPath, int port) {
         try {
             String installedExtensionId = Paths.get(extensionPath).getFileName().toString();
@@ -242,27 +243,28 @@ public class StoreExtensionTools {
     }
 
     public static void main(String[] args) {
-        StoreFetch.fetch(GEarth.version, new StoreFetch.StoreFetchListener() {
-            @Override
-            public void success(StoreRepository storeRepository) {
-                installExtension("G-BuildTools", storeRepository, new InstallExtListener() {
-                    @Override
-                    public void success(String installationFolder) {
-                        System.out.println(String.format("Installed in: %s", installationFolder));
-                    }
-
-                    @Override
-                    public void fail(String reason) {
-                        System.out.println(reason);
-                    }
-                });
-            }
-
-            @Override
-            public void fail(String reason) {
-                System.out.println("failed fetching repository");
-            }
-        });
+        System.out.println(EXTENSIONS_PATH);
+//        StoreFetch.fetch(GEarth.version, new StoreFetch.StoreFetchListener() {
+//            @Override
+//            public void success(StoreRepository storeRepository) {
+//                installExtension("G-BuildTools", storeRepository, new InstallExtListener() {
+//                    @Override
+//                    public void success(String installationFolder) {
+//                        System.out.println(String.format("Installed in: %s", installationFolder));
+//                    }
+//
+//                    @Override
+//                    public void fail(String reason) {
+//                        System.out.println(reason);
+//                    }
+//                });
+//            }
+//
+//            @Override
+//            public void fail(String reason) {
+//                System.out.println("failed fetching repository");
+//            }
+//        });
     }
 
 
