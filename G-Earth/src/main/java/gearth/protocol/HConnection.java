@@ -13,14 +13,18 @@ import gearth.protocol.connection.proxy.ProxyProviderFactory;
 import gearth.protocol.connection.proxy.flash.unix.LinuxRawIpFlashProxyProvider;
 import gearth.protocol.connection.proxy.unity.UnityProxyProvider;
 import gearth.services.extension_handler.ExtensionHandler;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.util.function.Consumer;
 
 public class HConnection {
 
+    private final static Logger LOGGER = LoggerFactory.getLogger(HConnection.class);
+
     public static volatile boolean DECRYPTPACKETS = true;
-    public static volatile boolean DEBUG = false;
+    public static volatile boolean DEBUG = true;
 
     private volatile ExtensionHandler extensionHandler = null;
 
@@ -31,19 +35,17 @@ public class HConnection {
     private volatile HState state = HState.NOT_CONNECTED;
     private volatile HProxy proxy = null;
 
-    private ProxyProviderFactory proxyProviderFactory;
+    private final ProxyProviderFactory proxyProviderFactory;
     private ProxyProvider proxyProvider = null;
 
     private volatile boolean developerMode = false;
 
     public HConnection() {
-        HConnection selff = this;
         proxyProviderFactory = new ProxyProviderFactory(
-                proxy -> selff.proxy = proxy,
-                selff::setState,
+                providedProxy -> proxy = providedProxy,
+                this::setState,
                 this
         );
-
         PacketSafetyManager.PACKET_SAFETY_MANAGER.initialize(this);
     }
 
@@ -53,6 +55,7 @@ public class HConnection {
 
     private void setState(HState state) {
         if (state != this.state) {
+            LOGGER.debug("Changed state to {}", state);
             HState buffer = this.state;
             this.state = state;
             stateObservable.fireEvent(l -> l.stateChanged(buffer, state));
@@ -62,6 +65,7 @@ public class HConnection {
     // autodetect mode
     public void start() {
         proxyProvider = proxyProviderFactory.provide();
+        LOGGER.debug("Created proxy provider {}",proxyProvider);
         startMITM();
     }
 
@@ -254,5 +258,13 @@ public class HConnection {
 
     public ProxyProvider getProxyProvider() {
         return proxyProvider;
+    }
+
+    @Override
+    public String toString() {
+        return "HConnection{" +
+                "state=" + state +
+                ", proxy=" + proxy +
+                '}';
     }
 }

@@ -11,7 +11,6 @@ import gearth.services.internal_extensions.extensionstore.repository.querying.Ex
 import gearth.ui.translations.LanguageBundle;
 import netscape.javascript.JSObject;
 
-import java.util.Arrays;
 import java.util.Collections;
 
 public class CategoryItem implements ContentItem {
@@ -28,7 +27,7 @@ public class CategoryItem implements ContentItem {
                 new CategorizedOverview(
                         gExtensionStore.getController().getCurrentOverview(),
                         0,
-                        GExtensionStore.PAGESIZE,
+                        GExtensionStore.MAX_PAGES,
                         gExtensionStore.getRepository(),
                         category
                 )

@@ -2,27 +2,28 @@ package gearth.protocol.connection.proxy;
 
 import gearth.misc.Cacher;
 import gearth.misc.OSValidator;
+import gearth.misc.StreamGobbler;
 import gearth.protocol.HConnection;
 import gearth.protocol.connection.HProxySetter;
 import gearth.protocol.connection.HStateSetter;
 import gearth.protocol.connection.proxy.flash.NormalFlashProxyProvider;
 import gearth.protocol.connection.proxy.flash.unix.LinuxRawIpFlashProxyProvider;
 import gearth.protocol.connection.proxy.flash.windows.WindowsRawIpFlashProxyProvider;
-import gearth.ui.titlebar.TitleBarController;
+import gearth.ui.alert.AlertUtil;
 import gearth.ui.translations.LanguageBundle;
-import javafx.application.Platform;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
+import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
 import javafx.scene.layout.Region;
-import javafx.stage.Stage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ProxyProviderFactory {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProxyProviderFactory.class);
 
     public static final String HOTELS_CACHE_KEY = "hotelsConnectionInfo";
     private static SocksConfiguration socksConfig = null;
@@ -52,11 +53,24 @@ public class ProxyProviderFactory {
 
         if (OSValidator.isMac()) {
             for (int i = 2; i <= autoDetectHosts.size() + 5; i++) {
-                ProcessBuilder allowLocalHost = new ProcessBuilder("ifconfig", "lo0", "alias", ("127.0.0." + i), "up");
+                final String alias = ("127.0.0." + i);
+                final String processName = "Process for lo0 with alias "+alias;
+                final ProcessBuilder pb = new ProcessBuilder("ifconfig", "lo0", "alias", alias, "up");
                 try {
-                    allowLocalHost.start();
-                } catch (IOException e) {
-                    e.printStackTrace();
+                    LOGGER.debug("Launching process with command {}", pb.command());
+                    final Process process = pb.start();
+
+                    final Logger logger = LoggerFactory.getLogger(processName);
+                    final StreamGobbler outputGobbler = new StreamGobbler(process.getInputStream(), logger::debug);
+                    final StreamGobbler errorGobbler = new StreamGobbler(process.getErrorStream(), logger::error);
+
+                    new Thread(outputGobbler).start();
+                    new Thread(errorGobbler).start();
+                    process.waitFor();
+
+                    LOGGER.debug("Finished process {}", process);
+                } catch (IOException | InterruptedException e) {
+                    LOGGER.error("Exception occurred for {}", processName, e);
                 }
             }
         }
@@ -106,18 +120,12 @@ public class ProxyProviderFactory {
                     return new WindowsRawIpFlashProxyProvider(proxySetter, stateSetter, hConnection, domain, port, true);
                 }
 
-                Platform.runLater(() -> {
-                    Alert alert = new Alert(Alert.AlertType.ERROR, "", ButtonType.OK);
-                    alert.getDialogPane().getChildren().add(new Label(LanguageBundle.get("alert.alreadyconnected.content").replaceAll("\\\\n", System.lineSeparator())));
-                    alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
-                    alert.setResizable(false);
-                    try {
-                        TitleBarController.create(alert).showAlert();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                AlertUtil.showAlert(alert -> {
+                    final DialogPane dialogPane = alert.getDialogPane();
+                    dialogPane.setMinHeight(Region.USE_PREF_SIZE);
+                    dialogPane.getChildren()
+                            .add(new Label(LanguageBundle.get("alert.alreadyconnected.content").replaceAll("\\\\n", System.lineSeparator())));
                 });
-
                 return null;
             }
             else if (OSValidator.isUnix() || OSValidator.isMac()) {
@@ -132,6 +140,7 @@ public class ProxyProviderFactory {
             return provide(potentialHost);
         }
     }
+
     private ProxyProvider provide(List<String> potentialHosts) {
         return new NormalFlashProxyProvider(proxySetter, stateSetter, hConnection, potentialHosts, socksConfig.useSocks() && !socksConfig.onlyUseIfNeeded());
     }

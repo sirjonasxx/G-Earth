@@ -3,7 +3,6 @@ package gearth.services.internal_extensions.extensionstore.application.entities.
 import gearth.services.internal_extensions.extensionstore.GExtensionStore;
 import gearth.services.internal_extensions.extensionstore.application.entities.ContentItem;
 import gearth.services.internal_extensions.extensionstore.application.entities.HOverview;
-import gearth.services.internal_extensions.extensionstore.application.entities.extensiondetails.StoreExtensionDetailsOverview;
 import gearth.services.internal_extensions.extensionstore.application.entities.queriedoverviews.SearchedQueryOverview;
 import gearth.services.internal_extensions.extensionstore.repository.StoreRepository;
 import gearth.ui.translations.LanguageBundle;
@@ -52,7 +51,7 @@ public class SearchOverview extends HOverview {
                 new SearchedQueryOverview(
                         gExtensionStore.getController().getCurrentOverview(),
                         0,
-                        GExtensionStore.PAGESIZE,
+                        GExtensionStore.MAX_PAGES,
                         storeRepository,
                         searchComponent.getSearchKeyword(),
                         searchComponent.getOrdering(),
