@@ -1,10 +1,9 @@
 package gearth.extensions.parsers;
 
+import gearth.extensions.parsers.stuffdata.IStuffData;
 import gearth.protocol.HPacket;
 
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class HFloorItem implements IFurni {
     private int id;
@@ -12,17 +11,15 @@ public class HFloorItem implements IFurni {
     private HPoint tile;
     private HDirection facing;
 
-    private int category;
-
     private int secondsToExpiration;
     private int usagePolicy;
     private int ownerId;
     private String ownerName;
-    private Object[] stuff;
+    private IStuffData stuff;
 
-    private String ignore1;
-    private Integer ignore2;
-    private String ignore3;
+    private String sizeZ;
+    private Integer extra;
+    private String staticClass;
 
     public HFloorItem(HPacket packet) {
         id = packet.readInteger();
@@ -34,12 +31,10 @@ public class HFloorItem implements IFurni {
 
         tile = new HPoint(x, y, Double.parseDouble(packet.readString()));
 
-        ignore1 = packet.readString();
-        ignore2 = packet.readInteger();
+        sizeZ = packet.readString();
+        extra = packet.readInteger();
 
-        category = packet.readInteger();
-
-        stuff = HStuff.readData(packet, category);
+        stuff = IStuffData.read(packet);
 
         secondsToExpiration = packet.readInteger();
         usagePolicy = packet.readInteger();
@@ -47,13 +42,11 @@ public class HFloorItem implements IFurni {
         ownerId = packet.readInteger();
 
         if (typeId < 0) {
-            ignore3 = packet.readString();
+            staticClass = packet.readString();
         }
         else {
-            ignore3 = null;
+            staticClass = null;
         }
-
-
     }
 
     public void appendToPacket(HPacket packet) {
@@ -76,20 +69,14 @@ public class HFloorItem implements IFurni {
         packet.appendString(tile.getZ() + "");
 
 
-//            ignore1 = packet.readString();
-        packet.appendString(ignore1);
+//            sizeZ = packet.readString();
+        packet.appendString(sizeZ);
 
-//            ignore2 = packet.readInteger();
-        packet.appendInt(ignore2);
+//            extra = packet.readInteger();
+        packet.appendInt(extra);
 
-//            category = packet.readInteger();
-        packet.appendInt(category);
-
-
-//            stuff = HStuff.readData(packet, category);
-        for (Object object : stuff) {
-            packet.appendObject(object);
-        }
+//            stuff = IStuffData.read(packet);
+        stuff.appendToPacket(packet);
 
 //            secondsToExpiration = packet.readInteger();
         packet.appendInt(secondsToExpiration);
@@ -102,8 +89,8 @@ public class HFloorItem implements IFurni {
 
 
         if (typeId < 0) {
-            // ignore3 = packet.readString();
-            packet.appendString(ignore3);
+            // staticClass = packet.readString();
+            packet.appendString(staticClass);
         }
     }
 
@@ -174,9 +161,9 @@ public class HFloorItem implements IFurni {
         return secondsToExpiration;
     }
 
-    public int getCategory() {
-        return category;
-    }
+//    public int getCategory() {
+//        return category;
+//    }
 
     public HDirection getFacing() {
         return facing;
@@ -186,7 +173,7 @@ public class HFloorItem implements IFurni {
         return tile;
     }
 
-    public Object[] getStuff() {
+    public IStuffData getStuff() {
         return stuff;
     }
 
@@ -210,9 +197,9 @@ public class HFloorItem implements IFurni {
         this.facing = facing;
     }
 
-    public void setCategory(int category) {
-        this.category = category;
-    }
+//    public void setCategory(int category) {
+//        this.category = category;
+//    }
 
     public void setSecondsToExpiration(int secondsToExpiration) {
         this.secondsToExpiration = secondsToExpiration;
@@ -226,7 +213,7 @@ public class HFloorItem implements IFurni {
         this.ownerId = ownerId;
     }
 
-    public void setStuff(Object[] stuff) {
+    public void setStuff(IStuffData stuff) {
         this.stuff = stuff;
     }
 }

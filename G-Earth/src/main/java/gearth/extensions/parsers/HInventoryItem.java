@@ -1,5 +1,6 @@
 package gearth.extensions.parsers;
 
+import gearth.extensions.parsers.stuffdata.IStuffData;
 import gearth.protocol.HPacket;
 
 public class HInventoryItem {
@@ -8,8 +9,7 @@ public class HInventoryItem {
     private int id;
     private int typeId;
     private HSpecialType specialType;
-    private int category;
-    private Object[] stuff;
+    private IStuffData stuff;
     private boolean recyclable;
     private boolean tradeable;
     private boolean groupable;
@@ -27,8 +27,7 @@ public class HInventoryItem {
         id = packet.readInteger();
         typeId = packet.readInteger();
         specialType = HSpecialType.fromId(packet.readInteger());
-        category = packet.readInteger();
-        stuff = HStuff.readData(packet, category);
+        stuff = IStuffData.read(packet);
         recyclable = packet.readBoolean();
         tradeable = packet.readBoolean();
         groupable = packet.readBoolean();
@@ -49,11 +48,7 @@ public class HInventoryItem {
         packet.appendInt(id);
         packet.appendInt(typeId);
         packet.appendInt(specialType.getId());
-        packet.appendInt(category);
-
-        for (Object object : stuff) {
-            packet.appendObject(object);
-        }
+        stuff.appendToPacket(packet);
 
         packet.appendBoolean(recyclable);
         packet.appendBoolean(tradeable);
@@ -133,19 +128,11 @@ public class HInventoryItem {
         this.typeId = typeId;
     }
 
-    public int getCategory() {
-        return category;
-    }
-
-    public void setCategory(int category) {
-        this.category = category;
-    }
-
-    public Object[] getStuff() {
+    public IStuffData getStuff() {
         return stuff;
     }
 
-    public void setStuff(Object[] stuff) {
+    public void setStuff(IStuffData stuff) {
         this.stuff = stuff;
     }
 
