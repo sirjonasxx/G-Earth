@@ -62,6 +62,7 @@ Depending on your machine you may have to disable SIP.
 ### :warning: CAUTION :warning:
 Turning off SIP allows any program with sudo privileges to modify memory contents of other processes. If you use pirated software, or other unverified apps, DO NOT DO THIS for your own safety! See the following stackoverflow post for some more info: https://apple.stackexchange.com/a/412281.
 
+A guide for disabling SIP can be found here: https://developer.apple.com/documentation/security/disabling_and_enabling_system_integrity_protection
 
 ## Launching G-Earth
 1. Open `Terminal` (press `⌘ + Enter`, type `Terminal` to open it from spotlight)
