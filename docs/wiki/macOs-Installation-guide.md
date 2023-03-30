@@ -21,7 +21,7 @@ There is a few steps u have to complete in order to get it to work on MacOS.
 
 ![Screenshot 2023-03-30 at 14 40 28](https://user-images.githubusercontent.com/102377087/228838867-57e465bc-5b83-4b1a-a8cc-3dd6d1e95353.png)
 
-5. Press `Continue` until you treach the `Specify a Location For The Certificate`, now do the following:
+5. Press `Continue` until you reach the `Specify a Location For The Certificate`, now do the following:
 * Set `Keychain:` to `System`
 
 ![Screenshot 2023-03-30 at 14 42 50](https://user-images.githubusercontent.com/102377087/228839468-982365d9-925c-44cf-a87d-fc6c268d05c8.png)
