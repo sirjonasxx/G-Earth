@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.DatagramSocket;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.util.List;
 import java.util.Optional;
@@ -40,12 +41,6 @@ public final class NetworkExtensionServer implements ExtensionProducer {
     private final static Logger LOGGER = LoggerFactory.getLogger(NetworkExtensionServer.class);
 
     /**
-     * Initial port server tries to listen at, if {@link ServerSocket} creation fails,
-     * it tries next port.
-     */
-    private static final int PORT_ONSET = 9092;
-
-    /**
      * The port at which the server is listening.
      */
     private int port = -1;
@@ -59,16 +54,11 @@ public final class NetworkExtensionServer implements ExtensionProducer {
                 .childOption(ChannelOption.TCP_NODELAY, true)
                 .group(new NioEventLoopGroup());
 
-        port = PORT_ONSET;
-        while (!available(port))
-            port++;
-        LOGGER.debug("Found open port {}, attempting to bind...", port);
-
-        final ChannelFuture channelFuture = bootstrap.bind(port).awaitUninterruptibly();
+        final ChannelFuture channelFuture = bootstrap.bind(0).awaitUninterruptibly();
         if (!channelFuture.isSuccess())
-            LOGGER.error("Failed to bind to port {}", port);
+            LOGGER.error("Failed to bind to a port");
         else
-            LOGGER.debug("Successfully bound to port {}", port);
+            this.port = ((InetSocketAddress) channelFuture.channel().localAddress()).getPort();
     }
 
     /**
@@ -78,40 +68,6 @@ public final class NetworkExtensionServer implements ExtensionProducer {
      */
     public int getPort() {
         return port;
-    }
-
-    /**
-     * Checks to see if a specific port is available.
-     *
-     * Taken from <a href="http://svn.apache.org/viewvc/camel/trunk/components/camel-test/src/main/java/org/apache/camel/test/AvailablePortFinder.java?view=markup#l130">http://svn.apache.org/viewvc/camel/trunk/components/camel-test/src/main/java/org/apache/camel/test/AvailablePortFinder.java?view=markup#l130</a>
-     *
-     * @param port the port to check for availability
-     */
-    private static boolean available(int port) {
-        ServerSocket ss = null;
-        DatagramSocket ds = null;
-        try {
-            ss = new ServerSocket(port);
-            ss.setReuseAddress(true);
-            ds = new DatagramSocket(port);
-            ds.setReuseAddress(true);
-            return true;
-        } catch (IOException ignored) {
-        } finally {
-            if (ds != null) {
-                ds.close();
-            }
-
-            if (ss != null) {
-                try {
-                    ss.close();
-                } catch (IOException e) {
-                    /* should not be thrown */
-                }
-            }
-        }
-
-        return false;
     }
 
     static class Initializer extends ChannelInitializer<SocketChannel> {
