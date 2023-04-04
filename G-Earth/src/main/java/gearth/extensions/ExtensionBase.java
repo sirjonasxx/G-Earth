@@ -169,7 +169,7 @@ public abstract class ExtensionBase extends IExtension {
      * The application got doubleclicked from the G-Earth interface. Doing something here is optional
      */
     @Override
-    public void onClick() {}
+    protected void onClick() {}
 
     @Override
     protected ExtensionInfo getInfoAnnotations() {
