@@ -31,7 +31,7 @@ There is a few steps u have to complete in order to get it to work on MacOS.
 ### Signing of G-Mem
 1. Open `Terminal` (press `⌘ + Enter`, type `Terminal` to open it from spotlight)
 2. Type `codesign -fs "gmem-cert" ` (do not press enter yet)
-3. Drag the `G-Mem` file into your terminal window (this will append the path to the file)
+3. Drag the `G-Mem` file into your terminal window *(this will append the path to the terminal)*
 
 Your terminal window should now resemble the following:
 
@@ -42,13 +42,13 @@ Your terminal window should now resemble the following:
 ### Making G-Mem executable
 1. Open `Terminal` (press `⌘ + Enter`, type `Terminal` to open it from spotlight)
 2. Type `chmod 755 ` (do not press enter yet)
-3. Drag the `G-Mem` file into your terminal window (this will append the path to the file)
+3. Drag the `G-Mem` file into your terminal window *(this will append the path to the terminal)*
 
 Your terminal window should now resemble the following:
 
 ![Screenshot 2023-03-30 at 14 52 29](https://user-images.githubusercontent.com/102377087/228841918-3205014b-5de8-431d-ae4d-d10b8ceeed03.png)
 
-4. Now press enter and verify the `Kind` of the `G-Mem` file is not `Unix Executable File`
+4. Now press enter and verify the `Kind` of the `G-Mem` file is now `Unix Executable File`
 
 ![Screenshot 2023-03-30 at 14 54 15](https://user-images.githubusercontent.com/102377087/228842389-78ea857e-3414-43d0-8270-91f8185ab57f.png)
 
@@ -67,7 +67,7 @@ A guide for disabling SIP can be found here: https://developer.apple.com/documen
 ## Launching G-Earth
 1. Open `Terminal` (press `⌘ + Enter`, type `Terminal` to open it from spotlight)
 2. Type `sudo java -jar `
-3. Drag the `G-Earth.jar` file into your terminal window (this will append the path to the file)
+3. Drag the `G-Earth.jar` file into your terminal window *(this will append the path to the terminal)*
 
 Your terminal window should now resemble the following:
 
