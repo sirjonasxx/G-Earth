@@ -77,6 +77,12 @@ Your terminal window should now resemble the following:
 
 ## Troubleshooting
 
+### 🚫 Apple can’t check app for malicious software
+In this case, you can grant an exception for a blocked app by clicking the `Open Anyway` button in Privacy & Security settings. 
+This button is available for about an hour after you try to open the app. Where it appears exactly depends on the OS version u are running,
+more details about it can be found here: https://support.apple.com/en-gb/guide/mac-help/mchleab3a043/mac
+
+### Other
 If you experience any other issues and the [Troubleshooting Page](https://github.com/sirjonasxx/G-Earth/wiki/Troubleshooting) doesn't help, 
 
 it might be useful to have a look at the following issues: [#67](../issues/67) [#10](../issues/10)
