@@ -114,10 +114,12 @@ public class UnityWebModifyer {
 
         contents = insertFrameworkCode(contents, 0, "js_code/unity_code.js");
 
+        // String exportSearch = "Module.asmLibraryArg,buffer);Module[\\\"asm\\\"]=asm;";
         String exportSearch = "Module[\"asm\"][\"Fj\"]).apply(null,arguments)};";
         int exportIndex = contents.indexOf(exportSearch) + exportSearch.length();
         contents = insertFrameworkCode(contents, exportIndex, "js_code/unity_exports.js");
 
+        // String importSearch = "if(!env[\"tableBase\"]){env[\"tableBase\"]=0}";
         String importSearch = "\"LANG\":lang,\"_\":getExecutableName()};";
         int importIndex = contents.indexOf(importSearch) + importSearch.length();
         contents = insertFrameworkCode(contents, importIndex, "js_code/unity_imports.js");
@@ -141,15 +143,16 @@ public class UnityWebModifyer {
         byte[] encoded = Files.readAllBytes(Paths.get(loaderFile.getAbsolutePath()));
         String contents = new String(encoded, StandardCharsets.UTF_8);
 
+        // contents = contents.replace("o.result.responseHeaders[e]==s.getResponseHeader(e)", "false");
         contents = contents.replace("r.headers.get(e)==t.headers.get(e)", "false");
-//        contents = contents.replace("a.responseHeaders[e]=o.getResponseHeader(e)",
-//                "const genRanHex = size => [...Array(size)].map(() => Math.floor(Math.random() * 16).toString(16)).join('');\n" +
-//                        "                if (e === \"ETag\") {\n" +
-//                        "                    a.responseHeaders[e] = \"W/\\\"\" + genRanHex(6) + \"-\" + genRanHex(13) + \"\\\"\"\n" +
-//                        "                }\n" +
-//                        "                else {\n" +
-//                        "                    a.responseHeaders[e] = o.getResponseHeader(e)\n" +
-//                        "                }");
+        // contents = contents.replace("a.responseHeaders[e]=o.getResponseHeader(e)",
+        //         "const genRanHex = size => [...Array(size)].map(() => Math.floor(Math.random() * 16).toString(16)).join('');\n" +
+        //                 "                if (e === \"ETag\") {\n" +
+        //                 "                    a.responseHeaders[e] = \"W/\\\"\" + genRanHex(6) + \"-\" + genRanHex(13) + \"\\\"\"\n" +
+        //                 "                }\n" +
+        //                 "                else {\n" +
+        //                 "                    a.responseHeaders[e] = o.getResponseHeader(e)\n" +
+        //                 "                }");
         contents = contents.replace("!r.headers.get(\"ETag\")", "!r.headers.set(\"Etag\", `W/\"${[...Array(6)].map(() => Math.floor(Math.random() * 16).toString(16)).join('')}-${[...Array(13)].map(() => Math.floor(Math.random() * 16).toString(16)).join('')}\"`)");
 
         BufferedWriter writer = new BufferedWriter(new FileWriter(loaderFile));
