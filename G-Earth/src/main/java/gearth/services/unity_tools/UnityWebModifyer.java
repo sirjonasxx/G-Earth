@@ -114,7 +114,7 @@ public class UnityWebModifyer {
 
         contents = insertFrameworkCode(contents, 0, "js_code/unity_code.js");
 
-        String exportSearch = "Module[\"asm\"]=exports;";
+        String exportSearch = "Module[\"asm\"][\"Fj\"]).apply(null,arguments)};";
         int exportIndex = contents.indexOf(exportSearch) + exportSearch.length();
         contents = insertFrameworkCode(contents, exportIndex, "js_code/unity_exports.js");
 
