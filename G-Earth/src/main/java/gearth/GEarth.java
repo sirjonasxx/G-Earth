@@ -5,6 +5,7 @@ import gearth.misc.Cacher;
 import gearth.misc.UpdateChecker;
 import gearth.misc.listenerpattern.ObservableObject;
 import gearth.ui.GEarthController;
+import gearth.ui.GEarthTrayIcon;
 import gearth.ui.themes.Theme;
 import gearth.ui.themes.ThemeFactory;
 import gearth.ui.titlebar.TitleBarConfig;
@@ -41,7 +42,6 @@ public class GEarth extends Application {
     public void start(Stage primaryStage) throws Exception{
         main = this;
         stage = primaryStage;
-
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/gearth/ui/G-Earth.fxml"));
         Parent root;
         try {
@@ -120,7 +120,8 @@ public class GEarth extends Application {
             stage.getScene().getStylesheets().add(GEarth.class.getResource(String.format("/gearth/ui/themes/%s/styling.css", theme.internalName())).toExternalForm());
 
             stage.getIcons().clear();
-            stage.getIcons().add(new Image(GEarth.class.getResourceAsStream(String.format("/gearth/ui/themes/%s/logoSmall.png", theme.overridesLogo() ? theme.internalName() : defaultTheme.internalName()))));
+            final Image image = new Image(GEarth.class.getResourceAsStream(String.format("/gearth/ui/themes/%s/logoSmall.png", theme.overridesLogo() ? theme.internalName() : defaultTheme.internalName())));
+            stage.getIcons().add(image);
             stage.setTitle((theme.overridesTitle() ? theme.title() : defaultTheme.title()) + " " + GEarth.version);
 
             controller.infoController.img_logo.setImage(new Image(GEarth.class.getResourceAsStream(
@@ -131,7 +132,11 @@ public class GEarth extends Application {
             )));
             controller.infoController.version.setText(stage.getTitle());
 //        });
+        GEarthTrayIcon.updateOrCreate(image);
+    }
 
+    public GEarthController getController() {
+        return controller;
     }
 
     public static String[] args;
