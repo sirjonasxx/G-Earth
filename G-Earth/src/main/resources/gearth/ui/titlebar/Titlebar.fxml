@@ -15,17 +15,17 @@
     <RowConstraints maxHeight="25.0" minHeight="25.0" prefHeight="25.0" vgrow="SOMETIMES" />
   </rowConstraints>
   <children>
-    <ImageView id="minimize-button" fx:id="minimizeBtn" fitHeight="25.0" fitWidth="50.0" onMouseClicked="#handleMinimizeAction" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="1">
+    <ImageView id="minimize-button" fx:id="minimizeButton" fitHeight="25.0" fitWidth="50.0" onMouseClicked="#onClickMinimizeButton" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="1">
       <image>
         <Image url="@files/minimizeButton.png" />
       </image>
     </ImageView>
-    <ImageView id="close-button" fitHeight="25.0" fitWidth="50.0" onMouseClicked="#handleCloseAction" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="2">
+    <ImageView id="close-button" fitHeight="25.0" fitWidth="50.0" onMouseClicked="#onClickCloseButton" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="2">
       <image>
         <Image url="@files/closeButton.png" />
       </image>
     </ImageView>
-    <GridPane maxHeight="25.0" maxWidth="1.7976931348623157E308" minHeight="25.0" minWidth="-Infinity" onMouseDragged="#handleMovementAction" onMousePressed="#handleClickAction" onMouseReleased="#handleClickReleaseAction" prefHeight="25.0">
+    <GridPane maxHeight="25.0" maxWidth="1.7976931348623157E308" minHeight="25.0" minWidth="-Infinity" onMouseDragged="#onMovement" onMousePressed="#onClick" onMouseReleased="#onPressReleased" prefHeight="25.0">
       <columnConstraints>
         <ColumnConstraints hgrow="SOMETIMES" maxWidth="7.0" minWidth="7.0" prefWidth="7.0" />
         <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" />
@@ -48,11 +48,11 @@
             <Insets left="2.0" />
           </padding>
         </Label>
-        <MenuButton id="language-picker" fx:id="languagePicker" alignment="CENTER" contentDisplay="CENTER" graphicTextGap="0.0" mnemonicParsing="false" translateX="-5.0" GridPane.columnIndex="3">
+        <MenuButton id="language-picker" fx:id="languagePickerMenu" alignment="CENTER" contentDisplay="CENTER" graphicTextGap="0.0" mnemonicParsing="false" translateX="-5.0" GridPane.columnIndex="3">
           <items>
           </items>
         </MenuButton>
-        <ImageView id="theme-button" fx:id="themeBtn" fitHeight="20.0" fitWidth="38.0" onMouseClicked="#toggleTheme" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="4">
+        <ImageView id="theme-button" fx:id="themeButton" fitHeight="20.0" fitWidth="38.0" onMouseClicked="#toggleTheme" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="4">
           <image>
             <Image url="@../themes/G-Earth/themeButton.png" />
           </image>

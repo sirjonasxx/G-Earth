@@ -1,11 +1,16 @@
 package gearth.misc;
 
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.StringProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.util.StringConverter;
+
+import java.util.function.Function;
 
 /**
  * Provides utility methods for bindings.
@@ -13,6 +18,27 @@ import javafx.util.StringConverter;
  * @author Dorving
  */
 public final class BindingsUtil {
+
+    /**
+     * Creates a binding that is true if the function returns true for the applied string.
+     */
+    public static BooleanBinding stringMatches(ObservableValue<String> stringValue, Function<String, Boolean> function) {
+        return Bindings.createBooleanBinding(() -> function.apply(stringValue.getValue()), stringValue);
+    }
+
+    /**
+     * Creates a binding that is true if the string is an integer.
+     */
+    public static BooleanBinding isInteger(ObservableValue<String> stringValue) {
+        return stringMatches(stringValue, StringUtils::isInteger);
+    }
+
+    /**
+     * Creates a binding that is true if the string is an UShort.
+     */
+    public static BooleanBinding isUShort(ObservableValue<String> stringValue) {
+        return stringMatches(stringValue, StringUtils::isUShort);
+    }
 
     /**
      * Ensures the list always contains the value of the binding.
@@ -23,6 +49,20 @@ public final class BindingsUtil {
             list.add(newValue);
         });
         list.add(binding.get());
+    }
+
+    /**
+     * Sets the value of a property and binds it to another observable value.
+     */
+    public static<T> void setAndBind(Property<T> a, ObservableValue<T> b, boolean unbindPrevious) {
+        if (unbindPrevious)
+            a.unbind();
+        a.setValue(b.getValue());
+        a.bind(b);
+    }
+
+    public static<T> void setAndBind(Property<T> a, ObservableValue<T> b) {
+        setAndBind(a, b, false);
     }
 
     /**

@@ -1,6 +1,6 @@
 package gearth.services.scheduler;
 
-import gearth.ui.subforms.scheduler.SchedulerController;
+import gearth.misc.StringUtils;
 
 /**
  * Created by Jonas on 11/04/18.
@@ -23,7 +23,7 @@ public class Interval {
             offset = -1;
             return;
         }
-        if (!SchedulerController.stringIsNumber(split[0]) || (split.length == 2 && !SchedulerController.stringIsNumber(split[1]))) {
+        if (!StringUtils.isInteger(split[0]) || (split.length == 2 && !StringUtils.isInteger(split[1]))) {
             delay = -1;
             offset = -1;
             return;

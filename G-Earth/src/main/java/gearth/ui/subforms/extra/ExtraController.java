@@ -2,6 +2,7 @@ package gearth.ui.subforms.extra;
 
 import gearth.GEarth;
 import gearth.misc.BindingsUtil;
+import gearth.misc.HyperLinkUtil;
 import gearth.protocol.connection.HState;
 import gearth.protocol.connection.proxy.ProxyProviderFactory;
 import gearth.protocol.connection.proxy.SocksConfiguration;
@@ -9,79 +10,82 @@ import gearth.services.always_admin.AdminService;
 import gearth.services.g_python.GPythonVersionUtils;
 import gearth.ui.GEarthProperties;
 import gearth.ui.SubForm;
-import gearth.ui.subforms.info.InfoController;
 import gearth.ui.titlebar.TitleBarController;
 import gearth.ui.translations.LanguageBundle;
 import gearth.ui.translations.TranslatableString;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
-import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Region;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.Optional;
+import java.util.ResourceBundle;
 
 /**
  * Created by Jonas on 06/04/18.
+ * TODO: add setup link to g-earth wiki
  */
-public class ExtraController extends SubForm implements SocksConfiguration {
+public class ExtraController extends SubForm implements SocksConfiguration, Initializable {
 
     public static final String INFO_URL_GPYTHON = "https://github.com/sirjonasxx/G-Earth/wiki/G-Python-qtConsole";
 
+    public TextArea notepadTextArea;
 
-    public TextArea txtarea_notepad;
+    public CheckBox alwaysOnTopBox;
+    public Hyperlink troubleshootingLink;
 
-    public CheckBox cbx_alwaysOnTop;
-    public Hyperlink url_troubleshooting;
+    public CheckBox enableClientSideStaffPermissionsBox;
+    public CheckBox enableDeveloperModeBox;
 
-    //TODO add setup link to g-earth wiki
-    public CheckBox cbx_gpython;
+    public CheckBox enableGPythonBox;
+    public CheckBox enableAdvancedBox;
 
-    public CheckBox cbx_advanced;
-    public GridPane grd_advanced;
+    public GridPane advancedPane;
+    public CheckBox advancedDisableDecryptionBox;
+    public CheckBox advancedEnableDebugBox;
+    public CheckBox advancedUseSocksBox;
+    public GridPane advancedSocksInfoGrid;
+    public TextField advancedSocketProxyIpField;
 
-    public CheckBox cbx_disableDecryption;
-    public CheckBox cbx_debug;
-
-    public CheckBox cbx_useSocks;
-    public GridPane grd_socksInfo;
-    public TextField txt_socksIp;
-    public CheckBox cbx_admin;
-    public Label lbl_notepad, lbl_proxyIp;
-    public CheckBox cbx_develop;
+    public Label notepadLabel, advancedSocksProxyIpLabel;
 
     private AdminService adminService;
 
-    public void initialize() {
-        url_troubleshooting.setTooltip(new Tooltip("https://github.com/sirjonasxx/G-Earth/wiki/Troubleshooting"));
-        InfoController.activateHyperlink(url_troubleshooting);
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
 
-        BindingsUtil.setAndBindBiDirectional(txtarea_notepad.textProperty(), GEarthProperties.notesProperty);
+        troubleshootingLink.setTooltip(new Tooltip("https://github.com/sirjonasxx/G-Earth/wiki/Troubleshooting"));
+        HyperLinkUtil.showDocumentOnClick(troubleshootingLink);
 
-        txt_socksIp.textProperty().set(GEarthProperties.getSocksHost()+":"+GEarthProperties.getSocksPort());
-        GEarthProperties.socksHostProperty.bind(Bindings.createStringBinding(this::getSocksHost, txt_socksIp.textProperty()));
-        GEarthProperties.socksPortProperty.bind(Bindings.createIntegerBinding(this::getSocksPort, txt_socksIp.textProperty()));
-        grd_socksInfo.disableProperty().bind(GEarthProperties.enableSocksProperty.not());
+        BindingsUtil.setAndBindBiDirectional(notepadTextArea.textProperty(), GEarthProperties.notesProperty);
 
-        BindingsUtil.setAndBindBiDirectional(cbx_useSocks.selectedProperty(), GEarthProperties.enableSocksProperty);
+        advancedSocketProxyIpField.textProperty().set(GEarthProperties.getSocksHost()+":"+GEarthProperties.getSocksPort());
+        GEarthProperties.socksHostProperty.bind(Bindings.createStringBinding(this::getSocksHost, advancedSocketProxyIpField.textProperty()));
+        GEarthProperties.socksPortProperty.bind(Bindings.createIntegerBinding(this::getSocksPort, advancedSocketProxyIpField.textProperty()));
+        advancedSocksInfoGrid.disableProperty().bind(GEarthProperties.enableSocksProperty.not());
+
+        BindingsUtil.setAndBindBiDirectional(advancedUseSocksBox.selectedProperty(), GEarthProperties.enableSocksProperty);
         ProxyProviderFactory.setSocksConfig(this);
 
-        BindingsUtil.setAndBindBiDirectional(cbx_debug.selectedProperty(), GEarthProperties.enableDebugProperty);
-        BindingsUtil.setAndBindBiDirectional(cbx_disableDecryption.selectedProperty(), GEarthProperties.disablePacketDecryptionProperty);
-        BindingsUtil.setAndBindBiDirectional(cbx_alwaysOnTop.selectedProperty(), GEarthProperties.alwaysOnTopProperty);
-        BindingsUtil.setAndBindBiDirectional(cbx_develop.selectedProperty(), GEarthProperties.enableDeveloperModeProperty);
-        BindingsUtil.setAndBindBiDirectional(cbx_admin.selectedProperty(), GEarthProperties.alwaysAdminProperty);
-        BindingsUtil.setAndBindBiDirectional(cbx_gpython.selectedProperty(), GEarthProperties.enableGPythonProperty);
+        BindingsUtil.setAndBindBiDirectional(advancedEnableDebugBox.selectedProperty(), GEarthProperties.enableDebugProperty);
+        BindingsUtil.setAndBindBiDirectional(advancedDisableDecryptionBox.selectedProperty(), GEarthProperties.disablePacketDecryptionProperty);
+        BindingsUtil.setAndBindBiDirectional(alwaysOnTopBox.selectedProperty(), GEarthProperties.alwaysOnTopProperty);
+        BindingsUtil.setAndBindBiDirectional(enableDeveloperModeBox.selectedProperty(), GEarthProperties.enableDeveloperModeProperty);
+        BindingsUtil.setAndBindBiDirectional(enableClientSideStaffPermissionsBox.selectedProperty(), GEarthProperties.alwaysAdminProperty);
+        BindingsUtil.setAndBindBiDirectional(enableGPythonBox.selectedProperty(), GEarthProperties.enableGPythonProperty);
 
         initLanguageBinding();
     }
 
     @Override
     protected void onParentSet() {
-        adminService = new AdminService(cbx_admin.isSelected(), getHConnection());
+        adminService = new AdminService(enableClientSideStaffPermissionsBox.isSelected(), getHConnection());
         getHConnection().addTrafficListener(1, message -> adminService.onMessage(message));
         getHConnection().stateProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue == HState.CONNECTED)
@@ -89,31 +93,18 @@ public class ExtraController extends SubForm implements SocksConfiguration {
             if (oldValue == HState.NOT_CONNECTED || newValue == HState.NOT_CONNECTED)
                 updateAdvancedUI();
         });
-        cbx_advanced.selectedProperty().addListener(observable -> updateAdvancedUI());
+        enableAdvancedBox.selectedProperty().addListener(observable -> updateAdvancedUI());
         updateAdvancedUI();
-    }
-
-    private void updateAdvancedUI() {
-        if (!cbx_advanced.isSelected()) {
-            cbx_debug.setSelected(false);
-            cbx_useSocks.setSelected(false);
-            if (getHConnection().getState() == HState.NOT_CONNECTED) {
-                cbx_disableDecryption.setSelected(false);
-            }
-        }
-        grd_advanced.setDisable(!cbx_advanced.isSelected());
-
-        cbx_disableDecryption.setDisable(getHConnection().getState() != HState.NOT_CONNECTED);
     }
 
     @Override
     public boolean useSocks() {
-        return cbx_useSocks.isSelected();
+        return advancedUseSocksBox.isSelected();
     }
 
     @Override
     public int getSocksPort() {
-        String socksString = txt_socksIp.getText();
+        String socksString = advancedSocketProxyIpField.getText();
         if (socksString.contains(":")) {
             return Integer.parseInt(socksString.split(":")[1]);
         }
@@ -122,7 +113,7 @@ public class ExtraController extends SubForm implements SocksConfiguration {
 
     @Override
     public String getSocksHost() {
-        return txt_socksIp.getText().split(":")[0];
+        return advancedSocketProxyIpField.getText().split(":")[0];
     }
 
     @Override
@@ -130,17 +121,13 @@ public class ExtraController extends SubForm implements SocksConfiguration {
 //        return cbx_socksUseIfNeeded.isSelected();
         return false;
     }
-
-    public boolean useGPython() {
-        return cbx_gpython.isSelected();
-    }
-
-    public void gpythonCbxClick(ActionEvent actionEvent) {
-        if (cbx_gpython.isSelected()) {
+    @FXML
+    public void onClickGPythonButton() {
+        if (enableGPythonBox.isSelected()) {
             new Thread(() -> {
                 Platform.runLater(() -> {
-                    cbx_gpython.setSelected(false);
-                    cbx_gpython.setDisable(true);
+                    enableGPythonBox.setSelected(false);
+                    enableGPythonBox.setDisable(true);
                 });
                 if (!GPythonVersionUtils.validInstallation()) {
                     Platform.runLater(() -> {
@@ -166,13 +153,13 @@ public class ExtraController extends SubForm implements SocksConfiguration {
                             e.printStackTrace();
                         }
 
-                        cbx_gpython.setDisable(false);
+                        enableGPythonBox.setDisable(false);
                     });
                 }
                 else {
                     Platform.runLater(() -> {
-                        cbx_gpython.setSelected(true);
-                        cbx_gpython.setDisable(false);
+                        enableGPythonBox.setSelected(true);
+                        enableGPythonBox.setDisable(false);
                         parentController.extensionsController.updateGPythonStatus();
                     });
                 }
@@ -183,8 +170,9 @@ public class ExtraController extends SubForm implements SocksConfiguration {
 
     }
 
-    public void developCbxClick(ActionEvent actionEvent) {
-        if (cbx_develop.isSelected()) {
+    @FXML
+    public void onClickDeveloperModeBox() {
+        if (enableDeveloperModeBox.isSelected()) {
             Platform.runLater(() -> {
                 Alert alert = new Alert(Alert.AlertType.WARNING, LanguageBundle.get("tab.extra.options.developmode.alert.title"), ButtonType.NO, ButtonType.YES);
                 alert.setTitle(LanguageBundle.get("tab.extra.options.developmode.alert.title"));
@@ -197,7 +185,7 @@ public class ExtraController extends SubForm implements SocksConfiguration {
                 try {
                     Optional<ButtonType> result = TitleBarController.create(alert).showAlertAndWait();
                     if (!result.isPresent() || result.get() == ButtonType.NO) {
-                        cbx_develop.setSelected(false);
+                        enableDeveloperModeBox.setSelected(false);
                     }
                     else {
                         setDevelopMode(true);
@@ -212,29 +200,47 @@ public class ExtraController extends SubForm implements SocksConfiguration {
         }
     }
 
-    private void setDevelopMode(boolean enabled) {
-        cbx_develop.setSelected(enabled);
+    @FXML
+    public void onClickClientSideStaffPermissionsBox() {
+        adminService.setEnabled(enableClientSideStaffPermissionsBox.isSelected());
     }
 
-    public void adminCbxClick(ActionEvent actionEvent) {
-        adminService.setEnabled(cbx_admin.isSelected());
+    public boolean useGPython() {
+        return enableGPythonBox.isSelected();
+    }
+
+    private void setDevelopMode(boolean enabled) {
+        enableDeveloperModeBox.setSelected(enabled);
+    }
+
+    private void updateAdvancedUI() {
+        if (!enableAdvancedBox.isSelected()) {
+            advancedEnableDebugBox.setSelected(false);
+            advancedUseSocksBox.setSelected(false);
+            if (getHConnection().getState() == HState.NOT_CONNECTED) {
+                advancedDisableDecryptionBox.setSelected(false);
+            }
+        }
+        advancedPane.setDisable(!enableAdvancedBox.isSelected());
+
+        advancedDisableDecryptionBox.setDisable(getHConnection().getState() != HState.NOT_CONNECTED);
     }
 
     private void initLanguageBinding() {
-        url_troubleshooting.textProperty().bind(new TranslatableString("%s", "tab.extra.troubleshooting"));
+        troubleshootingLink.textProperty().bind(new TranslatableString("%s", "tab.extra.troubleshooting"));
 
-        lbl_notepad.textProperty().bind(new TranslatableString("%s:", "tab.extra.notepad"));
-        lbl_proxyIp.textProperty().bind(new TranslatableString("%s:", "tab.extra.options.advanced.proxy.ip"));
+        notepadLabel.textProperty().bind(new TranslatableString("%s:", "tab.extra.notepad"));
+        advancedSocksProxyIpLabel.textProperty().bind(new TranslatableString("%s:", "tab.extra.options.advanced.proxy.ip"));
 
-        cbx_alwaysOnTop.textProperty().bind(new TranslatableString("%s", "tab.extra.options.alwaysontop"));
+        alwaysOnTopBox.textProperty().bind(new TranslatableString("%s", "tab.extra.options.alwaysontop"));
 
-        cbx_develop.textProperty().bind(new TranslatableString("%s", "tab.extra.options.developmode"));
-        cbx_admin.textProperty().bind(new TranslatableString("%s", "tab.extra.options.staffpermissions"));
-        cbx_gpython.textProperty().bind(new TranslatableString("%s", "tab.extra.options.pythonscripting"));
-        cbx_advanced.textProperty().bind(new TranslatableString("%s", "tab.extra.options.advanced"));
+        enableDeveloperModeBox.textProperty().bind(new TranslatableString("%s", "tab.extra.options.developmode"));
+        enableClientSideStaffPermissionsBox.textProperty().bind(new TranslatableString("%s", "tab.extra.options.staffpermissions"));
+        enableGPythonBox.textProperty().bind(new TranslatableString("%s", "tab.extra.options.pythonscripting"));
+        enableAdvancedBox.textProperty().bind(new TranslatableString("%s", "tab.extra.options.advanced"));
 
-        cbx_useSocks.textProperty().bind(new TranslatableString("%s", "tab.extra.options.advanced.socks"));
-        cbx_disableDecryption.textProperty().bind(new TranslatableString("%s", "tab.extra.options.advanced.disabledecryption"));
-        cbx_debug.textProperty().bind(new TranslatableString("%s", "tab.extra.options.advanced.debugstdout"));
+        advancedUseSocksBox.textProperty().bind(new TranslatableString("%s", "tab.extra.options.advanced.socks"));
+        advancedDisableDecryptionBox.textProperty().bind(new TranslatableString("%s", "tab.extra.options.advanced.disabledecryption"));
+        advancedEnableDebugBox.textProperty().bind(new TranslatableString("%s", "tab.extra.options.advanced.debugstdout"));
     }
 }

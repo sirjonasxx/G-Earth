@@ -14,18 +14,18 @@
     </rowConstraints>
    <AnchorPane prefHeight="200.0" prefWidth="200.0">
       <children>
-         <ImageView fx:id="img_logo" fitHeight="228.0" fitWidth="217.0" layoutX="23.0" layoutY="23.0" pickOnBounds="true" preserveRatio="true" />
-         <Label fx:id="version" layoutX="260.0" layoutY="23.0" text="\$theme $version" textFill="#000000b2">
+         <ImageView fx:id="logoImageView" fitHeight="228.0" fitWidth="217.0" layoutX="23.0" layoutY="23.0" pickOnBounds="true" preserveRatio="true" />
+         <Label fx:id="themeTitleLabel" layoutX="260.0" layoutY="23.0" text="\$theme $version" textFill="#000000b2">
             <font>
                <Font size="18.0" />
             </font>
          </Label>
-         <Label fx:id="lbl_description" layoutX="260.0" layoutY="57.0" text="Habbo packet manipulator for Linux, Windows &amp; Mac" textFill="#000000b2">
+         <Label fx:id="descriptionLabel" layoutX="260.0" layoutY="57.0" text="Habbo packet manipulator for Linux, Windows &amp; Mac" textFill="#000000b2">
             <font>
                <Font size="14.0" />
             </font>
          </Label>
-         <Label fx:id="lbl_createdBy" layoutX="260.0" layoutY="92.0" text="Created by:" textFill="#000000b2">
+         <Label fx:id="createdByLabel" layoutX="260.0" layoutY="92.0" text="Created by:" textFill="#000000b2">
             <font>
                <Font name="System Bold" size="14.0" />
             </font>
@@ -35,7 +35,7 @@
                <Font size="14.0" />
             </font>
          </Label>
-         <Label fx:id="lbl_contrib" layoutX="260.0" layoutY="124.0" text="Contributors:" textFill="#000000b2">
+         <Label fx:id="contributorsLabel" layoutX="260.0" layoutY="124.0" text="Contributors:" textFill="#000000b2">
             <font>
                <Font name="System Bold" size="14.0" />
             </font>
@@ -75,18 +75,18 @@
                <Font size="14.0" />
             </font>
          </Label>
-         <Label fx:id="lbl_links" layoutX="491.0" layoutY="92.0" text="Links:" textFill="#000000b2">
+         <Label fx:id="linksLabel" layoutX="491.0" layoutY="92.0" text="Links:" textFill="#000000b2">
             <font>
                <Font name="System Bold" size="14.0" />
             </font>
          </Label>
-         <Hyperlink fx:id="link_darkbox" layoutX="487.0" layoutY="112.0" text="Darkbox" />
-         <Hyperlink fx:id="link_g_gearth" layoutX="487.0" layoutY="132.0" text="Github - G-Earth" />
-         <Hyperlink fx:id="link_g_tanji" layoutX="487.0" layoutY="152.0" text="Github - Tanji" />
-         <Hyperlink fx:id="link_d_gearth" layoutX="487.0" layoutY="172.0" text="Discord - G-Earth" />
-         <Hyperlink fx:id="link_g_store" layoutX="487.0" layoutY="212.0" text="G-ExtensionStore" />
-         <Button fx:id="btn_donate" layoutX="537.0" layoutY="14.0" mnemonicParsing="false" onAction="#donate" prefHeight="20.0" prefWidth="100.0" text="Donate BTC" />
-         <Hyperlink fx:id="link_t_gearth" layoutX="487.0" layoutY="192.0" text="Twitter - G-Earth" />
+         <Hyperlink fx:id="darkBoxLink" layoutX="487.0" layoutY="112.0" text="Darkbox" />
+         <Hyperlink fx:id="githubGEarthLink" layoutX="487.0" layoutY="132.0" text="Github - G-Earth" />
+         <Hyperlink fx:id="githubTanjiLink" layoutX="487.0" layoutY="152.0" text="Github - Tanji" />
+         <Hyperlink fx:id="discordGEarthLink" layoutX="487.0" layoutY="172.0" text="Discord - G-Earth" />
+         <Hyperlink fx:id="githubExtensionStoreLink" layoutX="487.0" layoutY="212.0" text="G-ExtensionStore" />
+         <Button fx:id="donateButton" layoutX="537.0" layoutY="14.0" mnemonicParsing="false" onAction="#donate" prefHeight="20.0" prefWidth="100.0" text="Donate BTC" />
+         <Hyperlink fx:id="twitterGEarthLink" layoutX="487.0" layoutY="192.0" text="Twitter - G-Earth" />
          <Label layoutX="363.0" layoutY="204.0" text="Dorving" textFill="#000000b2">
             <font>
                <Font size="14.0" />

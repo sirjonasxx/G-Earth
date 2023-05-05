@@ -1,180 +1,147 @@
 package gearth.ui.subforms.tools;
 
-import gearth.services.packet_info.PacketInfoManager;
-import gearth.ui.translations.TranslatableString;
-import javafx.event.ActionEvent;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
-import javafx.scene.input.KeyCode;
+import gearth.misc.BindingsUtil;
 import gearth.protocol.HPacket;
+import gearth.services.packet_info.PacketInfoManager;
 import gearth.ui.SubForm;
+import gearth.ui.translations.TranslatableString;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
 
+import java.net.URL;
 import java.nio.ByteBuffer;
+import java.util.ResourceBundle;
 
+public class ToolsController extends SubForm implements Initializable {
 
-public class ToolsController extends SubForm {
-    public TextField txt_intDecoded;
-    public TextField txt_intEncoded;
-    public TextField txt_ushortDecoded;
-    public TextField txt_ushortEncoded;
-    public Button btnEncodeInt;
-    public Button btnDecodeInt;
-    public Button btnEncodeUShort;
-    public Button btnDecodeUshort;
+    public TextField decodedIntegerField;
+    public TextField encodedIntegerField;
+    public TextField decodedUShortField;
+    public TextField encodedUShortField;
+    public Button encodeIntegerButton;
+    public Button decodeIntegerButton;
+    public Button encodeUShortButton;
+    public Button decodeUShortButton;
 
-    public Button btn_toExpr;
-    public TextArea txt_packetArea;
-    public Button btn_toPacket;
-    public TextArea txt_exprArea;
+    public TextArea packetArea;
+    public TextArea expressionArea;
+    public Button convertPacketToExpressionButton;
+    public Button convertExpressionToPacketButton;
 
-    public Label lbl_integer, lbl_uShort, lbl_encodingDecoding, lbl_packetToExpression;
+    public Label
+            integerLabel,
+            uShortLabel,
+            encodingOrDecodingLabel,
+            packetToExpressionLabel;
 
     //TODO: toExpression() without bytelength limit for this use only
 
-    public void initialize() {
-        txt_packetArea.textProperty().addListener(observable -> {
-            btn_toExpr.setDisable(new HPacket(txt_packetArea.getText()).isCorrupted());
-        });
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
 
-        txt_packetArea.setOnKeyPressed(event -> {
-            if(event.getCode().equals(KeyCode.ENTER) && !btn_toExpr.isDisable()) {
-                btn_toExpr_clicked(null);
-            }
-        });
+        convertPacketToExpressionButton.disableProperty().bind(packetIsCorruptBinding(packetArea));
+        convertExpressionToPacketButton.disableProperty().bind(packetIsCorruptBinding(expressionArea));
 
-        txt_exprArea.textProperty().addListener(observable -> {
-            btn_toPacket.setDisable(new HPacket(txt_exprArea.getText()).isCorrupted());
-        });
+        encodeIntegerButton.disableProperty().bind(BindingsUtil.isInteger(decodedIntegerField.textProperty()).not());
+        decodeIntegerButton.disableProperty().bind(packetLengthEqualsBinding(encodedIntegerField, Integer.BYTES).not());
 
-        txt_exprArea.setOnKeyPressed(event -> {
-            if(event.getCode().equals(KeyCode.ENTER) && !btn_toPacket.isDisable()) {
-                btn_toPacket_clicked(null);
-            }
-        });
+        encodeUShortButton.disableProperty().bind(BindingsUtil.isUShort(decodedUShortField.textProperty()).not());
+        decodeUShortButton.disableProperty().bind(packetLengthEqualsBinding(encodedUShortField, Short.BYTES).not());
 
-
-        txt_intDecoded.textProperty().addListener(observable -> {
-            boolean isInt = true;
-
-            try {
-                Integer.parseInt(txt_intDecoded.getText());
-            } catch (NumberFormatException e) {
-                isInt = false;
-            }
-
-            btnEncodeInt.setDisable(!isInt);
-        });
-
-        txt_intDecoded.setOnKeyPressed(event -> {
-            if(event.getCode().equals(KeyCode.ENTER) && !btnEncodeInt.isDisable()) {
-                btnEncodeInt_clicked(null);
-            }
-        });
-
-        //---------------
-
-        txt_ushortDecoded.textProperty().addListener(observable -> {
-            boolean isDouble = true;
-
-            try {
-                int res = Integer.parseInt(txt_ushortDecoded.getText());
-                if (res < 0 || res >= (256*256)) isDouble = false;
-            } catch (NumberFormatException e) {
-                isDouble = false;
-            }
-            btnEncodeUShort.setDisable(!isDouble);
-        });
-
-        txt_ushortDecoded.setOnKeyPressed(event -> {
-            if(event.getCode().equals(KeyCode.ENTER) && !btnEncodeUShort.isDisable()) {
-                btnEncodeUShort_clicked(null);
-            }
-        });
-
-        //----------------
-
-        txt_intEncoded.textProperty().addListener(observable -> {
-            HPacket packet = new HPacket(txt_intEncoded.getText());
-            btnDecodeInt.setDisable(packet.getBytesLength() != 4);
-        });
-
-        txt_intEncoded.setOnKeyPressed(event -> {
-            if(event.getCode().equals(KeyCode.ENTER) && !btnDecodeInt.isDisable()) {
-                btnDecodeInt_clicked(null);
-            }
-        });
-
-        //----------------
-
-        txt_ushortEncoded.textProperty().addListener(observable -> {
-            HPacket packet = new HPacket(txt_ushortEncoded.getText());
-            btnDecodeUshort.setDisable(packet.getBytesLength() != 2);
-        });
-
-        txt_ushortEncoded.setOnKeyPressed(event -> {
-            if(event.getCode().equals(KeyCode.ENTER) && !btnDecodeUshort.isDisable()) {
-                btnDecodeUshort_clicked(null);
-            }
-        });
+        fireButtonOnPressEnter(packetArea, convertPacketToExpressionButton);
+        fireButtonOnPressEnter(expressionArea, convertExpressionToPacketButton);
+        fireButtonOnPressEnter(decodedIntegerField, encodeIntegerButton);
+        fireButtonOnPressEnter(decodedUShortField, encodeUShortButton);
+        fireButtonOnPressEnter(encodedIntegerField, decodeIntegerButton);
+        fireButtonOnPressEnter(encodedUShortField, decodeUShortButton);
 
         initLanguageBinding();
     }
 
-    public void btnEncodeInt_clicked(ActionEvent actionEvent) {
-        ByteBuffer b = ByteBuffer.allocate(4);
-        b.putInt(Integer.parseInt(txt_intDecoded.getText()));
-
-        HPacket packet = new HPacket(b.array());
-        txt_intEncoded.setText(packet.toString());
-    }
-    public void btnDecodeInt_clicked(ActionEvent actionEvent) {
-        txt_intDecoded.setText(new HPacket(txt_intEncoded.getText()).readInteger(0) + "");
-    }
-    public void btnEncodeUShort_clicked(ActionEvent actionEvent) {
-        ByteBuffer b = ByteBuffer.allocate(4);
-        b.putInt(Integer.parseInt(txt_ushortDecoded.getText()));
-
-        HPacket packet = new HPacket(new byte[]{b.array()[2], b.array()[3]});
-        txt_ushortEncoded.setText(packet.toString());
-    }
-    public void btnDecodeUshort_clicked(ActionEvent actionEvent) {
-        txt_ushortDecoded.setText(new HPacket(txt_ushortEncoded.getText()).readUshort(0) + "");
+    private BooleanBinding packetIsCorruptBinding(TextInputControl input) {
+        return Bindings.createBooleanBinding(() -> new HPacket(input.getText()).isCorrupted(), input.textProperty());
     }
 
+    private BooleanBinding packetLengthEqualsBinding(TextInputControl input, int length) {
+        return Bindings.createBooleanBinding(() -> new HPacket(input.getText()).getBytesLength() == length, input.textProperty());
+    }
+
+    private void fireButtonOnPressEnter(Node node, Button button) {
+        node.setOnKeyPressed(event -> {
+            if (event.getCode().equals(KeyCode.ENTER) && !button.isDisable())
+                button.fire();
+        });
+    }
+
+    @FXML
+    public void onClickEncodeIntegerButton() {
+        final HPacket packet = new HPacket(ByteBuffer
+                .allocate(4)
+                .putInt(Integer.parseInt(decodedIntegerField.getText()))
+                .array());
+        encodedIntegerField.setText(packet.toString());
+    }
+
+    @FXML
+    public void onClickDecodeIntegerButton() {
+        final HPacket hPacket = new HPacket(encodedIntegerField.getText());
+        decodedIntegerField.setText(Integer.toString(hPacket.readInteger(0)));
+    }
+
+    @FXML
+    public void onClickEncodeUShortButton() {
+        final byte[] dst = new byte[2];
+        ByteBuffer
+                .allocate(4)
+                .putInt(Integer.parseInt(decodedUShortField.getText()))
+                .get(dst, 2, 2);
+        final HPacket packet = new HPacket(dst);
+        encodedUShortField.setText(packet.toString());
+    }
+
+    @FXML
+    public void onClickDecodeUShortButton() {
+        final HPacket packet = new HPacket(encodedUShortField.getText());
+        decodedUShortField.setText(Integer.toString(packet.readUshort(0)));
+    }
+
+    @FXML
+    public void onClickPacketToExpressionButton() {
+        final HPacket packet = parseToPacket(packetArea.getText());
+        expressionArea.setText(packet.toExpression(getHConnection().getPacketInfoManager(), true));
+    }
+
+    @FXML
+    public void onClickExpressionToPacketButton() {
+        final HPacket packet = parseToPacket(expressionArea.getText());
+        packetArea.setText(packet.toString());
+    }
 
     private HPacket parseToPacket(String p) {
-        PacketInfoManager packetInfoManager = getHConnection().getPacketInfoManager();
-        HPacket packet = new HPacket(p);
-        if (!packet.isPacketComplete() && packetInfoManager != null) {
+        final PacketInfoManager packetInfoManager = getHConnection().getPacketInfoManager();
+        final HPacket packet = new HPacket(p);
+        if (!packet.isPacketComplete() && packetInfoManager != null)
             packet.completePacket(packetInfoManager);
-        }
-
         return packet;
     }
 
-    public void btn_toExpr_clicked(ActionEvent actionEvent) {
-        txt_exprArea.setText(parseToPacket(txt_packetArea.getText()).toExpression(getHConnection().getPacketInfoManager(), true));
-    }
-
-    public void btn_toPacket_clicked(ActionEvent actionEvent) {
-        txt_packetArea.setText(parseToPacket(txt_exprArea.getText()).toString());
-    }
-
     private void initLanguageBinding() {
-        lbl_integer.textProperty().bind(new TranslatableString("%s:", "tab.tools.type.integer"));
-        lbl_uShort.textProperty().bind(new TranslatableString("%s:", "tab.tools.type.ushort"));
+        integerLabel.textProperty().bind(new TranslatableString("%s:", "tab.tools.type.integer"));
+        uShortLabel.textProperty().bind(new TranslatableString("%s:", "tab.tools.type.ushort"));
 
-        TranslatableString encode = new TranslatableString("%s", "tab.tools.button.encode");
-        TranslatableString decode = new TranslatableString("%s", "tab.tools.button.decode");
-        btnEncodeInt.textProperty().bind(encode);
-        btnEncodeUShort.textProperty().bind(encode);
-        btnDecodeInt.textProperty().bind(decode);
-        btnDecodeUshort.textProperty().bind(decode);
+        final TranslatableString encode = new TranslatableString("%s", "tab.tools.button.encode");
+        final TranslatableString decode = new TranslatableString("%s", "tab.tools.button.decode");
+        encodeIntegerButton.textProperty().bind(encode);
+        encodeUShortButton.textProperty().bind(encode);
+        decodeIntegerButton.textProperty().bind(decode);
+        decodeUShortButton.textProperty().bind(decode);
 
-        lbl_encodingDecoding.textProperty().bind(new TranslatableString("%s/%s", "tab.tools.encoding", "tab.tools.decoding"));
-
-        lbl_packetToExpression.textProperty().bind(new TranslatableString("%s <-> %s", "tab.tools.packet", "tab.tools.expression"));
+        encodingOrDecodingLabel.textProperty().bind(new TranslatableString("%s/%s", "tab.tools.encoding", "tab.tools.decoding"));
+        packetToExpressionLabel.textProperty().bind(new TranslatableString("%s <-> %s", "tab.tools.packet", "tab.tools.expression"));
     }
 }

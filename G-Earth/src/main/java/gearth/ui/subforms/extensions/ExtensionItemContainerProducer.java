@@ -10,8 +10,8 @@ import javafx.scene.layout.VBox;
  */
 public class ExtensionItemContainerProducer {
 
-    private VBox parent;
-    private ScrollPane scrollPane;
+    private final VBox parent;
+    private final ScrollPane scrollPane;
 
     private final Object lock = new Object();
     private int port = -1;

@@ -1,6 +1,5 @@
 package gearth.ui.subforms.injection;
 
-import gearth.GEarth;
 import gearth.misc.StringifyAble;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;

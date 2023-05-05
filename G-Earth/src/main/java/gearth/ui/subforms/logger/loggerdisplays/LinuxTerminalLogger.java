@@ -57,7 +57,7 @@ class LinuxTerminalLogger extends SimpleTerminalLogger {
 
         output.append(colorizePackets.get("ENGLISH"));
 
-        System.out.println(output.toString());
+        System.out.println(output);
     }
 
     @Override

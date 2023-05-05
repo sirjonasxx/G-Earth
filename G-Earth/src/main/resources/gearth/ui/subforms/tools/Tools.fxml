@@ -46,69 +46,69 @@
             <GridPane.margin>
                 <Insets/>
             </GridPane.margin>
-            <Label fx:id="lbl_integer" alignment="CENTER" text="Integer:">
+            <Label fx:id="integerLabel" alignment="CENTER" text="Integer:">
                 <GridPane.margin>
                     <Insets left="10.0"/>
                 </GridPane.margin>
             </Label>
-            <TextField fx:id="txt_intDecoded" maxHeight="1.7976931348623157E308"
+            <TextField fx:id="decodedIntegerField" maxHeight="1.7976931348623157E308"
                        maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS">
                 <GridPane.margin>
                     <Insets bottom="7.0" left="5.0" right="5.0" top="7.0"/>
                 </GridPane.margin>
             </TextField>
-            <Button fx:id="btnEncodeInt" disable="true" maxHeight="1.7976931348623157E308"
+            <Button fx:id="encodeIntegerButton" disable="true" maxHeight="1.7976931348623157E308"
                     maxWidth="1.7976931348623157E308" mnemonicParsing="false"
-                    onAction="#btnEncodeInt_clicked" text="Encode" GridPane.columnIndex="2"
+                    onAction="#onClickEncodeIntegerButton" text="Encode" GridPane.columnIndex="2"
                     GridPane.halignment="CENTER">
                 <GridPane.margin>
                     <Insets bottom="7.0" left="5.0" right="5.0" top="7.0"/>
                 </GridPane.margin>
             </Button>
-            <Button fx:id="btnDecodeInt" disable="true" maxHeight="1.7976931348623157E308"
+            <Button fx:id="decodeIntegerButton" disable="true" maxHeight="1.7976931348623157E308"
                     maxWidth="1.7976931348623157E308" mnemonicParsing="false"
-                    onAction="#btnDecodeInt_clicked" text="Decode" GridPane.columnIndex="3"
+                    onAction="#onClickDecodeIntegerButton" text="Decode" GridPane.columnIndex="3"
                     GridPane.halignment="CENTER">
                 <GridPane.margin>
                     <Insets bottom="7.0" left="5.0" right="5.0" top="7.0"/>
                 </GridPane.margin>
             </Button>
-            <TextField fx:id="txt_intEncoded" maxHeight="1.7976931348623157E308"
+            <TextField fx:id="encodedIntegerField" maxHeight="1.7976931348623157E308"
                        maxWidth="1.7976931348623157E308" GridPane.columnIndex="4">
                 <GridPane.margin>
                     <Insets bottom="7.0" left="5.0" right="5.0" top="7.0"/>
                 </GridPane.margin>
             </TextField>
 
-            <Label fx:id="lbl_uShort" alignment="CENTER" text="Ushort:" GridPane.rowIndex="1">
+            <Label fx:id="uShortLabel" alignment="CENTER" text="Ushort:" GridPane.rowIndex="1">
                 <GridPane.margin>
                     <Insets left="10.0"/>
                 </GridPane.margin>
             </Label>
-            <TextField fx:id="txt_ushortDecoded" maxHeight="1.7976931348623157E308"
+            <TextField fx:id="decodedUShortField" maxHeight="1.7976931348623157E308"
                        maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS"
                        GridPane.rowIndex="1">
                 <GridPane.margin>
                     <Insets bottom="7.0" left="5.0" right="5.0" top="7.0"/>
                 </GridPane.margin>
             </TextField>
-            <Button fx:id="btnEncodeUShort" disable="true" maxHeight="1.7976931348623157E308"
+            <Button fx:id="encodeUShortButton" disable="true" maxHeight="1.7976931348623157E308"
                     maxWidth="1.7976931348623157E308" mnemonicParsing="false"
-                    onAction="#btnEncodeUShort_clicked" text="Encode" GridPane.columnIndex="2"
+                    onAction="#onClickEncodeUShortButton" text="Encode" GridPane.columnIndex="2"
                     GridPane.halignment="CENTER" GridPane.rowIndex="1">
                 <GridPane.margin>
                     <Insets bottom="7.0" left="5.0" right="5.0" top="7.0"/>
                 </GridPane.margin>
             </Button>
-            <Button fx:id="btnDecodeUshort" disable="true" maxHeight="1.7976931348623157E308"
+            <Button fx:id="decodeUShortButton" disable="true" maxHeight="1.7976931348623157E308"
                     maxWidth="1.7976931348623157E308" mnemonicParsing="false"
-                    onAction="#btnDecodeUshort_clicked" text="Decode" GridPane.columnIndex="3"
+                    onAction="#onClickDecodeUShortButton" text="Decode" GridPane.columnIndex="3"
                     GridPane.halignment="CENTER" GridPane.rowIndex="1">
                 <GridPane.margin>
                     <Insets bottom="7.0" left="5.0" right="5.0" top="7.0"/>
                 </GridPane.margin>
             </Button>
-            <TextField fx:id="txt_ushortEncoded" maxHeight="1.7976931348623157E308"
+            <TextField fx:id="encodedUShortField" maxHeight="1.7976931348623157E308"
                        maxWidth="1.7976931348623157E308" GridPane.columnIndex="4" GridPane.rowIndex="1">
                 <GridPane.margin>
                     <Insets bottom="7.0" left="5.0" right="5.0" top="7.0"/>
@@ -116,7 +116,7 @@
             </TextField>
 
         </GridPane>
-        <Label fx:id="lbl_encodingDecoding" text="Encoding/Decoding" textFill="#000000cc">
+        <Label fx:id="encodingOrDecodingLabel" text="Encoding/Decoding" textFill="#000000cc">
             <GridPane.margin>
                 <Insets left="6.0" top="5.0"/>
             </GridPane.margin>
@@ -149,29 +149,29 @@
             <GridPane.margin>
                 <Insets/>
             </GridPane.margin>
-            <Button fx:id="btn_toExpr" disable="true" maxHeight="1.7976931348623157E308"
-                    maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#btn_toExpr_clicked"
+            <Button fx:id="convertPacketToExpressionButton" disable="true" maxHeight="1.7976931348623157E308"
+                    maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onClickPacketToExpressionButton"
                     text="------&gt;" GridPane.columnIndex="1" GridPane.halignment="CENTER">
                 <GridPane.margin>
                     <Insets bottom="7.0" left="5.0" right="5.0" top="7.0"/>
                 </GridPane.margin>
             </Button>
-            <TextArea fx:id="txt_packetArea" maxHeight="1.7976931348623157E308"
+            <TextArea fx:id="packetArea" maxHeight="1.7976931348623157E308"
                       maxWidth="1.7976931348623157E308" prefHeight="200.0" prefWidth="200.0" wrapText="true"
                       GridPane.halignment="CENTER">
                 <GridPane.margin>
                     <Insets bottom="7.0" left="7.0" right="5.0" top="7.0"/>
                 </GridPane.margin>
             </TextArea>
-            <Button fx:id="btn_toPacket" disable="true" maxHeight="1.7976931348623157E308"
+            <Button fx:id="convertExpressionToPacketButton" disable="true" maxHeight="1.7976931348623157E308"
                     maxWidth="1.7976931348623157E308" mnemonicParsing="false"
-                    onAction="#btn_toPacket_clicked" text="&lt;------" GridPane.columnIndex="2"
+                    onAction="#onClickExpressionToPacketButton" text="&lt;------" GridPane.columnIndex="2"
                     GridPane.halignment="CENTER">
                 <GridPane.margin>
                     <Insets bottom="7.0" left="5.0" right="5.0" top="7.0"/>
                 </GridPane.margin>
             </Button>
-            <TextArea fx:id="txt_exprArea" maxHeight="1.7976931348623157E308"
+            <TextArea fx:id="expressionArea" maxHeight="1.7976931348623157E308"
                       maxWidth="1.7976931348623157E308" prefHeight="200.0" prefWidth="200.0" wrapText="true"
                       GridPane.columnIndex="3" GridPane.halignment="CENTER">
                 <GridPane.margin>
@@ -179,7 +179,7 @@
                 </GridPane.margin>
             </TextArea>
         </GridPane>
-        <Label fx:id="lbl_packetToExpression" text="Packet &lt;-&gt; Expression" textFill="#000000cc">
+        <Label fx:id="packetToExpressionLabel" text="Packet &lt;-&gt; Expression" textFill="#000000cc">
             <GridPane.margin>
                 <Insets left="6.0" top="2.0"/>
             </GridPane.margin>

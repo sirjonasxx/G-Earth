@@ -16,10 +16,10 @@
    <children>
       <AnchorPane prefHeight="262.0" prefWidth="318.0">
          <children>
-            <CheckBox fx:id="cbx_alwaysOnTop" layoutX="14.0" layoutY="232.0" mnemonicParsing="false" text="Always on top" />
-            <Hyperlink fx:id="url_troubleshooting" alignment="CENTER_RIGHT" layoutX="170.0" layoutY="232.0" prefWidth="150.0" text="Troubleshooting" />
-            <Label fx:id="lbl_notepad" layoutX="14.0" layoutY="8.0" text="Notepad:" textFill="#000000bd" />
-            <TextArea fx:id="txtarea_notepad" layoutX="11.0" layoutY="31.0" prefHeight="197.0" prefWidth="312.0" />
+            <CheckBox fx:id="alwaysOnTopBox" layoutX="14.0" layoutY="232.0" mnemonicParsing="false" text="Always on top" />
+            <Hyperlink fx:id="troubleshootingLink" alignment="CENTER_RIGHT" layoutX="170.0" layoutY="232.0" prefWidth="150.0" text="Troubleshooting" />
+            <Label fx:id="notepadLabel" layoutX="14.0" layoutY="8.0" text="Notepad:" textFill="#000000bd" />
+            <TextArea fx:id="notepadTextArea" layoutX="11.0" layoutY="31.0" prefHeight="197.0" prefWidth="312.0" />
          </children>
       </AnchorPane>
       <GridPane GridPane.columnIndex="1">
@@ -35,7 +35,7 @@
           <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" prefHeight="232.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
-            <GridPane fx:id="grd_advanced" disable="true" prefHeight="161.0" prefWidth="299.0" style="-fx-border-color: #888888; -fx-border-radius: 5px;" GridPane.rowIndex="5">
+            <GridPane fx:id="advancedPane" disable="true" prefHeight="161.0" prefWidth="299.0" style="-fx-border-color: #888888; -fx-border-radius: 5px;" GridPane.rowIndex="5">
               <columnConstraints>
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
               </columnConstraints>
@@ -52,10 +52,10 @@
                   <Insets left="7.0" top="3.0" />
                </padding>
                <children>
-                  <CheckBox fx:id="cbx_useSocks" mnemonicParsing="false" text="Use SOCKS proxy" />
-                  <CheckBox fx:id="cbx_disableDecryption" mnemonicParsing="false" text="Disable decryption" GridPane.rowIndex="2" />
-                  <CheckBox fx:id="cbx_debug" mnemonicParsing="false" text="Debug to stdout" GridPane.rowIndex="3" />
-                  <GridPane fx:id="grd_socksInfo" disable="true" prefHeight="54.0" prefWidth="81.0" GridPane.rowIndex="1">
+                  <CheckBox fx:id="advancedUseSocksBox" mnemonicParsing="false" text="Use SOCKS proxy" />
+                  <CheckBox fx:id="advancedDisableDecryptionBox" mnemonicParsing="false" text="Disable decryption" GridPane.rowIndex="2" />
+                  <CheckBox fx:id="advancedEnableDebugBox" mnemonicParsing="false" text="Debug to stdout" GridPane.rowIndex="3" />
+                  <GridPane fx:id="advancedSocksInfoGrid" disable="true" prefHeight="54.0" prefWidth="81.0" GridPane.rowIndex="1">
                     <columnConstraints>
                       <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                     </columnConstraints>
@@ -78,8 +78,8 @@
                             <RowConstraints maxHeight="2.0" minHeight="29.0" prefHeight="29.0" vgrow="SOMETIMES" />
                           </rowConstraints>
                            <children>
-                              <Label fx:id="lbl_proxyIp" text="Proxy IP:" />
-                              <TextField fx:id="txt_socksIp" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" promptText="ip:port" GridPane.columnIndex="1">
+                              <Label fx:id="advancedSocksProxyIpLabel" text="Proxy IP:" />
+                              <TextField fx:id="advancedSocketProxyIpField" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" promptText="ip:port" GridPane.columnIndex="1">
                                  <opaqueInsets>
                                     <Insets />
                                  </opaqueInsets>
@@ -96,7 +96,7 @@
                   </GridPane>
                </children>
             </GridPane>
-            <CheckBox fx:id="cbx_advanced" mnemonicParsing="false" text="Advanced" textFill="#000000ba" GridPane.rowIndex="4">
+            <CheckBox fx:id="enableAdvancedBox" mnemonicParsing="false" text="Advanced" textFill="#000000ba" GridPane.rowIndex="4">
                <GridPane.margin>
                   <Insets left="10.0" top="2.0" />
                </GridPane.margin>
@@ -104,17 +104,17 @@
                   <Insets top="2.0" />
                </padding>
             </CheckBox>
-            <CheckBox fx:id="cbx_gpython" mnemonicParsing="false" onAction="#gpythonCbxClick" text="G-Python scripting" textFill="#000000ba" GridPane.rowIndex="3">
+            <CheckBox fx:id="enableGPythonBox" mnemonicParsing="false" onAction="#onClickGPythonButton" text="G-Python scripting" textFill="#000000ba" GridPane.rowIndex="3">
                <GridPane.margin>
                   <Insets left="10.0" top="2.0" />
                </GridPane.margin>
             </CheckBox>
-            <CheckBox fx:id="cbx_admin" layoutX="20.0" layoutY="25.0" mnemonicParsing="false" onAction="#adminCbxClick" selected="true" text="Client-side staff permissions" textFill="#000000ba" GridPane.rowIndex="2">
+            <CheckBox fx:id="enableClientSideStaffPermissionsBox" layoutX="20.0" layoutY="25.0" mnemonicParsing="false" onAction="#onClickClientSideStaffPermissionsBox" selected="true" text="Client-side staff permissions" textFill="#000000ba" GridPane.rowIndex="2">
                <GridPane.margin>
                   <Insets left="10.0" top="2.0" />
                </GridPane.margin>
             </CheckBox>
-            <CheckBox fx:id="cbx_develop" layoutX="20.0" layoutY="52.0" mnemonicParsing="false" onAction="#developCbxClick" text="Developer mode" textFill="#000000ba" GridPane.rowIndex="1">
+            <CheckBox fx:id="enableDeveloperModeBox" layoutX="20.0" layoutY="52.0" mnemonicParsing="false" onAction="#onClickDeveloperModeBox" text="Developer mode" textFill="#000000ba" GridPane.rowIndex="1">
                <GridPane.margin>
                   <Insets left="10.0" />
                </GridPane.margin>
