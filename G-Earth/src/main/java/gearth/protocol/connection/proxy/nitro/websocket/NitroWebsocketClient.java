@@ -3,6 +3,7 @@ package gearth.protocol.connection.proxy.nitro.websocket;
 import gearth.protocol.HConnection;
 import gearth.protocol.HMessage;
 import gearth.protocol.connection.*;
+import gearth.protocol.connection.proxy.nitro.NitroConnectionState;
 import gearth.protocol.connection.proxy.nitro.NitroConstants;
 import gearth.protocol.connection.proxy.nitro.NitroProxyProvider;
 import gearth.protocol.packethandler.nitro.NitroPacketHandler;
@@ -25,8 +26,7 @@ public class NitroWebsocketClient implements NitroSession {
     private static final Logger logger = LoggerFactory.getLogger(NitroWebsocketClient.class);
 
     private final HProxySetter proxySetter;
-    private final HStateSetter stateSetter;
-    private final HConnection connection;
+    private final NitroConnectionState state;
     private final NitroProxyProvider proxyProvider;
     private final NitroWebsocketServer server;
     private final NitroPacketHandler packetHandler;
@@ -36,10 +36,9 @@ public class NitroWebsocketClient implements NitroSession {
 
     public NitroWebsocketClient(HProxySetter proxySetter, HStateSetter stateSetter, HConnection connection, NitroProxyProvider proxyProvider) {
         this.proxySetter = proxySetter;
-        this.stateSetter = stateSetter;
-        this.connection = connection;
+        this.state = new NitroConnectionState(stateSetter);
         this.proxyProvider = proxyProvider;
-        this.server = new NitroWebsocketServer(connection, this);
+        this.server = new NitroWebsocketServer(connection, this, this.state);
         this.packetHandler = new NitroPacketHandler(HMessage.Direction.TOSERVER, server, connection.getExtensionHandler(), connection.getTrafficObservables());
         this.shutdownLock = new AtomicBoolean();
     }
@@ -72,11 +71,13 @@ public class NitroWebsocketClient implements NitroSession {
         );
 
         proxySetter.setProxy(proxy);
-        stateSetter.setState(HState.CONNECTED);
+        state.setConnected(HMessage.Direction.TOSERVER);
     }
 
     @OnMessage
     public void onMessage(byte[] b, Session session) throws IOException {
+        logger.debug("Received packet from browser");
+
         packetHandler.act(b);
     }
 
@@ -133,7 +134,7 @@ public class NitroWebsocketClient implements NitroSession {
 
             // Reset program state.
             proxySetter.setProxy(null);
-            stateSetter.setState(HState.ABORTING);
+            state.setAborting();
         }
     }
 }

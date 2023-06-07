@@ -2,6 +2,7 @@ package gearth.protocol.connection.proxy.nitro.websocket;
 
 import gearth.protocol.HConnection;
 import gearth.protocol.HMessage;
+import gearth.protocol.connection.proxy.nitro.NitroConnectionState;
 import gearth.protocol.connection.proxy.nitro.NitroConstants;
 import gearth.protocol.packethandler.PacketHandler;
 import gearth.protocol.packethandler.nitro.NitroPacketHandler;
@@ -47,10 +48,12 @@ public class NitroWebsocketServer implements WebSocketListener, NitroSession {
 
     private final PacketHandler packetHandler;
     private final NitroWebsocketClient client;
+    private final NitroConnectionState state;
     private Session activeSession = null;
 
-    public NitroWebsocketServer(HConnection connection, NitroWebsocketClient client) {
+    public NitroWebsocketServer(HConnection connection, NitroWebsocketClient client, NitroConnectionState state) {
         this.client = client;
+        this.state = state;
         this.packetHandler = new NitroPacketHandler(HMessage.Direction.TOCLIENT, client, connection.getExtensionHandler(), connection.getTrafficObservables());
     }
 
@@ -83,8 +86,6 @@ public class NitroWebsocketServer implements WebSocketListener, NitroSession {
 
             client.start();
             client.connect(this, URI.create(websocketUrl), request);
-
-            logger.info("Connected to origin websocket");
         } catch (Exception e) {
             throw new IOException("Failed to start websocket client to origin " + websocketUrl, e);
         }
@@ -139,6 +140,7 @@ public class NitroWebsocketServer implements WebSocketListener, NitroSession {
     @Override
     public void onWebSocketConnect(org.eclipse.jetty.websocket.api.Session session) {
         activeSession = session;
+        state.setConnected(HMessage.Direction.TOCLIENT);
     }
 
     @Override
