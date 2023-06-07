@@ -6,6 +6,8 @@ import gearth.protocol.connection.proxy.nitro.NitroConstants;
 import gearth.protocol.packethandler.PacketHandler;
 import gearth.protocol.packethandler.nitro.NitroPacketHandler;
 import org.eclipse.jetty.client.HttpClient;
+import org.eclipse.jetty.http.HttpField;
+import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.WebSocketListener;
@@ -36,7 +38,11 @@ public class NitroWebsocketServer implements WebSocketListener, NitroSession {
             "Sec-WebSocket-Version",
             "Host",
             "Connection",
-            "Upgrade"
+            "Upgrade",
+            "User-Agent", // Added by default
+            "Accept-Encoding", // Added by default
+            "Cache-Control", // Added by default
+            "Pragma" // Added by default
     ));
 
     private final PacketHandler packetHandler;
@@ -56,6 +62,8 @@ public class NitroWebsocketServer implements WebSocketListener, NitroSession {
 
             final ClientUpgradeRequest request = new ClientUpgradeRequest();
 
+            request.addExtensions("permessage-deflate");
+
             clientHeaders.forEach((key, value) -> {
                 if (SKIP_HEADERS.contains(key)) {
                     return;
@@ -63,6 +71,13 @@ public class NitroWebsocketServer implements WebSocketListener, NitroSession {
 
                 request.setHeader(key, value);
             });
+
+            if (clientHeaders.containsKey("User-Agent")) {
+                final String realUserAgent = clientHeaders.get(HttpHeader.USER_AGENT.toString()).get(0);
+                final HttpField clientUserAgent = new HttpField(HttpHeader.USER_AGENT, realUserAgent);
+
+                client.getHttpClient().setUserAgentField(clientUserAgent);
+            }
 
             logger.info("Connecting to origin websocket at {}", websocketUrl);
 
