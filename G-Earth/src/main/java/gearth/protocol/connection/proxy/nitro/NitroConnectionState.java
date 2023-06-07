@@ -30,16 +30,24 @@ public class NitroConnectionState {
         this.checkConnected();
     }
 
-    public void checkConnected() {
+    public boolean isConnected() {
         if (this.aborting) {
-            return;
+            return false;
         }
 
         if (!this.toClient) {
-            return;
+            return false;
         }
 
         if (!this.toServer) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private void checkConnected() {
+        if (!this.isConnected()) {
             return;
         }
 
