@@ -10,43 +10,53 @@ import javafx.scene.layout.StackPane;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Created by Jonas on 11/04/18.
  */
 public class PauseResumeButton extends StackPane{
 
-    private boolean isPaused[] = {false};
+    private final boolean[] isPaused = {false};
 
+    private final ImageView imageView;
+    private final Image imagePause;
+    private final Image imagePauseOnHover;
 
-    private ImageView imageView;
-    private Image imagePause;
-    private Image imagePauseOnHover;
-
-    private Image imageResume;
-    private Image imageResumeOnHover;
+    private final Image imageResume;
+    private final Image imageResumeOnHover;
 
     private volatile boolean isHovering = false;
 
-    private List<InvalidationListener> clickListeners = new ArrayList<>();
+    private final List<InvalidationListener> clickListeners = new ArrayList<>();
 
     public PauseResumeButton(boolean isPaused) {
         this.isPaused[0] = isPaused;
 
-        this.imagePause = new Image(getClass().getResourceAsStream("files/ButtonPause.png"));
-        this.imagePauseOnHover = new Image(getClass().getResourceAsStream("files/ButtonPauseHover.png"));
-        this.imageResume = new Image(getClass().getResourceAsStream("files/ButtonResume.png"));
-        this.imageResumeOnHover = new Image(getClass().getResourceAsStream("files/ButtonResumeHover.png"));
+        this.imagePause = getImageResource("files/ButtonPause.png");
+        this.imagePauseOnHover = getImageResource("files/ButtonPauseHover.png");
+        this.imageResume = getImageResource("files/ButtonResume.png");
+        this.imageResumeOnHover = getImageResource("files/ButtonResumeHover.png");
         this.imageView = new ImageView();
 
         setCursor(Cursor.DEFAULT);
         getChildren().add(imageView);
-        setOnMouseEntered(onMouseHover);
-        setOnMouseExited(onMouseHoverDone);
+        setOnMouseEntered( t -> {
+            imageView.setImage(isPaused() ? imageResumeOnHover : imagePauseOnHover);
+            isHovering = true;
+        });
+        setOnMouseExited(t -> {
+            imageView.setImage(isPaused() ? imageResume : imagePause);
+            isHovering = false;
+        });
 
         imageView.setImage(isPaused() ? imageResume : imagePause);
 
         setEventHandler(MouseEvent.MOUSE_CLICKED, event -> click());
+    }
+
+    private Image getImageResource(String name) {
+        return new Image(Objects.requireNonNull(getClass().getResourceAsStream(name)));
     }
 
     public boolean isPaused() {
@@ -57,24 +67,8 @@ public class PauseResumeButton extends StackPane{
         clickListeners.add(listener);
     }
 
-
-    private EventHandler<MouseEvent> onMouseHover =
-            t -> {
-        imageView.setImage(isPaused() ? imageResumeOnHover : imagePauseOnHover);
-        isHovering = true;
-            };
-
-    private EventHandler<MouseEvent> onMouseHoverDone =
-            t -> {
-        imageView.setImage(isPaused() ? imageResume : imagePause);
-        isHovering = false;
-            };
-
-
     public void setPaused(boolean paused) {
         isPaused[0] = paused;
-
-
         imageView.setImage(isPaused() ?
                 (isHovering ? imageResumeOnHover : imageResume) :
                 (isHovering ? imagePauseOnHover : imagePause)
@@ -86,22 +80,4 @@ public class PauseResumeButton extends StackPane{
             clickListeners.get(i).invalidated(null);
         }
     }
-
-//    private ImageView imageView;
-//    private Image image;
-//    private Image imageOnHover;
-//    private boolean isVisible;
-//
-//    //paths zijn relatief aan deze classpath
-//    public BoxButton(String imagePath, String imageOnHoverPath) {
-//        this.image = new Image(getClass().getResourceAsStream(imagePath));
-//        this.imageOnHover = new Image(getClass().getResourceAsStream(imageOnHoverPath));
-//        this.imageView = new ImageView();
-//
-//        setCursor(Cursor.DEFAULT);
-//        getChildren().add(imageView);
-//        setOnMouseEntered(onMouseHover);
-//        setOnMouseExited(onMouseHoverDone);
-//    }
-
 }

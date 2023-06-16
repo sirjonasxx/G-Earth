@@ -1,16 +1,16 @@
 package gearth.extensions;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import gearth.misc.HostInfo;
 import gearth.misc.listenerpattern.Observable;
 import gearth.services.packet_info.PacketInfoManager;
 import javafx.application.HostServices;
 import javafx.application.Platform;
-import javafx.beans.InvalidationListener;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.stage.Stage;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
-
-import java.util.function.Consumer;
 
 /**
  * Created by Jonas on 22/09/18.
@@ -99,8 +99,17 @@ public abstract class ExtensionForm extends ExtensionBase {
     }
 
     public HostInfo getHostInfo() {
-        return extension.observableHostInfo.getObject();
+        return extension.hostInfoProperty.get();
     }
 
-    Observable<Runnable> fieldsInitialized = new Observable<>(Runnable::run);
+    private final BooleanProperty fieldsInitializedProperty = new SimpleBooleanProperty(false);
+
+    public void setFieldsInitialised(boolean value) {
+        fieldsInitializedProperty.set(value);
+    }
+
+    public BooleanProperty fieldsInitialisedProperty() {
+        return fieldsInitializedProperty;
+    }
+
 }

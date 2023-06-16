@@ -18,8 +18,8 @@ public abstract class ThemedExtensionFormCreator extends ExtensionFormCreator {
 
     @Override
     protected ExtensionForm createForm(Stage primaryStage) throws Exception {
-        FXMLLoader loader = new FXMLLoader(getFormResource());
-        Parent root = loader.load();
+        final FXMLLoader loader = new FXMLLoader(getFormResource());
+        final Parent root = loader.load();
 
         primaryStage.setTitle(getTitle());
         primaryStage.setScene(new Scene(root));
@@ -27,31 +27,38 @@ public abstract class ThemedExtensionFormCreator extends ExtensionFormCreator {
         primaryStage.setResizable(false);
         primaryStage.sizeToScene();
 
-        Theme defaultTheme = ThemeFactory.getDefaultTheme();
-        DefaultTitleBarConfig config = new DefaultTitleBarConfig(primaryStage, defaultTheme) {
+        final Theme defaultTheme = ThemeFactory.getDefaultTheme();
+        final DefaultTitleBarConfig config = new DefaultTitleBarConfig(primaryStage, defaultTheme) {
             @Override
             public boolean displayThemePicker() {
                 return false;
             }
         };
         TitleBarController.create(primaryStage, config);
-        Platform.runLater(() -> {
-            primaryStage.getScene().getRoot().getStyleClass().add(defaultTheme.title().replace(" ", "-").toLowerCase());
-            primaryStage.getScene().getRoot().getStyleClass().add(defaultTheme.isDark() ? "g-dark" : "g-light");
-        });
+        Platform.runLater(() -> primaryStage.getScene().getRoot().getStyleClass().addAll(
+                defaultTheme.title().replace(" ", "-").toLowerCase(),
+                defaultTheme.isDark() ? "g-dark" : "g-light"
+        ));
 
-        ExtensionForm extensionForm = loader.getController();
-        extensionForm.fieldsInitialized.addListener(() -> extensionForm.extension.observableHostInfo.addListener(hostInfo -> {
-            if (hostInfo.getAttributes().containsKey("theme")) {
-                String themeTitle = hostInfo.getAttributes().get("theme");
-                Theme theme = ThemeFactory.themeForTitle(themeTitle);
+        final ExtensionForm extensionForm = loader.getController();
+        extensionForm
+                .fieldsInitialisedProperty()
+                .addListener(observable -> listenForThemeChange(primaryStage, config, extensionForm));
+        return extensionForm;
+    }
+
+    private static void listenForThemeChange(Stage primaryStage, DefaultTitleBarConfig config, ExtensionForm extensionForm) {
+        extensionForm.extension.hostInfoProperty.addListener((observable, oldValue, newValue) -> {
+            final String themeTitle = newValue.getAttributes().get("theme");
+            if (themeTitle != null) {
+                final Theme theme = ThemeFactory.themeForTitle(themeTitle);
                 if (config.getCurrentTheme() != theme) {
-                    String styleClassOld = config.getCurrentTheme().title().replace(" ", "-").toLowerCase();
-                    String lightClassOld = config.getCurrentTheme().isDark() ? "g-dark" : "g-light";
-                    String styleClassNew = theme.title().replace(" ", "-").toLowerCase();
-                    String lightClassNew = theme.isDark() ? "g-dark" : "g-light";
+                    final String styleClassOld = config.getCurrentTheme().title().replace(" ", "-").toLowerCase();
+                    final String lightClassOld = config.getCurrentTheme().isDark() ? "g-dark" : "g-light";
+                    final String styleClassNew = theme.title().replace(" ", "-").toLowerCase();
+                    final String lightClassNew = theme.isDark() ? "g-dark" : "g-light";
                     config.setTheme(theme);
-                    Parent currentRoot = primaryStage.getScene().getRoot();
+                    final Parent currentRoot = primaryStage.getScene().getRoot();
                     Platform.runLater(() -> {
                         currentRoot.getStyleClass().remove(styleClassOld);
                         currentRoot.getStyleClass().add(styleClassNew);
@@ -62,13 +69,11 @@ public abstract class ThemedExtensionFormCreator extends ExtensionFormCreator {
                     });
                 }
             }
-        }));
-
-
-        return extensionForm;
+        });
     }
 
     protected abstract String getTitle();
+
     protected abstract URL getFormResource();
 
     // can be overridden for more settings

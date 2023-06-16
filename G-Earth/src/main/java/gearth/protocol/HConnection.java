@@ -13,28 +13,28 @@ import gearth.protocol.connection.proxy.ProxyProviderFactory;
 import gearth.protocol.connection.proxy.flash.unix.LinuxRawIpFlashProxyProvider;
 import gearth.protocol.connection.proxy.unity.UnityProxyProvider;
 import gearth.services.extension_handler.ExtensionHandler;
+import gearth.ui.GEarthProperties;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 
 import java.io.IOException;
 import java.util.function.Consumer;
 
 public class HConnection {
 
-    public static volatile boolean DECRYPTPACKETS = true;
-    public static volatile boolean DEBUG = false;
-
     private volatile ExtensionHandler extensionHandler = null;
 
     private volatile Object[] trafficObservables = {new Observable<TrafficListener>(), new Observable<TrafficListener>(), new Observable<TrafficListener>()};
-    private volatile Observable<StateChangeListener> stateObservable = new Observable<>();
-    private volatile Observable<Consumer<Boolean>> developerModeChangeObservable = new Observable<>();
 
-    private volatile HState state = HState.NOT_CONNECTED;
+    @Deprecated
+    private volatile Observable<StateChangeListener> stateObservable = new Observable<>();
+
+    private final ObjectProperty<HState> stateProperty = new SimpleObjectProperty<>(HState.NOT_CONNECTED);
+
     private volatile HProxy proxy = null;
 
     private ProxyProviderFactory proxyProviderFactory;
     private ProxyProvider proxyProvider = null;
-
-    private volatile boolean developerMode = false;
 
     public HConnection() {
         HConnection selff = this;
@@ -47,16 +47,16 @@ public class HConnection {
         PacketSafetyManager.PACKET_SAFETY_MANAGER.initialize(this);
     }
 
+    public ObjectProperty<HState> stateProperty() {
+        return stateProperty;
+    }
+
     public HState getState() {
-        return state;
+        return stateProperty.get();
     }
 
     private void setState(HState state) {
-        if (state != this.state) {
-            HState buffer = this.state;
-            this.state = state;
-            stateObservable.fireEvent(l -> l.stateChanged(buffer, state));
-        }
+        stateProperty.set(state);
     }
 
     // autodetect mode
@@ -107,6 +107,7 @@ public class HConnection {
         }
     }
 
+    @Deprecated
     public Observable<StateChangeListener> getStateObservable() {
         return stateObservable;
     }
@@ -165,11 +166,12 @@ public class HConnection {
     }
 
     public boolean canSendPacket(HMessage.Direction direction, HPacket packet) {
-        return isPacketSendingAllowed(direction, packet) && (developerMode || isPacketSendingSafe(direction, packet));
+        return isPacketSendingAllowed(direction, packet)
+                && (GEarthProperties.isDeveloperModeEnabled() || isPacketSendingSafe(direction, packet));
     }
 
     public boolean isPacketSendingAllowed(HMessage.Direction direction, HPacket packet) {
-        if (state != HState.CONNECTED) return false;
+        if (getState() != HState.CONNECTED) return false;
 
         HProxy proxy = this.proxy;
         if (proxy == null) return false;
@@ -196,14 +198,6 @@ public class HConnection {
         return packetsContainer.isPacketSafe(packet.headerId(), direction);
     }
 
-    public void setDeveloperMode(boolean developerMode) {
-        this.developerMode = developerMode;
-        developerModeChangeObservable.fireEvent(listener -> listener.accept(developerMode));
-    }
-
-    public void onDeveloperModeChange(Consumer<Boolean> onChange) {
-        developerModeChangeObservable.addListener(onChange);
-    }
 
     public String getClientHost() {
         if (proxy == null) {

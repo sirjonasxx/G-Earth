@@ -1,27 +1,24 @@
 package gearth.ui.titlebar;
 
 import gearth.GEarth;
+import gearth.misc.BindingsUtil;
+import gearth.ui.GEarthProperties;
 import gearth.ui.themes.ThemeFactory;
 import gearth.ui.translations.Language;
 import gearth.ui.translations.LanguageBundle;
 import javafx.application.Platform;
-import javafx.beans.InvalidationListener;
-import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import javafx.stage.WindowEvent;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -29,129 +26,127 @@ import java.util.Optional;
 public class TitleBarController {
 
     public Label titleLabel;
-    public Pane titleBar;
     public ImageView titleIcon;
-    public ImageView themeBtn;
-    public ImageView minimizeBtn;
-    public MenuButton languagePicker;
+    public ImageView themeButton;
+    public ImageView minimizeButton;
+    public MenuButton languagePickerMenu;
 
     private Stage stage;
     private TitleBarConfig config;
 
     private Alert alert = null;
+    private double xOffset, yOffset;
+    private boolean isMoving = false;
 
     public static TitleBarController create(Stage stage, TitleBarConfig config) throws IOException {
-        FXMLLoader loader = new FXMLLoader(TitleBarController.class.getResource("Titlebar.fxml"));
-        Parent titleBar = loader.load();
-        TitleBarController controller = initNewController(loader, stage, config);
+        final FXMLLoader loader = new FXMLLoader(TitleBarController.class.getResource("Titlebar.fxml"));
+        final Parent titleBar = loader.load();
+        final TitleBarController controller = initNewController(loader, stage, config);
 
-        VBox newParent = new VBox(titleBar, stage.getScene().getRoot());
+        final VBox newParent = new VBox(titleBar, stage.getScene().getRoot());
         newParent.setId("titlebar-main-container");
-        stage.getScene().setRoot(newParent);
 
+        stage.getScene().setRoot(newParent);
         return controller;
     }
 
     public static TitleBarController create(Alert alert) throws IOException {
+
         GEarth.setAlertOwner(alert);
 
-        FXMLLoader loader = new FXMLLoader(TitleBarController.class.getResource("Titlebar.fxml"));
-        Parent titleBar = loader.load();
-        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+        final FXMLLoader loader = new FXMLLoader(TitleBarController.class.getResource("Titlebar.fxml"));
+        final Parent titleBar = loader.load();
+        final Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
 
-        TitleBarConfig config = new GEarthThemedTitleBarConfig(stage) {
+        final TitleBarConfig config = new GEarthThemedTitleBarConfig(stage) {
             @Override
             public boolean displayMinimizeButton() {
                 return false;
             }
         };
-        TitleBarController controller = initNewController(loader, stage, config);
 
+        final TitleBarController controller = initNewController(loader, stage, config);
         controller.alert = alert;
-        Parent parent = alert.getDialogPane().getScene().getRoot();
-        VBox newParent = new VBox(titleBar, parent);
+
+        final Parent parent = alert.getDialogPane().getScene().getRoot();
+        final VBox newParent = new VBox(titleBar, parent);
         newParent.setId("titlebar-main-container");
+
         stage.setScene(new Scene(newParent));
         stage.getScene().setFill(Color.TRANSPARENT);
 
         return controller;
     }
 
-    private static TitleBarController initNewController(FXMLLoader loader, Stage stage, TitleBarConfig config) throws IOException {
-        TitleBarController controller = loader.getController();
+    private static TitleBarController initNewController(FXMLLoader loader, Stage stage, TitleBarConfig config) {
 
-        controller.stage = stage;
-        controller.config = config;
         stage.initStyle(StageStyle.TRANSPARENT);
 
-        stage.titleProperty().addListener((i) -> controller.setTitle(stage.getTitle()));
-        controller.setTitle(stage.getTitle());
+        final TitleBarController controller = loader.getController();
+        controller.stage = stage;
+        controller.config = config;
+        controller.languagePickerMenu.getItems().setAll(Language.getMenuItems());
+        controller.languagePickerMenu.setGraphic(LanguageBundle.getLanguage().getIcon());
 
-        controller.languagePicker.getItems().addAll(Language.getMenuItems());
-        controller.languagePicker.setGraphic(LanguageBundle.getLanguage().getIcon());
+        BindingsUtil.setAndBind(
+                controller.titleLabel.textProperty(),
+                GEarthProperties.themeTitleBinding,
+                true);
 
-        stage.getIcons().addListener((InvalidationListener) observable -> controller.updateIcon());
-        controller.updateIcon();
+        BindingsUtil.setAndBind(
+                controller.titleIcon.imageProperty(),
+                GEarthProperties.logoSmallImageBinding,
+                true);
 
         Platform.runLater(() -> {
             stage.getScene().setFill(Color.TRANSPARENT);
             stage.getScene().getRoot().getStyleClass().add("root-node");
 
             if (!config.displayMinimizeButton()) {
-                ((GridPane) controller.minimizeBtn.getParent()).getChildren().remove(controller.minimizeBtn);
+                ((GridPane) controller.minimizeButton.getParent()).getChildren().remove(controller.minimizeButton);
             }
 
             if (!config.displayThemePicker()) {
-                ((GridPane) controller.themeBtn.getParent()).getChildren().remove(controller.themeBtn);
-                ((GridPane) controller.languagePicker.getParent()).getChildren().remove(controller.languagePicker);
+                ((GridPane) controller.themeButton.getParent()).getChildren().remove(controller.themeButton);
+                ((GridPane) controller.languagePickerMenu.getParent()).getChildren().remove(controller.languagePickerMenu);
             }
         });
+
         return controller;
     }
 
-    private static void initLanguagePicker() {
-
-    }
-
-    public void updateIcon() {
-        Platform.runLater(() -> titleIcon.setImage(stage.getIcons().size() > 0 ? stage.getIcons().get(0) :
-                new Image(GEarth.class.getResourceAsStream(
-                        String.format("/gearth/ui/themes/%s/logoSmall.png", ThemeFactory.getDefaultTheme().internalName())))));
-    }
-
-    public void setTitle(String title) {
-        Platform.runLater(() -> titleLabel.setText(title));
-    }
-
-    public void handleCloseAction(MouseEvent event) {
+    @FXML
+    public void onClickCloseButton() {
         config.onCloseClicked();
     }
 
-    public void handleMinimizeAction(MouseEvent event) {
+    @FXML
+    public void onClickMinimizeButton() {
         config.onMinimizeClicked();
     }
 
-    private double xOffset, yOffset;
-    private boolean isMoving = false;
-
-    public void handleClickAction(MouseEvent event) {
+    @FXML
+    public void onClick(MouseEvent event) {
         xOffset = event.getSceneX();
         yOffset = event.getSceneY();
         isMoving = true;
     }
 
-    public void handleMovementAction(MouseEvent event) {
+    @FXML
+    public void onMovement(MouseEvent event) {
         if (isMoving) {
             stage.setX(event.getScreenX() - xOffset);
             stage.setY(event.getScreenY() - yOffset);
         }
     }
 
-    public void handleClickReleaseAction(MouseEvent mouseEvent) {
+    @FXML
+    public void onPressReleased() {
         isMoving = false;
     }
 
-    public void toggleTheme(MouseEvent event) {
+    @FXML
+    public void toggleTheme() {
         int themeIndex = ThemeFactory.allThemes().indexOf(config.getCurrentTheme());
         config.setTheme(ThemeFactory.allThemes().get((themeIndex + 1) % ThemeFactory.allThemes().size()));
     }

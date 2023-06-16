@@ -1,5 +1,6 @@
 package gearth.ui.subforms.extensions.logger;
 
+import gearth.misc.StringUtils;
 import javafx.application.Platform;
 import javafx.fxml.Initializable;
 import javafx.scene.layout.BorderPane;
@@ -12,14 +13,13 @@ import java.net.URL;
 import java.util.*;
 
 public class ExtensionLoggerController implements Initializable {
+
     public BorderPane borderPane;
 
-    private Stage stage = null;
     private StyleClassedTextArea area;
 
     private volatile boolean initialized = false;
     private final List<Element> appendOnLoad = new ArrayList<>();
-
 
     @Override
     public void initialize(URL arg0, ResourceBundle arg1) {
@@ -44,8 +44,8 @@ public class ExtensionLoggerController implements Initializable {
 
     private synchronized void appendLog(List<Element> elements) {
         Platform.runLater(() -> {
-            StringBuilder sb = new StringBuilder();
-            StyleSpansBuilder<Collection<String>> styleSpansBuilder = new StyleSpansBuilder<>(0);
+            final StringBuilder sb = new StringBuilder();
+            final StyleSpansBuilder<Collection<String>> styleSpansBuilder = new StyleSpansBuilder<>(0);
 
             for (Element element : elements) {
                 sb.append(element.text);
@@ -66,7 +66,7 @@ public class ExtensionLoggerController implements Initializable {
     }
 
     void log(String s) {
-        s = cleanTextContent(s);
+        s = StringUtils.cleanTextContent(s);
         ArrayList<Element> elements = new ArrayList<>();
 
         String classname, text;
@@ -98,21 +98,6 @@ public class ExtensionLoggerController implements Initializable {
     }
 
     void setStage(Stage stage) {
-        this.stage = stage;
-    }
-
-    private static String cleanTextContent(String text)
-    {
-//        // strips off all non-ASCII characters
-//        text = text.replaceAll("[^\\x00-\\x7F]", "");
-//
-//        // erases all the ASCII control characters
-        text = text.replaceAll("[\\p{Cntrl}&&[^\n\t]]", "");
-
-        // removes non-printable characters from Unicode
-//        text = text.replaceAll("\\p{C}", "");
-
-        return text.trim();
     }
 
 }

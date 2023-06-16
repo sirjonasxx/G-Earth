@@ -1,6 +1,5 @@
 package gearth.protocol.connection.proxy.flash;
 
-import gearth.GEarth;
 import gearth.misc.Cacher;
 import gearth.protocol.HConnection;
 import gearth.protocol.connection.*;
@@ -10,12 +9,11 @@ import gearth.protocol.hostreplacer.hostsfile.HostReplacer;
 import gearth.protocol.hostreplacer.hostsfile.HostReplacerFactory;
 import gearth.protocol.portchecker.PortChecker;
 import gearth.protocol.portchecker.PortCheckerFactory;
+import gearth.ui.GEarthProperties;
 import gearth.ui.titlebar.TitleBarController;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
-import javafx.scene.image.Image;
-import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.*;
@@ -128,7 +126,7 @@ public class NormalFlashProxyProvider extends FlashProxyProvider {
                             Socket client = proxy_server.accept();
                             proxy = potentialProxy;
                             closeAllProxies(proxy);
-                            if (HConnection.DEBUG) System.out.println("accepted a proxy");
+                            if (GEarthProperties.isDebugModeEnabled()) System.out.println("accepted a proxy");
 
                             new Thread(() -> {
                                 try {
@@ -173,7 +171,7 @@ public class NormalFlashProxyProvider extends FlashProxyProvider {
         }
 
 
-        if (HConnection.DEBUG) System.out.println("done waiting for clients with: " + hConnection.getState() );
+        if (GEarthProperties.isDebugModeEnabled()) System.out.println("done waiting for clients with: " + hConnection.getState() );
 
     }
 

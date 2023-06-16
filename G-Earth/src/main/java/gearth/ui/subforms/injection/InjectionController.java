@@ -4,152 +4,157 @@ import gearth.misc.Cacher;
 import gearth.protocol.HConnection;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
+import gearth.ui.GEarthProperties;
 import gearth.ui.SubForm;
 import gearth.ui.translations.LanguageBundle;
 import gearth.ui.translations.TranslatableString;
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
+import javafx.beans.InvalidationListener;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Text;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.net.URL;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-public class InjectionController extends SubForm {
+public class InjectionController extends SubForm implements Initializable {
 
     private static final String HISTORY_CACHE_KEY = "INJECTED_HISTORY";
-    private static final int historylimit = 69;
+    private static final int MAX_HISTORY_ENTRIES = 69;
 
-    public TextArea inputPacket;
-    public Text lbl_corruption;
-    public Text lbl_pcktInfo;
-    public Button btn_sendToServer;
-    public Button btn_sendToClient;
-    public ListView<InjectedPackets> history;
-    public Label lblHistory;
-    public Hyperlink lnk_clearHistory;
+    public TextArea packetTextArea;
+    public Text packetCorruptedText;
+    public Text packetInfoText;
+    public Button sendToServerButton;
+    public Button sendToClientButton;
+    public ListView<InjectedPackets> historyView;
+    public Label historyLabel;
+    public Hyperlink clearHistoryLink;
 
-    private TranslatableString corruption, pcktInfo;
+    private TranslatableString packetCorruptedString;
+    private TranslatableString packetInfoString;
 
+    @Override
     protected void onParentSet() {
-        getHConnection().onDeveloperModeChange(developMode -> updateUI());
-        getHConnection().getStateObservable().addListener((oldState, newState) -> Platform.runLater(this::updateUI));
-
-        inputPacket.textProperty().addListener(event -> Platform.runLater(this::updateUI));
+        final InvalidationListener updateUI = observable -> Platform.runLater(this::updateUI);
+        GEarthProperties.enableDeveloperModeProperty.addListener(updateUI);
+        getHConnection().stateProperty().addListener(updateUI);
+        packetTextArea.textProperty().addListener(updateUI);
     }
 
-    public void initialize() {
-        history.setOnMouseClicked(event -> {
-            if(event.getButton().equals(MouseButton.PRIMARY) && event.getClickCount() == 2) {
-                InjectedPackets injectedPackets = history.getSelectionModel().getSelectedItem();
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        historyView.setOnMouseClicked(event -> {
+            if (event.getButton().equals(MouseButton.PRIMARY) && event.getClickCount() == 2) {
+                final InjectedPackets injectedPackets = historyView.getSelectionModel().getSelectedItem();
                 if (injectedPackets != null) {
                     Platform.runLater(() -> {
-                        inputPacket.setText(injectedPackets.getPacketsAsString());
+                        packetTextArea.setText(injectedPackets.getPacketsAsString());
                         updateUI();
                     });
                 }
             }
         });
-
-        List<Object> rawHistory = Cacher.getList(HISTORY_CACHE_KEY);
-        if (rawHistory != null) {
-            List<InjectedPackets> history = rawHistory.stream()
-                    .map(o -> (String)o).limit(historylimit - 1).map(InjectedPackets::new).collect(Collectors.toList());
-            updateHistoryView(history);
-        }
-
+        findInjectedPackets().ifPresent(this::updateHistoryView);
         initLanguageBinding();
     }
 
-    private static boolean isPacketIncomplete(String line) {
-        boolean unmatchedBrace = false;
-
-        boolean ignoreBrace = false;
-
-        for (int i = 0; i < line.length(); i++) {
-            if (unmatchedBrace && line.charAt(i) == '"' && line.charAt(i - 1) != '\\') {
-                ignoreBrace = !ignoreBrace;
-            }
-
-            if (!ignoreBrace) {
-                if (line.charAt(i) == '{'){
-
-                    unmatchedBrace = true;
-                }
-                else if (line.charAt(i) == '}') {
-                    unmatchedBrace = false;
-                }
-            }
+    @FXML
+    public void onClickSendToServer() {
+        final HPacket[] packets = parsePackets(packetTextArea.getText());
+        for (HPacket packet : packets) {
+            getHConnection().sendToServer(packet);
+            writeToLog(Color.BLUE, String.format("SS -> %s: %d", LanguageBundle.get("tab.injection.log.packetwithid"), packet.headerId()));
         }
-
-        return unmatchedBrace;
+        addToHistory(packets, packetTextArea.getText(), HMessage.Direction.TOSERVER);
     }
 
-    private static HPacket[] parsePackets(String fullText) {
-        LinkedList<HPacket> packets = new LinkedList<>();
-        String[] lines = fullText.split("\n");
-
-        for (int i = 0; i < lines.length; i++) {
-            String line = lines[i];
-            while (isPacketIncomplete(line) && i < lines.length - 1)
-                line += '\n' + lines[++i];
-
-            packets.add(new HPacket(line));
+    @FXML
+    public void onClickSendToClient() {
+        final HPacket[] packets = parsePackets(packetTextArea.getText());
+        for (HPacket packet : packets) {
+            getHConnection().sendToClient(packet);
+            writeToLog(Color.RED, String.format("CS -> %s: %d", LanguageBundle.get("tab.injection.log.packetwithid"), packet.headerId()));
         }
-        return packets.toArray(new HPacket[0]);
+        addToHistory(packets, packetTextArea.getText(), HMessage.Direction.TOCLIENT);
+    }
+
+    @FXML
+    public void onClickClearHistory() {
+        Cacher.put(HISTORY_CACHE_KEY, Collections.emptyList());
+        updateHistoryView(Collections.emptyList());
+    }
+
+    private void addToHistory(HPacket[] packets, String packetsAsString, HMessage.Direction direction) {
+
+        final InjectedPackets injectedPackets = new InjectedPackets(packetsAsString, packets.length, getHConnection().getPacketInfoManager(), direction);
+
+        final List<InjectedPackets> history = Stream
+                .concat(
+                        Stream.of(injectedPackets),
+                        findInjectedPackets()
+                                .filter(old -> !old.isEmpty() && !old.get(0).getPacketsAsString().equals(injectedPackets.getPacketsAsString()))
+                                .orElseGet(Collections::emptyList)
+                                .stream())
+                .collect(Collectors.toList());
+        updateHistoryView(history);
+
+        final List<String> historyAsString = history.stream().map(InjectedPackets::stringify).collect(Collectors.toList());
+        Cacher.put(HISTORY_CACHE_KEY, historyAsString);
+    }
+
+    private void updateHistoryView(List<InjectedPackets> allHistoryItems) {
+        Platform.runLater(() -> historyView.getItems().setAll(allHistoryItems));
     }
 
     private void updateUI() {
         boolean dirty = false;
 
-        corruption.setFormat("%s: %s");
-        corruption.setKey(1, "tab.injection.corrupted.false");
-        lbl_corruption.getStyleClass().clear();
-        lbl_corruption.getStyleClass().add("not-corrupted-label");
+        packetCorruptedString.setFormat("%s: %s");
+        packetCorruptedString.setKey(1, "tab.injection.corrupted.false");
+        packetCorruptedText.getStyleClass().setAll("not-corrupted-label");
 
-        HPacket[] packets = parsePackets(inputPacket.getText());
+        final HPacket[] packets = parsePackets(packetTextArea.getText());
 
         if (packets.length == 0) {
             dirty = true;
-            lbl_corruption.setFill(Paint.valueOf("#ee0404b2"));
-            lbl_corruption.getStyleClass().clear();
-            lbl_corruption.getStyleClass().add("corrupted-label");
+            packetCorruptedText.setFill(Paint.valueOf("#ee0404b2"));
+            packetCorruptedText.getStyleClass().setAll("corrupted-label");
         }
 
         for (int i = 0; i < packets.length; i++) {
             if (packets[i].isCorrupted()) {
                 if (!dirty) {
-                    corruption.setFormat("%s: %s -> " + i);
-                    corruption.setKey(1, "tab.injection.corrupted.true");
-                    lbl_corruption.getStyleClass().clear();
-                    lbl_corruption.getStyleClass().add("corrupted-label");
+                    packetCorruptedString.setFormat("%s: %s -> " + i);
+                    packetCorruptedString.setKey(1, "tab.injection.corrupted.true");
+                    packetCorruptedText.getStyleClass().setAll("corrupted-label");
                     dirty = true;
                 } else
-                    corruption.setFormat(corruption.getFormat() + ", " + i);
+                    packetCorruptedString.setFormat(packetCorruptedString.getFormat() + ", " + i);
             }
         }
 
         if (dirty && packets.length == 1) {
-            corruption.setFormatAndKeys("%s: %s", "tab.injection.corrupted", "tab.injection.corrupted.true");
+            packetCorruptedString.setFormatAndKeys("%s: %s", "tab.injection.corrupted", "tab.injection.corrupted.true");
         }
 
         if (!dirty) {
 
-            HConnection connection = getHConnection();
+            final HConnection connection = getHConnection();
 
-            boolean canSendToClient = Arrays.stream(packets).allMatch(packet ->
+            final boolean canSendToClient = Arrays.stream(packets).allMatch(packet ->
                     connection.canSendPacket(HMessage.Direction.TOCLIENT, packet));
-            boolean canSendToServer = Arrays.stream(packets).allMatch(packet ->
+            final boolean canSendToServer = Arrays.stream(packets).allMatch(packet ->
                     connection.canSendPacket(HMessage.Direction.TOSERVER, packet));
 
-            btn_sendToClient.setDisable(!canSendToClient);
-            btn_sendToServer.setDisable(!canSendToServer);
+            sendToClientButton.setDisable(!canSendToClient);
+            sendToServerButton.setDisable(!canSendToServer);
 
             // mark packet sending unsafe if there is any packet that is unsafe for both TOSERVER and TOCLIENT
             boolean isUnsafe = Arrays.stream(packets).anyMatch(packet ->
@@ -159,122 +164,87 @@ public class InjectionController extends SubForm {
             if (packets.length == 1) {
                 HPacket packet = packets[0];
                 if (isUnsafe) {
-                    pcktInfo.setFormatAndKeys("%s (%s: " + packet.headerId() + ", %s: " + packet.length() + "), %s",
+                    packetInfoString.setFormatAndKeys("%s (%s: " + packet.headerId() + ", %s: " + packet.length() + "), %s",
                             "tab.injection.description.header",
                             "tab.injection.description.id",
                             "tab.injection.description.length",
                             "tab.injection.description.unsafe");
-                }
-                else {
-                    pcktInfo.setFormatAndKeys("%s (%s: " + packet.headerId() + ", %s: " + packet.length() + ")",
+                } else {
+                    packetInfoString.setFormatAndKeys("%s (%s: " + packet.headerId() + ", %s: " + packet.length() + ")",
                             "tab.injection.description.header",
                             "tab.injection.description.id",
                             "tab.injection.description.length");
                 }
-            }
-            else {
+            } else {
                 if (isUnsafe) {
-                    pcktInfo.setFormatAndKeys("%s", "tab.injection.description.unsafe");
-                }
-                else {
-                    pcktInfo.setFormatAndKeys("");
+                    packetInfoString.setFormatAndKeys("%s", "tab.injection.description.unsafe");
+                } else {
+                    packetInfoString.setFormatAndKeys("");
                 }
             }
         } else {
             if (packets.length == 1) {
-                pcktInfo.setFormatAndKeys("%s (%s:NULL, %s: " + packets[0].getBytesLength() + ")",
+                packetInfoString.setFormatAndKeys("%s (%s:NULL, %s: " + packets[0].getBytesLength() + ")",
                         "tab.injection.description.header",
                         "tab.injection.description.id",
                         "tab.injection.description.length");
+            } else {
+                packetInfoString.setFormatAndKeys("");
             }
-            else {
-                pcktInfo.setFormatAndKeys("");
-            }
-
-            btn_sendToClient.setDisable(true);
-            btn_sendToServer.setDisable(true);
+            sendToClientButton.setDisable(true);
+            sendToServerButton.setDisable(true);
         }
-
-    }
-
-    public void sendToServer_clicked(ActionEvent actionEvent) {
-        HPacket[] packets = parsePackets(inputPacket.getText());
-        for (HPacket packet : packets) {
-            getHConnection().sendToServer(packet);
-            writeToLog(Color.BLUE, String.format("SS -> %s: %d", LanguageBundle.get("tab.injection.log.packetwithid"), packet.headerId()));
-        }
-
-        addToHistory(packets, inputPacket.getText(), HMessage.Direction.TOSERVER);
-    }
-
-    public void sendToClient_clicked(ActionEvent actionEvent) {
-        HPacket[] packets = parsePackets(inputPacket.getText());
-        for (HPacket packet : packets) {
-            getHConnection().sendToClient(packet);
-            writeToLog(Color.RED, String.format("CS -> %s: %d", LanguageBundle.get("tab.injection.log.packetwithid"), packet.headerId()));
-        }
-
-        addToHistory(packets, inputPacket.getText(), HMessage.Direction.TOCLIENT);
-    }
-
-    private void addToHistory(HPacket[] packets, String packetsAsString, HMessage.Direction direction) {
-        InjectedPackets injectedPackets = new InjectedPackets(packetsAsString, packets.length, getHConnection().getPacketInfoManager(), direction);
-
-        List<InjectedPackets> newHistory = new ArrayList<>();
-        newHistory.add(injectedPackets);
-
-        List<Object> rawOldHistory = Cacher.getList(HISTORY_CACHE_KEY);
-        if (rawOldHistory != null) {
-            List<InjectedPackets> history = rawOldHistory.stream()
-                    .map(o -> (String)o).limit(historylimit - 1).map(InjectedPackets::new).collect(Collectors.toList());
-
-            // dont add to history if its equal to the latest added packet
-            if (history.size() != 0 && history.get(0).getPacketsAsString().equals(injectedPackets.getPacketsAsString())) {
-                return;
-            }
-
-            newHistory.addAll(history);
-        }
-
-        List<String> historyAsStrings = newHistory.stream().map(InjectedPackets::stringify).collect(Collectors.toList());
-        Cacher.put(HISTORY_CACHE_KEY, historyAsStrings);
-
-        updateHistoryView(newHistory);
-    }
-
-    private void updateHistoryView(List<InjectedPackets> allHistoryItems) {
-        Platform.runLater(() -> {
-            history.getItems().clear();
-            history.getItems().addAll(allHistoryItems);
-        });
-    }
-
-    public void clearHistoryClick(ActionEvent actionEvent) {
-        Cacher.put(HISTORY_CACHE_KEY, new ArrayList<>());
-        updateHistoryView(new ArrayList<>());
     }
 
     private void initLanguageBinding() {
-        lblHistory.textProperty().bind(new TranslatableString("%s", "tab.injection.history"));
-        lblHistory.setTooltip(new Tooltip());
-        lblHistory.getTooltip().textProperty().bind(new TranslatableString("%s", "tab.injection.history.tooltip"));
+        historyLabel.textProperty().bind(new TranslatableString("%s", "tab.injection.history"));
+        historyLabel.setTooltip(new Tooltip());
+        historyLabel.getTooltip().textProperty().bind(new TranslatableString("%s", "tab.injection.history.tooltip"));
 
-        corruption = new TranslatableString("%s: %s", "tab.injection.corrupted", "tab.injection.corrupted.true");
-        lbl_corruption.textProperty().bind(corruption);
+        packetCorruptedString = new TranslatableString("%s: %s", "tab.injection.corrupted", "tab.injection.corrupted.true");
+        packetCorruptedText.textProperty().bind(packetCorruptedString);
 
-        pcktInfo = new TranslatableString("%s (%s:NULL, %s:0)", "tab.injection.description.header", "tab.injection.description.id", "tab.injection.description.length");
-        lbl_pcktInfo.textProperty().bind(pcktInfo);
+        packetInfoString = new TranslatableString("%s (%s:NULL, %s:0)", "tab.injection.description.header", "tab.injection.description.id", "tab.injection.description.length");
+        packetInfoText.textProperty().bind(packetInfoString);
 
-        btn_sendToServer.textProperty().bind(new TranslatableString("%s", "tab.injection.send.toserver"));
-        btn_sendToClient.textProperty().bind(new TranslatableString("%s", "tab.injection.send.toclient"));
+        sendToServerButton.textProperty().bind(new TranslatableString("%s", "tab.injection.send.toserver"));
+        sendToClientButton.textProperty().bind(new TranslatableString("%s", "tab.injection.send.toclient"));
 
-        lnk_clearHistory.textProperty().bind(new TranslatableString("%s", "tab.injection.history.clear"));
+        clearHistoryLink.textProperty().bind(new TranslatableString("%s", "tab.injection.history.clear"));
     }
 
-    public static void main(String[] args) {
-        HPacket[] packets = parsePackets("{l}{h:3}{i:967585}{i:9589}{s:\"furni_inscriptionfuckfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionsssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss\"}{s:\"sirjonasxx-II\"}{s:\"\"}{i:188}{i:0}{i:0}{b:false}");
-        System.out.println(new HPacket("{l}{h:2550}{s:\"ClientPerf\"\"ormance\\\"}\"}{s:\"23\"}{s:\"fps\"}{s:\"Avatars: 1, Objects: 0\"}{i:76970180}").toExpression());
+    private static Optional<List<InjectedPackets>> findInjectedPackets() {
+        return Optional.ofNullable(Cacher.getList(HISTORY_CACHE_KEY))
+                .map(rawList -> rawList.stream()
+                        .limit(MAX_HISTORY_ENTRIES - 1)
+                        .map(o -> (String) o)
+                        .map(InjectedPackets::new)
+                        .collect(Collectors.toList()));
+    }
 
-        System.out.println("hi");
+    private static HPacket[] parsePackets(String fullText) {
+        final LinkedList<HPacket> packets = new LinkedList<>();
+        final String[] lines = fullText.split("\n");
+
+        for (int i = 0; i < lines.length; i++) {
+            String line = lines[i];
+            while (isPacketIncomplete(line) && i < lines.length - 1)
+                line += '\n' + lines[++i];
+            packets.add(new HPacket(line));
+        }
+        return packets.toArray(new HPacket[0]);
+    }
+
+    private static boolean isPacketIncomplete(String line) {
+        boolean unmatchedBrace = false;
+        boolean ignoreBrace = false;
+        for (int i = 0; i < line.length(); i++) {
+            final char c = line.charAt(i);
+            if (unmatchedBrace && c == '"' && line.charAt(i - 1) != '\\')
+                ignoreBrace = !ignoreBrace;
+            if (!ignoreBrace)
+                unmatchedBrace = c == '{' || (c != '}' && unmatchedBrace);
+        }
+        return unmatchedBrace;
     }
 }

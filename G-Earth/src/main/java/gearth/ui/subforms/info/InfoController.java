@@ -1,70 +1,79 @@
 package gearth.ui.subforms.info;
 
-import gearth.GEarth;
+import gearth.misc.BindingsUtil;
+import gearth.misc.HyperLinkUtil;
+import gearth.ui.GEarthProperties;
 import gearth.ui.titlebar.TitleBarController;
 import gearth.ui.translations.LanguageBundle;
 import gearth.ui.translations.TranslatableString;
 import javafx.event.ActionEvent;
+import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import gearth.ui.SubForm;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
-import javafx.scene.web.WebView;
 
 import java.io.IOException;
+import java.net.URL;
+import java.util.ResourceBundle;
 
 /**
  * Created by Jonas on 06/04/18.
  */
-public class InfoController extends SubForm {
-    public ImageView img_logo;
-    public Hyperlink link_darkbox;
-    public Hyperlink link_g_gearth;
-    public Hyperlink link_g_tanji;
-    public Hyperlink link_d_gearth;
-    public Hyperlink link_g_store;
-    public Hyperlink link_t_gearth;
+public class InfoController extends SubForm implements Initializable {
 
-    public Label version, lbl_description, lbl_createdBy, lbl_contrib, lbl_links;
-    public Button btn_donate;
+    private static final String PUBKEY = "1GEarthEV9Ua3RcixsKTcuc1PPZd9hqri3";
 
-    public static void activateHyperlink(Hyperlink link) {
-        link.setOnAction((ActionEvent event) -> {
-            Hyperlink h = (Hyperlink) event.getTarget();
-            String s = h.getTooltip().getText();
-            GEarth.main.getHostServices().showDocument(s);
-            event.consume();
-        });
-    }
+    public ImageView logoImageView;
+    public Hyperlink darkBoxLink;
+    public Hyperlink githubGEarthLink;
+    public Hyperlink githubTanjiLink;
+    public Hyperlink discordGEarthLink;
+    public Hyperlink githubExtensionStoreLink;
+    public Hyperlink twitterGEarthLink;
 
-    public void initialize() {
-        link_darkbox.setTooltip(new Tooltip("https://darkbox.nl"));
-        link_d_gearth.setTooltip(new Tooltip("https://discord.gg/AVkcF8y"));
-        link_g_gearth.setTooltip(new Tooltip("https://github.com/sirjonasxx/G-Earth"));
-        link_g_tanji.setTooltip(new Tooltip("https://github.com/ArachisH/Tanji"));
-        link_g_store.setTooltip(new Tooltip("https://github.com/sirjonasxx/G-ExtensionStore"));
-        link_t_gearth.setTooltip(new Tooltip("https://twitter.com/Scripting_Habbo"));
+    public Label
+            themeTitleLabel,
+            descriptionLabel,
+            createdByLabel,
+            contributorsLabel,
+            linksLabel;
 
-        activateHyperlink(link_darkbox);
-        activateHyperlink(link_d_gearth);
-        activateHyperlink(link_g_gearth);
-        activateHyperlink(link_g_tanji);
-        activateHyperlink(link_g_store);
-        activateHyperlink(link_t_gearth);
+    public Button donateButton;
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+
+        BindingsUtil.setAndBind(logoImageView.imageProperty(), GEarthProperties.logoImageBinding);
+        BindingsUtil.setAndBind(themeTitleLabel.textProperty(), GEarthProperties.themeTitleBinding);
+
+        darkBoxLink.setTooltip(new Tooltip("https://darkbox.nl"));
+        discordGEarthLink.setTooltip(new Tooltip("https://discord.gg/AVkcF8y"));
+        githubGEarthLink.setTooltip(new Tooltip("https://github.com/sirjonasxx/G-Earth"));
+        githubTanjiLink.setTooltip(new Tooltip("https://github.com/ArachisH/Tanji"));
+        githubExtensionStoreLink.setTooltip(new Tooltip("https://github.com/sirjonasxx/G-ExtensionStore"));
+        twitterGEarthLink.setTooltip(new Tooltip("https://twitter.com/Scripting_Habbo"));
+
+        HyperLinkUtil.showDocumentOnClick(darkBoxLink);
+        HyperLinkUtil.showDocumentOnClick(discordGEarthLink);
+        HyperLinkUtil.showDocumentOnClick(githubGEarthLink);
+        HyperLinkUtil.showDocumentOnClick(githubTanjiLink);
+        HyperLinkUtil.showDocumentOnClick(githubExtensionStoreLink);
+        HyperLinkUtil.showDocumentOnClick(twitterGEarthLink);
 
         initLanguageBinding();
     }
 
-    public void donate(ActionEvent actionEvent) {
-        String pubkey = "1GEarthEV9Ua3RcixsKTcuc1PPZd9hqri3";
 
-        Alert alert = new Alert(Alert.AlertType.INFORMATION, LanguageBundle.get("tab.info.donate.alert.title"), ButtonType.OK);
+    public void donate(ActionEvent actionEvent) {
+
+        final Alert alert = new Alert(Alert.AlertType.INFORMATION, LanguageBundle.get("tab.info.donate.alert.title"), ButtonType.OK);
         alert.setHeaderText(LanguageBundle.get("tab.info.donate.alert.title"));
 
-        VBox test = new VBox();
+        final VBox test = new VBox();
         test.getChildren().add(new Label(LanguageBundle.get("tab.info.donate.alert.content")));
-        TextArea pubText = new TextArea(pubkey);
+        final TextArea pubText = new TextArea(PUBKEY);
         pubText.setPrefHeight(28);
         pubText.setMaxWidth(250);
         test.getChildren().add(pubText);
@@ -80,11 +89,11 @@ public class InfoController extends SubForm {
     }
 
     private void initLanguageBinding() {
-        lbl_description.textProperty().bind(new TranslatableString("%s", "tab.info.description"));
-        lbl_createdBy.textProperty().bind(new TranslatableString("%s:", "tab.info.createdby"));
-        lbl_contrib.textProperty().bind(new TranslatableString("%s:", "tab.info.contributors"));
-        lbl_links.textProperty().bind(new TranslatableString("%s:", "tab.info.links"));
+        descriptionLabel.textProperty().bind(new TranslatableString("%s", "tab.info.description"));
+        createdByLabel.textProperty().bind(new TranslatableString("%s:", "tab.info.createdby"));
+        contributorsLabel.textProperty().bind(new TranslatableString("%s:", "tab.info.contributors"));
+        linksLabel.textProperty().bind(new TranslatableString("%s:", "tab.info.links"));
 
-        btn_donate.textProperty().bind(new TranslatableString("%s", "tab.info.donate"));
+        donateButton.textProperty().bind(new TranslatableString("%s", "tab.info.donate"));
     }
 }

@@ -40,12 +40,12 @@ public class ScheduleItemContainer extends GridPane {
     }
 
     private void initialize() {
-        RowConstraints rowConstraints = new RowConstraints(23);
+        final RowConstraints rowConstraints = new RowConstraints(23);
         getRowConstraints().addAll(rowConstraints);
 
-        for (int i = 0; i < columnWidths.length; i++) {
-            ColumnConstraints columnConstraints = new ColumnConstraints(20);
-            columnConstraints.setPercentWidth(columnWidths[i]);
+        for (int columnWidth : columnWidths) {
+            final ColumnConstraints columnConstraints = new ColumnConstraints(20);
+            columnConstraints.setPercentWidth(columnWidth);
             getColumnConstraints().add(columnConstraints);
         }
 
@@ -101,7 +101,7 @@ public class ScheduleItemContainer extends GridPane {
     }
 
     private Label initNewLabelColumn(String text) {
-        Label label = new Label();
+        final Label label = new Label();
 //        label.setMaxWidth(Double.MAX_VALUE);
 //        label.setMinHeight(Double.MAX_VALUE);
 //        label.setAlignment(Pos.CENTER);

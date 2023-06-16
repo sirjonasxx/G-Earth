@@ -1,13 +1,14 @@
 package gearth.protocol.packethandler.flash;
 
-import gearth.misc.listenerpattern.Observable;
-import gearth.protocol.HConnection;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 import gearth.protocol.crypto.RC4;
 import gearth.protocol.packethandler.PacketHandler;
 import gearth.protocol.packethandler.PayloadBuffer;
 import gearth.services.extension_handler.ExtensionHandler;
+import gearth.ui.GEarthProperties;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -18,7 +19,7 @@ public abstract class FlashPacketHandler extends PacketHandler {
 
     protected static final boolean DEBUG = false;
 
-    private volatile OutputStream out;
+    private final OutputStream out;
     private volatile boolean isTempBlocked = false;
     volatile boolean isDataStream = false;
 
@@ -36,7 +37,7 @@ public abstract class FlashPacketHandler extends PacketHandler {
     FlashPacketHandler(OutputStream outputStream, Object[] trafficObservables, ExtensionHandler extensionHandler) {
         super(extensionHandler, trafficObservables);
         out = outputStream;
-        this.payloadBuffer = new PayloadBuffer();
+        payloadBuffer = new PayloadBuffer();
     }
 
     public boolean isDataStream() {return isDataStream;}
@@ -49,6 +50,7 @@ public abstract class FlashPacketHandler extends PacketHandler {
     }
 
     public void act(byte[] buffer) throws IOException {
+
         if (!isDataStream) {
             synchronized (sendLock) {
                 out.write(buffer);
@@ -56,20 +58,19 @@ public abstract class FlashPacketHandler extends PacketHandler {
             return;
         }
 
-        bufferChangeObservable.fireEvent();
+        incomingBufferProperty.set(buffer);
 
         if (!isEncryptedStream) {
             payloadBuffer.push(buffer);
         }
-        else if (!HConnection.DECRYPTPACKETS) {
+        else if (GEarthProperties.isPacketDecryptionDisabled()) {
             synchronized (sendLock) {
                 out.write(buffer);
             }
         }
         else if (decryptcipher == null) {
-            for (int i = 0; i < buffer.length; i++) {
-                tempEncryptedBuffer.add(buffer[i]);
-            }
+            for (byte b : buffer)
+                tempEncryptedBuffer.add(b);
         }
         else {
             byte[] tm = decryptcipher.rc4(buffer);
@@ -162,9 +163,10 @@ public abstract class FlashPacketHandler extends PacketHandler {
 
     protected abstract void printForDebugging(byte[] bytes);
 
-    private Observable<BufferChangeListener> bufferChangeObservable = new Observable<>(BufferChangeListener::act);
-    public Observable<BufferChangeListener> getBufferChangeObservable() {
-        return bufferChangeObservable;
+    private final ObjectProperty<byte[]> incomingBufferProperty = new SimpleObjectProperty<>();
+
+    public ObjectProperty<byte[]> incomingBufferProperty() {
+        return incomingBufferProperty;
     }
 
     public int getCurrentIndex() {

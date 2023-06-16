@@ -55,7 +55,7 @@ public class InternalExtensionFormLauncher<L extends InternalExtensionFormCreato
             extensionForm.extension = internalExtension;
             extensionForm.primaryStage = stage;
 
-            extensionForm.fieldsInitialized.fireEvent();
+            extensionForm.setFieldsInitialised(true);
             GEarthExtension gEarthExtension = new InternalExtensionBuilder(internalExtension);
             observer.onExtensionProduced(gEarthExtension);
 

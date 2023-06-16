@@ -7,11 +7,13 @@ import gearth.protocol.crypto.RC4;
 import gearth.protocol.memory.habboclient.HabboClient;
 import gearth.protocol.memory.habboclient.HabboClientFactory;
 import gearth.protocol.packethandler.PayloadBuffer;
-import gearth.protocol.packethandler.flash.BufferChangeListener;
 import gearth.protocol.packethandler.flash.FlashPacketHandler;
+import gearth.ui.GEarthProperties;
 import gearth.ui.titlebar.TitleBarController;
 import gearth.ui.translations.LanguageBundle;
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Hyperlink;
@@ -37,21 +39,22 @@ public class Rc4Obtainer {
     public void setFlashPacketHandlers(FlashPacketHandler... flashPacketHandlers) {
         this.flashPacketHandlers = Arrays.asList(flashPacketHandlers);
         for (FlashPacketHandler handler : flashPacketHandlers) {
-            BufferChangeListener bufferChangeListener = new BufferChangeListener() {
+            final InvalidationListener bufferChangeListener = new InvalidationListener() {
                 @Override
-                public void act() {
+                public void invalidated(Observable observable) {
                     if (handler.isEncryptedStream()) {
-                        onSendFirstEncryptedMessage(handler);
-                        handler.getBufferChangeObservable().removeListener(this);
+                        Rc4Obtainer.this.onSendFirstEncryptedMessage(handler);
+                        handler.incomingBufferProperty().removeListener(this);
                     }
                 }
             };
-            handler.getBufferChangeObservable().addListener(bufferChangeListener);
+            handler.incomingBufferProperty().addListener(bufferChangeListener);
         }
     }
 
     private void onSendFirstEncryptedMessage(FlashPacketHandler flashPacketHandler) {
-        if (!HConnection.DECRYPTPACKETS) return;
+        if (GEarthProperties.isPacketDecryptionDisabled())
+            return;
 
         flashPacketHandlers.forEach(FlashPacketHandler::block);
 

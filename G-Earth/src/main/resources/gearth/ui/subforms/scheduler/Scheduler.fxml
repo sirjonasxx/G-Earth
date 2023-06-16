@@ -16,8 +16,8 @@
         <GridPane.margin>
             <Insets bottom="8.0" left="17.0" right="17.0" top="17.0" />
         </GridPane.margin>
-        <VBox fx:id="schedulecontainer" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
-            <GridPane fx:id="header" gridLinesVisible="true" styleClass="table-header">
+        <VBox fx:id="root" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+            <GridPane fx:id="headerGrid" gridLinesVisible="true" styleClass="table-header">
                 <columnConstraints>
                     <ColumnConstraints hgrow="SOMETIMES" maxWidth="163.0" minWidth="10.0" percentWidth="10.0" prefWidth="57.0" />
                     <ColumnConstraints hgrow="SOMETIMES" maxWidth="190.0" minWidth="10.0" percentWidth="39.0" prefWidth="189.0" />
@@ -31,11 +31,11 @@
                 <VBox.margin>
                     <Insets bottom="-2.0" left="-2.0" right="-2.0" top="-2.0" />
                 </VBox.margin>
-                <Label fx:id="lbl_tableIndex" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-text-fill: #666666; -fx-background-color: #F7F7F7;" text="Index" />
-                <Label fx:id="lbl_tablePacket" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-text-fill: #666666; -fx-background-color: #F7F7F7;" text="Packet" GridPane.columnIndex="1" />
-                <Label fx:id="lbl_tableInterval" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-text-fill: #666666; -fx-background-color: #F7F7F7;" text="Interval" GridPane.columnIndex="2" />
-                <Label fx:id="lbl_tableDest" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-text-fill: #666666; -fx-background-color: #F7F7F7;" text="Destination" GridPane.columnIndex="3" />
-                <Label fx:id="lbl_tableEdit" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-text-fill: #666666; -fx-background-color: #F7F7F7;" text="Edit" GridPane.columnIndex="4" />
+                <Label fx:id="tableIndexLabel" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-text-fill: #666666; -fx-background-color: #F7F7F7;" text="Index" />
+                <Label fx:id="tablePacketLabel" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-text-fill: #666666; -fx-background-color: #F7F7F7;" text="Packet" GridPane.columnIndex="1" />
+                <Label fx:id="tableIntervalLabel" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-text-fill: #666666; -fx-background-color: #F7F7F7;" text="Interval" GridPane.columnIndex="2" />
+                <Label fx:id="tableDestinationLabel" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-text-fill: #666666; -fx-background-color: #F7F7F7;" text="Destination" GridPane.columnIndex="3" />
+                <Label fx:id="tableEditLabel" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-text-fill: #666666; -fx-background-color: #F7F7F7;" text="Edit" GridPane.columnIndex="4" />
             </GridPane>
         </VBox>
     </ScrollPane>
@@ -62,19 +62,19 @@
             <rowConstraints>
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
             </rowConstraints>
-            <TextField fx:id="txt_packet" prefHeight="25.0" prefWidth="251.0" text="[0][0][0][2][0][0]" GridPane.columnIndex="1">
+            <TextField fx:id="packetExpressionField" prefHeight="25.0" prefWidth="251.0" text="[0][0][0][2][0][0]" GridPane.columnIndex="1">
                 <GridPane.margin>
                     <Insets left="-7.0" />
                 </GridPane.margin>
             </TextField>
-            <Label fx:id="lbl_setupPacket" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Packet:" textFill="#000000bb">
+            <Label fx:id="packetExpressionLabel" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Packet:" textFill="#000000bb">
                 <GridPane.margin>
                     <Insets left="3.0" />
                 </GridPane.margin>
             </Label>
-            <Button fx:id="btn_clear" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#clearBtnClicked" text="Clear" GridPane.columnIndex="3" />
-            <Button fx:id="btn_save" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#saveBtnClicked" text="S" GridPane.columnIndex="4" />
-            <Button fx:id="btn_load" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#loadBtnClicked" text="L" GridPane.columnIndex="5" />
+            <Button fx:id="clearButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Clear" GridPane.columnIndex="3" />
+            <Button fx:id="saveButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onClickSaveButton" text="S" GridPane.columnIndex="4" />
+            <Button fx:id="loadButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onClickLoadButton" text="L" GridPane.columnIndex="5" />
         </GridPane>
         <GridPane prefHeight="33.0" prefWidth="502.0" GridPane.rowIndex="1">
             <columnConstraints>
@@ -91,35 +91,35 @@
             <GridPane.margin>
                 <Insets />
             </GridPane.margin>
-            <TextField fx:id="txt_delay" text="500+0" GridPane.columnIndex="1">
+            <TextField fx:id="packetDelayField" text="500+0" GridPane.columnIndex="1">
                 <GridPane.margin>
                     <Insets right="5.0" />
                 </GridPane.margin>
             </TextField>
-            <Label fx:id="lbl_setupInterval" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Interval:" textFill="#000000bb">
+            <Label fx:id="packetIntervalLabel" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Interval:" textFill="#000000bb">
                 <GridPane.margin>
                     <Insets left="3.0" />
                 </GridPane.margin>
             </Label>
-            <Button fx:id="btn_addoredit" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#scheduleBtnClicked" text="Add" GridPane.columnIndex="4">
+            <Button fx:id="addOrEditButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onClickAddOrEditButton" text="Add" GridPane.columnIndex="4">
                 <GridPane.margin>
                     <Insets bottom="2.0" left="5.0" top="2.0" />
                 </GridPane.margin>
             </Button>
-            <RadioButton fx:id="rb_incoming" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="In" GridPane.columnIndex="2">
+            <RadioButton fx:id="packetIncomingOption" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="In" GridPane.columnIndex="2">
                 <GridPane.margin>
                     <Insets left="5.0" />
                 </GridPane.margin>
                 <toggleGroup>
-                    <ToggleGroup fx:id="scheduler_dest" />
+                    <ToggleGroup fx:id="packetTypeOptions" />
                 </toggleGroup>
             </RadioButton>
-            <RadioButton fx:id="rb_outgoing" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Out" toggleGroup="$scheduler_dest" GridPane.columnIndex="3">
+            <RadioButton fx:id="packetOutgoingOption" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Out" toggleGroup="$packetTypeOptions" GridPane.columnIndex="3">
                 <GridPane.margin>
                     <Insets left="5.0" />
                 </GridPane.margin>
             </RadioButton>
-         <CheckBox fx:id="cbx_hotkeys" mnemonicParsing="false" text="Enable hotkeys (Ctrl+Shift+Index)" textFill="#4d4d4d" GridPane.columnIndex="5">
+         <CheckBox fx:id="enableHotkeysBox" mnemonicParsing="false" text="Enable hotkeys (Ctrl+Shift+Index)" textFill="#4d4d4d" GridPane.columnIndex="5">
             <GridPane.margin>
                <Insets left="32.0" />
             </GridPane.margin>
