@@ -2,8 +2,11 @@ package gearth.protocol.connection.proxy.nitro.websocket;
 
 import gearth.protocol.HConnection;
 import gearth.protocol.HMessage;
+import gearth.protocol.StateChangeListener;
 import gearth.protocol.connection.*;
+import gearth.protocol.connection.proxy.nitro.NitroConnectionState;
 import gearth.protocol.connection.proxy.nitro.NitroConstants;
+import gearth.protocol.connection.proxy.nitro.NitroPacketQueue;
 import gearth.protocol.connection.proxy.nitro.NitroProxyProvider;
 import gearth.protocol.packethandler.nitro.NitroPacketHandler;
 import org.eclipse.jetty.websocket.jsr356.JsrSession;
@@ -25,28 +28,48 @@ public class NitroWebsocketClient implements NitroSession {
     private static final Logger logger = LoggerFactory.getLogger(NitroWebsocketClient.class);
 
     private final HProxySetter proxySetter;
-    private final HStateSetter stateSetter;
     private final HConnection connection;
+    private final NitroConnectionState state;
     private final NitroProxyProvider proxyProvider;
     private final NitroWebsocketServer server;
     private final NitroPacketHandler packetHandler;
+    private final NitroPacketQueue packetQueue;
     private final AtomicBoolean shutdownLock;
 
     private JsrSession activeSession = null;
 
     public NitroWebsocketClient(HProxySetter proxySetter, HStateSetter stateSetter, HConnection connection, NitroProxyProvider proxyProvider) {
         this.proxySetter = proxySetter;
-        this.stateSetter = stateSetter;
         this.connection = connection;
+        this.state = new NitroConnectionState(stateSetter);
         this.proxyProvider = proxyProvider;
-        this.server = new NitroWebsocketServer(connection, this);
+        this.server = new NitroWebsocketServer(connection, this, this.state);
         this.packetHandler = new NitroPacketHandler(HMessage.Direction.TOSERVER, server, connection.getExtensionHandler(), connection.getTrafficObservables());
+        this.packetQueue = new NitroPacketQueue(this.packetHandler);
         this.shutdownLock = new AtomicBoolean();
     }
 
     @OnOpen
     public void onOpen(Session session) throws Exception {
         logger.info("WebSocket connection accepted");
+
+        // Setup state change listener
+        connection.getStateObservable().addListener(new StateChangeListener() {
+            @Override
+            public void stateChanged(HState oldState, HState newState) {
+                // Clean up when we don't need it anymore.
+                if ((oldState == HState.WAITING_FOR_CLIENT || newState == HState.NOT_CONNECTED) || newState == HState.ABORTING) {
+                    connection.getStateObservable().removeListener(this);
+                }
+
+                // Process queue when connected.
+                try {
+                    packetQueue.flush();
+                } catch (IOException e) {
+                    logger.error("Failed to flush packet queue in state change listener", e);
+                }
+            }
+        });
 
         activeSession = (JsrSession) session;
         activeSession.setMaxBinaryMessageBufferSize(NitroConstants.WEBSOCKET_BUFFER_SIZE);
@@ -72,12 +95,21 @@ public class NitroWebsocketClient implements NitroSession {
         );
 
         proxySetter.setProxy(proxy);
-        stateSetter.setState(HState.CONNECTED);
+        state.setConnected(HMessage.Direction.TOSERVER);
     }
 
     @OnMessage
     public void onMessage(byte[] b, Session session) throws IOException {
-        packetHandler.act(b);
+        logger.debug("Received packet from browser");
+
+        // Enqueue all packets we receive to ensure we preserve correct packet order.
+        packetQueue.enqueue(b);
+
+        // Flush everything if we are connected.
+        // We also flush when connection state changes to connected.
+        if (state.isConnected()) {
+            packetQueue.flush();
+        }
     }
 
     @OnClose
@@ -133,7 +165,7 @@ public class NitroWebsocketClient implements NitroSession {
 
             // Reset program state.
             proxySetter.setProxy(null);
-            stateSetter.setState(HState.ABORTING);
+            state.setAborting();
         }
     }
 }

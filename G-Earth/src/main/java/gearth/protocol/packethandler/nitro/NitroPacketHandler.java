@@ -35,6 +35,7 @@ public class NitroPacketHandler extends PacketHandler {
         final Session localSession = session.getSession();
 
         if (localSession == null) {
+            logger.warn("Discarding {} bytes because the session for direction {} was null", buffer.length, this.direction);
             return false;
         }
 
