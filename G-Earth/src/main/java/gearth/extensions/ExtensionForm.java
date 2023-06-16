@@ -67,7 +67,7 @@ public abstract class ExtensionForm extends ExtensionBase {
     /**
      * The application got doubleclicked from the G-Earth interface. Doing something here is optional
      */
-    public void onClick(){
+    public final void onClick(){
         Platform.runLater(() -> {
             primaryStage.show();
             primaryStage.requestFocus();
