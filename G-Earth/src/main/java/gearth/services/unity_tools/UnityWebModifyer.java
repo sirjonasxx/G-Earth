@@ -114,7 +114,7 @@ public class UnityWebModifyer {
 
         contents = insertFrameworkCode(contents, 0, "js_code/unity_code.js");
 
-        String exportSearch = "Module.asmLibraryArg,buffer);Module[\\\"asm\\\"]=asm;";
+        String exportSearch = "Module.asmLibraryArg,buffer);Module[\"asm\"]=asm;";
         int exportIndex = contents.indexOf(exportSearch) + exportSearch.length();
         contents = insertFrameworkCode(contents, exportIndex, "js_code/unity_exports.js");
 
@@ -150,7 +150,7 @@ public class UnityWebModifyer {
                         "                else {\n" +
                         "                    a.responseHeaders[e] = o.getResponseHeader(e)\n" +
                         "                }");
-        
+
         BufferedWriter writer = new BufferedWriter(new FileWriter(loaderFile));
         writer.write(contents);
         writer.close();
