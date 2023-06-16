@@ -8,6 +8,7 @@ import gearth.services.extension_handler.extensions.implementations.network.exec
 import gearth.services.extension_handler.extensions.implementations.network.executer.ExtensionRunner;
 import gearth.services.extension_handler.extensions.implementations.network.executer.ExtensionRunnerFactory;
 import gearth.services.g_python.GPythonShell;
+import gearth.ui.GEarthTrayIcon;
 import gearth.ui.SubForm;
 import gearth.ui.subforms.extensions.logger.ExtensionLogger;
 import gearth.ui.translations.LanguageBundle;
@@ -18,6 +19,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 
 import java.io.File;
 
@@ -54,9 +56,10 @@ public class ExtensionsController extends SubForm {
     protected void onParentSet() {
         ExtensionItemContainerProducer producer = new ExtensionItemContainerProducer(extensioncontainer, scroller);
         extensionHandler = new ExtensionHandler(getHConnection());
-        extensionHandler.getObservable().addListener((e -> {
-            Platform.runLater(() -> producer.extensionConnected(e));
-        }));
+        extensionHandler.getObservable().addListener((e -> Platform.runLater(() -> {
+            producer.extensionConnected(e);
+            GEarthTrayIcon.addExtension(e);
+        })));
 
         //noinspection OptionalGetWithoutIsPresent
         networkExtensionsProducer
