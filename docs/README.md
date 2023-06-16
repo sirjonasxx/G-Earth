@@ -36,7 +36,6 @@ Name | Language | Developers | Github
 --- | --- | --- | --- |
 G-Earth (Native) | Java | sirjonasxx | https://github.com/sirjonasxx/G-Earth
 G-Python<sup>1</sup> | Python | sirjonasxx | https://github.com/sirjonasxx/G-Python
-Geode | C# & Visual Basic | ArachisH, LilithRainbows | https://github.com/LilithRainbows/Geode
 Xabbo | C# | b7 | https://github.com/b7c/Xabbo.GEarth
 Xabbo scripter<sup>2</sup> | C# | b7 | https://github.com/b7c/Xabbo.Scripter
 G-Node | Node.js | WiredSpast | https://github.com/WiredSpast/G-Node
