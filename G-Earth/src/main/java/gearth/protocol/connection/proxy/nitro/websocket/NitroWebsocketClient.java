@@ -72,8 +72,8 @@ public class NitroWebsocketClient implements NitroSession {
         });
 
         activeSession = (JsrSession) session;
-        activeSession.setMaxBinaryMessageBufferSize(NitroConstants.WEBSOCKET_BUFFER_SIZE);
-        activeSession.setMaxTextMessageBufferSize(NitroConstants.WEBSOCKET_BUFFER_SIZE);
+        activeSession.getPolicy().setMaxBinaryMessageSize(NitroConstants.WEBSOCKET_BUFFER_SIZE);
+        activeSession.getPolicy().setMaxTextMessageSize(NitroConstants.WEBSOCKET_BUFFER_SIZE);
 
         // Set proper headers to spoof being a real client.
         final Map<String, List<String>> headers = new HashMap<>(activeSession.getUpgradeRequest().getHeaders());
