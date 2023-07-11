@@ -188,8 +188,8 @@ public class NitroWebsocketServer implements WebSocketListener, NitroSession {
     private WebSocketClient createWebSocketClient() {
         final WebSocketClient client = new WebSocketClient(createHttpClient());
 
-        client.setMaxBinaryMessageBufferSize(NitroConstants.WEBSOCKET_BUFFER_SIZE);
-        client.setMaxTextMessageBufferSize(NitroConstants.WEBSOCKET_BUFFER_SIZE);
+        client.getPolicy().setMaxBinaryMessageSize(NitroConstants.WEBSOCKET_BUFFER_SIZE);
+        client.getPolicy().setMaxTextMessageSize(NitroConstants.WEBSOCKET_BUFFER_SIZE);
 
         return client;
     }
