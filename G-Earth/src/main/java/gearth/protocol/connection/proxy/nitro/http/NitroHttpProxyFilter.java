@@ -16,9 +16,9 @@ import java.util.regex.Pattern;
 
 public class NitroHttpProxyFilter extends HttpFiltersAdapter {
 
-    private static final String NitroConfigSearch = "\"socket.url\"";
+    private static final String NitroConfigSearch = "socket.url";
     private static final String NitroClientSearch = "configurationUrls:";
-    private static final Pattern NitroConfigPattern = Pattern.compile("\"socket\\.url\":.?\"(wss?://.*?)\"", Pattern.MULTILINE);
+    private static final Pattern NitroConfigPattern = Pattern.compile("[\"']socket\\.url[\"']:.?[\"'](wss?://.*?)[\"']", Pattern.MULTILINE);
 
     // https://developers.cloudflare.com/fundamentals/get-started/reference/cloudflare-cookies/
     private static final HashSet<String> CloudflareCookies = new HashSet<>(Arrays.asList(
