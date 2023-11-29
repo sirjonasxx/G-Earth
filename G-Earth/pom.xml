@@ -11,7 +11,7 @@
     <properties>
         <javafx.version>1.8</javafx.version>
         <jettyVersion>9.4.51.v20230217</jettyVersion>
-        <logback.version>1.3.5</logback.version>
+        <logback.version>1.3.12</logback.version>
     </properties>
 
     <parent>
