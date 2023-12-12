@@ -18,7 +18,7 @@ public class NitroHttpProxyFilter extends HttpFiltersAdapter {
 
     private static final String NitroConfigSearch = "socket.url";
     private static final String NitroClientSearch = "configurationUrls:";
-    private static final Pattern NitroConfigPattern = Pattern.compile("[\"']socket\\.url[\"']:.+[\"'](wss?://.*?)[\"']", Pattern.MULTILINE);
+    private static final Pattern NitroConfigPattern = Pattern.compile("[\"']socket\\.url[\"']:(\\s+)?[\"'](wss?:.*?)[\"']", Pattern.MULTILINE);
 
     // https://developers.cloudflare.com/fundamentals/get-started/reference/cloudflare-cookies/
     private static final HashSet<String> CloudflareCookies = new HashSet<>(Arrays.asList(
@@ -95,11 +95,11 @@ public class NitroHttpProxyFilter extends HttpFiltersAdapter {
                 final Matcher matcher = NitroConfigPattern.matcher(responseBody);
 
                 if (matcher.find()) {
-                    final String originalWebsocket = matcher.group(1);
+                    final String originalWebsocket = matcher.group(2).replace("\\/", "/");
                     final String replacementWebsocket = callback.replaceWebsocketServer(this.url, originalWebsocket);
 
                     if (replacementWebsocket != null) {
-                        responseBody = responseBody.replace(originalWebsocket, replacementWebsocket);
+                        responseBody = responseBody.replace(matcher.group(2), replacementWebsocket);
                         responseModified = true;
                     }
                 }
