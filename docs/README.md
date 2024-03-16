@@ -39,6 +39,7 @@ G-Python<sup>1</sup> | Python | sirjonasxx | https://github.com/sirjonasxx/G-Pyt
 Xabbo | C# | b7 | https://github.com/b7c/Xabbo.GEarth
 Xabbo scripter<sup>2</sup> | C# | b7 | https://github.com/b7c/Xabbo.Scripter
 G-Node | Node.js | WiredSpast | https://github.com/WiredSpast/G-Node
+G-Rust | Rust | WiredSpast | https://github.com/WiredSpast/G-Rust
 GProgrammer<sup>3</sup> | Javascript | at15four2020 | https://github.com/at15four2020/GProgrammer/wiki
 
 <sub>1: built-in in G-Earth through the [live scripting console](https://github.com/sirjonasxx/G-Earth/wiki/G-Python-qtConsole) </sub>  
