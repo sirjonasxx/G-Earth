@@ -59,7 +59,6 @@ public class NitroMacOS implements NitroOsFunctions {
     @Override
     public boolean registerSystemProxy(String host, int port) {
         try {
-            final String proxy = String.format("%s:%d", host, port);
             final String[] ignoreHosts = PROXY_IGNORE.split(";");
 
             // Enable proxy
