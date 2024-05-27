@@ -4,7 +4,8 @@ import gearth.protocol.HConnection;
 import gearth.protocol.connection.HProxySetter;
 import gearth.protocol.connection.HStateSetter;
 import gearth.protocol.connection.proxy.nitro.NitroProxyProvider;
-import org.eclipse.jetty.server.Connector;
+import gearth.protocol.connection.proxy.nitro.http.NitroCertificateSniffingManager;
+import gearth.protocol.connection.proxy.nitro.http.NitroSslContextFactory;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
@@ -21,19 +22,37 @@ public class NitroWebsocketProxy {
     private final HStateSetter stateSetter;
     private final HConnection connection;
     private final NitroProxyProvider proxyProvider;
+    private final NitroCertificateSniffingManager certificateManager;
 
     private final Server server;
+    private final int serverPort;
     
-    public NitroWebsocketProxy(HProxySetter proxySetter, HStateSetter stateSetter, HConnection connection, NitroProxyProvider proxyProvider) {
+    public NitroWebsocketProxy(HProxySetter proxySetter,
+                               HStateSetter stateSetter,
+                               HConnection connection,
+                               NitroProxyProvider proxyProvider,
+                               NitroCertificateSniffingManager certificateManager) {
         this.proxySetter = proxySetter;
         this.stateSetter = stateSetter;
         this.connection = connection;
         this.proxyProvider = proxyProvider;
-        this.server = new Server(0);
+        this.certificateManager = certificateManager;
+        this.server = new Server();
+        this.serverPort = 0;
     }
 
     public boolean start() {
         try {
+            // Configure SSL.
+            final NitroSslContextFactory sslContextFactory = new NitroSslContextFactory(this.certificateManager);
+            final ServerConnector sslConnector = new ServerConnector(server, sslContextFactory);
+
+            sslConnector.setPort(this.serverPort);
+
+            // Add SSL to the server.
+            server.addConnector(sslConnector);
+
+            // Configure the WebSocket.
             final ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
             context.setContextPath("/");
 
