@@ -24,11 +24,16 @@ public class NitroHttpProxyFilter extends HttpFiltersAdapter {
     private static final HashSet<String> CloudflareCookies = new HashSet<>(Arrays.asList(
             "__cflb",
             "__cf_bm",
+            "__cfseq",
             "cf_ob_info",
             "cf_use_ob",
             "__cfwaitingroom",
             "__cfruid",
-            "cf_clearance"
+            "_cfuvid",
+            "cf_clearance",
+            "cf_chl_rc_i",
+            "cf_chl_rc_ni",
+            "cf_chl_rc_m"
     ));
 
     private static final String HeaderAcceptEncoding = "Accept-Encoding";
