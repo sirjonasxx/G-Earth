@@ -6,6 +6,8 @@ import gearth.protocol.connection.HProxySetter;
 import gearth.protocol.connection.HState;
 import gearth.protocol.connection.HStateSetter;
 import gearth.protocol.connection.proxy.ProxyProvider;
+import gearth.protocol.connection.proxy.nitro.http.NitroAuthority;
+import gearth.protocol.connection.proxy.nitro.http.NitroCertificateSniffingManager;
 import gearth.protocol.connection.proxy.nitro.http.NitroHttpProxy;
 import gearth.protocol.connection.proxy.nitro.http.NitroHttpProxyServerCallback;
 import gearth.protocol.connection.proxy.nitro.websocket.NitroWebsocketProxy;
@@ -13,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.net.ServerSocket;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class NitroProxyProvider implements ProxyProvider, NitroHttpProxyServerCallback, StateChangeListener {
@@ -32,11 +33,14 @@ public class NitroProxyProvider implements ProxyProvider, NitroHttpProxyServerCa
     private String originalCookies;
 
     public NitroProxyProvider(HProxySetter proxySetter, HStateSetter stateSetter, HConnection connection) {
+        final NitroAuthority authority = new NitroAuthority();
+        final NitroCertificateSniffingManager certificateManager = new NitroCertificateSniffingManager(authority);
+
         this.proxySetter = proxySetter;
         this.stateSetter = stateSetter;
         this.connection = connection;
-        this.nitroHttpProxy = new NitroHttpProxy(this);
-        this.nitroWebsocketProxy = new NitroWebsocketProxy(proxySetter, stateSetter, connection, this);
+        this.nitroHttpProxy = new NitroHttpProxy(this, certificateManager);
+        this.nitroWebsocketProxy = new NitroWebsocketProxy(proxySetter, stateSetter, connection, this, certificateManager);
         this.abortLock = new AtomicBoolean();
     }
 
@@ -122,7 +126,7 @@ public class NitroProxyProvider implements ProxyProvider, NitroHttpProxyServerCa
     public String replaceWebsocketServer(String configUrl, String websocketUrl) {
         originalWebsocketUrl = websocketUrl;
 
-        return String.format("ws://127.0.0.1:%d", websocketPort);
+        return String.format("wss://127.0.0.1:%d", websocketPort);
     }
 
     @Override

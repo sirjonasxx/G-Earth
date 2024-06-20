@@ -20,12 +20,31 @@ public class NitroCertificateSniffingManager implements MitmManager {
     private static final boolean DEBUG = false;
 
     private final BouncyCastleSslEngineSource sslEngineSource;
+    private final Authority authority;
 
-    public NitroCertificateSniffingManager(Authority authority) throws RootCertificateException {
+    public NitroCertificateSniffingManager(Authority authority) {
+        this.authority = authority;
         try {
             sslEngineSource = new BouncyCastleSslEngineSource(authority, true, true, null);
         } catch (final Exception e) {
-            throw new RootCertificateException("Errors during assembling root CA.", e);
+            throw new RuntimeException(new RootCertificateException("Errors during assembling root CA.", e));
+        }
+    }
+
+    public Authority getAuthority() {
+        return authority;
+    }
+
+    public SSLEngine websocketSslEngine(String commonName) {
+        final SubjectAlternativeNameHolder san = new SubjectAlternativeNameHolder();
+
+        san.addDomainName("localhost");
+        san.addIpAddress("127.0.0.1");
+
+        try {
+            return sslEngineSource.createCertForHost(commonName, san);
+        } catch (Exception e) {
+            throw new FakeCertificateException("Failed to create WebSocket certificate", e);
         }
     }
 
