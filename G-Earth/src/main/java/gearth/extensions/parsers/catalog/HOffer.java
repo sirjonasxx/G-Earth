@@ -13,6 +13,7 @@ public class HOffer {
     private int priceInCredits;
     private int priceInActivityPoints;
     private int activityPointType;
+    private int priceInSilver;
     private boolean giftable;
     private List<HProduct> products = new ArrayList<>();
     private int clubLevel;
@@ -28,6 +29,7 @@ public class HOffer {
         this.priceInCredits = packet.readInteger();
         this.priceInActivityPoints = packet.readInteger();
         this.activityPointType = packet.readInteger();
+        this.priceInSilver = packet.readInteger();
         this.giftable = packet.readBoolean();
 
         int productCount = packet.readInteger();
@@ -63,6 +65,10 @@ public class HOffer {
 
     public int getActivityPointType() {
         return activityPointType;
+    }
+
+    public int getPriceInSilver() {
+        return priceInSilver;
     }
 
     public boolean isGiftable() {

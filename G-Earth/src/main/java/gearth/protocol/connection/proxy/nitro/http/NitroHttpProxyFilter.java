@@ -16,19 +16,24 @@ import java.util.regex.Pattern;
 
 public class NitroHttpProxyFilter extends HttpFiltersAdapter {
 
-    private static final String NitroConfigSearch = "\"socket.url\"";
+    private static final String NitroConfigSearch = "socket.url";
     private static final String NitroClientSearch = "configurationUrls:";
-    private static final Pattern NitroConfigPattern = Pattern.compile("\"socket\\.url\":.?\"(wss?://.*?)\"", Pattern.MULTILINE);
+    private static final Pattern NitroConfigPattern = Pattern.compile("[\"']socket\\.url[\"']:(\\s+)?[\"'](wss?:.*?)[\"']", Pattern.MULTILINE);
 
     // https://developers.cloudflare.com/fundamentals/get-started/reference/cloudflare-cookies/
     private static final HashSet<String> CloudflareCookies = new HashSet<>(Arrays.asList(
             "__cflb",
             "__cf_bm",
+            "__cfseq",
             "cf_ob_info",
             "cf_use_ob",
             "__cfwaitingroom",
             "__cfruid",
-            "cf_clearance"
+            "_cfuvid",
+            "cf_clearance",
+            "cf_chl_rc_i",
+            "cf_chl_rc_ni",
+            "cf_chl_rc_m"
     ));
 
     private static final String HeaderAcceptEncoding = "Accept-Encoding";
@@ -95,11 +100,11 @@ public class NitroHttpProxyFilter extends HttpFiltersAdapter {
                 final Matcher matcher = NitroConfigPattern.matcher(responseBody);
 
                 if (matcher.find()) {
-                    final String originalWebsocket = matcher.group(1);
+                    final String originalWebsocket = matcher.group(2).replace("\\/", "/");
                     final String replacementWebsocket = callback.replaceWebsocketServer(this.url, originalWebsocket);
 
                     if (replacementWebsocket != null) {
-                        responseBody = responseBody.replace(originalWebsocket, replacementWebsocket);
+                        responseBody = responseBody.replace(matcher.group(2), replacementWebsocket);
                         responseModified = true;
                     }
                 }
