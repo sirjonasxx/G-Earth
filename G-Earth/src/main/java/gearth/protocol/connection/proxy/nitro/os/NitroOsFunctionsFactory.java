@@ -1,6 +1,7 @@
 package gearth.protocol.connection.proxy.nitro.os;
 
 import gearth.misc.OSValidator;
+import gearth.protocol.connection.proxy.nitro.os.macos.NitroMacOS;
 import gearth.protocol.connection.proxy.nitro.os.windows.NitroWindows;
 import org.apache.commons.lang3.NotImplementedException;
 
@@ -15,7 +16,10 @@ public final class NitroOsFunctionsFactory {
             throw new NotImplementedException("unix nitro is not implemented yet");
         }
 
-        throw new NotImplementedException("macOS nitro is not implemented yet");
-    }
+        if (OSValidator.isMac()) {
+            return new NitroMacOS();
+        }
 
+        throw new NotImplementedException("unsupported operating system");
+    }
 }
