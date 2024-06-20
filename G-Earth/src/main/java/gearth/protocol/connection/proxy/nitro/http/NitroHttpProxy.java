@@ -12,8 +12,6 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import org.littleshoot.proxy.HttpProxyServer;
 import org.littleshoot.proxy.impl.DefaultHttpProxyServer;
-import org.littleshoot.proxy.mitm.Authority;
-import org.littleshoot.proxy.mitm.RootCertificateException;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,20 +23,20 @@ public class NitroHttpProxy {
     private static final String ADMIN_WARNING_KEY = "admin_warning_dialog";
     private static final AtomicBoolean SHUTDOWN_HOOK = new AtomicBoolean();
 
-    private final Authority authority;
     private final NitroOsFunctions osFunctions;
     private final NitroHttpProxyServerCallback serverCallback;
+    private final NitroCertificateSniffingManager certificateManager;
 
     private HttpProxyServer proxyServer = null;
 
-    public NitroHttpProxy(NitroHttpProxyServerCallback serverCallback) {
+    public NitroHttpProxy(NitroHttpProxyServerCallback serverCallback, NitroCertificateSniffingManager certificateManager) {
         this.serverCallback = serverCallback;
-        this.authority = new NitroAuthority();
+        this.certificateManager = certificateManager;
         this.osFunctions = NitroOsFunctionsFactory.create();
     }
 
     private boolean initializeCertificate() {
-        final File certificate = this.authority.aliasFile(".pem");
+        final File certificate = this.certificateManager.getAuthority().aliasFile(".pem");
 
         // All good if certificate is already trusted.
         if (this.osFunctions.isRootCertificateTrusted(certificate)) {
@@ -80,7 +78,7 @@ public class NitroHttpProxy {
             return false;
         }
 
-        return this.osFunctions.installRootCertificate(this.authority.aliasFile(".pem"));
+        return this.osFunctions.installRootCertificate(this.certificateManager.getAuthority().aliasFile(".pem"));
     }
 
     /**
@@ -100,33 +98,28 @@ public class NitroHttpProxy {
     public boolean start() {
         setupShutdownHook();
 
-        try {
-            proxyServer = DefaultHttpProxyServer.bootstrap()
-                    .withPort(NitroConstants.HTTP_PORT)
-                    .withManInTheMiddle(new NitroCertificateSniffingManager(authority))
-                    .withFiltersSource(new NitroHttpProxyFilterSource(serverCallback))
-                    .withTransparent(true)
-                    .start();
+        proxyServer = DefaultHttpProxyServer.bootstrap()
+                .withPort(NitroConstants.HTTP_PORT)
+                .withManInTheMiddle(this.certificateManager)
+                .withFiltersSource(new NitroHttpProxyFilterSource(serverCallback))
+                .withTransparent(true)
+                .start();
 
-            if (!initializeCertificate()) {
-                proxyServer.stop();
+        if (!initializeCertificate()) {
+            proxyServer.stop();
 
-                System.out.println("Failed to initialize certificate");
-                return false;
-            }
-
-            if (!registerProxy()) {
-                proxyServer.stop();
-
-                System.out.println("Failed to register certificate");
-                return false;
-            }
-
-            return true;
-        } catch (RootCertificateException e) {
-            e.printStackTrace();
+            System.out.println("Failed to initialize certificate");
             return false;
         }
+
+        if (!registerProxy()) {
+            proxyServer.stop();
+
+            System.out.println("Failed to register certificate");
+            return false;
+        }
+
+        return true;
     }
 
     public void pause() {
