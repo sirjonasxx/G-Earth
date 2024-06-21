@@ -1,11 +1,11 @@
 package gearth.protocol.packethandler.shockwave.buffers;
 
-import gearth.protocol.format.shockwave.ShockPacket;
+import gearth.protocol.HPacket;
 
 public interface ShockwaveBuffer {
 
     void push(byte[] data);
 
-    ShockPacket[] receive();
+    HPacket[] receive();
 
 }

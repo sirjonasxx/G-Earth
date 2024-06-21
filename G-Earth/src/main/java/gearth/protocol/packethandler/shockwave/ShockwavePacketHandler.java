@@ -1,8 +1,7 @@
 package gearth.protocol.packethandler.shockwave;
 
 import gearth.protocol.HMessage;
-import gearth.protocol.format.shockwave.ShockMessage;
-import gearth.protocol.format.shockwave.ShockPacket;
+import gearth.protocol.HPacket;
 import gearth.protocol.packethandler.PacketHandler;
 import gearth.protocol.packethandler.shockwave.buffers.ShockwaveBuffer;
 import gearth.services.extension_handler.ExtensionHandler;
@@ -14,12 +13,13 @@ import java.io.OutputStream;
 
 public abstract class ShockwavePacketHandler extends PacketHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(ShockwavePacketHandler.class);
+    protected static final Logger logger = LoggerFactory.getLogger(ShockwavePacketHandler.class);
 
     private final HMessage.Direction direction;
     private final ShockwaveBuffer payloadBuffer;
-    private final OutputStream outputStream;
     private final Object flushLock;
+
+    protected final OutputStream outputStream;
 
     ShockwavePacketHandler(HMessage.Direction direction, ShockwaveBuffer payloadBuffer, OutputStream outputStream, ExtensionHandler extensionHandler, Object[] trafficObservables) {
         super(extensionHandler, trafficObservables);
@@ -30,20 +30,9 @@ public abstract class ShockwavePacketHandler extends PacketHandler {
     }
 
     @Override
-    public boolean sendToStream(byte[] buffer) {
-        synchronized (sendLock) {
-            try {
-                outputStream.write(buffer);
-                return true;
-            } catch (IOException e) {
-                logger.error("Error while sending packet to stream.", e);
-                return false;
-            }
-        }
-    }
-
-    @Override
     public void act(byte[] buffer) throws IOException {
+        logger.info("Direction {} Received {} bytes", this.direction, buffer.length);
+
         payloadBuffer.push(buffer);
 
         flush();
@@ -51,10 +40,10 @@ public abstract class ShockwavePacketHandler extends PacketHandler {
 
     public void flush() throws IOException {
         synchronized (flushLock) {
-            final ShockPacket[] packets = payloadBuffer.receive();
+            final HPacket[] packets = payloadBuffer.receive();
 
-            for (final ShockPacket packet : packets){
-                final ShockMessage message = new ShockMessage(packet, direction, currentIndex);
+            for (final HPacket packet : packets){
+                final HMessage message = new HMessage(packet, direction, currentIndex);
 
                 awaitListeners(message, x -> sendToStream(x.getPacket().toBytes()));
 

@@ -17,7 +17,7 @@ import java.util.Optional;
 public class HPacket implements StringifyAble {
 
     private boolean isEdited = false;
-    private byte[] packetInBytes;
+    protected byte[] packetInBytes;
     private int readIndex = 6;
 
     // if identifier != null, this is a placeholder name for the type of packet, headerId will be "-1"
@@ -754,5 +754,8 @@ public class HPacket implements StringifyAble {
         HPacket packet2 = (HPacket) object;
         return Arrays.equals(packetInBytes, packet2.packetInBytes) && (isEdited == packet2.isEdited);
     }
-    
+
+    public HPacket copy() {
+        return new HPacket(this);
+    }
 }

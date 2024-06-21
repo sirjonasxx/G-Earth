@@ -1,7 +1,8 @@
 package gearth.protocol.packethandler.shockwave.buffers;
 
-import gearth.protocol.format.shockwave.ShockPacket;
+import gearth.protocol.HPacket;
 import gearth.protocol.packethandler.ByteArrayUtils;
+import gearth.protocol.packethandler.shockwave.packets.ShockPacket;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,7 +17,7 @@ public class ShockwaveInBuffer implements ShockwaveBuffer {
     }
 
     @Override
-    public ShockPacket[] receive() {
+    public HPacket[] receive() {
         if (buffer.length < 3) {
             return new ShockPacket[0];
         }

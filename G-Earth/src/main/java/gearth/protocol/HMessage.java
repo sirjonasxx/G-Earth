@@ -74,7 +74,7 @@ public class HMessage implements StringifyAble {
         this.isBlocked = message.isBlocked();
         this.index = message.getIndex();
         this.direction = message.getDestination();
-        this.hPacket = new HPacket(message.getPacket());
+        this.hPacket = message.getPacket().copy();
     }
 
     @Override
