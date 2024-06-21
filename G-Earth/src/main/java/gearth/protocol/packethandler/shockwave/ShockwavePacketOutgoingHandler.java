@@ -1,31 +1,25 @@
 package gearth.protocol.packethandler.shockwave;
 
 import gearth.encoding.Base64Encoding;
+import gearth.misc.listenerpattern.Observable;
 import gearth.protocol.HMessage;
+import gearth.protocol.TrafficListener;
+import gearth.protocol.packethandler.ByteArrayUtils;
 import gearth.protocol.packethandler.shockwave.buffers.ShockwaveOutBuffer;
 import gearth.services.extension_handler.ExtensionHandler;
 
-import java.io.IOException;
 import java.io.OutputStream;
 
 public class ShockwavePacketOutgoingHandler extends ShockwavePacketHandler {
-    public ShockwavePacketOutgoingHandler(OutputStream outputStream, ExtensionHandler extensionHandler, Object[] trafficObservables) {
+    public ShockwavePacketOutgoingHandler(OutputStream outputStream, ExtensionHandler extensionHandler, Observable<TrafficListener>[] trafficObservables) {
         super(HMessage.Direction.TOSERVER, new ShockwaveOutBuffer(), outputStream, extensionHandler, trafficObservables);
     }
 
     @Override
-    public boolean sendToStream(byte[] buffer) {
-        synchronized (sendLock) {
-            try {
-                byte[] bufferLen = Base64Encoding.encode(buffer.length, 3);
+    public boolean sendToStream(byte[] packet) {
+        byte[] bufferLen = Base64Encoding.encode(packet.length, 3);
+        byte[] buffer = ByteArrayUtils.combineByteArrays(bufferLen, packet);
 
-                outputStream.write(bufferLen);
-                outputStream.write(buffer);
-                return true;
-            } catch (IOException e) {
-                logger.error("Error while sending packet to stream.", e);
-                return false;
-            }
-        }
+        return super.sendToStream(buffer);
     }
 }

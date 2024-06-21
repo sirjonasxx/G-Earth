@@ -1,9 +1,11 @@
 package gearth.protocol.memory.habboclient.macOs;
 
+import gearth.encoding.HexEncoding;
 import gearth.misc.Cacher;
 import gearth.protocol.HConnection;
 import gearth.protocol.HMessage;
 import gearth.protocol.memory.habboclient.HabboClient;
+import org.bouncycastle.util.encoders.Hex;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -44,7 +46,7 @@ public class MacOsHabboClient extends HabboClient {
                 return new ArrayList<>();
 
             for (String s : possibleResults)
-                result.add(hexStringToByteArray(s));
+                result.add(HexEncoding.toBytes(s));
         } catch (IOException | URISyntaxException e) {
             e.printStackTrace();
         }
@@ -124,25 +126,11 @@ public class MacOsHabboClient extends HabboClient {
             ArrayList<String> possibleData = readPossibleBytes(false);
 
             for (String possibleHexStr : possibleData) {
-                result.add(hexStringToByteArray(possibleHexStr));
+                result.add(HexEncoding.toBytes(possibleHexStr));
             }
         } catch (IOException | URISyntaxException e) {
             e.printStackTrace();
         }
         return result;
-    }
-
-    private static byte[] hexStringToByteArray(String s) {
-        int len = s.length();
-        if (len % 2 == 1) {
-            s = "0" + s;
-            len += 1;
-        }
-        byte[] data = new byte[len / 2];
-        for (int i = 0; i < len; i += 2) {
-            data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
-                    + Character.digit(s.charAt(i+1), 16));
-        }
-        return data;
     }
 }

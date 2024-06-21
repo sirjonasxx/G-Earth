@@ -24,7 +24,7 @@ public class HConnection {
 
     private volatile ExtensionHandler extensionHandler = null;
 
-    private volatile Object[] trafficObservables = {new Observable<TrafficListener>(), new Observable<TrafficListener>(), new Observable<TrafficListener>()};
+    private volatile Observable<TrafficListener>[] trafficObservables = new Observable[]{new Observable<TrafficListener>(), new Observable<TrafficListener>(), new Observable<TrafficListener>()};
     private volatile Observable<StateChangeListener> stateObservable = new Observable<>();
     private volatile Observable<Consumer<Boolean>> developerModeChangeObservable = new Observable<>();
 
@@ -136,7 +136,7 @@ public class HConnection {
         return extensionHandler;
     }
 
-    public Object[] getTrafficObservables() {
+    public Observable<TrafficListener>[] getTrafficObservables() {
         return trafficObservables;
     }
 

@@ -1,5 +1,6 @@
 package gearth.protocol.memory.habboclient.windows;
 
+import gearth.encoding.HexEncoding;
 import gearth.misc.Cacher;
 import gearth.protocol.HConnection;
 import gearth.protocol.HMessage;
@@ -44,7 +45,7 @@ public class WindowsHabboClient extends HabboClient {
                 return new ArrayList<>();
 
             for (String s : possibleResults)
-                result.add(hexStringToByteArray(s));
+                result.add(HexEncoding.toBytes(s));
         } catch (IOException | URISyntaxException e) {
             e.printStackTrace();
         }
@@ -126,21 +127,11 @@ public class WindowsHabboClient extends HabboClient {
             ArrayList<String> possibleData = readPossibleBytes(false);
 
             for (String possibleHexStr : possibleData) {
-                result.add(hexStringToByteArray(possibleHexStr));
+                result.add(HexEncoding.toBytes(possibleHexStr));
             }
         } catch (IOException | URISyntaxException e) {
             e.printStackTrace();
         }
         return result;
-    }
-
-    private static byte[] hexStringToByteArray(String s) {
-        int len = s.length();
-        byte[] data = new byte[len / 2];
-        for (int i = 0; i < len; i += 2) {
-            data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
-                    + Character.digit(s.charAt(i+1), 16));
-        }
-        return data;
     }
 }

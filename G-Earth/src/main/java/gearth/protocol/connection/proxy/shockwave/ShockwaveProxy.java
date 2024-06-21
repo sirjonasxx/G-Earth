@@ -88,7 +88,7 @@ public class ShockwaveProxy implements ProxyProvider, ConnectionInterceptorCallb
         final Semaphore abort = new Semaphore(0);
 
         final ShockwavePacketOutgoingHandler outgoingHandler = new ShockwavePacketOutgoingHandler(server.getOutputStream(), hConnection.getExtensionHandler(), hConnection.getTrafficObservables());
-        final ShockwavePacketIncomingHandler incomingHandler = new ShockwavePacketIncomingHandler(client.getOutputStream(), hConnection.getExtensionHandler(), hConnection.getTrafficObservables());
+        final ShockwavePacketIncomingHandler incomingHandler = new ShockwavePacketIncomingHandler(client.getOutputStream(), hConnection.getExtensionHandler(), hConnection.getTrafficObservables(), outgoingHandler);
 
         // TODO: Non hardcoded version "20". Not exactly sure yet how to deal with this for now.
         // Lets revisit when origins is more mature.
