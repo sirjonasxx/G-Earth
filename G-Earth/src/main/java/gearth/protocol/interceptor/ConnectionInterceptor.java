@@ -1,9 +1,11 @@
-package gearth.protocol.connection.proxy.flash;
+package gearth.protocol.interceptor;
 
-import gearth.GEarth;
 import gearth.misc.Cacher;
 import gearth.protocol.HConnection;
-import gearth.protocol.connection.*;
+import gearth.protocol.connection.HClient;
+import gearth.protocol.connection.HProxy;
+import gearth.protocol.connection.HState;
+import gearth.protocol.connection.HStateSetter;
 import gearth.protocol.connection.proxy.ProxyProviderFactory;
 import gearth.protocol.connection.proxy.SocksConfiguration;
 import gearth.protocol.hostreplacer.hostsfile.HostReplacer;
@@ -14,20 +16,30 @@ import gearth.ui.titlebar.TitleBarController;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
-import javafx.scene.image.Image;
-import javafx.stage.Stage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.net.*;
+import java.net.BindException;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NormalFlashProxyProvider extends FlashProxyProvider {
+public class ConnectionInterceptor {
 
-    private List<String> potentialHosts;
-
-
+    private static final Logger logger = LoggerFactory.getLogger(ConnectionInterceptor.class);
     private static final HostReplacer hostsReplacer = HostReplacerFactory.get();
+
+    private final HClient hClient;
+    private final HStateSetter hStateSetter;
+    private final HConnection hConnection;
+    private final ConnectionInterceptorCallbacks callbacks;
+    private final List<String> potentialHosts;
+
     private volatile boolean hostRedirected = false;
 
     private volatile List<HProxy> potentialProxies = new ArrayList<>();
@@ -35,28 +47,31 @@ public class NormalFlashProxyProvider extends FlashProxyProvider {
 
     private boolean useSocks;
 
-
-    public NormalFlashProxyProvider(HProxySetter proxySetter, HStateSetter stateSetter, HConnection hConnection, List<String> potentialHosts, boolean useSocks) {
-        super(proxySetter, stateSetter, hConnection);
+    public ConnectionInterceptor(HClient client, HStateSetter stateSetter, HConnection hConnection, ConnectionInterceptorCallbacks callbacks, List<String> potentialHosts, boolean useSocks) {
+        this.hClient = client;
+        this.hStateSetter = stateSetter;
+        this.hConnection = hConnection;
+        this.callbacks = callbacks;
         this.potentialHosts = potentialHosts;
         this.useSocks = useSocks;
     }
 
-
-    @Override
     public void start() throws IOException {
-        if (hConnection.getState() != HState.NOT_CONNECTED) {
-            return;
-        }
-
         prepare();
         addToHosts();
         launchProxy();
+    }
 
+    public void stop(boolean forceRemoveFromHosts) {
+        if (forceRemoveFromHosts || hostRedirected) {
+            removeFromHosts();
+        }
+
+        clearAllProxies();
     }
 
     private void prepare() {
-        stateSetter.setState(HState.PREPARING);
+        hStateSetter.setState(HState.PREPARING);
 
         List<String> willremove = new ArrayList<>();
         int c = 0;
@@ -79,7 +94,7 @@ public class NormalFlashProxyProvider extends FlashProxyProvider {
 
                 int intercept_port = port;
                 String intercept_host = "127.0." + (c / 254) + "." + (1 + c % 254);
-                potentialProxies.add(new HProxy(HClient.FLASH, input_dom, actual_dom, port, intercept_port, intercept_host));
+                potentialProxies.add(new HProxy(hClient, input_dom, actual_dom, port, intercept_port, intercept_host));
                 c++;
             }
         }
@@ -92,11 +107,11 @@ public class NormalFlashProxyProvider extends FlashProxyProvider {
             Cacher.put(ProxyProviderFactory.HOTELS_CACHE_KEY, additionalCachedHotels);
         }
 
-        stateSetter.setState(HState.PREPARED);
+        hStateSetter.setState(HState.PREPARED);
     }
 
     private void launchProxy() throws IOException {
-        stateSetter.setState(HState.WAITING_FOR_CLIENT);
+        hStateSetter.setState(HState.WAITING_FOR_CLIENT);
 
         for (int c = 0; c < potentialProxies.size(); c++) {
             HProxy potentialProxy = potentialProxies.get(c);
@@ -128,46 +143,37 @@ public class NormalFlashProxyProvider extends FlashProxyProvider {
                             Socket client = proxy_server.accept();
                             proxy = potentialProxy;
                             closeAllProxies(proxy);
-                            if (HConnection.DEBUG) System.out.println("accepted a proxy");
+                            if (HConnection.DEBUG) logger.debug("Accepted a proxy");
 
                             new Thread(() -> {
                                 try {
                                     Socket server;
                                     if (!useSocks) {
-                                         server = new Socket(proxy.getActual_domain(), proxy.getActual_port());
+                                        server = new Socket(proxy.getActual_domain(), proxy.getActual_port());
                                     }
                                     else {
                                         SocksConfiguration configuration = ProxyProviderFactory.getSocksConfig();
                                         if (configuration == null) {
-                                            showInvalidConnectionError();
-                                            abort();
+                                            callbacks.onInterceptorError();
                                             return;
                                         }
                                         server = configuration.createSocket();
                                         server.connect(new InetSocketAddress(proxy.getActual_domain(), proxy.getActual_port()), 5000);
                                     }
 
-                                    startProxyThread(client, server, proxy);
-                                } catch (SocketException | SocketTimeoutException e) {
+                                    callbacks.onInterceptorConnected(client, server, proxy);
+                                } catch (Exception e) {
                                     // should only happen when SOCKS configured badly
-                                    showInvalidConnectionError();
-                                    abort();
-                                    e.printStackTrace();
-                                }
-                                catch (InterruptedException | IOException e) {
-                                    // TODO Auto-generated catch block
-                                    e.printStackTrace();
+                                    callbacks.onInterceptorError();
+                                    logger.error("Error occurred while intercepting connection", e);
                                 }
                             }).start();
-
-
-                        } catch (IOException e1) {
-                            // TODO Auto-generated catch block
-//                                e1.printStackTrace();
+                        } catch (IOException e) {
+                            // ignore
                         }
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    logger.error("Proxy server thread error", e);
                 }
             }).start();
         }
@@ -175,24 +181,6 @@ public class NormalFlashProxyProvider extends FlashProxyProvider {
 
         if (HConnection.DEBUG) System.out.println("done waiting for clients with: " + hConnection.getState() );
 
-    }
-
-    @Override
-    public void abort() {
-        stateSetter.setState(HState.ABORTING);
-        if (hostRedirected)	{
-            removeFromHosts();
-        }
-
-        clearAllProxies();
-        super.abort();
-    }
-
-    @Override
-    protected void onConnect() {
-        super.onConnect();
-        removeFromHosts();
-        clearAllProxies();
     }
 
     private void addToHosts() {
@@ -208,6 +196,7 @@ public class NormalFlashProxyProvider extends FlashProxyProvider {
         hostsReplacer.addRedirect(lines);
         hostRedirected = true;
     }
+
     private void removeFromHosts(){
         List<String> linesTemp = new ArrayList<>();
         for (HProxy proxy : potentialProxies) {
@@ -226,6 +215,7 @@ public class NormalFlashProxyProvider extends FlashProxyProvider {
         closeAllProxies(null);
 //        potentialProxies = new ArrayList<>();
     }
+
     private void closeAllProxies(HProxy except) {
         for (HProxy proxy : potentialProxies) {
             if (except != proxy) {
@@ -241,4 +231,5 @@ public class NormalFlashProxyProvider extends FlashProxyProvider {
         }
 //        potentialProxies = Collections.singletonList(except);
     }
+
 }

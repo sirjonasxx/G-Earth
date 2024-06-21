@@ -114,11 +114,11 @@ public class PacketInfoManager {
 
         if (clientType == HClient.UNITY) {
             result.addAll(new GEarthUnityPacketInfoProvider(hotelversion).provide());
-        } else if (clientType == HClient.FLASH || clientType == HClient.NITRO) {
+        } else if (clientType == HClient.FLASH || clientType == HClient.NITRO || clientType == HClient.SHOCKWAVE) {
             try {
                 List<RemotePacketInfoProvider> providers = new ArrayList<>();
                 providers.add(new HarblePacketInfoProvider(hotelversion));
-                providers.add(new SulekPacketInfoProvider(hotelversion));
+                providers.add(new SulekPacketInfoProvider(clientType, hotelversion));
 
                 Semaphore blockUntilComplete = new Semaphore(providers.size());
                 blockUntilComplete.acquire(providers.size());

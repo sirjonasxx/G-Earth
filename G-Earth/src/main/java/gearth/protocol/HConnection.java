@@ -20,7 +20,7 @@ import java.util.function.Consumer;
 public class HConnection {
 
     public static volatile boolean DECRYPTPACKETS = true;
-    public static volatile boolean DEBUG = false;
+    public static volatile boolean DEBUG = true;
 
     private volatile ExtensionHandler extensionHandler = null;
 
@@ -60,14 +60,14 @@ public class HConnection {
     }
 
     // autodetect mode
-    public void start() {
-        proxyProvider = proxyProviderFactory.provide();
+    public void start(HClient client) {
+        proxyProvider = proxyProviderFactory.provide(client);
         startMITM();
     }
 
     // manual input mode
-    public void start(String host, int port) {
-        proxyProvider = proxyProviderFactory.provide(host, port);
+    public void start(HClient client, String host, int port) {
+        proxyProvider = proxyProviderFactory.provide(client, host, port);
         startMITM();
     }
 

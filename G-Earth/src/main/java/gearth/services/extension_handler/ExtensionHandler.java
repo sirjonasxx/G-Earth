@@ -7,6 +7,7 @@ import gearth.protocol.HConnection;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 import gearth.protocol.connection.HState;
+import gearth.protocol.format.shockwave.ShockMessage;
 import gearth.services.extension_handler.extensions.ExtensionListener;
 import gearth.services.extension_handler.extensions.GEarthExtension;
 import gearth.services.extension_handler.extensions.extensionproducers.ExtensionProducer;
@@ -160,6 +161,7 @@ public class ExtensionHandler {
             }
         }
     }
+
     public void handle(HMessage hMessage, OnHMessageHandled callback) {
         synchronized (hMessageStuffLock) {
             Pair<HMessage.Direction, Integer> msgDirectionAndId = new Pair<>(hMessage.getDestination(), hMessage.getIndex());
@@ -177,11 +179,28 @@ public class ExtensionHandler {
             }
         }
 
-
         maybeFinishHmessage(hMessage);
     }
 
+    public void handle(ShockMessage hMessage, OnHMessageHandled callback) {
+        synchronized (hMessageStuffLock) {
+            Pair<HMessage.Direction, Integer> msgDirectionAndId = new Pair<>(hMessage.getDirection(), hMessage.getIndex());
+            originalMessages.put(msgDirectionAndId, hMessage);
+            finishManipulationCallback.put(hMessage, callback);
+            editedMessages.put(hMessage, null);
+            allAwaitingMessages.add(hMessage);
 
+            synchronized (gEarthExtensions) {
+                awaitManipulation.put(hMessage, new HashSet<>(gEarthExtensions));
+
+                for (GEarthExtension extension : gEarthExtensions) {
+                    extension.packetIntercept(new HMessage(hMessage));
+                }
+            }
+        }
+
+        maybeFinishHmessage(hMessage);
+    }
 
     private ExtensionProducerObserver createExtensionProducerObserver() {
         return new ExtensionProducerObserver() {

@@ -43,6 +43,7 @@ public class ConnectionController extends SubForm {
     public static final String CLIENT_CACHE_KEY = "last_client_mode";
     public ToggleGroup tgl_clientMode;
     public RadioButton rd_unity;
+    public RadioButton rd_origins;
     public RadioButton rd_flash;
     public RadioButton rd_nitro;
     public GridPane grd_clientSelection;
@@ -63,6 +64,9 @@ public class ConnectionController extends SubForm {
             switch (Cacher.getCacheContents().getEnum(HClient.class, CLIENT_CACHE_KEY)) {
                 case FLASH:
                     rd_flash.setSelected(true);
+                    break;
+                case SHOCKWAVE:
+                    rd_origins.setSelected(true);
                     break;
                 case UNITY:
                     rd_unity.setSelected(true);
@@ -240,12 +244,16 @@ public class ConnectionController extends SubForm {
                         inpPort.getSelectionModel().select(port);
                         cbx_autodetect.setSelected(false);
                     });
-                    getHConnection().start(host, Integer.parseInt(port));
+                    getHConnection().start(HClient.FLASH, host, Integer.parseInt(port));
                 }
                 else {
                     Platform.runLater(() -> cbx_autodetect.setSelected(true));
-                    getHConnection().start();
+                    getHConnection().start(HClient.FLASH);
                 }
+            }
+            else if (connectMode.equals("origins")) {
+                Platform.runLater(() -> rd_origins.setSelected(true));
+                getHConnection().start(HClient.SHOCKWAVE);
             }
             else if (connectMode.equals("unity")) {
                 Platform.runLater(() -> rd_unity.setSelected(true));
@@ -266,10 +274,12 @@ public class ConnectionController extends SubForm {
             new Thread(() -> {
                 if (isClientMode(HClient.FLASH)) {
                     if (cbx_autodetect.isSelected()) {
-                        getHConnection().start();
+                        getHConnection().start(HClient.FLASH);
                     } else {
-                        getHConnection().start(inpHost.getEditor().getText(), Integer.parseInt(inpPort.getEditor().getText()));
+                        getHConnection().start(HClient.FLASH, inpHost.getEditor().getText(), Integer.parseInt(inpPort.getEditor().getText()));
                     }
+                } else if (isClientMode(HClient.SHOCKWAVE)) {
+                    getHConnection().start(HClient.SHOCKWAVE);
                 } else if (isClientMode(HClient.UNITY)) {
                     getHConnection().startUnity();
                 } else if (isClientMode(HClient.NITRO)) {
@@ -291,6 +301,8 @@ public class ConnectionController extends SubForm {
     protected void onExit() {
         if (rd_flash.isSelected()) {
             Cacher.put(CLIENT_CACHE_KEY, HClient.FLASH);
+        } else if (rd_origins.isSelected()) {
+            Cacher.put(CLIENT_CACHE_KEY, HClient.SHOCKWAVE);
         } else if (rd_unity.isSelected()) {
             Cacher.put(CLIENT_CACHE_KEY, HClient.UNITY);
         } else if (rd_nitro.isSelected()) {
@@ -311,6 +323,8 @@ public class ConnectionController extends SubForm {
         switch (client) {
             case FLASH:
                 return rd_flash.isSelected();
+            case SHOCKWAVE:
+                return rd_origins.isSelected();
             case UNITY:
                 return rd_unity.isSelected();
             case NITRO:
@@ -333,6 +347,7 @@ public class ConnectionController extends SubForm {
         lblHotelVersion.textProperty().bind(new TranslatableString("%s", "tab.connection.version"));
         lblClient.textProperty().bind(new TranslatableString("%s", "tab.connection.client"));
         rd_unity.textProperty().bind(new TranslatableString("%s", "tab.connection.client.unity"));
+        rd_origins.textProperty().bind(new TranslatableString("%s", "tab.connection.client.origins"));
         rd_flash.textProperty().bind(new TranslatableString("%s", "tab.connection.client.flash"));
         rd_nitro.textProperty().bind(new TranslatableString("%s", "tab.connection.client.nitro"));
         lblStateHead.textProperty().bind(new TranslatableString("%s", "tab.connection.state"));

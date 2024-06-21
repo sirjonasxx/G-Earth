@@ -1,5 +1,6 @@
 package gearth.services.packet_info.providers.implementations;
 
+import gearth.protocol.connection.HClient;
 import gearth.services.packet_info.PacketInfo;
 import gearth.services.packet_info.providers.RemotePacketInfoProvider;
 import gearth.protocol.HMessage;
@@ -12,15 +13,23 @@ import java.util.List;
 public class SulekPacketInfoProvider extends RemotePacketInfoProvider {
 
     public static final String CACHE_PREFIX = "SULEK_API-";
-    public static final String SULEK_API_URL = "https://api.sulek.dev/releases/$hotelversion$/messages";
+    public static final String SULEK_API_URL_GLOBAL = "https://api.sulek.dev/releases/$hotelversion$/messages";
+    public static final String SULEK_API_URL_VARIANT = "https://api.sulek.dev/releases/$variant$/$hotelversion$/messages";
 
-    public SulekPacketInfoProvider(String hotelVersion) {
+    private final HClient client;
+
+    public SulekPacketInfoProvider(HClient client, String hotelVersion) {
         super(hotelVersion);
+        this.client = client;
     }
 
     @Override
     protected String getRemoteUrl() {
-        return SULEK_API_URL.replace("$hotelversion$", hotelVersion);
+        if (client == HClient.SHOCKWAVE) {
+            return SULEK_API_URL_VARIANT.replace("$variant$", "shockwave-windows").replace("$hotelversion$", hotelVersion);
+        }
+
+        return SULEK_API_URL_GLOBAL.replace("$hotelversion$", hotelVersion);
     }
 
     @Override

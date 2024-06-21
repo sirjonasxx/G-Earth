@@ -3,20 +3,20 @@ package gearth.protocol.connection.proxy;
 import gearth.misc.Cacher;
 import gearth.misc.OSValidator;
 import gearth.protocol.HConnection;
+import gearth.protocol.connection.HClient;
 import gearth.protocol.connection.HProxySetter;
 import gearth.protocol.connection.HStateSetter;
-import gearth.protocol.connection.proxy.flash.NormalFlashProxyProvider;
+import gearth.protocol.connection.proxy.flash.FlashProxy;
 import gearth.protocol.connection.proxy.flash.unix.LinuxRawIpFlashProxyProvider;
 import gearth.protocol.connection.proxy.flash.windows.WindowsRawIpFlashProxyProvider;
+import gearth.protocol.connection.proxy.shockwave.ShockwaveProxy;
 import gearth.ui.titlebar.TitleBarController;
 import gearth.ui.translations.LanguageBundle;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
 import javafx.scene.layout.Region;
-import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -40,6 +40,8 @@ public class ProxyProviderFactory {
         autoDetectHosts.add("game-tr.habbo.com:30000");
         autoDetectHosts.add("game-us.habbo.com:30000");
         autoDetectHosts.add("game-s2.habbo.com:30000");
+
+        autoDetectHosts.add("game-ous.habbo.com:40001");
 
         List<Object> additionalCachedHotels = Cacher.getList(HOTELS_CACHE_KEY);
         if (additionalCachedHotels != null) {
@@ -83,10 +85,11 @@ public class ProxyProviderFactory {
         return true;
     }
 
-    public ProxyProvider provide()  {
-        return provide(autoDetectHosts);
+    public ProxyProvider provide(HClient client)  {
+        return provide(client, autoDetectHosts);
     }
-    public ProxyProvider provide(String domain, int port)  {
+
+    public ProxyProvider provide(HClient client, String domain, int port)  {
         List<Object> additionalCachedHotels = Cacher.getList(HOTELS_CACHE_KEY);
         if (additionalCachedHotels == null) {
             additionalCachedHotels = new ArrayList<>();
@@ -129,11 +132,14 @@ public class ProxyProviderFactory {
         else {
             List<String> potentialHost = new ArrayList<>();
             potentialHost.add(domain+":"+port);
-            return provide(potentialHost);
+            return provide(client, potentialHost);
         }
     }
-    private ProxyProvider provide(List<String> potentialHosts) {
-        return new NormalFlashProxyProvider(proxySetter, stateSetter, hConnection, potentialHosts, socksConfig.useSocks() && !socksConfig.onlyUseIfNeeded());
+
+    private ProxyProvider provide(HClient client, List<String> potentialHosts) {
+        return client == HClient.FLASH
+                ? new FlashProxy(proxySetter, stateSetter, hConnection, potentialHosts, socksConfig.useSocks() && !socksConfig.onlyUseIfNeeded())
+                : new ShockwaveProxy(proxySetter, stateSetter, hConnection, potentialHosts);
     }
 
     public static void setSocksConfig(SocksConfiguration configuration) {

@@ -3,6 +3,7 @@ package gearth.protocol.packethandler;
 import gearth.misc.listenerpattern.Observable;
 import gearth.protocol.HMessage;
 import gearth.protocol.TrafficListener;
+import gearth.protocol.format.shockwave.ShockMessage;
 import gearth.services.extension_handler.ExtensionHandler;
 
 import java.io.IOException;
@@ -32,7 +33,26 @@ public abstract class PacketHandler {
         message.getPacket().resetReadIndex();
     }
 
+    protected void notifyListeners(int i, ShockMessage message) {
+        ((Observable<TrafficListener>) trafficObservables[i]).fireEvent(trafficListener -> {
+            message.getPacket().resetReadIndex();
+            trafficListener.onCapture(message);
+        });
+        message.getPacket().resetReadIndex();
+    }
+
     protected void awaitListeners(HMessage message, PacketSender packetSender) {
+        notifyListeners(0, message);
+        notifyListeners(1, message);
+        extensionHandler.handle(message, message2 -> {
+            notifyListeners(2, message2);
+            if (!message2.isBlocked()) {
+                packetSender.send(message2);
+            }
+        });
+    }
+
+    protected void awaitListeners(ShockMessage message, PacketSender packetSender) {
         notifyListeners(0, message);
         notifyListeners(1, message);
         extensionHandler.handle(message, message2 -> {
