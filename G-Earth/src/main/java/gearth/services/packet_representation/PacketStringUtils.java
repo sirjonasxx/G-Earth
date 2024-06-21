@@ -1,6 +1,9 @@
 package gearth.services.packet_representation;
 
+import gearth.encoding.Base64Encoding;
+import gearth.encoding.VL64Encoding;
 import gearth.protocol.HMessage;
+import gearth.protocol.HPacketFormat;
 import gearth.services.packet_info.PacketInfo;
 import gearth.services.packet_representation.prediction.StructurePredictor;
 import gearth.protocol.HPacket;
@@ -14,8 +17,7 @@ import java.util.regex.Pattern;
 // for all the logistics behind bytes-string conversion
 public class PacketStringUtils {
 
-    private static String replaceAll(String templateText, String regex,
-                                           Function<Matcher, String> replacer) {
+    private static String replaceAll(String templateText, String regex, Function<Matcher, String> replacer) {
         Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
         Matcher matcher = pattern.matcher(templateText);
         StringBuffer result = new StringBuffer();
@@ -29,34 +31,66 @@ public class PacketStringUtils {
         return result.toString();
     }
 
+    private static String replaceWithFormat(HPacketFormat format, String templateText, String regex, PacketReplaceWriter writer) {
+        return replaceAll(templateText, regex, m -> {
+            // Create temp packet.
+            final HPacket temp = format.createPacket(0);
+            final int sizeBefore = temp.getBytesLength();
 
+            // Write the value to the temp packet.
+            writer.write(temp, m.group(1));
+
+            // Calculate the size of the value.
+            final int sizeAfter = temp.getBytesLength();
+            final int size = sizeAfter - sizeBefore;
+
+            // Return the value in the format.
+            return toString(temp.readBytes(size));
+        });
+    }
+
+    @Deprecated
     public static HPacket fromString(String packet) throws InvalidPacketException {
+        return fromString(packet, HPacketFormat.EVA_WIRE);
+    }
+
+    public static HPacket fromString(String packet, HPacketFormat format) throws InvalidPacketException {
         boolean fixLengthLater = false;
-        if (packet.startsWith("{h:")) {
-            fixLengthLater = true;
+
+        if (format != HPacketFormat.EVA_WIRE) {
+            packet = replaceWithFormat(format, packet, "\\{s:(-?[0-9]+)}", (temp, value) -> temp.appendUShort(Short.parseShort(value)));
+            packet = replaceWithFormat(format, packet, "\\{i:(-?[0-9]+)}", (temp, value) -> temp.appendInt(Integer.parseInt(value)));
+            packet = replaceWithFormat(format, packet, "\\{b:([Ff]alse|[Tt]rue)}", (temp, value) -> temp.appendBoolean(value.equalsIgnoreCase("true")));
+
+            packet = replaceAll(packet, "\\{b:([0-9]{1,3})}", m -> "[" + Integer.parseInt(m.group(1)) + "]");
+            packet = replaceAll(packet, "\\{h:(-?[0-9]+)}", m -> toString(Base64Encoding.encode(Short.parseShort(m.group(1)), 2)));
+        } else {
+            if (packet.startsWith("{h:")) {
+                fixLengthLater = true;
+            }
+
+            // note: in String expressions {s:"string"}, character " needs to be backslashed -> \" if used in string
+            packet = replaceAll(packet, "\\{i:(-?[0-9]+)}",
+                    m -> toString(ByteBuffer.allocate(4).putInt(Integer.parseInt(m.group(1))).array()));
+
+            packet = replaceAll(packet, "\\{l:(-?[0-9]+)}",
+                    m -> toString(ByteBuffer.allocate(8).putLong(Long.parseLong(m.group(1))).array()));
+
+            packet = replaceAll(packet, "\\{d:(-?[0-9]*\\.[0-9]*)}",
+                    m -> toString(ByteBuffer.allocate(8).putDouble(Double.parseDouble(m.group(1))).array()));
+
+            packet = replaceAll(packet, "\\{u:([0-9]+)}",
+                    m -> "[" + (Integer.parseInt(m.group(1))/256) + "][" + (Integer.parseInt(m.group(1)) % 256) + "]");
+
+            packet = replaceAll(packet, "\\{h:(-?[0-9]+)}",
+                    m -> toString(ByteBuffer.allocate(2).putShort(Short.parseShort(m.group(1))).array()));
+
+            packet = replaceAll(packet, "\\{b:([Ff]alse|[Tt]rue)}",
+                    m -> m.group(1).toLowerCase().equals("true") ? "[1]" : "[0]");
+
+            packet = replaceAll(packet, "\\{b:([0-9]{1,3})}",
+                    m -> "[" + Integer.parseInt(m.group(1)) + "]");
         }
-
-        // note: in String expressions {s:"string"}, character " needs to be backslashed -> \" if used in string
-        packet = replaceAll(packet, "\\{i:(-?[0-9]+)}",
-                m -> toString(ByteBuffer.allocate(4).putInt(Integer.parseInt(m.group(1))).array()));
-
-        packet = replaceAll(packet, "\\{l:(-?[0-9]+)}",
-                m -> toString(ByteBuffer.allocate(8).putLong(Long.parseLong(m.group(1))).array()));
-
-        packet = replaceAll(packet, "\\{d:(-?[0-9]*\\.[0-9]*)}",
-                m -> toString(ByteBuffer.allocate(8).putDouble(Double.parseDouble(m.group(1))).array()));
-
-        packet = replaceAll(packet, "\\{u:([0-9]+)}",
-                m -> "[" + (Integer.parseInt(m.group(1))/256) + "][" + (Integer.parseInt(m.group(1)) % 256) + "]");
-
-        packet = replaceAll(packet, "\\{h:(-?[0-9]+)}",
-                m -> toString(ByteBuffer.allocate(2).putShort(Short.parseShort(m.group(1))).array()));
-
-        packet = replaceAll(packet, "\\{b:([Ff]alse|[Tt]rue)}",
-                m -> m.group(1).toLowerCase().equals("true") ? "[1]" : "[0]");
-
-        packet = replaceAll(packet, "\\{b:([0-9]{1,3})}",
-                m -> "[" + Integer.parseInt(m.group(1)) + "]");
 
         // results in regex stackoverflow for long strings
 //        packet = replaceAll(packet, "\\{s:\"(([^\"]|(\\\\\"))*)\"}",
@@ -127,12 +161,16 @@ public class PacketStringUtils {
             actualString.append(match);
 
             String latin = new String(actualString.toString().getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1);
-            HPacket temp = new HPacket(0);
-            temp.appendString(latin, StandardCharsets.ISO_8859_1);
+            HPacket temp = format.createPacket(0);
 
-            packet = packet.substring(0, start) +
-                    toString(temp.readBytes(latin.length() + 2, 6)) +
-                    packet.substring(end + 2);
+            int sizeBefore = temp.getBytesLength();
+            temp.appendString(latin, StandardCharsets.ISO_8859_1);
+            int sizeAfter = temp.getBytesLength();
+            int size = sizeAfter - sizeBefore;
+
+            packet = packet.substring(0, start)
+                    + toString(temp.readBytes(size))
+                    + packet.substring(end + 2);
         }
 
         String[] identifier = {null};
@@ -162,14 +200,14 @@ public class PacketStringUtils {
         }
 
         byte[] packetInBytes = packet.getBytes(StandardCharsets.ISO_8859_1);
-        if (fixLengthLater) {
+        if (fixLengthLater && format == HPacketFormat.EVA_WIRE) {
             byte[] combined = new byte[4 + packetInBytes.length];
             System.arraycopy(packetInBytes,0, combined, 4, packetInBytes.length);
             packetInBytes = combined;
         }
 
-        HPacket hPacket = new HPacket(packetInBytes);
-        if (fixLengthLater) {
+        HPacket hPacket = format.createPacket(packetInBytes);
+        if (fixLengthLater && format == HPacketFormat.EVA_WIRE) {
             hPacket.fixLength();
         }
         if (identifier[0] != null) {
@@ -179,6 +217,7 @@ public class PacketStringUtils {
         }
         return hPacket;
     }
+
     public static String toString(byte[] packet) {
         StringBuilder teststring = new StringBuilder();
         for (byte x : packet)	{
@@ -292,6 +331,10 @@ public class PacketStringUtils {
 
         HPacket p3 = fromString("{h:2266}{s:\"¥\"}{i:0}{i:0}");
         System.out.println(p3);
+
+        // IPAKQA
+        System.out.println(VL64Encoding.decode("K".getBytes()));
+        //System.out.println(VL64Encoding.decode("K".getBytes()));
     }
 
 }

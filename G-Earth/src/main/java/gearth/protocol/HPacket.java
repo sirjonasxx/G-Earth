@@ -27,14 +27,19 @@ public class HPacket implements StringifyAble {
     public HPacket(byte[] packet)	{
         packetInBytes = packet.clone();
     }
+
     public HPacket(HPacket packet) {
         packetInBytes = packet.packetInBytes.clone();
         isEdited = packet.isEdited;
     }
 
     public HPacket(String packet) {
+        this(packet, HPacketFormat.EVA_WIRE);
+    }
+
+    public HPacket(String packet, HPacketFormat format) {
         try {
-            HPacket packetFromString = PacketStringUtils.fromString(packet);
+            HPacket packetFromString = PacketStringUtils.fromString(packet, format);
             packetInBytes = packetFromString.packetInBytes;
             identifier = packetFromString.identifier;
             identifierDirection = packetFromString.identifierDirection;
@@ -45,7 +50,7 @@ public class HPacket implements StringifyAble {
 
     public HPacket(int header) {
         packetInBytes = new byte[]{0,0,0,2,0,0};
-        replaceShort(4, (short)header);
+        replacePacketId((short)header);
         isEdited = false;
     }
 
@@ -132,7 +137,7 @@ public class HPacket implements StringifyAble {
         }
 
         boolean wasEdited = isEdited;
-        replaceShort(4, (short)(packetInfo.getHeaderId()));
+        replacePacketId((short)(packetInfo.getHeaderId()));
         identifier = null;
 
         isEdited = wasEdited;
@@ -329,6 +334,9 @@ public class HPacket implements StringifyAble {
         return (readByte(index) != 0);
     }
 
+    protected void replacePacketId(short headerId) {
+        replaceShort(4, headerId);
+    }
 
     public HPacket replaceBoolean(int index, boolean b) {
         isEdited = true;
