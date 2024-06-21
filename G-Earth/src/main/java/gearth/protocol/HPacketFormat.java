@@ -1,5 +1,7 @@
 package gearth.protocol;
 
+import gearth.extensions.parsers.HDirection;
+import gearth.protocol.connection.HClient;
 import gearth.protocol.packethandler.shockwave.packets.ShockPacketIncoming;
 import gearth.protocol.packethandler.shockwave.packets.ShockPacketOutgoing;
 
@@ -8,6 +10,14 @@ public enum HPacketFormat {
     EVA_WIRE,
     WEDGIE_INCOMING,
     WEDGIE_OUTGOING;
+
+    public static HPacketFormat getFormat(HClient client, HMessage.Direction direction) {
+        if (client != HClient.SHOCKWAVE) {
+            return EVA_WIRE;
+        } else {
+            return direction == HMessage.Direction.TOCLIENT ? WEDGIE_INCOMING : WEDGIE_OUTGOING;
+        }
+    }
 
     public HPacket createPacket(String data) {
         switch (this) {

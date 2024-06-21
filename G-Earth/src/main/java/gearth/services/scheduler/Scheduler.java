@@ -1,8 +1,12 @@
 package gearth.services.scheduler;
 
+import gearth.extensions.parsers.HDirection;
 import gearth.protocol.HConnection;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
+import gearth.protocol.HPacketFormat;
+import gearth.protocol.connection.HClient;
+import gearth.protocol.connection.HState;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -13,7 +17,7 @@ public class Scheduler<T extends ScheduleItem> {
 
     private List<T> scheduleItems = new ArrayList<>();
 
-    public Scheduler(HConnection connection) {
+    public Scheduler(final HConnection connection) {
         new Thread(() -> {
             long t = System.currentTimeMillis();
             long changed = 1;
@@ -27,6 +31,12 @@ public class Scheduler<T extends ScheduleItem> {
                     e.printStackTrace();
                 }
 
+                if (connection.getState() != HState.CONNECTED) {
+                    continue;
+                }
+
+                final HClient clientType = connection.getClientType();
+
                 set.clear();
                 for (int i = size() - 1; i >= 0; i--) {
                     set.add(get(i));
@@ -37,18 +47,18 @@ public class Scheduler<T extends ScheduleItem> {
                         Interval cur = item.getDelayProperty().get();
                         for (int i = 0; i < changed; i++) {
                             if ((t - i) % cur.getDelay() == cur.getOffset()) {
-                                HPacket hPacket = new HPacket(item.getPacketAsStringProperty().get());
+                                final HMessage.Direction direction = item.getDestinationProperty().get();
+                                final HPacketFormat format = HPacketFormat.getFormat(clientType, direction);
+                                final HPacket hPacket = format.createPacket(item.getPacketAsStringProperty().get());
 
-                                if (item.getDestinationProperty().get() == HMessage.Direction.TOSERVER) {
+                                if (direction == HMessage.Direction.TOSERVER) {
                                     connection.sendToServer(hPacket);
-                                }
-                                else {
+                                } else {
                                     connection.sendToClient(hPacket);
                                 }
                             }
                         }
                     }
-
                 }
 
                 long newT = System.currentTimeMillis();
