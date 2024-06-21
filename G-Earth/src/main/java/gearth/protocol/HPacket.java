@@ -16,9 +16,9 @@ import java.util.Optional;
 
 public class HPacket implements StringifyAble {
 
-    private boolean isEdited = false;
+    protected boolean isEdited = false;
     protected byte[] packetInBytes;
-    private int readIndex = 6;
+    protected int readIndex = 6;
 
     // if identifier != null, this is a placeholder name for the type of packet, headerId will be "-1"
     private String identifier = null;
@@ -31,16 +31,18 @@ public class HPacket implements StringifyAble {
         packetInBytes = packet.packetInBytes.clone();
         isEdited = packet.isEdited;
     }
-    public HPacket(String packet)	{
+
+    public HPacket(String packet) {
         try {
             HPacket packetFromString = PacketStringUtils.fromString(packet);
             packetInBytes = packetFromString.packetInBytes;
             identifier = packetFromString.identifier;
             identifierDirection = packetFromString.identifierDirection;
-    } catch (InvalidPacketException e) {
-        packetInBytes = new byte[0];
+        } catch (InvalidPacketException e) {
+            packetInBytes = new byte[0];
+        }
     }
-}
+
     public HPacket(int header) {
         packetInBytes = new byte[]{0,0,0,2,0,0};
         replaceShort(4, (short)header);

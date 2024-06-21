@@ -1,9 +1,10 @@
 package gearth.ui.subforms.injection;
 
-import gearth.GEarth;
 import gearth.misc.StringifyAble;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
+import gearth.protocol.connection.HClient;
+import gearth.protocol.packethandler.shockwave.packets.ShockPacket;
 import gearth.services.packet_info.PacketInfo;
 import gearth.services.packet_info.PacketInfoManager;
 import gearth.ui.translations.LanguageBundle;
@@ -15,16 +16,17 @@ import java.util.Optional;
 
 public class InjectedPackets implements StringifyAble {
 
+    private HClient client;
     private String packetsAsString;
     private String description;
 
-    public InjectedPackets(String packetsAsString, int amountPackets, PacketInfoManager packetInfoManager, HMessage.Direction direction) {
+    public InjectedPackets(String packetsAsString, int amountPackets, PacketInfoManager packetInfoManager, HMessage.Direction direction, HClient client) {
         String description;
         if (amountPackets > 1) {
             description = String.format("(%s: %d, %s: %d)", LanguageBundle.get("tab.injection.description.packets"), amountPackets, LanguageBundle.get("tab.injection.description.length"), packetsAsString.length());
         }
         else { // assume 1 packet
-            HPacket packet = new HPacket(packetsAsString);
+            HPacket packet = client == HClient.SHOCKWAVE ? new ShockPacket(packetsAsString) : new HPacket(packetsAsString);
             String identifier = null;
             if (!packet.isPacketComplete()) {
                 identifier = packet.packetIncompleteIdentifier();
@@ -46,6 +48,7 @@ public class InjectedPackets implements StringifyAble {
             }
         }
 
+        this.client = client;
         this.description = description;
         this.packetsAsString = packetsAsString;
     }
@@ -67,6 +70,7 @@ public class InjectedPackets implements StringifyAble {
         Map<String, String> info = new HashMap<>();
         info.put("packetsAsString", packetsAsString);
         info.put("description", description);
+        info.put("clientType", client.toString());
 
         return new JSONObject(info).toString();
     }
@@ -76,6 +80,7 @@ public class InjectedPackets implements StringifyAble {
         JSONObject jsonObject = new JSONObject(str);
         this.packetsAsString = jsonObject.getString("packetsAsString");
         this.description = jsonObject.getString("description");
+        this.client = jsonObject.has("clientType") ? HClient.valueOf(jsonObject.getString("clientType")) : null;
     }
 
     @Override

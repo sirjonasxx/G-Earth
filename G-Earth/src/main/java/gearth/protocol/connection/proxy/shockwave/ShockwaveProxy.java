@@ -64,9 +64,11 @@ public class ShockwaveProxy implements ProxyProvider, ConnectionInterceptorCallb
 
     @Override
     public void onInterceptorConnected(Socket client, Socket server, HProxy proxy) throws IOException, InterruptedException {
-        logger.info("Shockwave connection has been intercepted.");
+        logger.info("Shockwave connection has been intercepted, starting proxy thread.");
 
         startProxyThread(client, server, proxy);
+
+        logger.info("Stopped proxy thread.");
     }
 
     @Override
@@ -83,7 +85,7 @@ public class ShockwaveProxy implements ProxyProvider, ConnectionInterceptorCallb
         client.setSoTimeout(0);
         client.setTcpNoDelay(true);
 
-        logger.info("Connected to shockwave server {}:{}", server.getRemoteSocketAddress(), server.getPort());
+        logger.info("Connected to shockwave server {}:{}", server.getInetAddress().getHostAddress(), server.getPort());
 
         final Semaphore abort = new Semaphore(0);
 

@@ -20,7 +20,7 @@ import java.util.function.Consumer;
 public class HConnection {
 
     public static volatile boolean DECRYPTPACKETS = true;
-    public static volatile boolean DEBUG = true;
+    public static volatile boolean DEBUG = false;
 
     private volatile ExtensionHandler extensionHandler = null;
 

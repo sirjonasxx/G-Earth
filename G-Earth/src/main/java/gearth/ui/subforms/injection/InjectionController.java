@@ -4,6 +4,8 @@ import gearth.misc.Cacher;
 import gearth.protocol.HConnection;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
+import gearth.protocol.connection.HClient;
+import gearth.protocol.packethandler.shockwave.packets.ShockPacket;
 import gearth.ui.SubForm;
 import gearth.ui.translations.LanguageBundle;
 import gearth.ui.translations.TranslatableString;
@@ -91,7 +93,7 @@ public class InjectionController extends SubForm {
         return unmatchedBrace;
     }
 
-    private static HPacket[] parsePackets(String fullText) {
+    private static HPacket[] parsePackets(HClient client, String fullText) {
         LinkedList<HPacket> packets = new LinkedList<>();
         String[] lines = fullText.split("\n");
 
@@ -100,7 +102,9 @@ public class InjectionController extends SubForm {
             while (isPacketIncomplete(line) && i < lines.length - 1)
                 line += '\n' + lines[++i];
 
-            packets.add(new HPacket(line));
+            packets.add(client == HClient.SHOCKWAVE
+                    ? new ShockPacket(line)
+                    : new HPacket(line));
         }
         return packets.toArray(new HPacket[0]);
     }
@@ -113,7 +117,7 @@ public class InjectionController extends SubForm {
         lbl_corruption.getStyleClass().clear();
         lbl_corruption.getStyleClass().add("not-corrupted-label");
 
-        HPacket[] packets = parsePackets(inputPacket.getText());
+        HPacket[] packets = parsePackets(getHConnection().getClientType(), inputPacket.getText());
 
         if (packets.length == 0) {
             dirty = true;
@@ -198,7 +202,7 @@ public class InjectionController extends SubForm {
     }
 
     public void sendToServer_clicked(ActionEvent actionEvent) {
-        HPacket[] packets = parsePackets(inputPacket.getText());
+        HPacket[] packets = parsePackets(getHConnection().getClientType(), inputPacket.getText());
         for (HPacket packet : packets) {
             getHConnection().sendToServer(packet);
             writeToLog(Color.BLUE, String.format("SS -> %s: %d", LanguageBundle.get("tab.injection.log.packetwithid"), packet.headerId()));
@@ -208,7 +212,7 @@ public class InjectionController extends SubForm {
     }
 
     public void sendToClient_clicked(ActionEvent actionEvent) {
-        HPacket[] packets = parsePackets(inputPacket.getText());
+        HPacket[] packets = parsePackets(getHConnection().getClientType(), inputPacket.getText());
         for (HPacket packet : packets) {
             getHConnection().sendToClient(packet);
             writeToLog(Color.RED, String.format("CS -> %s: %d", LanguageBundle.get("tab.injection.log.packetwithid"), packet.headerId()));
@@ -218,7 +222,7 @@ public class InjectionController extends SubForm {
     }
 
     private void addToHistory(HPacket[] packets, String packetsAsString, HMessage.Direction direction) {
-        InjectedPackets injectedPackets = new InjectedPackets(packetsAsString, packets.length, getHConnection().getPacketInfoManager(), direction);
+        InjectedPackets injectedPackets = new InjectedPackets(packetsAsString, packets.length, getHConnection().getPacketInfoManager(), direction, getHConnection().getClientType());
 
         List<InjectedPackets> newHistory = new ArrayList<>();
         newHistory.add(injectedPackets);
@@ -272,7 +276,7 @@ public class InjectionController extends SubForm {
     }
 
     public static void main(String[] args) {
-        HPacket[] packets = parsePackets("{l}{h:3}{i:967585}{i:9589}{s:\"furni_inscriptionfuckfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionsssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss\"}{s:\"sirjonasxx-II\"}{s:\"\"}{i:188}{i:0}{i:0}{b:false}");
+        HPacket[] packets = parsePackets(HClient.FLASH, "{l}{h:3}{i:967585}{i:9589}{s:\"furni_inscriptionfuckfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionfurni_inscriptionsssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss\"}{s:\"sirjonasxx-II\"}{s:\"\"}{i:188}{i:0}{i:0}{b:false}");
         System.out.println(new HPacket("{l}{h:2550}{s:\"ClientPerf\"\"ormance\\\"}\"}{s:\"23\"}{s:\"fps\"}{s:\"Avatars: 1, Objects: 0\"}{i:76970180}").toExpression());
 
         System.out.println("hi");
