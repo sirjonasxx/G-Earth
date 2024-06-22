@@ -36,7 +36,7 @@ public class TestPacketStringUtils {
     public void testShockwaveOutgoingExpressions() throws InvalidPacketException {
         checkExpression(HPacketFormat.WEDGIE_OUTGOING, "{h:18}{b:false}", "@RH"); // GETFVRF
         checkExpression(HPacketFormat.WEDGIE_OUTGOING, "{h:52}{s:\"Hoi123\"}", "@t@FHoi123"); // CHAT
-        checkExpression(HPacketFormat.WEDGIE_OUTGOING, "{h:75}{s:10}{s:6}", "AK@J@F"); // MOVE
+        checkExpression(HPacketFormat.WEDGIE_OUTGOING, "{h:75}{u:10}{u:6}", "AK@J@F"); // MOVE
     }
 
     private void checkSame(String expected) throws InvalidPacketException {

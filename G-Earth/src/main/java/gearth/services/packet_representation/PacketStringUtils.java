@@ -58,7 +58,7 @@ public class PacketStringUtils {
         boolean fixLengthLater = false;
 
         if (format != HPacketFormat.EVA_WIRE) {
-            packet = replaceWithFormat(format, packet, "\\{s:(-?[0-9]+)}", (temp, value) -> temp.appendUShort(Short.parseShort(value)));
+            packet = replaceWithFormat(format, packet, "\\{u:(-?[0-9]+)}", (temp, value) -> temp.appendShort(Short.parseShort(value)));
             packet = replaceWithFormat(format, packet, "\\{i:(-?[0-9]+)}", (temp, value) -> temp.appendInt(Integer.parseInt(value)));
             packet = replaceWithFormat(format, packet, "\\{b:([Ff]alse|[Tt]rue)}", (temp, value) -> temp.appendBoolean(value.equalsIgnoreCase("true")));
 
