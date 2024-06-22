@@ -62,7 +62,7 @@ public abstract class GEarthExtension {
     protected void sendManipulatedPacket(HMessage hMessage) {
         int orgIndex = hMessage.getPacket().getReadIndex();
         extensionObservable.fireEvent(listener -> {
-            hMessage.getPacket().setReadIndex(6);
+            hMessage.getPacket().resetReadIndex();
             listener.manipulatedPacket(hMessage);
         });
         hMessage.getPacket().setReadIndex(orgIndex);
@@ -73,7 +73,7 @@ public abstract class GEarthExtension {
     protected void sendMessage(HMessage.Direction direction, HPacket packet) {
         int orgIndex = packet.getReadIndex();
         extensionObservable.fireEvent(listener -> {
-            packet.setReadIndex(6);
+            packet.resetReadIndex();
             listener.sendMessage(direction, packet);
         });
         packet.setReadIndex(orgIndex);
@@ -88,7 +88,7 @@ public abstract class GEarthExtension {
     protected void packetToStringRequest(HPacket packet) {
         int orgIndex = packet.getReadIndex();
         extensionObservable.fireEvent(listener -> {
-            packet.setReadIndex(6);
+            packet.resetReadIndex();
             listener.packetToStringRequest(packet);
         });
         packet.setReadIndex(orgIndex);
