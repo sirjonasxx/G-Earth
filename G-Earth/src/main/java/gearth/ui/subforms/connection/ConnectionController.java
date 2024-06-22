@@ -96,7 +96,7 @@ public class ConnectionController extends SubForm {
             updateInputUI();
         });
 
-        List<String> knownHosts = ProxyProviderFactory.autoDetectHosts;
+        List<String> knownHosts = ProxyProviderFactory.getAllHosts();
         Set<String> hosts = new HashSet<>();
         Set<String> ports = new HashSet<>();
 

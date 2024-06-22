@@ -27,7 +27,10 @@ public class ProxyProviderFactory {
     public static final String HOTELS_CACHE_KEY = "hotelsConnectionInfo";
     private static SocksConfiguration socksConfig = null;
 
-    public static List<String> autoDetectHosts;
+    private static List<String> autoDetectHosts;
+    private static List<String> autoDetectHostsOrigins;
+    private static List<String> allHosts;
+
     static {
         autoDetectHosts = new ArrayList<>();
         autoDetectHosts.add("game-br.habbo.com:30000");
@@ -41,10 +44,15 @@ public class ProxyProviderFactory {
         autoDetectHosts.add("game-us.habbo.com:30000");
         autoDetectHosts.add("game-s2.habbo.com:30000");
 
-        autoDetectHosts.add("game-od.habbo.com:40001");
-        autoDetectHosts.add("game-ous.habbo.com:40001");
-        autoDetectHosts.add("game-obr.habbo.com:40001");
-        autoDetectHosts.add("game-oes.habbo.com:40001");
+        autoDetectHostsOrigins = new ArrayList<>();
+        autoDetectHostsOrigins.add("game-od.habbo.com:40001");
+        autoDetectHostsOrigins.add("game-ous.habbo.com:40001");
+        autoDetectHostsOrigins.add("game-obr.habbo.com:40001");
+        autoDetectHostsOrigins.add("game-oes.habbo.com:40001");
+
+        allHosts = new ArrayList<>(autoDetectHosts.size() + autoDetectHostsOrigins.size());
+        allHosts.addAll(autoDetectHosts);
+        allHosts.addAll(autoDetectHostsOrigins);
 
         List<Object> additionalCachedHotels = Cacher.getList(HOTELS_CACHE_KEY);
         if (additionalCachedHotels != null) {
@@ -56,7 +64,7 @@ public class ProxyProviderFactory {
         }
 
         if (OSValidator.isMac()) {
-            for (int i = 2; i <= autoDetectHosts.size() + 5; i++) {
+            for (int i = 2; i <= allHosts.size() + 5; i++) {
                 ProcessBuilder allowLocalHost = new ProcessBuilder("ifconfig", "lo0", "alias", ("127.0.0." + i), "up");
                 try {
                     allowLocalHost.start();
@@ -65,6 +73,10 @@ public class ProxyProviderFactory {
                 }
             }
         }
+    }
+
+    public static List<String> getAllHosts() {
+        return allHosts;
     }
 
     private final HProxySetter proxySetter;
@@ -89,7 +101,7 @@ public class ProxyProviderFactory {
     }
 
     public ProxyProvider provide(HClient client)  {
-        return provide(client, autoDetectHosts);
+        return provide(client, client == HClient.FLASH ? autoDetectHosts : autoDetectHostsOrigins);
     }
 
     public ProxyProvider provide(HClient client, String domain, int port)  {
