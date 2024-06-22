@@ -6,18 +6,17 @@ import gearth.misc.listenerpattern.Observable;
 import gearth.protocol.HConnection;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
+import gearth.protocol.HPacketFormat;
 import gearth.protocol.connection.HState;
 import gearth.services.extension_handler.extensions.ExtensionListener;
 import gearth.services.extension_handler.extensions.GEarthExtension;
 import gearth.services.extension_handler.extensions.extensionproducers.ExtensionProducer;
 import gearth.services.extension_handler.extensions.extensionproducers.ExtensionProducerFactory;
 import gearth.services.extension_handler.extensions.extensionproducers.ExtensionProducerObserver;
-import gearth.ui.themes.Theme;
 import javafx.util.Pair;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.function.Consumer;
 
 public class ExtensionHandler {
 
@@ -244,7 +243,7 @@ public class ExtensionHandler {
                     }
 
                     @Override
-                    protected void stringToPacketRequest(String string) {
+                    protected void stringToPacketRequest(String string, HPacketFormat format) {
                         HPacket packet = new HPacket(string);
                         if (!packet.isPacketComplete()) packet.completePacket(hConnection.getPacketInfoManager());
                         extension.stringToPacketResponse(packet);

@@ -11,30 +11,35 @@ import java.nio.charset.StandardCharsets;
 // Client to Server
 public class ShockPacketOutgoing extends ShockPacket {
     public ShockPacketOutgoing(byte[] packet) {
-        super(packet);
+        super(HPacketFormat.WEDGIE_OUTGOING, packet);
     }
 
     public ShockPacketOutgoing(HPacket packet) {
-        super(packet);
+        super(HPacketFormat.WEDGIE_OUTGOING, packet);
     }
 
     public ShockPacketOutgoing(String packet) {
-        super(packet, HPacketFormat.WEDGIE_OUTGOING);
+        super(HPacketFormat.WEDGIE_OUTGOING, packet);
     }
 
     public ShockPacketOutgoing(int header) {
-        super(header);
+        super(HPacketFormat.WEDGIE_OUTGOING, header);
     }
 
     @Override
-    public HPacket appendBoolean(boolean b) {
-        return appendInt(b ? 1 : 0);
+    public HPacket appendBoolean(boolean value) {
+        return appendInt(value ? 1 : 0);
     }
 
     @Override
-    public HPacket appendUShort(int ushort) {
+    public HPacket appendShort(short value) {
+        return appendUShort(value);
+    }
+
+    @Override
+    public HPacket appendUShort(int value) {
         isEdited = true;
-        appendBytes(Base64Encoding.encode(ushort, 2));
+        appendBytes(Base64Encoding.encode(value, 2));
         return this;
     }
 
@@ -46,17 +51,60 @@ public class ShockPacketOutgoing extends ShockPacket {
     }
 
     @Override
-    public HPacket appendString(String s) {
-        return appendString(s, StandardCharsets.ISO_8859_1);
+    public HPacket appendString(String value) {
+        return appendString(value, StandardCharsets.ISO_8859_1);
     }
 
     @Override
-    public HPacket appendString(String s, Charset charset) {
+    public HPacket appendString(String value, Charset charset) {
         isEdited = true;
 
-        final byte[] data = s.getBytes(charset);
+        final byte[] data = value.getBytes(charset);
         appendUShort(data.length);
         appendBytes(data);
         return this;
+    }
+
+    @Override
+    public boolean readBoolean() {
+        return readInteger() == 1;
+    }
+
+    @Override
+    public short readShort() {
+        return (short) Base64Encoding.decode(readBytes(2));
+    }
+
+    @Override
+    public int readUshort() {
+        return this.readShort();
+    }
+
+    @Override
+    public int readInteger() {
+        int length = packetInBytes[readIndex] >> 3 & 7;
+        int value = VL64Encoding.decode(packetInBytes, readIndex);
+
+        readIndex += length;
+
+        return value;
+    }
+
+    @Override
+    public String readString() {
+        return this.readString(StandardCharsets.UTF_8);
+    }
+
+    @Override
+    public String readString(Charset charset) {
+        int length = readUshort();
+        byte[] data = readBytes(length);
+
+        return new String(data, charset);
+    }
+
+    @Override
+    public HPacket copy() {
+        return new ShockPacketOutgoing(this);
     }
 }

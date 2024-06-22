@@ -3,6 +3,7 @@ package gearth.services.extension_handler.extensions.implementations.network;
 import gearth.misc.HostInfo;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
+import gearth.protocol.HPacketFormat;
 import gearth.protocol.connection.HClient;
 import gearth.services.extension_handler.extensions.implementations.network.NetworkExtensionMessage.Outgoing;
 import gearth.services.extension_handler.extensions.implementations.network.NetworkExtensionMessage.Incoming;
@@ -141,10 +142,14 @@ public final class NetworkExtensionCodec {
                 }));
         register(Incoming.ManipulatedPacket.MANIPULATED_PACKET,
                 Incoming.ManipulatedPacket.class,
-                (message, hPacket) -> hPacket.appendLongString(message.gethMessage().stringify()),
+                (message, hPacket) -> {
+                    hPacket.appendLongString(message.gethMessage().stringify());
+                    hPacket.appendInt(message.gethMessage().getPacket().getFormat().getId());
+                },
                 (hPacket -> {
-                    final String packetString = hPacket.readLongString(6);
-                    final HMessage hMessage = new HMessage(packetString);
+                    final String packetString = hPacket.readLongString();
+                    final HPacketFormat packetFormat = hPacket.isEOF() == 0 ? HPacketFormat.fromId(hPacket.readInteger()) : HPacketFormat.EVA_WIRE;
+                    final HMessage hMessage = new HMessage(packetFormat, packetString);
                     return new Incoming.ManipulatedPacket(hMessage);
                 }));
         register(Incoming.SendMessage.HEADER_ID,
@@ -153,12 +158,14 @@ public final class NetworkExtensionCodec {
                     hPacket.appendByte((byte) (message.getDirection() == TOCLIENT ? 0 : 1));
                     hPacket.appendInt(message.getPacket().getBytesLength());
                     hPacket.appendBytes(message.getPacket().toBytes());
+                    hPacket.appendInt(message.getPacket().getFormat().getId());
                 }),
                 (hPacket -> {
                     final byte side = hPacket.readByte();
                     final int length = hPacket.readInteger();
                     final byte[] data = hPacket.readBytes(length);
-                    final HPacket packet = new HPacket(data);
+                    final HPacketFormat format = hPacket.isEOF() == 0 ? HPacketFormat.fromId(hPacket.readInteger()) : HPacketFormat.EVA_WIRE;
+                    final HPacket packet = format.createPacket(data);
                     return new Incoming.SendMessage(packet, side == 0 ? TOCLIENT : TOSERVER);
                 }));
         register(Incoming.RequestFlags.HEADER_ID,
@@ -172,12 +179,22 @@ public final class NetworkExtensionCodec {
                 (hPacket -> new Incoming.ExtensionConsoleLog(hPacket.readString())));
         register(Incoming.PacketToStringRequest.HEADER_ID,
                 Incoming.PacketToStringRequest.class,
-                (message, hPacket) -> hPacket.appendLongString(message.getString()),
-                (hPacket -> new Incoming.PacketToStringRequest(hPacket.readLongString())));
+                (message, hPacket) -> {
+                    hPacket.appendLongString(message.getString());
+                    hPacket.appendInt(message.getFormat().getId());
+                },
+                (hPacket -> new Incoming.PacketToStringRequest(
+                        hPacket.readLongString(),
+                        hPacket.isEOF() == 0 ? HPacketFormat.fromId(hPacket.readInteger()) : HPacketFormat.EVA_WIRE)));
         register(Incoming.StringToPacketRequest.HEADER_ID,
                 Incoming.StringToPacketRequest.class,
-                (message, hPacket) -> hPacket.appendLongString(message.getString(), StandardCharsets.UTF_8),
-                (hPacket -> new Incoming.StringToPacketRequest(hPacket.readLongString(StandardCharsets.UTF_8))));
+                (message, hPacket) -> {
+                    hPacket.appendLongString(message.getString(), StandardCharsets.UTF_8);
+                    hPacket.appendInt(message.getFormat().getId());
+                },
+                (hPacket -> new Incoming.StringToPacketRequest(
+                        hPacket.readLongString(StandardCharsets.UTF_8),
+                        hPacket.isEOF() == 0 ? HPacketFormat.fromId(hPacket.readInteger()) : HPacketFormat.EVA_WIRE)));
     }
 
     private static void registerOutgoingMessages() {
@@ -236,8 +253,13 @@ public final class NetworkExtensionCodec {
                 (hPacket -> new Outgoing.OnDoubleClick()));
         register(Outgoing.PacketIntercept.HEADER_ID,
                 Outgoing.PacketIntercept.class,
-                (message, hPacket) -> hPacket.appendLongString(message.getPacketString()),
-                (hPacket -> new Outgoing.PacketIntercept(hPacket.readLongString())));
+                (message, hPacket) -> {
+                    hPacket.appendLongString(message.getPacketString());
+                    hPacket.appendInt(message.getPacketFormat().getId());
+                },
+                (hPacket -> new Outgoing.PacketIntercept(
+                        hPacket.readLongString(),
+                        hPacket.isEOF() == 0 ? HPacketFormat.fromId(hPacket.readInteger()) : HPacketFormat.EVA_WIRE)));
         register(Outgoing.UpdateHostInfo.HEADER_ID,
                 Outgoing.UpdateHostInfo.class,
                 (message, hPacket) -> message.getHostInfo().appendToPacket(hPacket),

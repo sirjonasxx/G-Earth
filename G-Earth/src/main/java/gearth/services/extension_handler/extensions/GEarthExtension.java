@@ -3,6 +3,7 @@ package gearth.services.extension_handler.extensions;
 import gearth.misc.HostInfo;
 import gearth.misc.listenerpattern.Observable;
 import gearth.misc.listenerpattern.SynchronizedObservable;
+import gearth.protocol.HPacketFormat;
 import gearth.services.packet_info.PacketInfoManager;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
@@ -92,8 +93,8 @@ public abstract class GEarthExtension {
         });
         packet.setReadIndex(orgIndex);
     }
-    protected void stringToPacketRequest(String string) {
-        extensionObservable.fireEvent(l -> l.stringToPacketRequest(string));
+    protected void stringToPacketRequest(String string, HPacketFormat format) {
+        extensionObservable.fireEvent(l -> l.stringToPacketRequest(string, format));
     }
 
     // --------------------------------------------------------------------

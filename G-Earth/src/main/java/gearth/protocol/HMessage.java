@@ -15,7 +15,9 @@ public class HMessage implements StringifyAble {
 
     private boolean isBlocked;
 
-    public HMessage(String fromString) {
+    public HMessage(HPacketFormat format, String fromString) {
+        // A little bit hacky to get the correct packet class inside constructFromString.
+        this.hPacket = format.createPacket(0);
         constructFromString(fromString);
     }
 
@@ -65,9 +67,8 @@ public class HMessage implements StringifyAble {
         this.isBlocked = parts[0].equals("1");
         this.index = Integer.parseInt(parts[1]);
         this.direction = parts[2].equals("TOCLIENT") ? Direction.TOCLIENT : Direction.TOSERVER;
-        HPacket p = new HPacket(new byte[0]);
-        p.constructFromString(parts[3]);
-        this.hPacket = p;
+        this.hPacket = hPacket.getFormat().createPacket(0);
+        this.hPacket.constructFromString(parts[3]);
     }
 
     public void constructFromHMessage(HMessage message) {

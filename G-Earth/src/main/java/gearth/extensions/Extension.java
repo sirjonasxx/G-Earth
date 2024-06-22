@@ -1,6 +1,7 @@
 package gearth.extensions;
 
 import gearth.misc.HostInfo;
+import gearth.protocol.HPacketFormat;
 import gearth.services.extension_handler.extensions.implementations.network.NetworkExtensionMessage;
 import gearth.services.extension_handler.extensions.implementations.network.NetworkExtensionMessage.Incoming;
 import gearth.services.extension_handler.extensions.implementations.network.NetworkExtensionMessage.Outgoing;
@@ -174,12 +175,14 @@ public abstract class Extension extends ExtensionBase {
                 }
                 else if (packet.headerId() == Outgoing.PacketIntercept.HEADER_ID) {
                     String stringifiedMessage = packet.readLongString();
-                    HMessage habboMessage = new HMessage(stringifiedMessage);
+                    HPacketFormat packetFormat = HPacketFormat.fromId(packet.readInteger());
+                    HMessage habboMessage = new HMessage(packetFormat, stringifiedMessage);
 
                     modifyMessage(habboMessage);
 
                     HPacket response = new HPacket(Incoming.ManipulatedPacket.MANIPULATED_PACKET);
                     response.appendLongString(habboMessage.stringify());
+                    response.appendInt(habboMessage.getPacket().getFormat().getId());
 
                     writeToStream(response.toBytes());
                 }
@@ -237,6 +240,7 @@ public abstract class Extension extends ExtensionBase {
         packet1.appendByte(direction == HMessage.Direction.TOCLIENT ? (byte)0 : (byte)1);
         packet1.appendInt(packet.getBytesLength());
         packet1.appendBytes(packet.toBytes());
+        packet1.appendInt(packet.getFormat().getId());
         try {
             writeToStream(packet1.toBytes());
             return true;

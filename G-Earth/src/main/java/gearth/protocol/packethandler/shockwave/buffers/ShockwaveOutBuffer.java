@@ -4,6 +4,7 @@ import gearth.encoding.Base64Encoding;
 import gearth.protocol.HPacket;
 import gearth.protocol.packethandler.ByteArrayUtils;
 import gearth.protocol.packethandler.shockwave.packets.ShockPacket;
+import gearth.protocol.packethandler.shockwave.packets.ShockPacketOutgoing;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,7 +40,7 @@ public class ShockwaveOutBuffer implements ShockwaveBuffer {
             int endPos = length + PACKET_LENGTH_SIZE;
             byte[] packet = Arrays.copyOfRange(buffer, PACKET_LENGTH_SIZE, endPos);
 
-            out.add(new ShockPacket(packet));
+            out.add(new ShockPacketOutgoing(packet));
 
             buffer = Arrays.copyOfRange(buffer, endPos, buffer.length);
         }

@@ -10,24 +10,28 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidParameterException;
 
-public class ShockPacket extends HPacket {
-    public ShockPacket(byte[] packet) {
+public abstract class ShockPacket extends HPacket {
+    public ShockPacket(HPacketFormat format, byte[] packet) {
         super(packet);
+        packetFormat = format;
         readIndex = 2;
     }
 
-    public ShockPacket(HPacket packet) {
+    public ShockPacket(HPacketFormat format, HPacket packet) {
         super(packet);
+        packetFormat = format;
         readIndex = 2;
     }
 
-    public ShockPacket(String packet, HPacketFormat format) {
+    public ShockPacket(HPacketFormat format, String packet) {
         super(packet, format);
+        packetFormat = format;
         readIndex = 2;
     }
 
-    public ShockPacket(int header) {
+    public ShockPacket(HPacketFormat format, int header) {
         super(Base64Encoding.encode(header, 2));
+        packetFormat = format;
         readIndex = 2;
     }
 
@@ -107,6 +111,136 @@ public class ShockPacket extends HPacket {
     }
 
     @Override
+    public byte readByte() {
+        throw new ShockPacketUnsupported();
+    }
+
+    @Override
+    public byte readByte(int index) {
+        throw new ShockPacketUnsupported();
+    }
+
+    @Override
+    public short readShort() {
+        throw new ShockPacketUnsupported();
+    }
+
+    @Override
+    public short readShort(int index) {
+        throw new ShockPacketUnsupported();
+    }
+
+    @Override
+    public int readUshort() {
+        throw new ShockPacketUnsupported();
+    }
+
+    @Override
+    public int readUshort(int index) {
+        throw new ShockPacketUnsupported();
+    }
+
+    @Override
+    public int readInteger() {
+        throw new ShockPacketUnsupported();
+    }
+
+    @Override
+    public int readInteger(int index) {
+        throw new ShockPacketUnsupported();
+    }
+
+    @Override
+    public double readDouble() {
+        throw new ShockPacketUnsupported();
+    }
+
+    @Override
+    public double readDouble(int index) {
+        throw new ShockPacketUnsupported();
+    }
+
+    @Override
+    public float readFloat() {
+        throw new ShockPacketUnsupported();
+    }
+
+    @Override
+    public float readFloat(int index) {
+        throw new ShockPacketUnsupported();
+    }
+
+    @Override
+    public byte[] readBytes(int length) {
+        return super.readBytes(length);
+    }
+
+    @Override
+    public byte[] readBytes(int length, int index) {
+        return super.readBytes(length, index);
+    }
+
+    @Override
+    public long readLong() {
+        throw new ShockPacketUnsupported();
+    }
+
+    @Override
+    public long readLong(int index) {
+        throw new ShockPacketUnsupported();
+    }
+
+    @Override
+    public String readString(Charset charset) {
+        throw new ShockPacketUnsupported();
+    }
+
+    @Override
+    public String readString(int index, Charset charset) {
+        throw new ShockPacketUnsupported();
+    }
+
+    @Override
+    public String readString() {
+        throw new ShockPacketUnsupported();
+    }
+
+    @Override
+    public String readString(int index) {
+        throw new ShockPacketUnsupported();
+    }
+
+    @Override
+    public String readLongString(Charset charset) {
+        throw new ShockPacketUnsupported();
+    }
+
+    @Override
+    public String readLongString(int index, Charset charset) {
+        throw new ShockPacketUnsupported();
+    }
+
+    @Override
+    public String readLongString() {
+        throw new ShockPacketUnsupported();
+    }
+
+    @Override
+    public String readLongString(int index) {
+        throw new ShockPacketUnsupported();
+    }
+
+    @Override
+    public boolean readBoolean() {
+        throw new ShockPacketUnsupported();
+    }
+
+    @Override
+    public boolean readBoolean(int index) {
+        throw new ShockPacketUnsupported();
+    }
+
+    @Override
     protected void replacePacketId(short headerId) {
         final byte[] header = Base64Encoding.encode(headerId, 2);
 
@@ -128,8 +262,8 @@ public class ShockPacket extends HPacket {
     }
 
     @Override
-    public HPacket copy() {
-        return new ShockPacket(this);
+    public void resetReadIndex() {
+        setReadIndex(2);
     }
 
     @Override

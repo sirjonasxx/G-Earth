@@ -1,6 +1,5 @@
 package gearth.protocol;
 
-import gearth.extensions.parsers.HDirection;
 import gearth.misc.StringifyAble;
 import gearth.services.packet_info.PacketInfo;
 import gearth.services.packet_info.PacketInfoManager;
@@ -17,6 +16,7 @@ import java.util.Optional;
 public class HPacket implements StringifyAble {
 
     protected boolean isEdited = false;
+    protected HPacketFormat packetFormat = HPacketFormat.EVA_WIRE;
     protected byte[] packetInBytes;
     protected int readIndex = 6;
 
@@ -83,7 +83,9 @@ public class HPacket implements StringifyAble {
         isEdited = false;
     }
 
-
+    public HPacketFormat getFormat() {
+        return packetFormat;
+    }
 
     public String toString()	{
         return PacketStringUtils.toString(packetInBytes);

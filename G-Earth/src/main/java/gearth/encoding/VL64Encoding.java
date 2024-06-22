@@ -35,7 +35,10 @@ public class VL64Encoding {
     }
 
     public static int decode(byte[] bzData) {
-        int pos = 0;
+        return decode(bzData, 0);
+    }
+
+    public static int decode(byte[] bzData, int pos) {
         int v = 0;
 
         boolean negative = (bzData[pos] & 4) == 4;

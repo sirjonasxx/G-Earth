@@ -3,6 +3,7 @@ package gearth.protocol.packethandler.shockwave.buffers;
 import gearth.protocol.HPacket;
 import gearth.protocol.packethandler.ByteArrayUtils;
 import gearth.protocol.packethandler.shockwave.packets.ShockPacket;
+import gearth.protocol.packethandler.shockwave.packets.ShockPacketIncoming;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,7 +32,7 @@ public class ShockwaveInBuffer implements ShockwaveBuffer {
         for (int i = 0; i < buffer.length; i++) {
             if (buffer[i] == 1) {
                 byte[] packetData = Arrays.copyOfRange(buffer, curPos, i);
-                packets.add(new ShockPacket(packetData));
+                packets.add(new ShockPacketIncoming(packetData));
                 curPos = i + 1;
             }
         }

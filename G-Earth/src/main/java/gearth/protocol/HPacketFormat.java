@@ -1,15 +1,39 @@
 package gearth.protocol;
 
-import gearth.extensions.parsers.HDirection;
 import gearth.protocol.connection.HClient;
 import gearth.protocol.packethandler.shockwave.packets.ShockPacketIncoming;
 import gearth.protocol.packethandler.shockwave.packets.ShockPacketOutgoing;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public enum HPacketFormat {
 
-    EVA_WIRE,
-    WEDGIE_INCOMING,
-    WEDGIE_OUTGOING;
+    EVA_WIRE(0),
+    WEDGIE_INCOMING(1),
+    WEDGIE_OUTGOING(2);
+
+    private static final Map<Integer, HPacketFormat> ID_MAP = new HashMap<>();
+
+    static {
+        for (HPacketFormat format : values()) {
+            ID_MAP.put(format.id, format);
+        }
+    }
+
+    public static HPacketFormat fromId(int id) {
+        return ID_MAP.get(id);
+    }
+
+    private final int id;
+
+    HPacketFormat(int id) {
+        this.id = id;
+    }
+
+    public int getId() {
+        return id;
+    }
 
     public static HPacketFormat getFormat(HClient client, HMessage.Direction direction) {
         if (client != HClient.SHOCKWAVE) {
