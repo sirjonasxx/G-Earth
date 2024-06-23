@@ -62,6 +62,8 @@ public class SchedulerController extends SubForm {
 
         txt_packet.textProperty().addListener(event -> Platform.runLater(this::updateUI));
         txt_delay.textProperty().addListener(event -> Platform.runLater(this::updateUI));
+        rb_incoming.setOnMouseClicked(event -> Platform.runLater(this::updateUI));
+        rb_outgoing.setOnMouseClicked(event -> Platform.runLater(this::updateUI));
 
         //register hotkeys
         //disable some output things
