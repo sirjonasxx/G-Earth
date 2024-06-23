@@ -4,13 +4,12 @@ import gearth.GEarth;
 import gearth.ui.titlebar.TitleBarController;
 import gearth.ui.translations.LanguageBundle;
 import javafx.application.Platform;
+import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Region;
-import javafx.scene.web.WebView;
 import org.apache.commons.io.IOUtils;
 import org.apache.maven.artifact.versioning.ComparableVersion;
 import org.json.JSONObject;
@@ -26,62 +25,74 @@ public class UpdateChecker {
     private static final Logger logger = LoggerFactory.getLogger(UpdateChecker.class);
 
     public static void checkForUpdates() {
-        final String currentVersion = GEarth.version;
-        final String latestReleaseApi = String.format("https://api.github.com/repos/%s/releases/latest", GEarth.repository);
-        final String latestRelease = String.format("https://github.com/%s/releases/latest", GEarth.repository);
 
         new Thread(() -> {
-            try {
-                JSONObject object = new JSONObject(IOUtils.toString(
-                        new URL(latestReleaseApi).openStream(), StandardCharsets.UTF_8));
-
-                String gitv = (String)object.get("tag_name");
-                if (new ComparableVersion(currentVersion).compareTo(new ComparableVersion(gitv)) < 0) {
-                    Platform.runLater(() -> {
-                        String body = (String)object.get("body");
-                        boolean isForcedUpdate = body.contains("(!)");
-
-                        Alert alert = new Alert(isForcedUpdate ? Alert.AlertType.ERROR : Alert.AlertType.INFORMATION, LanguageBundle.get("alert.outdated.title"), ButtonType.OK);
-
-                        FlowPane fp = new FlowPane();
-                        Label lbl = new Label(LanguageBundle.get("alert.outdated.content.newversion") + " ("+gitv+")" + System.lineSeparator()+ System.lineSeparator() + LanguageBundle.get("alert.outdated.content.update") + ":");
-                        Hyperlink link = new Hyperlink(latestRelease);
-                        fp.getChildren().addAll( lbl, link);
-                        link.setOnAction(event -> {
-                            GEarth.main.getHostServices().showDocument(link.getText());
-                            event.consume();
-                        });
-
-
-
-                        WebView webView = new WebView();
-                        webView.getEngine().loadContent(String.format("<html>%s (%s)<br><br>%s:<br><a href=\"%s\">%s</a></html>",
-                                LanguageBundle.get("alert.outdated.content.newversion"),
-                                gitv,
-                                LanguageBundle.get("alert.outdated.content.update"),
-                                latestRelease,
-                                latestRelease));
-                        webView.setPrefSize(500, 200);
-
-                        alert.setResizable(false);
-                        alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
-                        alert.getDialogPane().setContent(fp);
-                        if (isForcedUpdate) {
-                            alert.setOnCloseRequest(event -> System.exit(0));
-                        }
-                        try {
-                            TitleBarController.create(alert).showAlert();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-
-                    });
+            // Check official repository first.
+            if (!GEarth.repository.equals(GEarth.OFFICIAL_REPOSITORY)) {
+                if (checkRepository(GEarth.OFFICIAL_REPOSITORY)) {
+                    return;
                 }
-
-            } catch (IOException e) {
-                logger.error("Failed to check for updates", e);
             }
+
+            // Check repository of the fork.
+            checkRepository("UnfamiliarLegacy/G-Earth");
         }).start();
+    }
+
+    private static boolean checkRepository(String repository) {
+        final String currentVersion = GEarth.version;
+        final String latestReleaseApi = String.format("https://api.github.com/repos/%s/releases/latest", repository);
+        final String latestRelease = String.format("https://github.com/%s/releases/latest", repository);
+
+        try {
+            JSONObject object = new JSONObject(IOUtils.toString(
+                    new URL(latestReleaseApi).openStream(), StandardCharsets.UTF_8));
+
+            String gitv = (String)object.get("tag_name");
+
+            if (gitv.startsWith("v")) {
+                gitv = gitv.substring(1);
+            }
+
+            if (new ComparableVersion(currentVersion).compareTo(new ComparableVersion(gitv)) < 0) {
+                final String newVersion = gitv;
+
+                Platform.runLater(() -> {
+                    final String body = (String)object.get("body");
+                    final boolean isForcedUpdate = body.contains("(!)");
+                    final Alert alert = new Alert(isForcedUpdate ? Alert.AlertType.ERROR : Alert.AlertType.INFORMATION);
+                    FlowPane fp = new FlowPane();
+                    Label lbl = new Label(LanguageBundle.get("alert.outdated.content.newversion") + " ("+newVersion+")" + System.lineSeparator() + System.lineSeparator() + LanguageBundle.get("alert.outdated.content.update"));
+                    Hyperlink link = new Hyperlink(latestRelease);
+                    link.setPadding(Insets.EMPTY);
+                    fp.getChildren().addAll(lbl, link);
+                    link.setOnAction(event -> {
+                        GEarth.main.getHostServices().showDocument(link.getText());
+                        event.consume();
+                    });
+
+                    alert.setTitle(LanguageBundle.get("alert.outdated.title"));
+                    alert.setHeaderText(null);
+                    alert.setResizable(false);
+                    alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+                    alert.getDialogPane().setContent(fp);
+                    if (isForcedUpdate) {
+                        alert.setOnCloseRequest(event -> System.exit(0));
+                    }
+                    try {
+                        TitleBarController.create(alert).showAlert();
+                    } catch (IOException e) {
+                        logger.error("Failed to show alert", e);
+                    }
+                });
+
+                return true;
+            }
+        } catch (IOException e) {
+            logger.error("Failed to check for updates", e);
+        }
+
+        return false;
     }
 
 }

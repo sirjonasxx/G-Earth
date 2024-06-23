@@ -26,7 +26,7 @@ import java.util.Properties;
 
 public class GEarth extends Application {
 
-    private static final String OFFICIAL_REPOSITORY = "sirjonasxx/G-Earth";
+    public static final String OFFICIAL_REPOSITORY = "sirjonasxx/G-Earth";
 
     private static final Logger logger = LoggerFactory.getLogger(GEarth.class);
 
