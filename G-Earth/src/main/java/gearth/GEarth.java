@@ -32,6 +32,7 @@ public class GEarth extends Application {
 
     public static GEarth main;
     public static String version;
+    public static String storeVersion;
     public static String repository;
     public static ObservableObject<Theme> observableTheme;
 
@@ -51,6 +52,7 @@ public class GEarth extends Application {
             buildProperties.load(GEarth.class.getResourceAsStream("/build.properties"));
 
             version = buildProperties.getProperty("build.version");
+            storeVersion = buildProperties.getProperty("build.storeVersion");
             repository = buildProperties.getProperty("build.github");
 
             logger.info("Starting G-Earth {} from repository {}", version, repository);
