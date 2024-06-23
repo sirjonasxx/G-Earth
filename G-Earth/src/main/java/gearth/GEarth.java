@@ -26,6 +26,8 @@ import java.util.Properties;
 
 public class GEarth extends Application {
 
+    private static final String OFFICIAL_REPOSITORY = "sirjonasxx/G-Earth";
+
     private static final Logger logger = LoggerFactory.getLogger(GEarth.class);
 
     public static GEarth main;
@@ -141,7 +143,8 @@ public class GEarth extends Application {
             stage.getIcons().clear();
             final Image image = new Image(GEarth.class.getResourceAsStream(String.format("/gearth/ui/themes/%s/logoSmall.png", theme.overridesLogo() ? theme.internalName() : defaultTheme.internalName())));
             stage.getIcons().add(image);
-            stage.setTitle((theme.overridesTitle() ? theme.title() : defaultTheme.title()) + " " + GEarth.version);
+            final String isFork = GEarth.repository.equals(OFFICIAL_REPOSITORY) ? "" : " (" + GEarth.repository + ")";
+            stage.setTitle((theme.overridesTitle() ? theme.title() : defaultTheme.title()) + " " + GEarth.version + isFork);
 
             controller.infoController.img_logo.setImage(new Image(GEarth.class.getResourceAsStream(
                     String.format(
