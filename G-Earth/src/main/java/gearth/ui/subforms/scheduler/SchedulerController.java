@@ -1,10 +1,8 @@
 package gearth.ui.subforms.scheduler;
 
 import com.tulskiy.keymaster.common.Provider;
-import gearth.extensions.parsers.HDirection;
 import gearth.protocol.HConnection;
-import gearth.protocol.StateChangeListener;
-import gearth.protocol.connection.HState;
+import gearth.protocol.HPacketFormat;
 import gearth.services.scheduler.Interval;
 import gearth.services.scheduler.Scheduler;
 import gearth.ui.translations.LanguageBundle;
@@ -23,7 +21,6 @@ import javax.swing.*;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 
 /**
  * Created by Jonas on 06/04/18.
@@ -114,15 +111,21 @@ public class SchedulerController extends SubForm {
         if (connection == null) return;
 
         HMessage.Direction direction = rb_incoming.isSelected() ? HMessage.Direction.TOCLIENT : HMessage.Direction.TOSERVER;
-        HPacket packet = new HPacket(txt_packet.getText());
+        HPacketFormat packetFormat = HPacketFormat.getFormat(connection.getClientType(), direction);
+        HPacket packet = packetFormat.createPacket(txt_packet.getText());
         boolean isPacketOk = connection.canSendPacket(direction, packet);
 
         btn_addoredit.setDisable(!Interval.isValid(txt_delay.getText()) || !isPacketOk);
     }
 
     public void scheduleBtnClicked(ActionEvent actionEvent) {
+        HConnection connection = getHConnection();
+        if (connection == null) return;
+
         if (isBeingEdited == null) {
-            HPacket packet = new HPacket(txt_packet.getText());
+            HMessage.Direction direction = rb_incoming.isSelected() ? HMessage.Direction.TOCLIENT : HMessage.Direction.TOSERVER;
+            HPacketFormat packetFormat = HPacketFormat.getFormat(connection.getClientType(), direction);
+            HPacket packet = packetFormat.createPacket(txt_packet.getText());
             if (packet.isCorrupted()) return;
 
             InteractableScheduleItem newItem = new InteractableScheduleItem(
