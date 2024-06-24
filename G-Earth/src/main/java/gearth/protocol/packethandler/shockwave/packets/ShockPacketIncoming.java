@@ -1,9 +1,9 @@
 package gearth.protocol.packethandler.shockwave.packets;
 
 import gearth.encoding.VL64Encoding;
+import gearth.misc.ArrayUtils;
 import gearth.protocol.HPacket;
 import gearth.protocol.HPacketFormat;
-import org.apache.commons.lang3.ArrayUtils;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
