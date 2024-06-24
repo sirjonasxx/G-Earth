@@ -6,9 +6,9 @@ import gearth.protocol.HMessage;
 import gearth.protocol.crypto.RC4;
 import gearth.protocol.memory.habboclient.HabboClient;
 import gearth.protocol.memory.habboclient.HabboClientFactory;
+import gearth.protocol.packethandler.EncryptedPacketHandler;
 import gearth.protocol.packethandler.PayloadBuffer;
 import gearth.protocol.packethandler.flash.BufferChangeListener;
-import gearth.protocol.packethandler.flash.FlashPacketHandler;
 import gearth.ui.titlebar.TitleBarController;
 import gearth.ui.translations.LanguageBundle;
 import javafx.application.Platform;
@@ -28,32 +28,32 @@ public class Rc4Obtainer {
     public static final boolean DEBUG = false;
 
     private final HabboClient client;
-    private List<FlashPacketHandler> flashPacketHandlers;
+    private List<EncryptedPacketHandler> flashPacketHandlers;
 
     public Rc4Obtainer(HConnection hConnection) {
         client = HabboClientFactory.get(hConnection);
     }
 
-    public void setFlashPacketHandlers(FlashPacketHandler... flashPacketHandlers) {
+    public void setFlashPacketHandlers(EncryptedPacketHandler... flashPacketHandlers) {
         this.flashPacketHandlers = Arrays.asList(flashPacketHandlers);
-        for (FlashPacketHandler handler : flashPacketHandlers) {
+        for (EncryptedPacketHandler handler : flashPacketHandlers) {
             BufferChangeListener bufferChangeListener = new BufferChangeListener() {
                 @Override
-                public void act() {
+                public void onPacket() {
                     if (handler.isEncryptedStream()) {
                         onSendFirstEncryptedMessage(handler);
-                        handler.getBufferChangeObservable().removeListener(this);
+                        handler.getPacketReceivedObservable().removeListener(this);
                     }
                 }
             };
-            handler.getBufferChangeObservable().addListener(bufferChangeListener);
+            handler.getPacketReceivedObservable().addListener(bufferChangeListener);
         }
     }
 
-    private void onSendFirstEncryptedMessage(FlashPacketHandler flashPacketHandler) {
+    private void onSendFirstEncryptedMessage(EncryptedPacketHandler flashPacketHandler) {
         if (!HConnection.DECRYPTPACKETS) return;
 
-        flashPacketHandlers.forEach(FlashPacketHandler::block);
+        flashPacketHandlers.forEach(EncryptedPacketHandler::block);
 
         new Thread(() -> {
 
@@ -99,11 +99,11 @@ public class Rc4Obtainer {
             if (DEBUG)
                 System.out.println("Cracked RC4 in " + (endTime - startTime) + "ms");
 
-            flashPacketHandlers.forEach(FlashPacketHandler::unblock);
+            flashPacketHandlers.forEach(EncryptedPacketHandler::unblock);
         }).start();
     }
 
-    private boolean onSendFirstEncryptedMessage(FlashPacketHandler flashPacketHandler, List<byte[]> potentialRC4tables) {
+    private boolean onSendFirstEncryptedMessage(EncryptedPacketHandler flashPacketHandler, List<byte[]> potentialRC4tables) {
 
         for (byte[] possible : potentialRC4tables)
             if (isCorrectRC4Table(flashPacketHandler, possible))
@@ -112,7 +112,7 @@ public class Rc4Obtainer {
         return false;
     }
 
-    private boolean isCorrectRC4Table(FlashPacketHandler flashPacketHandler, byte[] possible) {
+    private boolean isCorrectRC4Table(EncryptedPacketHandler flashPacketHandler, byte[] possible) {
 
         try {
 
@@ -127,7 +127,7 @@ public class Rc4Obtainer {
                     final byte[] keycpy = Arrays.copyOf(possible, possible.length);
                     final RC4 rc4Tryout = new RC4(keycpy, i, j);
 
-                    if (flashPacketHandler.getMessageSide() == HMessage.Direction.TOSERVER)
+                    if (flashPacketHandler.getDirection() == HMessage.Direction.TOSERVER)
                         rc4Tryout.undoRc4(encBuffer);
 
                     if (rc4Tryout.couldBeFresh()) {

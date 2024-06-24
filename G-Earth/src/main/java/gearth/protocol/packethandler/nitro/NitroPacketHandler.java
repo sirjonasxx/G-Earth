@@ -1,7 +1,9 @@
 package gearth.protocol.packethandler.nitro;
 
+import gearth.misc.listenerpattern.Observable;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
+import gearth.protocol.TrafficListener;
 import gearth.protocol.connection.proxy.nitro.websocket.NitroSession;
 import gearth.protocol.packethandler.PacketHandler;
 import gearth.protocol.packethandler.PayloadBuffer;
@@ -22,7 +24,7 @@ public class NitroPacketHandler extends PacketHandler {
     private final PayloadBuffer payloadBuffer;
     private final Object payloadLock;
 
-    public NitroPacketHandler(HMessage.Direction direction, NitroSession session, ExtensionHandler extensionHandler, Object[] trafficObservables) {
+    public NitroPacketHandler(HMessage.Direction direction, NitroSession session, ExtensionHandler extensionHandler, Observable<TrafficListener>[] trafficObservables) {
         super(extensionHandler, trafficObservables);
         this.direction = direction;
         this.session = session;
