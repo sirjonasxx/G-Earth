@@ -2,7 +2,7 @@ package gearth.extensions;
 
 import gearth.misc.HostInfo;
 import gearth.protocol.HPacketFormat;
-import gearth.services.extension_handler.extensions.implementations.network.NetworkExtensionMessage;
+import gearth.protocol.connection.packetsafety.PacketTypeChecker;
 import gearth.services.extension_handler.extensions.implementations.network.NetworkExtensionMessage.Incoming;
 import gearth.services.extension_handler.extensions.implementations.network.NetworkExtensionMessage.Outgoing;
 import gearth.services.packet_info.PacketInfoManager;
@@ -30,6 +30,11 @@ public abstract class Extension extends ExtensionBase {
     private volatile boolean delayed_init = false;
 
     private OutputStream out = null;
+
+    /**
+     * Which client G-Earth is connected to.
+     */
+    private HClient clientType = null;
 
     private String getArgument(String[] args, String... arg) {
         for (int i = 0; i < args.length - 1; i++) {
@@ -132,7 +137,7 @@ public abstract class Extension extends ExtensionBase {
                     int connectionPort = packet.readInteger();
                     String hotelVersion = packet.readString();
                     String clientIdentifier = packet.readString();
-                    HClient clientType = HClient.valueOf(packet.readString());
+                    clientType = HClient.valueOf(packet.readString());
                     setPacketInfoManager(PacketInfoManager.readFromPacket(packet));
 
                     Constants.UNITY_PACKETS = clientType == HClient.UNITY;
@@ -231,6 +236,10 @@ public abstract class Extension extends ExtensionBase {
         return send(packet, HMessage.Direction.TOSERVER);
     }
     private boolean send(HPacket packet, HMessage.Direction direction) {
+        if (clientType == null) return false;
+
+        PacketTypeChecker.ensureValid(clientType, direction, packet);
+
         if (packet.isCorrupted()) return false;
 
         if (!packet.isPacketComplete()) packet.completePacket(packetInfoManager);

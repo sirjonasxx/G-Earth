@@ -1,7 +1,9 @@
 package gearth.protocol.connection;
 
+import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 import gearth.protocol.connection.packetsafety.PacketSafetyManager;
+import gearth.protocol.connection.packetsafety.PacketTypeChecker;
 import gearth.protocol.connection.packetsafety.SafePacketsContainer;
 import gearth.services.packet_info.PacketInfo;
 import gearth.services.packet_info.PacketInfoManager;
@@ -57,6 +59,7 @@ public class HProxy {
 
     public boolean sendToServer(HPacket packet) {
         if (outHandler != null) {
+            PacketTypeChecker.ensureValid(hClient, HMessage.Direction.TOSERVER, packet);
             return outHandler.sendToStream(packet.toBytes());
         }
         return false;
@@ -64,6 +67,7 @@ public class HProxy {
 
     public boolean sendToClient(HPacket packet) {
         if (inHandler != null) {
+            PacketTypeChecker.ensureValid(hClient, HMessage.Direction.TOCLIENT, packet);
             return inHandler.sendToStream(packet.toBytes());
         }
         return false;
