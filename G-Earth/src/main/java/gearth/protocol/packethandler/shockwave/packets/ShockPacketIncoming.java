@@ -2,11 +2,12 @@ package gearth.protocol.packethandler.shockwave.packets;
 
 import gearth.encoding.VL64Encoding;
 import gearth.misc.ArrayUtils;
+import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 import gearth.protocol.HPacketFormat;
 
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
+import java.security.InvalidParameterException;
 import java.util.Arrays;
 
 // Server to Client
@@ -25,6 +26,22 @@ public class ShockPacketIncoming extends ShockPacket {
 
     public ShockPacketIncoming(int header) {
         super(HPacketFormat.WEDGIE_INCOMING, header);
+    }
+
+    public ShockPacketIncoming(int header, byte[] bytes) {
+        super(HPacketFormat.WEDGIE_INCOMING, header, bytes);
+    }
+
+    public ShockPacketIncoming(int header, Object... objects) throws InvalidParameterException {
+        super(HPacketFormat.WEDGIE_INCOMING, header, objects);
+    }
+
+    public ShockPacketIncoming(String identifier, HMessage.Direction direction) throws InvalidParameterException {
+        super(HPacketFormat.WEDGIE_INCOMING, identifier, direction);
+    }
+
+    public ShockPacketIncoming(String identifier, HMessage.Direction direction, Object... objects) throws InvalidParameterException {
+        super(HPacketFormat.WEDGIE_INCOMING, identifier, direction, objects);
     }
 
     @Override

@@ -30,9 +30,38 @@ public abstract class ShockPacket extends HPacket {
     }
 
     public ShockPacket(HPacketFormat format, int header) {
-        super(Base64Encoding.encode(header, 2));
+        super(header);
         packetFormat = format;
         readIndex = 2;
+    }
+
+    public ShockPacket(HPacketFormat format, int header, byte[] bytes) {
+        super(header, bytes);
+        packetFormat = format;
+        readIndex = 2;
+    }
+
+    public ShockPacket(HPacketFormat format, int header, Object... objects) throws InvalidParameterException {
+        super(header, objects);
+        packetFormat = format;
+        readIndex = 2;
+    }
+
+    public ShockPacket(HPacketFormat format, String identifier, HMessage.Direction direction) throws InvalidParameterException {
+        super(identifier, direction);
+        packetFormat = format;
+        readIndex = 2;
+    }
+
+    public ShockPacket(HPacketFormat format, String identifier, HMessage.Direction direction, Object... objects) throws InvalidParameterException {
+        super(identifier, direction, objects);
+        packetFormat = format;
+        readIndex = 2;
+    }
+
+    @Override
+    protected void initPacket(int header) {
+        packetInBytes = Base64Encoding.encode(header, 2);
     }
 
     @Override
@@ -102,12 +131,12 @@ public abstract class ShockPacket extends HPacket {
 
     @Override
     public HPacket appendObjects(Object... objects) {
-        throw new ShockPacketUnsupported();
+        return super.appendObjects(objects);
     }
 
     @Override
     public HPacket appendObject(Object o) throws InvalidParameterException {
-        throw new ShockPacketUnsupported();
+        return super.appendObject(o);
     }
 
     @Override

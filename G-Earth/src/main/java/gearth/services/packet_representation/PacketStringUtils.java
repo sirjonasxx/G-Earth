@@ -266,7 +266,7 @@ public class PacketStringUtils {
             }
             else if (c == 'i') builder.append("{i:").append(prevInt = p.readInteger()).append('}');
             else if (c == 's') builder.append("{s:\"").append(
-                    p.readString(StandardCharsets.UTF_8)
+                    p.readString()
                             .replace("\\", "\\\\")  // \ -> \\
                             .replace("\"", "\\\"")  // " -> \"
                             .replace("\r", "\\r")   // CR -> \r

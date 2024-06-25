@@ -2,11 +2,12 @@ package gearth.protocol.packethandler.shockwave.packets;
 
 import gearth.encoding.Base64Encoding;
 import gearth.encoding.VL64Encoding;
+import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 import gearth.protocol.HPacketFormat;
 
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
+import java.security.InvalidParameterException;
 
 // Client to Server
 public class ShockPacketOutgoing extends ShockPacket {
@@ -24,6 +25,22 @@ public class ShockPacketOutgoing extends ShockPacket {
 
     public ShockPacketOutgoing(int header) {
         super(HPacketFormat.WEDGIE_OUTGOING, header);
+    }
+
+    public ShockPacketOutgoing(int header, byte[] bytes) {
+        super(HPacketFormat.WEDGIE_INCOMING, header, bytes);
+    }
+
+    public ShockPacketOutgoing(int header, Object... objects) throws InvalidParameterException {
+        super(HPacketFormat.WEDGIE_INCOMING, header, objects);
+    }
+
+    public ShockPacketOutgoing(String identifier, HMessage.Direction direction) throws InvalidParameterException {
+        super(HPacketFormat.WEDGIE_INCOMING, identifier, direction);
+    }
+
+    public ShockPacketOutgoing(String identifier, HMessage.Direction direction, Object... objects) throws InvalidParameterException {
+        super(HPacketFormat.WEDGIE_INCOMING, identifier, direction, objects);
     }
 
     @Override
@@ -83,11 +100,6 @@ public class ShockPacketOutgoing extends ShockPacket {
         readIndex += length;
 
         return value;
-    }
-
-    @Override
-    public String readString() {
-        return this.readString(StandardCharsets.UTF_8);
     }
 
     @Override

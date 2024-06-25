@@ -49,8 +49,7 @@ public class HPacket implements StringifyAble {
     }
 
     public HPacket(int header) {
-        packetInBytes = new byte[]{0,0,0,2,0,0};
-        replacePacketId((short)header);
+        initPacket(header);
         isEdited = false;
     }
 
@@ -72,7 +71,7 @@ public class HPacket implements StringifyAble {
     }
 
     public HPacket(String identifier, HMessage.Direction direction) throws InvalidParameterException {
-        packetInBytes = new byte[]{0,0,0,2,-1,-1};
+        initPacket(0);
         this.identifier = identifier;
         this.identifierDirection = direction;
     }
@@ -81,6 +80,11 @@ public class HPacket implements StringifyAble {
         this(identifier, direction);
         appendObjects(objects);
         isEdited = false;
+    }
+
+    protected void initPacket(int header) {
+        packetInBytes = new byte[]{0,0,0,2,0,0};
+        replacePacketId((short)header);
     }
 
     public HPacketFormat getFormat() {
@@ -650,7 +654,7 @@ public class HPacket implements StringifyAble {
             appendShort((Short)o);
         }
         else if (o instanceof String) {
-            appendString((String)o, StandardCharsets.UTF_8);
+            appendString((String)o, StandardCharsets.ISO_8859_1);
         }
         else if (o instanceof Boolean) {
             appendBoolean((Boolean) o);
