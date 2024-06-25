@@ -36,12 +36,8 @@ public class ShockPacketIncoming extends ShockPacket {
         super(HPacketFormat.WEDGIE_INCOMING, header, objects);
     }
 
-    public ShockPacketIncoming(String identifier, HMessage.Direction direction) throws InvalidParameterException {
-        super(HPacketFormat.WEDGIE_INCOMING, identifier, direction);
-    }
-
-    public ShockPacketIncoming(String identifier, HMessage.Direction direction, Object... objects) throws InvalidParameterException {
-        super(HPacketFormat.WEDGIE_INCOMING, identifier, direction, objects);
+    public ShockPacketIncoming(String identifier, Object... objects) throws InvalidParameterException {
+        super(HPacketFormat.WEDGIE_INCOMING, identifier, HMessage.Direction.TOCLIENT, objects);
     }
 
     @Override
