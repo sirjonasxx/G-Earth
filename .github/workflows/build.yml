@@ -36,11 +36,16 @@ jobs:
     - name: Install G-Wasm
       working-directory: gwasm
       run: mvn -B install
-       
+
+    # Check if GITHUB_REF_TYPE is a tag
     - name: Build G-Earth
       run: |
-        mvn -B package -Drepository=${GITHUB_REPOSITORY}
-
+        if [[ $GITHUB_REF_TYPE == 'tag' ]]; then
+          mvn -B package -Drepository=${GITHUB_REPOSITORY} -Dchangelist=
+        else
+          mvn -B package -Drepository=${GITHUB_REPOSITORY}
+        fi
+        
     - name: Upload Mac OSX
       uses: actions/upload-artifact@v4
       with:
