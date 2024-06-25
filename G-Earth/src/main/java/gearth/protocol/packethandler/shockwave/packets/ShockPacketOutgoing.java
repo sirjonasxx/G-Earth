@@ -51,11 +51,6 @@ public class ShockPacketOutgoing extends ShockPacket {
     }
 
     @Override
-    public HPacket appendString(String value) {
-        return appendString(value, StandardCharsets.ISO_8859_1);
-    }
-
-    @Override
     public HPacket appendString(String value, Charset charset) {
         isEdited = true;
 

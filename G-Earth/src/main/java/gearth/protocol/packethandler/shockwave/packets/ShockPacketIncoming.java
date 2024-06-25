@@ -54,11 +54,6 @@ public class ShockPacketIncoming extends ShockPacket {
     }
 
     @Override
-    public HPacket appendString(String value) {
-        return appendString(value, StandardCharsets.ISO_8859_1);
-    }
-
-    @Override
     public HPacket appendString(String value, Charset charset) {
         isEdited = true;
 
@@ -91,11 +86,6 @@ public class ShockPacketIncoming extends ShockPacket {
         readIndex += length;
 
         return value;
-    }
-
-    @Override
-    public String readString() {
-        return this.readString(StandardCharsets.UTF_8);
     }
 
     @Override

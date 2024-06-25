@@ -161,7 +161,7 @@ public class PacketStringUtils {
             }
             actualString.append(match);
 
-            String latin = new String(actualString.toString().getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1);
+            String latin = new String(actualString.toString().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.ISO_8859_1);
             HPacket temp = format.createPacket(0);
 
             int sizeBefore = temp.getBytesLength();

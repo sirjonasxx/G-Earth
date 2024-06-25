@@ -87,7 +87,7 @@ public abstract class ShockPacket extends HPacket {
 
     @Override
     public HPacket appendString(String s) {
-        throw new ShockPacketUnsupported();
+        return appendString(s, StandardCharsets.ISO_8859_1);
     }
 
     @Override
@@ -202,7 +202,7 @@ public abstract class ShockPacket extends HPacket {
 
     @Override
     public String readString() {
-        throw new ShockPacketUnsupported();
+        return this.readString(StandardCharsets.ISO_8859_1);
     }
 
     @Override
