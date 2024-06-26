@@ -1,66 +1,45 @@
 package gearth.protocol.packethandler.shockwave;
 
-import gearth.encoding.HexEncoding;
 import gearth.misc.listenerpattern.Observable;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
+import gearth.protocol.HPacketFormat;
 import gearth.protocol.TrafficListener;
-import gearth.protocol.packethandler.PacketHandler;
-import gearth.protocol.packethandler.shockwave.buffers.ShockwaveBuffer;
-import gearth.protocol.packethandler.shockwave.crypto.RC4Shockwave;
+import gearth.protocol.crypto.RC4Cipher;
+import gearth.protocol.packethandler.EncryptedPacketHandler;
+import gearth.protocol.packethandler.PayloadBuffer;
 import gearth.services.extension_handler.ExtensionHandler;
-import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.OutputStream;
 
-public abstract class ShockwavePacketHandler extends PacketHandler {
-
-    // The first 20 bytes of the artificialKey.
-    public static final byte[] ARTIFICIAL_KEY = Hex.decode("14d288cdb0bc08c274809a7802962af98b41dec8");
+public abstract class ShockwavePacketHandler extends EncryptedPacketHandler {
 
     protected static final Logger logger = LoggerFactory.getLogger(ShockwavePacketHandler.class);
 
     private final HMessage.Direction direction;
-    private final ShockwaveBuffer payloadBuffer;
+    private final HPacketFormat format;
+    private final PayloadBuffer payloadBuffer;
     private final Object flushLock;
 
     protected final OutputStream outputStream;
 
-    private boolean isEncrypted;
-    private final RC4Shockwave decryptCipher;
-    private final RC4Shockwave encryptCipher;
-
-    ShockwavePacketHandler(HMessage.Direction direction, ShockwaveBuffer payloadBuffer, OutputStream outputStream, ExtensionHandler extensionHandler, Observable<TrafficListener>[] trafficObservables) {
-        super(extensionHandler, trafficObservables);
+    ShockwavePacketHandler(HMessage.Direction direction, PayloadBuffer payloadBuffer, OutputStream outputStream, ExtensionHandler extensionHandler, Observable<TrafficListener>[] trafficObservables) {
+        super(extensionHandler, trafficObservables, direction);
         this.direction = direction;
+        this.format = direction == HMessage.Direction.TOSERVER ? HPacketFormat.WEDGIE_OUTGOING : HPacketFormat.WEDGIE_INCOMING;
         this.payloadBuffer = payloadBuffer;
         this.outputStream = outputStream;
         this.flushLock = new Object();
-        this.isEncrypted = false;
-        this.decryptCipher = new RC4Shockwave(0, ARTIFICIAL_KEY);
-        this.encryptCipher = new RC4Shockwave(0, ARTIFICIAL_KEY);
-    }
-
-    protected void setEncrypted() {
-        isEncrypted = true;
     }
 
     @Override
     public boolean sendToStream(byte[] buffer) {
-        return sendToStream(buffer, isEncrypted);
-    }
-
-    private boolean sendToStream(byte[] buffer, boolean isEncrypted) {
         synchronized (sendLock) {
             try {
-                if (!isEncrypted) {
-                    outputStream.write(buffer);
-                } else {
-                    outputStream.write(HexEncoding.toHex(encryptCipher.crypt(buffer), true));
-                }
+                outputStream.write(buffer);
                 return true;
             } catch (IOException e) {
                 logger.error("Failed to send packet to stream", e);
@@ -71,20 +50,40 @@ public abstract class ShockwavePacketHandler extends PacketHandler {
 
     @Override
     public void act(byte[] buffer) throws IOException {
-        if (!isEncrypted) {
-            payloadBuffer.push(buffer);
-        } else {
-            payloadBuffer.push(decryptCipher.crypt(Hex.decode(buffer)));
-        }
+        super.act(buffer);
 
-        flush();
+        if (!isBlocked()) {
+            flush();
+        }
+    }
+
+    @Override
+    protected void writeOut(byte[] buffer) throws IOException {
+        synchronized (sendLock) {
+            outputStream.write(buffer);
+        }
+    }
+
+    @Override
+    protected void writeBuffer(byte[] buffer) {
+        payloadBuffer.push(buffer);
+    }
+
+    @Override
+    public void setRc4(RC4Cipher rc4) {
+        payloadBuffer.setCipher(rc4);
+        super.setRc4(rc4);
     }
 
     public void flush() throws IOException {
         synchronized (flushLock) {
-            final HPacket[] packets = payloadBuffer.receive();
+            final byte[][] packets = payloadBuffer.receive();
 
-            for (final HPacket packet : packets){
+            for (final byte[] rawPacket : packets) {
+                final HPacket packet = isEncryptedStream()
+                        ? format.createPacket(decrypt(rawPacket))
+                        : format.createPacket(rawPacket);
+
                 packet.setIdentifierDirection(direction);
 
                 final HMessage message = new HMessage(packet, direction, currentIndex);

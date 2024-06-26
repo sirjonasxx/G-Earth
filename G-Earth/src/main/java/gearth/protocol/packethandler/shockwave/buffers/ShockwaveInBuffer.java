@@ -1,44 +1,39 @@
 package gearth.protocol.packethandler.shockwave.buffers;
 
-import gearth.protocol.HPacket;
-import gearth.protocol.packethandler.ByteArrayUtils;
-import gearth.protocol.packethandler.shockwave.packets.ShockPacket;
-import gearth.protocol.packethandler.shockwave.packets.ShockPacketIncoming;
+import gearth.protocol.crypto.RC4Cipher;
+import gearth.protocol.packethandler.PayloadBuffer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class ShockwaveInBuffer implements ShockwaveBuffer {
-
-    private byte[] buffer = new byte[0];
+public class ShockwaveInBuffer extends PayloadBuffer {
 
     @Override
-    public void push(byte[] data) {
-        buffer = buffer.length == 0 ? data.clone() : ByteArrayUtils.combineByteArrays(buffer, data);
+    public void setCipher(RC4Cipher cipher) {
+        // We don't need to decrypt incoming packet headers, for now.
     }
 
     @Override
-    public HPacket[] receive() {
+    public byte[][] receive() {
         if (buffer.length < 3) {
-            return new ShockPacket[0];
+            return new byte[0][];
         }
 
         // Incoming packets are delimited by chr(1).
         // We need to split the buffer by chr(1) and then parse each packet.
-        ArrayList<ShockPacket> packets = new ArrayList<>();
+        final ArrayList<byte[]> packets = new ArrayList<>();
 
         int curPos = 0;
 
         for (int i = 0; i < buffer.length; i++) {
             if (buffer[i] == 1) {
-                byte[] packetData = Arrays.copyOfRange(buffer, curPos, i);
-                packets.add(new ShockPacketIncoming(packetData));
+                packets.add(Arrays.copyOfRange(buffer, curPos, i));
                 curPos = i + 1;
             }
         }
 
         buffer = Arrays.copyOfRange(buffer, curPos, buffer.length);
 
-        return packets.toArray(new ShockPacket[0]);
+        return packets.toArray(new byte[0][]);
     }
 }

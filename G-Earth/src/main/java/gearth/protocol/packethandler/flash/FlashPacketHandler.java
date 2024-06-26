@@ -5,7 +5,6 @@ import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 import gearth.protocol.TrafficListener;
 import gearth.protocol.packethandler.EncryptedPacketHandler;
-import gearth.protocol.packethandler.PayloadBuffer;
 import gearth.services.extension_handler.ExtensionHandler;
 
 import java.io.IOException;
@@ -14,13 +13,13 @@ import java.io.OutputStream;
 public abstract class FlashPacketHandler extends EncryptedPacketHandler {
 
     private final OutputStream out;
-    private final PayloadBuffer payloadBuffer;
+    private final FlashBuffer payloadBuffer;
     private volatile boolean isDataStream;
 
     FlashPacketHandler(HMessage.Direction direction, OutputStream outputStream, Observable<TrafficListener>[] trafficObservables, ExtensionHandler extensionHandler) {
         super(extensionHandler, trafficObservables, direction);
         this.out = outputStream;
-        this.payloadBuffer = new PayloadBuffer();
+        this.payloadBuffer = new FlashBuffer();
         this.isDataStream = false;
     }
 
@@ -32,6 +31,7 @@ public abstract class FlashPacketHandler extends EncryptedPacketHandler {
         isDataStream = true;
     }
 
+    @Override
     public void act(byte[] buffer) throws IOException {
         if (!isDataStream) {
             synchronized (sendLock) {
@@ -40,7 +40,11 @@ public abstract class FlashPacketHandler extends EncryptedPacketHandler {
             return;
         }
 
-        super.act(buffer);
+        if (isEncryptedStream() && isCiphersSet()) {
+            super.act(decrypt(buffer));
+        } else {
+            super.act(buffer);
+        }
 
         if (!isBlocked()) {
             flush();
@@ -59,6 +63,7 @@ public abstract class FlashPacketHandler extends EncryptedPacketHandler {
         payloadBuffer.push(buffer);
     }
 
+    @Override
     public boolean sendToStream(byte[] buffer) {
         return sendToStream(buffer, isEncryptedStream());
     }
@@ -77,10 +82,9 @@ public abstract class FlashPacketHandler extends EncryptedPacketHandler {
 
     public void flush() throws IOException {
         synchronized (flushLock) {
-            HPacket[] hpackets = payloadBuffer.receive();
-
-            for (HPacket hpacket : hpackets){
-                HMessage hMessage = new HMessage(hpacket, getDirection(), currentIndex);
+            for (final byte[] packet : payloadBuffer.receive()){
+                HPacket hPacket = new HPacket(packet);
+                HMessage hMessage = new HMessage(hPacket, getDirection(), currentIndex);
                 boolean isencrypted = isEncryptedStream();
 
                 if (isDataStream) {

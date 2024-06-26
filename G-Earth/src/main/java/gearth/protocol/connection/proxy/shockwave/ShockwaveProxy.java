@@ -9,6 +9,7 @@ import gearth.protocol.connection.HStateSetter;
 import gearth.protocol.connection.proxy.ProxyProvider;
 import gearth.protocol.interceptor.ConnectionInterceptor;
 import gearth.protocol.interceptor.ConnectionInterceptorCallbacks;
+import gearth.protocol.memory.Rc4Obtainer;
 import gearth.protocol.packethandler.PacketHandler;
 import gearth.protocol.packethandler.shockwave.ShockwavePacketIncomingHandler;
 import gearth.protocol.packethandler.shockwave.ShockwavePacketOutgoingHandler;
@@ -92,9 +93,12 @@ public class ShockwaveProxy implements ProxyProvider, ConnectionInterceptorCallb
         final ShockwavePacketOutgoingHandler outgoingHandler = new ShockwavePacketOutgoingHandler(server.getOutputStream(), hConnection.getExtensionHandler(), hConnection.getTrafficObservables());
         final ShockwavePacketIncomingHandler incomingHandler = new ShockwavePacketIncomingHandler(client.getOutputStream(), hConnection.getExtensionHandler(), hConnection.getTrafficObservables(), outgoingHandler);
 
-        // TODO: Non hardcoded version "20". Not exactly sure yet how to deal with this for now.
+        final Rc4Obtainer rc4Obtainer = new Rc4Obtainer(hConnection);
+
+        rc4Obtainer.setFlashPacketHandlers(outgoingHandler, incomingHandler);
+        // TODO: Non hardcoded version "24". Not exactly sure yet how to deal with this for now.
         // Lets revisit when origins is more mature.
-        proxy.verifyProxy(incomingHandler, outgoingHandler, "20", "SHOCKWAVE");
+        proxy.verifyProxy(incomingHandler, outgoingHandler, "24", "SHOCKWAVE");
         hProxySetter.setProxy(proxy);
         onConnect();
 
@@ -107,7 +111,6 @@ public class ShockwaveProxy implements ProxyProvider, ConnectionInterceptorCallb
         try {
             if (!server.isClosed()) server.close();
             if (!client.isClosed()) client.close();
-            if (HConnection.DEBUG) System.out.println("STOP");
             onConnectEnd();
         } catch (IOException e) {
             logger.error("Error occurred while closing sockets.", e);

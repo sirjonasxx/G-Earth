@@ -4,7 +4,7 @@ import gearth.misc.listenerpattern.Observable;
 import gearth.protocol.HConnection;
 import gearth.protocol.HMessage;
 import gearth.protocol.TrafficListener;
-import gearth.protocol.crypto.RC4;
+import gearth.protocol.crypto.RC4Cipher;
 import gearth.protocol.packethandler.flash.BufferChangeListener;
 import gearth.services.extension_handler.ExtensionHandler;
 import org.slf4j.Logger;
@@ -27,8 +27,8 @@ public abstract class EncryptedPacketHandler extends PacketHandler {
     private volatile boolean isEncryptedStream;
     private volatile List<Byte> tempEncryptedBuffer;
 
-    private RC4 encryptCipher;
-    private RC4 decryptCipher;
+    private RC4Cipher encryptCipher;
+    private RC4Cipher decryptCipher;
 
     protected EncryptedPacketHandler(ExtensionHandler extensionHandler, Observable<TrafficListener>[] trafficObservables, HMessage.Direction direction) {
         super(extensionHandler, trafficObservables);
@@ -73,16 +73,16 @@ public abstract class EncryptedPacketHandler extends PacketHandler {
                 tempEncryptedBuffer.add(buffer[i]);
             }
         } else {
-            writeBuffer(decryptCipher.rc4(buffer));
+            writeBuffer(buffer);
         }
     }
 
     protected byte[] encrypt(byte[] buffer) {
-        return encryptCipher.rc4(buffer);
+        return encryptCipher.cipher(buffer);
     }
 
     protected byte[] decrypt(byte[] buffer) {
-        return decryptCipher.rc4(buffer);
+        return decryptCipher.decipher(buffer);
     }
 
     protected abstract void writeOut(byte[] buffer) throws IOException;
@@ -105,7 +105,11 @@ public abstract class EncryptedPacketHandler extends PacketHandler {
         isTempBlocked = false;
     }
 
-    public void setRc4(RC4 rc4) {
+    public boolean isCiphersSet() {
+        return encryptCipher != null && decryptCipher != null;
+    }
+
+    public void setRc4(RC4Cipher rc4) {
         this.decryptCipher = rc4.deepCopy();
         this.encryptCipher = rc4.deepCopy();
 

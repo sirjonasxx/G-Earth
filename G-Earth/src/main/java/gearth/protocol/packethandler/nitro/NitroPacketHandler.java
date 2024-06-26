@@ -6,7 +6,7 @@ import gearth.protocol.HPacket;
 import gearth.protocol.TrafficListener;
 import gearth.protocol.connection.proxy.nitro.websocket.NitroSession;
 import gearth.protocol.packethandler.PacketHandler;
-import gearth.protocol.packethandler.PayloadBuffer;
+import gearth.protocol.packethandler.flash.FlashBuffer;
 import gearth.services.extension_handler.ExtensionHandler;
 import org.eclipse.jetty.websocket.api.Session;
 import org.slf4j.Logger;
@@ -21,14 +21,14 @@ public class NitroPacketHandler extends PacketHandler {
 
     private final HMessage.Direction direction;
     private final NitroSession session;
-    private final PayloadBuffer payloadBuffer;
+    private final FlashBuffer payloadBuffer;
     private final Object payloadLock;
 
     public NitroPacketHandler(HMessage.Direction direction, NitroSession session, ExtensionHandler extensionHandler, Observable<TrafficListener>[] trafficObservables) {
         super(extensionHandler, trafficObservables);
         this.direction = direction;
         this.session = session;
-        this.payloadBuffer = new PayloadBuffer();
+        this.payloadBuffer = new FlashBuffer();
         this.payloadLock = new Object();
     }
 
@@ -61,8 +61,9 @@ public class NitroPacketHandler extends PacketHandler {
         payloadBuffer.push(buffer);
 
         synchronized (payloadLock) {
-            for (HPacket packet : payloadBuffer.receive()) {
-                HMessage hMessage = new HMessage(packet, direction, currentIndex);
+            for (final byte[] packet : payloadBuffer.receive()) {
+                HPacket hPacket = new HPacket(packet);
+                HMessage hMessage = new HMessage(hPacket, direction, currentIndex);
                 awaitListeners(hMessage, hMessage1 -> sendToStream(hMessage1.getPacket().toBytes()));
                 currentIndex++;
             }

@@ -34,7 +34,7 @@ public class ShockwavePacketIncomingHandler extends ShockwavePacketHandler {
                 if (packet.headerId() == ID_SECRET_KEY) {
                     logger.info("Received SECRET_KEY from server, enabling encryption / decryption.");
                     trafficObservables[0].removeListener(this);
-                    outgoingHandler.setEncrypted();
+                    outgoingHandler.setEncryptedStream();
                 }
             }
         });
