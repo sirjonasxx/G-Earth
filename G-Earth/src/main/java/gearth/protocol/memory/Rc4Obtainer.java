@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Rc4Obtainer {
 
@@ -70,9 +71,17 @@ public class Rc4Obtainer {
 
         for (EncryptedPacketHandler handler : flashPacketHandlers) {
             BufferChangeListener bufferChangeListener = new BufferChangeListener() {
+                private final AtomicInteger counter = new AtomicInteger(0);
+
                 @Override
                 public void onPacket() {
                     if (handler.isEncryptedStream()) {
+                        final boolean isShockwave = handler instanceof ShockwavePacketOutgoingHandler;
+
+                        if (isShockwave && counter.incrementAndGet() != 3) {
+                            return;
+                        }
+
                         onSendFirstEncryptedMessage(handler);
                         handler.getPacketReceivedObservable().removeListener(this);
                     }
@@ -98,7 +107,6 @@ public class Rc4Obtainer {
 
         new Thread(() -> {
             final long startTime = System.currentTimeMillis();
-
 
             boolean worked = false;
             int i = 0;
