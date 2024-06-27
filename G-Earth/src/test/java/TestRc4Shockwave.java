@@ -22,7 +22,11 @@ import static org.mockito.Mockito.mockStatic;
 
 public class TestRc4Shockwave {
 
-    private final byte[] encryptedBuffer = Hex.decode("724148504d776b51545841624c6776583352355750713537696931482f39684e2f566466507841756a484f62684e6b4d666c44636e55676d30396c625573304b71754a303966786a5555503342536c32336b633239715577373956512f2b43384577657a5a4d65756b6258347436775061496a6b5539517a324b654a53326e4e4e4c3351666334");
+    private final byte[][] encryptedBuffers = new byte[][]{
+            Hex.decode("724148504d776b51545841624c6776583352355750713537696931482f39684e2f566466507841756a484f62684e6b4d666c44636e55676d30396c625573304b71754a303966786a5555503342536c32336b63323971557737395651"),
+            Hex.decode("2f2b43384577657a5a4d65756b6258347436775061496a6b5539517a324b654a5332"),
+            Hex.decode("6e4e4e4c3351666334")
+    };
 
     private final byte[][] potentialTables = new byte[][] {
             Hex.decode("cfa4debb4f28d4279d0f668aabba13810b8f7f4c7917eb1618296937c852d05a5d5f41ffc65c4d63bdacf22ebea27e913f56016fd6dae11ab749e068d59a99656ca8c91bf5779b4b03eda560fdc2742a2421517afa6242470e87f8c45edfbc59e650826e4a4810b9ca7df31e1db16175723354c564a67820e3b4dd5b3dd7b39f73a30d96053c71c795ae5707b611a04ead268eb5220cf9e7b2ee23f6bf9e76a7e5a1e9587c408583af3a8b7be8d13000fc86452f929738350206b0c398fb8dfe09f7c1e41ff18470d86d672d1c8ccc806bd332f025ef90a9ea08d26a89dbb8cbec4615f4e29c5544aa53c0d9883b433493ce0adc12cd2c1914942b36043e3139"),
@@ -152,7 +156,9 @@ public class TestRc4Shockwave {
 
         obtainer.setFlashPacketHandlers(mockEncryptedPacketHandler);
 
-        mockEncryptedPacketHandler.act(encryptedBuffer);
+        for (byte[] buffer : encryptedBuffers) {
+            mockEncryptedPacketHandler.act(buffer);
+        }
 
         waitSemaphore.acquire();
 

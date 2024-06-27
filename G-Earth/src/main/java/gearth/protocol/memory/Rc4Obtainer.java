@@ -227,10 +227,6 @@ public class Rc4Obtainer {
             final byte[][] packets = buffer.receive();
 
             if (packets.length == 3 && buffer.isEmpty()) {
-                System.out.println("Cracked RC4 table");
-                System.out.printf("Q: %d -> %d%n", rc4.getQ(), q);
-                System.out.printf("J: %d -> %d%n", rc4.getJ(), j);
-
                 packetHandler.setRc4(rc4);
                 return true;
             }
