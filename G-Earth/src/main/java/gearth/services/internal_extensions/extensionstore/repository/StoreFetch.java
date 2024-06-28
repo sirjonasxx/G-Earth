@@ -19,7 +19,7 @@ public class StoreFetch {
     }
 
     public static void fetch(StoreFetchListener storeFetchListener) {
-        fetch(GEarth.version, storeFetchListener, "sirjonasxx/G-ExtensionStore");
+        fetch(GEarth.storeVersion, storeFetchListener, "sirjonasxx/G-ExtensionStore");
     }
 
     public static void fetch(String version, StoreFetchListener storeFetchListener) {

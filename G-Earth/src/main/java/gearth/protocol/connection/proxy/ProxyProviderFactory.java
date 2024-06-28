@@ -3,20 +3,20 @@ package gearth.protocol.connection.proxy;
 import gearth.misc.Cacher;
 import gearth.misc.OSValidator;
 import gearth.protocol.HConnection;
+import gearth.protocol.connection.HClient;
 import gearth.protocol.connection.HProxySetter;
 import gearth.protocol.connection.HStateSetter;
-import gearth.protocol.connection.proxy.flash.NormalFlashProxyProvider;
+import gearth.protocol.connection.proxy.flash.FlashProxy;
 import gearth.protocol.connection.proxy.flash.unix.LinuxRawIpFlashProxyProvider;
 import gearth.protocol.connection.proxy.flash.windows.WindowsRawIpFlashProxyProvider;
+import gearth.protocol.connection.proxy.shockwave.ShockwaveProxy;
 import gearth.ui.titlebar.TitleBarController;
 import gearth.ui.translations.LanguageBundle;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
 import javafx.scene.layout.Region;
-import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -27,7 +27,10 @@ public class ProxyProviderFactory {
     public static final String HOTELS_CACHE_KEY = "hotelsConnectionInfo";
     private static SocksConfiguration socksConfig = null;
 
-    public static List<String> autoDetectHosts;
+    private static List<String> autoDetectHosts;
+    private static List<String> autoDetectHostsOrigins;
+    private static List<String> allHosts;
+
     static {
         autoDetectHosts = new ArrayList<>();
         autoDetectHosts.add("game-br.habbo.com:30000");
@@ -41,6 +44,16 @@ public class ProxyProviderFactory {
         autoDetectHosts.add("game-us.habbo.com:30000");
         autoDetectHosts.add("game-s2.habbo.com:30000");
 
+        autoDetectHostsOrigins = new ArrayList<>();
+        autoDetectHostsOrigins.add("game-od.habbo.com:40001");
+        autoDetectHostsOrigins.add("game-ous.habbo.com:40001");
+        autoDetectHostsOrigins.add("game-obr.habbo.com:40001");
+        autoDetectHostsOrigins.add("game-oes.habbo.com:40001");
+
+        allHosts = new ArrayList<>(autoDetectHosts.size() + autoDetectHostsOrigins.size());
+        allHosts.addAll(autoDetectHosts);
+        allHosts.addAll(autoDetectHostsOrigins);
+
         List<Object> additionalCachedHotels = Cacher.getList(HOTELS_CACHE_KEY);
         if (additionalCachedHotels != null) {
             for (Object additionalHotel : additionalCachedHotels) {
@@ -51,7 +64,7 @@ public class ProxyProviderFactory {
         }
 
         if (OSValidator.isMac()) {
-            for (int i = 2; i <= autoDetectHosts.size() + 5; i++) {
+            for (int i = 2; i <= allHosts.size() + 5; i++) {
                 ProcessBuilder allowLocalHost = new ProcessBuilder("ifconfig", "lo0", "alias", ("127.0.0." + i), "up");
                 try {
                     allowLocalHost.start();
@@ -60,6 +73,10 @@ public class ProxyProviderFactory {
                 }
             }
         }
+    }
+
+    public static List<String> getAllHosts() {
+        return allHosts;
     }
 
     private final HProxySetter proxySetter;
@@ -83,10 +100,11 @@ public class ProxyProviderFactory {
         return true;
     }
 
-    public ProxyProvider provide()  {
-        return provide(autoDetectHosts);
+    public ProxyProvider provide(HClient client)  {
+        return provide(client, client == HClient.FLASH ? autoDetectHosts : autoDetectHostsOrigins);
     }
-    public ProxyProvider provide(String domain, int port)  {
+
+    public ProxyProvider provide(HClient client, String domain, int port)  {
         List<Object> additionalCachedHotels = Cacher.getList(HOTELS_CACHE_KEY);
         if (additionalCachedHotels == null) {
             additionalCachedHotels = new ArrayList<>();
@@ -129,11 +147,14 @@ public class ProxyProviderFactory {
         else {
             List<String> potentialHost = new ArrayList<>();
             potentialHost.add(domain+":"+port);
-            return provide(potentialHost);
+            return provide(client, potentialHost);
         }
     }
-    private ProxyProvider provide(List<String> potentialHosts) {
-        return new NormalFlashProxyProvider(proxySetter, stateSetter, hConnection, potentialHosts, socksConfig.useSocks() && !socksConfig.onlyUseIfNeeded());
+
+    private ProxyProvider provide(HClient client, List<String> potentialHosts) {
+        return client == HClient.FLASH
+                ? new FlashProxy(proxySetter, stateSetter, hConnection, potentialHosts, socksConfig.useSocks() && !socksConfig.onlyUseIfNeeded())
+                : new ShockwaveProxy(proxySetter, stateSetter, hConnection, potentialHosts);
     }
 
     public static void setSocksConfig(SocksConfiguration configuration) {

@@ -4,6 +4,7 @@
 out/
 
 # maven
+.flattened-pom.xml
 bin/
 **/target/
 

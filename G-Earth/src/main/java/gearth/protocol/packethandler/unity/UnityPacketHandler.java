@@ -1,7 +1,9 @@
 package gearth.protocol.packethandler.unity;
 
+import gearth.misc.listenerpattern.Observable;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
+import gearth.protocol.TrafficListener;
 import gearth.protocol.packethandler.ByteArrayUtils;
 import gearth.protocol.packethandler.PacketHandler;
 import gearth.services.extension_handler.ExtensionHandler;
@@ -15,7 +17,7 @@ public class UnityPacketHandler extends PacketHandler {
     private final Session session;
     private final HMessage.Direction direction;
 
-    public UnityPacketHandler(ExtensionHandler extensionHandler, Object[] trafficObservables, Session session, HMessage.Direction direction) {
+    public UnityPacketHandler(ExtensionHandler extensionHandler, Observable<TrafficListener>[] trafficObservables, Session session, HMessage.Direction direction) {
         super(extensionHandler, trafficObservables);
         this.session = session;
         this.direction = direction;

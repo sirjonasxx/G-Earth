@@ -1,7 +1,8 @@
 package gearth.extensions;
 
 import gearth.misc.HostInfo;
-import gearth.services.extension_handler.extensions.implementations.network.NetworkExtensionMessage;
+import gearth.protocol.HPacketFormat;
+import gearth.protocol.connection.packetsafety.PacketTypeChecker;
 import gearth.services.extension_handler.extensions.implementations.network.NetworkExtensionMessage.Incoming;
 import gearth.services.extension_handler.extensions.implementations.network.NetworkExtensionMessage.Outgoing;
 import gearth.services.packet_info.PacketInfoManager;
@@ -29,6 +30,11 @@ public abstract class Extension extends ExtensionBase {
     private volatile boolean delayed_init = false;
 
     private OutputStream out = null;
+
+    /**
+     * Which client G-Earth is connected to.
+     */
+    private HClient clientType = null;
 
     private String getArgument(String[] args, String... arg) {
         for (int i = 0; i < args.length - 1; i++) {
@@ -131,7 +137,7 @@ public abstract class Extension extends ExtensionBase {
                     int connectionPort = packet.readInteger();
                     String hotelVersion = packet.readString();
                     String clientIdentifier = packet.readString();
-                    HClient clientType = HClient.valueOf(packet.readString());
+                    clientType = HClient.valueOf(packet.readString());
                     setPacketInfoManager(PacketInfoManager.readFromPacket(packet));
 
                     Constants.UNITY_PACKETS = clientType == HClient.UNITY;
@@ -174,12 +180,14 @@ public abstract class Extension extends ExtensionBase {
                 }
                 else if (packet.headerId() == Outgoing.PacketIntercept.HEADER_ID) {
                     String stringifiedMessage = packet.readLongString();
-                    HMessage habboMessage = new HMessage(stringifiedMessage);
+                    HPacketFormat packetFormat = HPacketFormat.fromId(packet.readInteger());
+                    HMessage habboMessage = new HMessage(packetFormat, stringifiedMessage);
 
                     modifyMessage(habboMessage);
 
                     HPacket response = new HPacket(Incoming.ManipulatedPacket.MANIPULATED_PACKET);
                     response.appendLongString(habboMessage.stringify());
+                    response.appendInt(habboMessage.getPacket().getFormat().getId());
 
                     writeToStream(response.toBytes());
                 }
@@ -228,6 +236,10 @@ public abstract class Extension extends ExtensionBase {
         return send(packet, HMessage.Direction.TOSERVER);
     }
     private boolean send(HPacket packet, HMessage.Direction direction) {
+        if (clientType == null) return false;
+
+        PacketTypeChecker.ensureValid(clientType, direction, packet);
+
         if (packet.isCorrupted()) return false;
 
         if (!packet.isPacketComplete()) packet.completePacket(packetInfoManager);
@@ -237,6 +249,7 @@ public abstract class Extension extends ExtensionBase {
         packet1.appendByte(direction == HMessage.Direction.TOCLIENT ? (byte)0 : (byte)1);
         packet1.appendInt(packet.getBytesLength());
         packet1.appendBytes(packet.toBytes());
+        packet1.appendInt(packet.getFormat().getId());
         try {
             writeToStream(packet1.toBytes());
             return true;

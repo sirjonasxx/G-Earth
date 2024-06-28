@@ -3,6 +3,7 @@ package gearth.services.always_admin;
 import gearth.protocol.HConnection;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
+import gearth.protocol.connection.HClient;
 
 public class AdminService {
 
@@ -36,17 +37,16 @@ public class AdminService {
     }
 
     public void onMessage(HMessage message) {
+        if (!enabled || hConnection.getClientType() == HClient.SHOCKWAVE) return;
         HPacket packet = message.getPacket();
         if (message.getDestination() == HMessage.Direction.TOCLIENT
                 && (originalPacket == null || packet.headerId() == originalPacket.headerId())
                 && packet.length() == 11 && (packet.readByte(14) == 0 || packet.readByte(14) == 1)) {
             originalPacket = new HPacket(packet);
 
-            if (enabled) {
-                packet.replaceInt(6, 7);
-                packet.replaceInt(10, 7);
-                packet.replaceBoolean(14, true);
-            }
+            packet.replaceInt(6, 7);
+            packet.replaceInt(10, 7);
+            packet.replaceBoolean(14, true);
         }
 
     }

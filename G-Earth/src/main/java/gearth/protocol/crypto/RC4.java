@@ -54,9 +54,9 @@ import java.util.Arrays;
  * <p>
  * @author  Clarence Ho
  */
-public class RC4 {
+public class RC4 implements RC4Cipher {
 
-    private byte state[] = new byte[256];
+    private byte[] state = new byte[256];
     private int x;
     private int y;
 
@@ -79,9 +79,8 @@ public class RC4 {
      * @param key   the encryption/decryption key
      */
     public RC4(byte[] key) throws NullPointerException {
-
-        for (int i=0; i < 256; i++) {
-            state[i] = (byte)i;
+        for (int i = 0; i < 256; i++) {
+            state[i] = (byte) i;
         }
 
         x = 0;
@@ -96,8 +95,7 @@ public class RC4 {
             throw new NullPointerException();
         }
 
-        for (int i=0; i < 256; i++) {
-
+        for (int i = 0; i < 256; i++) {
             index2 = ((key[index1] & 0xff) + (state[i] & 0xff) + index2) & 0xff;
 
             tmp = state[i];
@@ -106,9 +104,6 @@ public class RC4 {
 
             index1 = (index1 + 1) % key.length;
         }
-
-
-
     }
 
     public RC4(byte[] state, int x, int y) {
@@ -117,51 +112,29 @@ public class RC4 {
         this.state = state;
     }
 
-    //copyconstructor
-    public RC4 deepCopy() {
-        return new RC4(Arrays.copyOf(state, 256), x, y);
-    }
-
     /**
      * RC4 encryption/decryption.
      *
-     * @param data  the data to be encrypted/decrypted
+     * @param data the data to be encrypted/decrypted
      * @return the result of the encryption/decryption
      */
-    public byte[] rc4(String data) {
+    @Override
+    public byte[] cipher(byte[] data) {
+        return cipher(data, 0, data.length);
+    }
+
+    @Override
+    public byte[] cipher(byte[] data, int offset, int length) {
+        int xorIndex;
+        byte tmp;
 
         if (data == null) {
             return null;
         }
 
-        byte[] tmp = data.getBytes();
+        byte[] result = new byte[length];
 
-        this.rc4(tmp);
-
-        return tmp;
-    }
-
-    /**
-     * RC4 encryption/decryption.
-     *
-     * @param buf  the data to be encrypted/decrypted
-     * @return the result of the encryption/decryption
-     */
-    public byte[] rc4(byte[] buf) {
-
-        //int lx = this.x;
-        //int ly = this.y;
-
-        int xorIndex;
-        byte tmp;
-
-        if (buf == null) {
-            return null;
-        }
-
-        byte[] result = new byte[buf.length];
-
-        for (int i=0; i < buf.length; i++) {
+        for (int i = 0; i < length; i++) {
 
             x = (x + 1) & 0xff;
             y = ((state[x] & 0xff) + y) & 0xff;
@@ -170,14 +143,40 @@ public class RC4 {
             state[x] = state[y];
             state[y] = tmp;
 
-            xorIndex = ((state[x] &0xff) + (state[y] & 0xff)) & 0xff;
-            result[i] = (byte)(buf[i] ^ state[xorIndex]);
+            xorIndex = ((state[x] & 0xff) + (state[y] & 0xff)) & 0xff;
+            result[i] = (byte) (data[offset + i] ^ state[xorIndex]);
         }
 
-        //this.x = lx;
-        //this.y = ly;
-
         return result;
+    }
+
+    @Override
+    public byte[] decipher(byte[] data) {
+        return cipher(data);
+    }
+
+    @Override
+    public byte[] decipher(byte[] data, int offset, int length) {
+        return cipher(data, offset, length);
+    }
+
+    @Override
+    public byte[] getState () {
+        return state;
+    }
+
+    @Override
+    public int getQ() {
+        return x;
+    }
+
+    @Override
+    public int getJ() {
+        return y;
+    }
+
+    public RC4 deepCopy() {
+        return new RC4(Arrays.copyOf(state, 256), x, y);
     }
 
     public boolean couldBeFresh() {
@@ -185,11 +184,9 @@ public class RC4 {
     }
 
     public void undoRc4(byte[] buf) {
-
         byte tmp;
 
-        for (int i = buf.length - 1; i >= 0; i--) {
-
+        for (int i = 0; i < buf.length; i++) {
             tmp = state[x];
             state[x] = state[y];
             state[y] = tmp;
@@ -197,10 +194,5 @@ public class RC4 {
             y = (y - (state[x] & 0xff)) & 0xff;
             x = (x - 1) & 0xff;
         }
-
-    }
-
-    public byte[] getState () {
-        return state;
     }
 }

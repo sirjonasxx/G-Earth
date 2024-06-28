@@ -1,6 +1,5 @@
 package gearth.protocol;
 
-import gearth.extensions.parsers.HDirection;
 import gearth.misc.StringifyAble;
 import gearth.services.packet_info.PacketInfo;
 import gearth.services.packet_info.PacketInfoManager;
@@ -16,9 +15,10 @@ import java.util.Optional;
 
 public class HPacket implements StringifyAble {
 
-    private boolean isEdited = false;
-    private byte[] packetInBytes;
-    private int readIndex = 6;
+    protected boolean isEdited = false;
+    protected HPacketFormat packetFormat = HPacketFormat.EVA_WIRE;
+    protected byte[] packetInBytes;
+    protected int readIndex = 6;
 
     // if identifier != null, this is a placeholder name for the type of packet, headerId will be "-1"
     private String identifier = null;
@@ -27,23 +27,29 @@ public class HPacket implements StringifyAble {
     public HPacket(byte[] packet)	{
         packetInBytes = packet.clone();
     }
+
     public HPacket(HPacket packet) {
         packetInBytes = packet.packetInBytes.clone();
         isEdited = packet.isEdited;
     }
-    public HPacket(String packet)	{
+
+    public HPacket(String packet) {
+        this(packet, HPacketFormat.EVA_WIRE);
+    }
+
+    public HPacket(String packet, HPacketFormat format) {
         try {
-            HPacket packetFromString = PacketStringUtils.fromString(packet);
+            HPacket packetFromString = PacketStringUtils.fromString(packet, format);
             packetInBytes = packetFromString.packetInBytes;
             identifier = packetFromString.identifier;
             identifierDirection = packetFromString.identifierDirection;
-    } catch (InvalidPacketException e) {
-        packetInBytes = new byte[0];
+        } catch (InvalidPacketException e) {
+            packetInBytes = new byte[0];
+        }
     }
-}
+
     public HPacket(int header) {
-        packetInBytes = new byte[]{0,0,0,2,0,0};
-        replaceShort(4, (short)header);
+        initPacket(header);
         isEdited = false;
     }
 
@@ -65,7 +71,7 @@ public class HPacket implements StringifyAble {
     }
 
     public HPacket(String identifier, HMessage.Direction direction) throws InvalidParameterException {
-        packetInBytes = new byte[]{0,0,0,2,-1,-1};
+        initPacket(0);
         this.identifier = identifier;
         this.identifierDirection = direction;
     }
@@ -76,7 +82,14 @@ public class HPacket implements StringifyAble {
         isEdited = false;
     }
 
+    protected void initPacket(int header) {
+        packetInBytes = new byte[]{0,0,0,2,0,0};
+        replacePacketId((short)header);
+    }
 
+    public HPacketFormat getFormat() {
+        return packetFormat;
+    }
 
     public String toString()	{
         return PacketStringUtils.toString(packetInBytes);
@@ -130,7 +143,7 @@ public class HPacket implements StringifyAble {
         }
 
         boolean wasEdited = isEdited;
-        replaceShort(4, (short)(packetInfo.getHeaderId()));
+        replacePacketId((short)(packetInfo.getHeaderId()));
         identifier = null;
 
         isEdited = wasEdited;
@@ -327,6 +340,9 @@ public class HPacket implements StringifyAble {
         return (readByte(index) != 0);
     }
 
+    protected void replacePacketId(short headerId) {
+        replaceShort(4, headerId);
+    }
 
     public HPacket replaceBoolean(int index, boolean b) {
         isEdited = true;
@@ -638,7 +654,7 @@ public class HPacket implements StringifyAble {
             appendShort((Short)o);
         }
         else if (o instanceof String) {
-            appendString((String)o, StandardCharsets.UTF_8);
+            appendString((String)o, StandardCharsets.ISO_8859_1);
         }
         else if (o instanceof Boolean) {
             appendBoolean((Boolean) o);
@@ -754,5 +770,8 @@ public class HPacket implements StringifyAble {
         HPacket packet2 = (HPacket) object;
         return Arrays.equals(packetInBytes, packet2.packetInBytes) && (isEdited == packet2.isEdited);
     }
-    
+
+    public HPacket copy() {
+        return new HPacket(this);
+    }
 }

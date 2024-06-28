@@ -7,7 +7,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.util.*;
 
-public class LinuxHabboClient extends HabboClient {
+public class LinuxHabboClient implements HabboClient {
 
 
     private static final String[] potentialProcessNames = {"--ppapi-flash-args", "plugin-container", "Habbo"};
@@ -25,8 +25,6 @@ public class LinuxHabboClient extends HabboClient {
     private static final boolean DEBUG = false;
 
     public LinuxHabboClient(HConnection connection) {
-        super(connection);
-
         File folder = new File("/proc");
 
         boolean found = false;
@@ -55,12 +53,6 @@ public class LinuxHabboClient extends HabboClient {
 
         if (DEBUG) System.out.println("* Found flashclient " + potentialProcesses.size() + " potential processes");
     }
-
-    @Override
-    public List<byte[]> getRC4cached() {
-        return new ArrayList<>();
-    }
-
 
     private void refreshMemoryMaps() {
         String filename = "/proc/"+this.PID+"/maps";
@@ -148,7 +140,7 @@ public class LinuxHabboClient extends HabboClient {
 
     }
 
-    public List<byte[]> getRC4possibilities() {
+    public List<byte[]> getRC4Tables() {
 
         int offset = 4;
         List<byte[]> resultSet = new ArrayList<>();

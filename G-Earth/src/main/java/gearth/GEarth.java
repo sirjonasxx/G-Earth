@@ -19,12 +19,21 @@ import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Properties;
 
 public class GEarth extends Application {
 
+    public static final String OFFICIAL_REPOSITORY = "sirjonasxx/G-Earth";
+
+    private static final Logger logger = LoggerFactory.getLogger(GEarth.class);
+
     public static GEarth main;
-    public static String version = "1.5.3";
-    public static String gitApi = "https://api.github.com/repos/sirjonasxx/G-Earth/releases/latest";
+    public static String version;
+    public static String storeVersion;
+    public static String repository;
     public static ObservableObject<Theme> observableTheme;
 
     private Stage stage;
@@ -36,6 +45,20 @@ public class GEarth extends Application {
                         ThemeFactory.themeForTitle(Cacher.getCacheContents().getString("theme")) :
                         ThemeFactory.getDefaultTheme()
         );
+
+        // Load build.properties
+        try {
+            final Properties buildProperties = new Properties();
+            buildProperties.load(GEarth.class.getResourceAsStream("/build.properties"));
+
+            version = buildProperties.getProperty("build.version");
+            storeVersion = buildProperties.getProperty("build.storeVersion");
+            repository = buildProperties.getProperty("build.github");
+
+            logger.info("Starting G-Earth {} from repository {}", version, repository);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -122,7 +145,8 @@ public class GEarth extends Application {
             stage.getIcons().clear();
             final Image image = new Image(GEarth.class.getResourceAsStream(String.format("/gearth/ui/themes/%s/logoSmall.png", theme.overridesLogo() ? theme.internalName() : defaultTheme.internalName())));
             stage.getIcons().add(image);
-            stage.setTitle((theme.overridesTitle() ? theme.title() : defaultTheme.title()) + " " + GEarth.version);
+            final String isFork = GEarth.repository.equals(OFFICIAL_REPOSITORY) ? "" : " (" + GEarth.repository + ")";
+            stage.setTitle((theme.overridesTitle() ? theme.title() : defaultTheme.title()) + " " + GEarth.version + isFork);
 
             controller.infoController.img_logo.setImage(new Image(GEarth.class.getResourceAsStream(
                     String.format(

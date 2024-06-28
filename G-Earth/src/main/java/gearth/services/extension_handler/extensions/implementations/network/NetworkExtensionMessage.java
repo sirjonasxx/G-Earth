@@ -3,6 +3,7 @@ package gearth.services.extension_handler.extensions.implementations.network;
 import gearth.misc.HostInfo;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
+import gearth.protocol.HPacketFormat;
 import gearth.protocol.connection.HClient;
 import gearth.services.packet_info.PacketInfoManager;
 
@@ -140,13 +141,19 @@ public class NetworkExtensionMessage {
             public static final int HEADER_ID = 20;
 
             private final String string;
+            private final HPacketFormat format;
 
-            public PacketToStringRequest(String string) {
+            public PacketToStringRequest(String string, HPacketFormat format) {
                 this.string = string;
+                this.format = format;
             }
 
             public String getString() {
                 return string;
+            }
+
+            public HPacketFormat getFormat() {
+                return format;
             }
         }
 
@@ -160,13 +167,19 @@ public class NetworkExtensionMessage {
             public static final int HEADER_ID = 21;
 
             private final String string;
+            private final HPacketFormat format;
 
-            public StringToPacketRequest(String string) {
+            public StringToPacketRequest(String string, HPacketFormat format) {
                 this.string = string;
+                this.format = format;
             }
 
             public String getString() {
                 return string;
+            }
+
+            public HPacketFormat getFormat() {
+                return format;
             }
         }
 
@@ -239,13 +252,19 @@ public class NetworkExtensionMessage {
             public static final int HEADER_ID = 3;
 
             private final String packetString;
+            private final HPacketFormat packetFormat;
 
-            public PacketIntercept(String packetString) {
+            public PacketIntercept(String packetString, HPacketFormat packetFormat) {
                 this.packetString = packetString;
+                this.packetFormat = packetFormat;
             }
 
             public String getPacketString() {
                 return packetString;
+            }
+
+            public HPacketFormat getPacketFormat() {
+                return packetFormat;
             }
         }
 

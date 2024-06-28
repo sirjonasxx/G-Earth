@@ -7,7 +7,17 @@
     <groupId>G-Earth</groupId>
     <artifactId>G-Earth-Parent</artifactId>
     <packaging>pom</packaging>
-    <version>1.5.3</version>
+    <version>${revision}${changelist}</version>
+
+    <properties>
+        <!-- Version of the application. -->
+        <revision>1.5.4-beta-5</revision>
+        <changelist>-SNAPSHOT</changelist>
+        <!-- Version for https://github.com/sirjonasxx/G-ExtensionStore to keep compatibility with beta versions. -->
+        <storeVersion>1.5.3</storeVersion>
+        <!-- Default repository for version checking. -->
+        <repository>sirjonasxx/G-Earth</repository>
+    </properties>
 
     <name>G-Earth-Parent</name>
     <url>https://github.com/sirjonasxx/G-Earth</url>

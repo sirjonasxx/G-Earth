@@ -2,6 +2,7 @@ package gearth.services.extension_handler.extensions;
 
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
+import gearth.protocol.HPacketFormat;
 
 public abstract class ExtensionListener {
 
@@ -13,6 +14,11 @@ public abstract class ExtensionListener {
     protected void hasClosed() {}
 
     protected void packetToStringRequest(HPacket packet) {}
-    protected void stringToPacketRequest(String string) {}
+    @Deprecated
+    protected void stringToPacketRequest(String string) {
+        // Kept for backwards compatibility with old extensions
+        stringToPacketRequest(string, HPacketFormat.EVA_WIRE);
+    }
+    protected void stringToPacketRequest(String string, HPacketFormat format) {}
 
 }

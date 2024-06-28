@@ -3,6 +3,7 @@ package gearth.services.extension_handler.extensions.implementations.network;
 import gearth.misc.HostInfo;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
+import gearth.protocol.HPacketFormat;
 import gearth.protocol.connection.HClient;
 import gearth.services.extension_handler.extensions.ExtensionType;
 import gearth.services.extension_handler.extensions.GEarthExtension;
@@ -76,11 +77,13 @@ public final class NetworkExtensionClient extends GEarthExtension {
             } else if (incoming instanceof Incoming.ExtensionConsoleLog) {
                 log(((Incoming.ExtensionConsoleLog) incoming).getContents());
             } else if (incoming instanceof Incoming.PacketToStringRequest) {
-                final HPacket hPacket = new HPacket(new byte[0]);
+                final Incoming.PacketToStringRequest incomingPacket = (Incoming.PacketToStringRequest) incoming;
+                final HPacket hPacket = incomingPacket.getFormat().createPacket(0);
                 hPacket.constructFromString(((Incoming.PacketToStringRequest) incoming).getString());
                 packetToStringRequest(hPacket);
             } else if (incoming instanceof Incoming.StringToPacketRequest) {
-                stringToPacketRequest(((Incoming.StringToPacketRequest) incoming).getString());
+                final Incoming.StringToPacketRequest incomingPacket = (Incoming.StringToPacketRequest) incoming;
+                stringToPacketRequest(incomingPacket.getString(), incomingPacket.getFormat());
             }
         } catch (Exception e){
             LOGGER.error("Failed to handle incoming message {} (channel={})", incoming, channel, e);
@@ -138,7 +141,9 @@ public final class NetworkExtensionClient extends GEarthExtension {
     @Override
     public void packetIntercept(HMessage hMessage) {
         final String messageAsString = hMessage.stringify();
-        channel.writeAndFlush(new Outgoing.PacketIntercept(messageAsString));
+        final HPacketFormat packetFormat = hMessage.getPacket().getFormat();
+
+        channel.writeAndFlush(new Outgoing.PacketIntercept(messageAsString, packetFormat));
     }
 
     @Override
