@@ -5,8 +5,6 @@ package gearth.encoding;
  * <a href="https://github.com/Quackster/Kepler">Kepler</a>
  */
 public class Base64Encoding {
-    public byte NEGATIVE = 64;
-    public byte POSITIVE = 65;
 
     public static byte[] encode(int i, int numBytes) {
         byte[] bzRes = new byte[numBytes];
@@ -19,20 +17,19 @@ public class Base64Encoding {
         return bzRes;
     }
 
-    public static int decode(byte[] bzData) {
-        int i = 0;
-        int j = 0;
-        for (int k = bzData.length - 1; k >= 0; k--)
-        {
-            int x = bzData[k] - 0x40;
-            if (j > 0)
-                x *= (int)Math.pow(64.0, (double)j);
+    public static int decode(byte[] data) {
+        int res = 0;
 
-            i += x;
-            j++;
+        for (int k = data.length - 1, i = 0; k >= 0; k--, i++)
+        {
+            int x = data[k] - 0x40;
+            if (i > 0){
+                res += x << (i * 6);
+            } else {
+                res += x;
+            }
         }
 
-        return i;
+        return res;
     }
 }
-
