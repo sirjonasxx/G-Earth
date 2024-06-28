@@ -76,9 +76,7 @@ public class Rc4Obtainer {
                 @Override
                 public void onPacket() {
                     if (handler.isEncryptedStream()) {
-                        final boolean isShockwave = handler instanceof ShockwavePacketOutgoingHandler;
-
-                        if (isShockwave && counter.incrementAndGet() != 3) {
+                        if (counter.incrementAndGet() != 3) {
                             return;
                         }
 
@@ -99,25 +97,11 @@ public class Rc4Obtainer {
         logger.info("Caught encrypted packet, attempting to find decryption keys");
 
         final HabboClient client = HabboClientFactory.get(hConnection);
-        if (client == null) {
-            logger.info("Unsupported platform / client combination, aborting connection");
-            hConnection.abort();
-            return;
-        }
 
         new Thread(() -> {
             final long startTime = System.currentTimeMillis();
 
-            boolean worked = false;
-            int i = 0;
-            while (!worked && i < 4) {
-                worked = (i % 2 == 0) ?
-                        onSendFirstEncryptedMessage(flashPacketHandler, client.getRC4cached()) :
-                        onSendFirstEncryptedMessage(flashPacketHandler, client.getRC4possibilities());
-                i++;
-            }
-
-            if (!worked) {
+            if (!onSendFirstEncryptedMessage(flashPacketHandler, client.getRC4Tables())) {
                 try {
                     Platform.runLater(Rc4Obtainer::showErrorDialog);
                 } catch (IllegalStateException e) {
@@ -153,8 +137,16 @@ public class Rc4Obtainer {
         }
 
         if (packetHandler instanceof FlashPacketHandler) {
+            // Fast-path.
             for (byte[] possible : potentialRC4tables) {
-                if (bruteFlash(packetHandler, encBuffer, possible)) {
+                if (bruteFlashFast(packetHandler, encBuffer, possible)) {
+                    return true;
+                }
+            }
+
+            // Slow-path.
+            for (byte[] possible : potentialRC4tables) {
+                if (bruteFlashSlow(packetHandler, encBuffer, possible)) {
                     return true;
                 }
             }
@@ -178,11 +170,13 @@ public class Rc4Obtainer {
     }
 
     private boolean bruteShockwaveHeaderFast(EncryptedPacketHandler packetHandler, byte[] encBuffer, byte[] tableState) {
-        final int HardcodedQ = 164;
+        // Table state Q starts at 152 after premixing.
+        // Add 12 for the 3 headers being encrypted and you get 164.
+        final int EstimatedQ = 164;
 
         for (int j = 0; j < 256; j++) {
-            if (bruteShockwaveHeader(packetHandler, encBuffer, tableState, HardcodedQ, j)) {
-                logger.debug("Brute forced with fast path");
+            if (bruteShockwaveHeader(packetHandler, encBuffer, tableState, EstimatedQ, j)) {
+                logger.debug("Brute forced shockwave with fast path");
                 return true;
             }
         }
@@ -194,7 +188,7 @@ public class Rc4Obtainer {
         for (int q = 0; q < 256; q++) {
             for (int j = 0; j < 256; j++) {
                 if (bruteShockwaveHeader(packetHandler, encBuffer, tableState, q, j)) {
-                    logger.debug("Brute forced with slow path");
+                    logger.debug("Brute forced shockwave with slow path");
                     return true;
                 }
             }
@@ -237,43 +231,60 @@ public class Rc4Obtainer {
         return false;
     }
 
-    private boolean bruteFlash(EncryptedPacketHandler flashPacketHandler, byte[] encBuffer, byte[] possible) {
+    private boolean bruteFlashFast(EncryptedPacketHandler packetHandler, byte[] encBuffer, byte[] tableState) {
+        final int EstimatedQ = encBuffer.length % 256;
 
-        try {
-            for (int i = 0; i < 256; i++) {
-                for (int j = 0; j < 256; j++) {
+        for (int j = 0; j < 256; j++) {
+            if (bruteFlash(packetHandler, encBuffer, tableState, EstimatedQ, j)) {
+                logger.debug("Brute forced flash with fast path");
+                return true;
+            }
+        }
 
-                    final byte[] keycpy = Arrays.copyOf(possible, possible.length);
-                    final RC4 rc4Tryout = new RC4(keycpy, i, j);
+        return false;
+    }
 
-                    if (flashPacketHandler.getDirection() == HMessage.Direction.TOSERVER)
-                        rc4Tryout.undoRc4(encBuffer);
-
-                    if (rc4Tryout.couldBeFresh()) {
-
-                        final byte[] encDataCopy = Arrays.copyOf(encBuffer, encBuffer.length);
-                        final RC4 rc4TryCopy = rc4Tryout.deepCopy();
-
-                        try {
-                            final PayloadBuffer payloadBuffer = new FlashBuffer();
-                            final byte[] decoded = rc4TryCopy.cipher(encDataCopy);
-
-                            payloadBuffer.push(decoded);
-                            payloadBuffer.receive();
-
-                            if (payloadBuffer.isEmpty()) {
-                                flashPacketHandler.setRc4(rc4Tryout);
-                                return true;
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
+    private boolean bruteFlashSlow(EncryptedPacketHandler packetHandler, byte[] encBuffer, byte[] tableState) {
+        for (int q = 0; q < 256; q++) {
+            for (int j = 0; j < 256; j++) {
+                if (bruteFlash(packetHandler, encBuffer, tableState, q, j)) {
+                    logger.debug("Brute forced flash with slow path");
+                    return true;
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
+
+        return false;
+    }
+
+    private boolean bruteFlash(EncryptedPacketHandler flashPacketHandler, byte[] encBuffer, byte[] tableState, int q, int j) {
+        final byte[] keycpy = Arrays.copyOf(tableState, tableState.length);
+        final RC4 rc4Tryout = new RC4(keycpy, q, j);
+
+        if (flashPacketHandler.getDirection() == HMessage.Direction.TOSERVER) {
+            rc4Tryout.undoRc4(encBuffer);
+        }
+
+        if (rc4Tryout.couldBeFresh()) {
+            final byte[] encDataCopy = Arrays.copyOf(encBuffer, encBuffer.length);
+            final RC4 rc4TryCopy = rc4Tryout.deepCopy();
+
+            try {
+                final PayloadBuffer payloadBuffer = new FlashBuffer();
+                final byte[] decoded = rc4TryCopy.cipher(encDataCopy);
+
+                payloadBuffer.push(decoded);
+                payloadBuffer.receive();
+
+                if (payloadBuffer.isEmpty()) {
+                    flashPacketHandler.setRc4(rc4Tryout);
+                    return true;
+                }
+            } catch (Exception e) {
+                // ignore
+            }
+        }
+
         return false;
     }
 }

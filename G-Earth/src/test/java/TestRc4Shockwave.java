@@ -4,7 +4,7 @@ import gearth.protocol.crypto.RC4Base64;
 import gearth.protocol.crypto.RC4Cipher;
 import gearth.protocol.memory.Rc4Obtainer;
 import gearth.protocol.memory.habboclient.HabboClientFactory;
-import gearth.protocol.memory.habboclient.shockwave.ShockwaveMemoryClient;
+import gearth.protocol.memory.habboclient.external.MemoryClient;
 import gearth.protocol.packethandler.EncryptedPacketHandler;
 import gearth.protocol.packethandler.shockwave.ShockwavePacketOutgoingHandler;
 import org.bouncycastle.util.encoders.Hex;
@@ -39,14 +39,9 @@ public class TestRc4Shockwave {
     private final Semaphore waitSemaphore = new Semaphore(0);
     private final AtomicReference<RC4Cipher> cipher = new AtomicReference<>();
 
-    private final ShockwaveMemoryClient mockShockwaveMemoryClient = new ShockwaveMemoryClient(null) {
+    private final MemoryClient mockShockwaveMemoryClient = new MemoryClient(null) {
         @Override
-        public List<byte[]> getRC4cached() {
-            return new ArrayList<>();
-        }
-
-        @Override
-        public List<byte[]> getRC4possibilities() {
+        public List<byte[]> getRC4Tables() {
             return Arrays.asList(potentialTables);
         }
     };

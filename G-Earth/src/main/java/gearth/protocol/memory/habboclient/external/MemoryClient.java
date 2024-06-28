@@ -1,8 +1,9 @@
-package gearth.protocol.memory.habboclient.shockwave;
+package gearth.protocol.memory.habboclient.external;
 
 import gearth.encoding.HexEncoding;
 import gearth.misc.OSValidator;
 import gearth.protocol.HConnection;
+import gearth.protocol.connection.HClient;
 import gearth.protocol.memory.habboclient.HabboClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,21 +18,18 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
-public class ShockwaveMemoryClient extends HabboClient {
+public class MemoryClient implements HabboClient {
 
-    private static final Logger logger = LoggerFactory.getLogger(ShockwaveMemoryClient.class);
+    private static final Logger logger = LoggerFactory.getLogger(MemoryClient.class);
 
-    public ShockwaveMemoryClient(HConnection connection) {
-        super(connection);
+    private final HConnection connection;
+
+    public MemoryClient(HConnection connection) {
+        this.connection = connection;
     }
 
     @Override
-    public List<byte[]> getRC4cached() {
-        return Collections.emptyList();
-    }
-
-    @Override
-    public List<byte[]> getRC4possibilities() {
+    public List<byte[]> getRC4Tables() {
         final List<byte[]> result = new ArrayList<>();
 
         try {
@@ -41,7 +39,7 @@ public class ShockwaveMemoryClient extends HabboClient {
                 result.add(HexEncoding.toBytes(potentialTable));
             }
         } catch (IOException | URISyntaxException e) {
-            logger.error("Failed to read RC4 possibilities from the Shockwave client", e);
+            logger.error("Failed to read RC4 possibilities from the client", e);
         }
 
         // Reverse the list so that the most likely keys are at the top.
@@ -59,7 +57,8 @@ public class ShockwaveMemoryClient extends HabboClient {
             filePath += "/G-MemZ";
         }
 
-        final ProcessBuilder pb = new ProcessBuilder(filePath);
+        final String hotelType = connection.getClientType() == HClient.SHOCKWAVE ? "shockwave" : "flash";
+        final ProcessBuilder pb = new ProcessBuilder(filePath, hotelType);
         final Process p = pb.start();
 
         final HashSet<String> possibleData = new HashSet<>();
