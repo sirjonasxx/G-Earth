@@ -149,7 +149,13 @@ public class ConnectionInterceptor {
                                 try {
                                     Socket server;
                                     if (!useSocks) {
-                                        server = new Socket(proxy.getActual_domain(), proxy.getActual_port());
+                                        try {
+                                            server = new Socket(proxy.getActual_domain(), proxy.getActual_port());
+                                        } catch (Exception e) {
+                                            logger.error("Failed to connect to Habbo server {}:{}", proxy.getActual_domain(), proxy.getActual_port());
+                                            callbacks.onInterceptorError();
+                                            return;
+                                        }
                                     }
                                     else {
                                         SocksConfiguration configuration = ProxyProviderFactory.getSocksConfig();
@@ -163,9 +169,8 @@ public class ConnectionInterceptor {
 
                                     callbacks.onInterceptorConnected(client, server, proxy);
                                 } catch (Exception e) {
-                                    // should only happen when SOCKS configured badly
-                                    callbacks.onInterceptorError();
                                     logger.error("Error occurred while intercepting connection", e);
+                                    callbacks.onInterceptorError();
                                 }
                             }).start();
                         } catch (IOException e) {
