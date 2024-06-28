@@ -121,6 +121,8 @@ public class Rc4Obtainer {
     }
 
     private boolean onSendFirstEncryptedMessage(EncryptedPacketHandler packetHandler, List<byte[]> potentialRC4tables) {
+        logger.info("Attempting to brute force RC4 table");
+
         if (potentialRC4tables == null || potentialRC4tables.isEmpty()) {
             return false;
         }

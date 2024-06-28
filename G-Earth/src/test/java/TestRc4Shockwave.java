@@ -7,6 +7,7 @@ import gearth.protocol.memory.habboclient.HabboClientFactory;
 import gearth.protocol.memory.habboclient.external.MemoryClient;
 import gearth.protocol.packethandler.EncryptedPacketHandler;
 import gearth.protocol.packethandler.shockwave.ShockwavePacketOutgoingHandler;
+import gearth.protocol.packethandler.shockwave.buffers.ShockwaveOutBuffer;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
@@ -209,5 +210,45 @@ public class TestRc4Shockwave {
         assertArrayEquals(h3Table, cipher.getState());
         assertEquals(h3Q, cipher.getQ());
         assertEquals(h3J, cipher.getJ());
+    }
+
+    @Test
+    public void testSplitPackets() {
+        final RC4Cipher c = new RC4Base64(
+                Hex.decode("d102ecab2e8d0a851000a393a483de68f2182f879b884bb6be77595701ffc0900db9f00f415332fd9fe35dcc8ceaa5c480214cc8ee661627e23736795b444a3d5a3f721cfbd4b370d7daaae7f8b1769a78569c3065d6c7607438752c39ced51992634e15a850efcd1a5fd0b782cb6254f4c598f36f485e35f7bf86a9fc03344d8ae9fe07db1355bc7d7f2de8e42052b424e0954f8f71df4612b0c95c7c252aacc394edbb7e45b540f6cadcf18443678ebd513169580e913a3b6b0664290c11fac173a26e1f09ada66199b2b805d8d9d38117331b0447262b1d8b08ddcf7b42e63e97289d23896d1ea70b147af5e19ed2aeebaf6c3cbac2a16a96e522c6f949a0"),
+                152,
+                79
+        );
+
+        final ShockwaveOutBuffer buffer = new ShockwaveOutBuffer();
+
+        buffer.setCipher(c);
+
+        // State.
+        int received = 0;
+
+        // Packet 1.
+        buffer.push(Hex.decode("4b78316b61774f426838576553476f48355478684946554c7368525749373856326a784b723762"));
+        received += buffer.receive().length;
+
+        buffer.push(Hex.decode("7866797279636c313743324a34714a392f5361584e656a6a6b6e53657550476b7638684637302b354d42484d373350434c434a3977"));
+        received += buffer.receive().length;
+
+        // Packet 2.
+        buffer.push(Hex.decode("3634616845413754796c6371324d346c"));
+        received += buffer.receive().length;
+
+        buffer.push(Hex.decode("546f616b62484d55346a5943694c4b386c4a"));
+        received += buffer.receive().length;
+
+        // Packet 3.
+        buffer.push(Hex.decode("4750"));
+        received += buffer.receive().length;
+
+        buffer.push(Hex.decode("41364d67417330"));
+        received += buffer.receive().length;
+
+        assertEquals(3, received);
+        assertTrue(buffer.isEmpty());
     }
 }
