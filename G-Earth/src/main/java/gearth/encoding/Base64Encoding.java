@@ -20,14 +20,10 @@ public class Base64Encoding {
     public static int decode(byte[] data) {
         int res = 0;
 
-        for (int k = data.length - 1, i = 0; k >= 0; k--, i++)
-        {
-            int x = data[k] - 0x40;
-            if (i > 0){
-                res += x << (i * 6);
-            } else {
-                res += x;
-            }
+        for (byte x : data) {
+            final int byteVal = x - 0x40;
+
+            res = (res << 6) | byteVal;
         }
 
         return res;
