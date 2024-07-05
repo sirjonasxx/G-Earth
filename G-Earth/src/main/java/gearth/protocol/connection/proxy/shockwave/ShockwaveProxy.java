@@ -96,9 +96,9 @@ public class ShockwaveProxy implements ProxyProvider, ConnectionInterceptorCallb
         final Rc4Obtainer rc4Obtainer = new Rc4Obtainer(hConnection);
 
         rc4Obtainer.setFlashPacketHandlers(outgoingHandler, incomingHandler);
-        // TODO: Non hardcoded version "24". Not exactly sure yet how to deal with this for now.
+        // TODO: Non hardcoded version "25". Not exactly sure yet how to deal with this for now.
         // Lets revisit when origins is more mature.
-        proxy.verifyProxy(incomingHandler, outgoingHandler, "24", "SHOCKWAVE");
+        proxy.verifyProxy(incomingHandler, outgoingHandler, "25", "SHOCKWAVE");
         hProxySetter.setProxy(proxy);
         onConnect();
 

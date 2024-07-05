@@ -117,7 +117,9 @@ public class PacketInfoManager {
         } else if (clientType == HClient.FLASH || clientType == HClient.NITRO || clientType == HClient.SHOCKWAVE) {
             try {
                 List<RemotePacketInfoProvider> providers = new ArrayList<>();
-                providers.add(new HarblePacketInfoProvider(hotelversion));
+                if (clientType != HClient.SHOCKWAVE) {
+                    providers.add(new HarblePacketInfoProvider(hotelversion));
+                }
                 providers.add(new SulekPacketInfoProvider(clientType, hotelversion));
 
                 Semaphore blockUntilComplete = new Semaphore(providers.size());
