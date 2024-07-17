@@ -180,7 +180,7 @@ public abstract class Extension extends ExtensionBase {
                 }
                 else if (packet.headerId() == Outgoing.PacketIntercept.HEADER_ID) {
                     String stringifiedMessage = packet.readLongString();
-                    HPacketFormat packetFormat = HPacketFormat.fromId(packet.readInteger());
+                    HPacketFormat packetFormat = packet.isEOF() == 0 ? HPacketFormat.fromId(packet.readInteger()) : HPacketFormat.EVA_WIRE;
                     HMessage habboMessage = new HMessage(packetFormat, stringifiedMessage);
 
                     modifyMessage(habboMessage);
