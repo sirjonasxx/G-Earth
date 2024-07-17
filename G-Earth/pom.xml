@@ -99,6 +99,9 @@
                             <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                         </manifest>
                     </archive>
+                    <excludes>
+                        <exclude>build/**</exclude>
+                    </excludes>
                 </configuration>
             </plugin>
 
