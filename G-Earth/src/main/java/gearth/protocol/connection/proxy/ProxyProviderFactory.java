@@ -101,7 +101,7 @@ public class ProxyProviderFactory {
     }
 
     public ProxyProvider provide(HClient client)  {
-        return provide(client, client == HClient.FLASH ? autoDetectHosts : autoDetectHostsOrigins);
+        return provide(client, client == HClient.SHOCKWAVE ? autoDetectHostsOrigins : autoDetectHosts);
     }
 
     public ProxyProvider provide(HClient client, String domain, int port)  {
@@ -152,9 +152,9 @@ public class ProxyProviderFactory {
     }
 
     private ProxyProvider provide(HClient client, List<String> potentialHosts) {
-        return client == HClient.FLASH
-                ? new FlashProxy(proxySetter, stateSetter, hConnection, potentialHosts, socksConfig.useSocks() && !socksConfig.onlyUseIfNeeded())
-                : new ShockwaveProxy(proxySetter, stateSetter, hConnection, potentialHosts);
+        return client == HClient.SHOCKWAVE
+                ? new ShockwaveProxy(proxySetter, stateSetter, hConnection, potentialHosts)
+                : new FlashProxy(proxySetter, stateSetter, hConnection, potentialHosts, socksConfig.useSocks() && !socksConfig.onlyUseIfNeeded());
     }
 
     public static void setSocksConfig(SocksConfiguration configuration) {

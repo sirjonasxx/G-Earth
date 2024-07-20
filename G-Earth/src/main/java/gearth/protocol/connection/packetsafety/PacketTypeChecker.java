@@ -26,7 +26,7 @@ public class PacketTypeChecker {
                 throw new PacketTypeException(String.format("ShockPacketIncoming expected for %s", clientType));
             }
         } else if (packet.getFormat() != HPacketFormat.EVA_WIRE) {
-            throw new PacketTypeException(String.format("Invalid packet, expected HPacket for %s", clientType));
+            throw new PacketTypeException(String.format("Invalid packet, expected %s for client type %s, got %s", HPacketFormat.EVA_WIRE, clientType, packet.getFormat()));
         }
     }
 }

@@ -117,7 +117,7 @@ public class InjectionController extends SubForm {
         lbl_corruption.getStyleClass().add("not-corrupted-label");
 
         // For Shockwave parse with either WEDGIE_INCOMING or WEDGIE_OUTGOING, both will validate the same expression.
-        HPacketFormat format = getHConnection().getClientType() == HClient.FLASH ? HPacketFormat.EVA_WIRE : HPacketFormat.WEDGIE_INCOMING;
+        HPacketFormat format = getHConnection().getClientType() == HClient.SHOCKWAVE ? HPacketFormat.WEDGIE_INCOMING : HPacketFormat.EVA_WIRE;
         HPacket[] packets = parsePackets(format, inputPacket.getText());
 
         if (packets.length == 0) {
@@ -203,7 +203,7 @@ public class InjectionController extends SubForm {
     }
 
     public void sendToServer_clicked(ActionEvent actionEvent) {
-        HPacketFormat format = getHConnection().getClientType() == HClient.FLASH ? HPacketFormat.EVA_WIRE : HPacketFormat.WEDGIE_OUTGOING;
+        HPacketFormat format = getHConnection().getClientType() == HClient.SHOCKWAVE ? HPacketFormat.WEDGIE_OUTGOING : HPacketFormat.EVA_WIRE;
         HPacket[] packets = parsePackets(format, inputPacket.getText());
         for (HPacket packet : packets) {
             getHConnection().sendToServer(packet);
@@ -214,7 +214,7 @@ public class InjectionController extends SubForm {
     }
 
     public void sendToClient_clicked(ActionEvent actionEvent) {
-        HPacketFormat format = getHConnection().getClientType() == HClient.FLASH ? HPacketFormat.EVA_WIRE : HPacketFormat.WEDGIE_INCOMING;
+        HPacketFormat format = getHConnection().getClientType() == HClient.SHOCKWAVE ? HPacketFormat.WEDGIE_INCOMING : HPacketFormat.EVA_WIRE;
         HPacket[] packets = parsePackets(format, inputPacket.getText());
         for (HPacket packet : packets) {
             getHConnection().sendToClient(packet);
