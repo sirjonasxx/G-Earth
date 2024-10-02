@@ -11,7 +11,7 @@
 
     <properties>
         <!-- Version of the application. -->
-        <revision>1.5.4-beta-8</revision>
+        <revision>1.5.4-beta-9</revision>
         <changelist>-SNAPSHOT</changelist>
         <!-- Version for https://github.com/sirjonasxx/G-ExtensionStore to keep compatibility with beta versions. -->
         <storeVersion>1.5.3</storeVersion>
