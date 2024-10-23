@@ -4,7 +4,7 @@ import gearth.protocol.HConnection;
 import gearth.protocol.connection.HProxySetter;
 import gearth.protocol.connection.HStateSetter;
 import gearth.protocol.connection.proxy.nitro.NitroProxyProvider;
-import gearth.protocol.connection.proxy.nitro.http.NitroCertificateSniffingManager;
+import gearth.protocol.connection.proxy.nitro.http.NitroCertificateFactory;
 import gearth.protocol.connection.proxy.nitro.http.NitroSslContextFactory;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
@@ -22,7 +22,7 @@ public class NitroWebsocketProxy {
     private final HStateSetter stateSetter;
     private final HConnection connection;
     private final NitroProxyProvider proxyProvider;
-    private final NitroCertificateSniffingManager certificateManager;
+    private final NitroCertificateFactory certificateFactory;
 
     private final Server server;
     private final int serverPort;
@@ -31,12 +31,12 @@ public class NitroWebsocketProxy {
                                HStateSetter stateSetter,
                                HConnection connection,
                                NitroProxyProvider proxyProvider,
-                               NitroCertificateSniffingManager certificateManager) {
+                               NitroCertificateFactory certificateFactory) {
         this.proxySetter = proxySetter;
         this.stateSetter = stateSetter;
         this.connection = connection;
         this.proxyProvider = proxyProvider;
-        this.certificateManager = certificateManager;
+        this.certificateFactory = certificateFactory;
         this.server = new Server();
         this.serverPort = 0;
     }
@@ -44,7 +44,7 @@ public class NitroWebsocketProxy {
     public boolean start() {
         try {
             // Configure SSL.
-            final NitroSslContextFactory sslContextFactory = new NitroSslContextFactory(this.certificateManager);
+            final NitroSslContextFactory sslContextFactory = new NitroSslContextFactory(this.certificateFactory);
             final ServerConnector sslConnector = new ServerConnector(server, sslContextFactory);
 
             sslConnector.setPort(this.serverPort);

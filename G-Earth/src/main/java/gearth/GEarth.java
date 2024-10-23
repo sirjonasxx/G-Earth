@@ -122,8 +122,8 @@ public class GEarth extends Application {
         primaryStage.show();
         primaryStage.setOnCloseRequest(event -> closeGEarth());
 
-        AdminValidator.validate();
-        UpdateChecker.checkForUpdates();
+        //AdminValidator.validate();
+        //UpdateChecker.checkForUpdates();
 
     }
 

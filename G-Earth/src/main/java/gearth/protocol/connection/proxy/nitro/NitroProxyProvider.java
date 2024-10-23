@@ -6,8 +6,7 @@ import gearth.protocol.connection.HProxySetter;
 import gearth.protocol.connection.HState;
 import gearth.protocol.connection.HStateSetter;
 import gearth.protocol.connection.proxy.ProxyProvider;
-import gearth.protocol.connection.proxy.nitro.http.NitroAuthority;
-import gearth.protocol.connection.proxy.nitro.http.NitroCertificateSniffingManager;
+import gearth.protocol.connection.proxy.nitro.http.NitroCertificateFactory;
 import gearth.protocol.connection.proxy.nitro.http.NitroHttpProxy;
 import gearth.protocol.connection.proxy.nitro.http.NitroHttpProxyServerCallback;
 import gearth.protocol.connection.proxy.nitro.websocket.NitroWebsocketProxy;
@@ -33,8 +32,7 @@ public class NitroProxyProvider implements ProxyProvider, NitroHttpProxyServerCa
     private String originalCookies;
 
     public NitroProxyProvider(HProxySetter proxySetter, HStateSetter stateSetter, HConnection connection) {
-        final NitroAuthority authority = new NitroAuthority();
-        final NitroCertificateSniffingManager certificateManager = new NitroCertificateSniffingManager(authority);
+        final NitroCertificateFactory certificateManager = new NitroCertificateFactory();
 
         this.proxySetter = proxySetter;
         this.stateSetter = stateSetter;
@@ -103,7 +101,7 @@ public class NitroProxyProvider implements ProxyProvider, NitroHttpProxyServerCa
             try {
                 nitroHttpProxy.stop();
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error("Failed to stop nitro http proxy", e);
             }
 
             logger.info("Stopping nitro websocket proxy");
@@ -111,7 +109,7 @@ public class NitroProxyProvider implements ProxyProvider, NitroHttpProxyServerCa
             try {
                 nitroWebsocketProxy.stop();
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error("Failed to stop nitro websocket proxy", e);
             }
 
             stateSetter.setState(HState.NOT_CONNECTED);

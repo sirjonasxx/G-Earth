@@ -1,42 +1,57 @@
 package gearth.protocol.connection.proxy.nitro.http;
 
+import com.github.monkeywie.proxyee.server.HttpProxyServer;
+import com.github.monkeywie.proxyee.server.HttpProxyServerConfig;
 import gearth.misc.ConfirmationDialog;
 import gearth.protocol.connection.proxy.nitro.NitroConstants;
 import gearth.protocol.connection.proxy.nitro.os.NitroOsFunctions;
 import gearth.protocol.connection.proxy.nitro.os.NitroOsFunctionsFactory;
 import gearth.ui.titlebar.TitleBarController;
 import gearth.ui.translations.LanguageBundle;
+import io.netty.handler.ssl.SslContextBuilder;
+import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
-import org.littleshoot.proxy.HttpProxyServer;
-import org.littleshoot.proxy.impl.DefaultHttpProxyServer;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.jsse.provider.BouncyCastleJsseProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.net.ssl.SSLException;
 import java.io.File;
-import java.io.IOException;
+import java.security.Security;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class NitroHttpProxy {
+
+    private static final Logger log = LoggerFactory.getLogger(NitroHttpProxy.class);
 
     private static final String ADMIN_WARNING_KEY = "admin_warning_dialog";
     private static final AtomicBoolean SHUTDOWN_HOOK = new AtomicBoolean();
 
     private final NitroOsFunctions osFunctions;
     private final NitroHttpProxyServerCallback serverCallback;
-    private final NitroCertificateSniffingManager certificateManager;
+    private final NitroCertificateFactory certificateFactory;
 
     private HttpProxyServer proxyServer = null;
 
-    public NitroHttpProxy(NitroHttpProxyServerCallback serverCallback, NitroCertificateSniffingManager certificateManager) {
+    public NitroHttpProxy(NitroHttpProxyServerCallback serverCallback, NitroCertificateFactory certificateManager) {
         this.serverCallback = serverCallback;
-        this.certificateManager = certificateManager;
+        this.certificateFactory = certificateManager;
         this.osFunctions = NitroOsFunctionsFactory.create();
     }
 
     private boolean initializeCertificate() {
-        final File certificate = this.certificateManager.getAuthority().aliasFile(".pem");
+        if (!this.certificateFactory.loadOrCreate()) {
+            return false;
+        }
+
+        final File certificate = this.certificateFactory.getCaCertFile();
 
         // All good if certificate is already trusted.
         if (this.osFunctions.isRootCertificateTrusted(certificate)) {
@@ -48,28 +63,31 @@ public class NitroHttpProxy {
         final AtomicBoolean shouldInstall = new AtomicBoolean();
 
         Platform.runLater(() -> {
-            Alert alert = ConfirmationDialog.createAlertWithOptOut(Alert.AlertType.WARNING, ADMIN_WARNING_KEY,
-                    LanguageBundle.get("alert.rootcertificate.title"), null,
-                    "", LanguageBundle.get("alert.rootcertificate.remember"),
-                    ButtonType.YES, ButtonType.NO
-            );
-
-            alert.getDialogPane().setContent(new Label(LanguageBundle.get("alert.rootcertificate.content").replaceAll("\\\\n", System.lineSeparator())));
-
             try {
+                Alert alert = ConfirmationDialog.createAlertWithOptOut(Alert.AlertType.WARNING, ADMIN_WARNING_KEY,
+                        LanguageBundle.get("alert.rootcertificate.title"), null,
+                        "", LanguageBundle.get("alert.rootcertificate.remember"),
+                        ButtonType.YES, ButtonType.NO
+                );
+
+                alert.getDialogPane().setContent(new Label(LanguageBundle.get("alert.rootcertificate.content").replaceAll("\\\\n", System.lineSeparator())));
+
+                log.debug("Showing certificate install dialog");
+
                 shouldInstall.set(TitleBarController.create(alert).showAlertAndWait()
                         .filter(t -> t == ButtonType.YES).isPresent());
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (Exception e) {
+                log.error("Failed to show install dialog", e);
+            } finally {
+                waitForDialog.release();
             }
-            waitForDialog.release();
         });
 
         // Wait for dialog choice.
         try {
             waitForDialog.acquire();
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            log.error("Interrupted while waiting for user input", e);
             return false;
         }
 
@@ -78,7 +96,7 @@ public class NitroHttpProxy {
             return false;
         }
 
-        return this.osFunctions.installRootCertificate(this.certificateManager.getAuthority().aliasFile(".pem"));
+        return this.osFunctions.installRootCertificate(this.certificateFactory.getCaCertFile());
     }
 
     /**
@@ -98,24 +116,44 @@ public class NitroHttpProxy {
     public boolean start() {
         setupShutdownHook();
 
-        proxyServer = DefaultHttpProxyServer.bootstrap()
-                .withPort(NitroConstants.HTTP_PORT)
-                .withManInTheMiddle(this.certificateManager)
-                .withFiltersSource(new NitroHttpProxyFilterSource(serverCallback))
-                .withTransparent(true)
-                .start();
-
         if (!initializeCertificate()) {
-            proxyServer.stop();
+            log.error("Failed to initialize certificate");
+            return false;
+        }
 
-            System.out.println("Failed to initialize certificate");
+        final HttpProxyServerConfig config = new HttpProxyServerConfig();
+
+        config.setHandleSsl(true);
+
+        proxyServer = new HttpProxyServer()
+                .serverConfig(config)
+                .caCertFactory(this.certificateFactory)
+                .proxyInterceptInitializer(new NitroHttpProxyIntercept(serverCallback));
+
+        proxyServer.startAsync(NitroConstants.HTTP_PORT);
+
+        // Hack to swap the SSL context.
+        try {
+            Security.addProvider(new BouncyCastleProvider());
+
+            config.setClientSslCtx(SslContextBuilder
+                    .forClient()
+                    .sslContextProvider(new BouncyCastleJsseProvider())
+                    .trustManager(InsecureTrustManagerFactory.INSTANCE)
+                    .protocols("TLSv1.3", "TLSv1.2")
+                    .ciphers(new HashSet<>(Arrays.asList(NitroConstants.CIPHER_SUITES)))
+                    .build());
+        } catch (SSLException e) {
+            proxyServer.close();
+
+            log.error("Failed to create nitro proxy SSL context", e);
             return false;
         }
 
         if (!registerProxy()) {
-            proxyServer.stop();
+            proxyServer.close();
 
-            System.out.println("Failed to register certificate");
+            log.error("Failed to register system proxy");
             return false;
         }
 
@@ -124,7 +162,7 @@ public class NitroHttpProxy {
 
     public void pause() {
         if (!unregisterProxy()) {
-            System.out.println("Failed to unregister system proxy, please check manually");
+            log.error("Failed to unregister system proxy, please check manually");
         }
     }
 
@@ -135,7 +173,7 @@ public class NitroHttpProxy {
             return;
         }
 
-        proxyServer.stop();
+        proxyServer.close();
         proxyServer = null;
     }
 

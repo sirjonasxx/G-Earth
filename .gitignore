@@ -26,3 +26,5 @@ Extensions/BlockReplacePackets/.classpath
 # Certificates
 *.p12
 *.pem
+*.crt
+*.key

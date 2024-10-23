@@ -313,19 +313,37 @@
             <version>1.5.0</version>
         </dependency>
         <dependency>
-            <groupId>com.github.ganskef</groupId>
-            <artifactId>littleproxy-mitm</artifactId>
-            <version>1.1.0</version>
+            <groupId>com.github.monkeywie</groupId>
+            <artifactId>proxyee</artifactId>
+            <version>1.7.6</version>
             <exclusions>
                 <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
+                    <groupId>org.bouncycastle</groupId>
+                    <artifactId>bcprov-jdk15on</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-log4j12</artifactId>
+                    <groupId>org.bouncycastle</groupId>
+                    <artifactId>bcpkix-jdk15on</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk18on -->
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk18on</artifactId>
+            <version>1.78.1</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.bouncycastle/bcpkix-jdk18on -->
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcpkix-jdk18on</artifactId>
+            <version>1.78.1</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.bouncycastle/bctls-jdk18on -->
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bctls-jdk18on</artifactId>
+            <version>1.78.1</version>
         </dependency>
         <dependency>
             <groupId>G-Earth</groupId>

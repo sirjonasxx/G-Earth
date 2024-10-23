@@ -1,21 +1,21 @@
 package gearth.protocol.connection.proxy.nitro.os.windows;
 
-import com.sun.jna.platform.win32.Kernel32;
-import com.sun.jna.platform.win32.WinBase;
 import com.sun.jna.platform.win32.WinDef;
-import com.sun.jna.ptr.IntByReference;
 import gearth.misc.RuntimeUtil;
 import gearth.protocol.connection.proxy.nitro.os.NitroOsFunctions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
 
 public class NitroWindows implements NitroOsFunctions {
 
+    private static final Logger log = LoggerFactory.getLogger(NitroWindows.class);
+
     /**
      * Semicolon separated hosts to ignore for proxying.
      */
-    // habba.io;
     private static final String PROXY_IGNORE = "discord.com;discordapp.com;github.com;challenges.cloudflare.com;";
 
     /**
@@ -31,7 +31,7 @@ public class NitroWindows implements NitroOsFunctions {
             return !output.contains("CERT_TRUST_IS_UNTRUSTED_ROOT") &&
                     output.contains("dwInfoStatus=10c dwErrorStatus=0");
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Failed to check if root certificate is trusted", e);
         }
 
         return false;
@@ -39,21 +39,27 @@ public class NitroWindows implements NitroOsFunctions {
 
     @Override
     public boolean installRootCertificate(File certificate) {
-        final String certificatePath = certificate.getAbsolutePath();
+        final String certificatePath = certificate.toPath().normalize().toAbsolutePath().toString();
 
-        // Prompt UAC elevation.
-        WinDef.HINSTANCE result = NitroWindowsShell32.INSTANCE.ShellExecuteA(null, "runas", "cmd.exe", "/S /C 'certutil -addstore root \"" + certificatePath + "\"'", null, 1);
+        // Correct the command for certutil
+        final String installCommand = "/c certutil -addstore root \"" + certificatePath + "\"";
 
-        // Wait for exit.
-        Kernel32.INSTANCE.WaitForSingleObject(result, WinBase.INFINITE);
+        log.debug("Installing root certificate with command: {}", installCommand);
 
-        // Exit code for certutil.
-        final IntByReference statusRef = new IntByReference(-1);
-        Kernel32.INSTANCE.GetExitCodeProcess(result, statusRef);
+        // Prompt UAC elevation using ShellExecuteA with "runas"
+        WinDef.HINSTANCE result = NitroWindowsShell32.INSTANCE.ShellExecuteA(
+                null,                               // Handle to parent window (optional)
+                "runas",                            // Use "runas" to request elevation
+                "cmd.exe",                          // Program to execute
+                installCommand,                     // Command to run with cmd.exe /c
+                null,                               // Directory (optional)
+                1                                   // Show the window
+        );
 
-        // Check if process exited without errors
-        if (statusRef.getValue() != -1) {
-            System.out.printf("Certutil command exited with exit code %s%n", statusRef.getValue());
+        final int resultValue = result.toNative().hashCode();
+
+        if (resultValue <= 32) { // If the result is <= 32, an error occurred
+            log.error("Failed to start process for installing root certificate. Error code: {}", resultValue);
             return false;
         }
 
@@ -69,7 +75,7 @@ public class NitroWindows implements NitroOsFunctions {
             Runtime.getRuntime().exec("reg add \"HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\" /v ProxyEnable /t REG_DWORD /d 1 /f");
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Failed to register system proxy", e);
         }
 
         return false;
@@ -81,7 +87,7 @@ public class NitroWindows implements NitroOsFunctions {
             Runtime.getRuntime().exec("reg add \"HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\" /v ProxyEnable /t REG_DWORD /d 0 /f");
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Failed to unregister system proxy", e);
         }
 
         return false;
