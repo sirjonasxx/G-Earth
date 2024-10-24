@@ -133,6 +133,7 @@ public class NitroHttpProxy {
         proxyServer.startAsync(NitroConstants.HTTP_PORT);
 
         // Hack to swap the SSL context.
+        // Need to set this after proxyServer is started because starting it will override the configured SSL context.
         try {
             Security.addProvider(new BouncyCastleProvider());
 
@@ -149,6 +150,9 @@ public class NitroHttpProxy {
             log.error("Failed to create nitro proxy SSL context", e);
             return false;
         }
+
+        // Add config to factory so websocket server can use it as well.
+        this.certificateFactory.setServerConfig(config);
 
         if (!registerProxy()) {
             proxyServer.close();
