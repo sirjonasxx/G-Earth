@@ -1,8 +1,7 @@
 package gearth;
 
-import gearth.misc.AdminValidator;
 import gearth.misc.Cacher;
-import gearth.misc.UpdateChecker;
+import gearth.misc.Logging;
 import gearth.misc.listenerpattern.ObservableObject;
 import gearth.ui.GEarthController;
 import gearth.ui.GEarthTrayIcon;
@@ -21,7 +20,6 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import java.util.Properties;
 
@@ -48,8 +46,7 @@ public class GEarth extends Application {
         );
 
         // Bridge JUL to SLF4J.
-        SLF4JBridgeHandler.removeHandlersForRootLogger();
-        SLF4JBridgeHandler.install();
+        Logging.bridgeJavaLoggingToSlf4j();
 
         // Load build.properties
         try {
@@ -172,6 +169,9 @@ public class GEarth extends Application {
 
     public static void main(String[] args) {
         GEarth.args = args;
+
+        Logging.setLogLevel(hasFlag("--debug"));
+
         launch(args);
     }
 
