@@ -250,6 +250,12 @@
 <!--            <artifactId>javafx-web</artifactId>-->
 <!--            <version>${javafx.version}</version>-->
 <!--        </dependency>-->
+        <!-- https://mvnrepository.com/artifact/org.slf4j/jul-to-slf4j -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jul-to-slf4j</artifactId>
+            <version>2.1.0-alpha1</version>
+        </dependency>
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>

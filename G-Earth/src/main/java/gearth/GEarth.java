@@ -21,6 +21,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import java.util.Properties;
 
@@ -45,6 +46,10 @@ public class GEarth extends Application {
                         ThemeFactory.themeForTitle(Cacher.getCacheContents().getString("theme")) :
                         ThemeFactory.getDefaultTheme()
         );
+
+        // Bridge JUL to SLF4J.
+        SLF4JBridgeHandler.removeHandlersForRootLogger();
+        SLF4JBridgeHandler.install();
 
         // Load build.properties
         try {
