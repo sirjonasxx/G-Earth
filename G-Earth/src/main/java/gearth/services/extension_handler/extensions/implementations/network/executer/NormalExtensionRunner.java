@@ -1,6 +1,7 @@
 package gearth.services.extension_handler.extensions.implementations.network.executer;
 
 import gearth.GEarth;
+import gearth.misc.OSValidator;
 import gearth.services.extension_handler.extensions.implementations.network.NetworkExtensionAuthenticator;
 import gearth.services.internal_extensions.extensionstore.tools.StoreExtensionTools;
 import org.slf4j.Logger;
@@ -109,7 +110,7 @@ public final class NormalExtensionRunner implements ExtensionRunner {
             }
 
             final ProcessBuilder processBuilder = new ProcessBuilder(execCommand);
-            final Process process = processBuilder.start();
+            final Process process = startProcess(processBuilder);
 
             maybeLogExtension(path, process);
 
@@ -118,6 +119,15 @@ public final class NormalExtensionRunner implements ExtensionRunner {
         }
     }
 
+    public static Process startProcess(ProcessBuilder processBuilder) throws IOException {
+        // Redirect output streams if logging is not enabled to prevent lockup.
+        if (!GEarth.hasFlag(ExtensionRunner.SHOW_EXTENSIONS_LOG)) {
+            processBuilder.redirectErrorStream(true);
+            processBuilder.redirectOutput(new File(OSValidator.isWindows() ? "NUL" : "/dev/null"));
+        }
+
+        return processBuilder.start();
+    }
 
     public static void maybeLogExtension(String path, Process process) {
         if (GEarth.hasFlag(ExtensionRunner.SHOW_EXTENSIONS_LOG)) {

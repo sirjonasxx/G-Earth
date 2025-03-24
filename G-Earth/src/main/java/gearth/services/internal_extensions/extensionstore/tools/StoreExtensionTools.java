@@ -52,7 +52,7 @@ public class StoreExtensionTools {
 
             ProcessBuilder pb = new ProcessBuilder(command);
             pb.directory(new File(Paths.get(extensionPath, "extension").toString()));
-            Process p = pb.start();
+            Process p = NormalExtensionRunner.startProcess(pb);
             NormalExtensionRunner.maybeLogExtension(extensionPath, p);
 
         } catch (IOException e) {
