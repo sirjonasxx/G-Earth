@@ -58,22 +58,24 @@ public class NitroWebsocketHandler implements NitroWebsocketCallback {
         );
 
         proxySetter.setProxy(proxy);
+
+        // Set state to connected.
+        this.stateSetter.setState(HState.CONNECTED);
     }
 
     @Override
     public void onHandshakeComplete() {
         logger.info("Websocket handshake completed");
 
-        // Set state to connected.
-        this.stateSetter.setState(HState.CONNECTED);
-
-        // Flush and send packet queue.
-        try {
-            this.packetQueue.flushAndAct();
-        } catch (IOException e) {
-            logger.error("Failed to flush packet queue", e);
-        }
+        // Mark handshake as complete.
         this.isHandshakeComplete = true;
+
+        // Handle queued packets.
+        try {
+            packetQueue.flushAndAct();
+        } catch (IOException e) {
+            logger.error("Failed to flush packet queue after handshake", e);
+        }
     }
 
     @Override

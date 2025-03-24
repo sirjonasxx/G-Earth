@@ -12,6 +12,6 @@
     <logger name="com.tulskiy.keymaster" level="WARN"/>
     <logger name="io.netty" level="WARN"/>
     <logger name="org.eclipse.jetty" level="WARN"/>
-    <logger name="com.github.monkeywie" level="WARN"/>
+    <logger name="com.github.monkeywie" level="DEBUG"/>
     <logger name="org.bouncycastle" level="WARN"/>
 </configuration>
