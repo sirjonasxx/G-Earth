@@ -18,6 +18,8 @@ jobs:
     steps:
     - name: Checkout G-Earth
       uses: actions/checkout@v4
+      with:
+        submodules: recursive
 
     - name: Checkout G-Wasm
       uses: actions/checkout@v4

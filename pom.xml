@@ -11,7 +11,7 @@
 
     <properties>
         <!-- Version of the application. -->
-        <revision>1.5.4-beta-10</revision>
+        <revision>1.5.4-beta-11</revision>
         <changelist>-SNAPSHOT</changelist>
         <!-- Version for https://github.com/sirjonasxx/G-ExtensionStore to keep compatibility with beta versions. -->
         <storeVersion>1.5.3</storeVersion>
@@ -25,6 +25,7 @@
 
     <modules>
         <module>G-Earth</module>
+        <module>deps/Proxyee</module>
     </modules>
 
     <build>

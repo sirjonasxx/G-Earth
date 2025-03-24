@@ -5,26 +5,25 @@ import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 import gearth.protocol.TrafficListener;
 import gearth.protocol.connection.proxy.nitro.websocket.NitroSession;
+import gearth.protocol.connection.proxy.nitro.websocket.NitroSessionProvider;
 import gearth.protocol.packethandler.PacketHandler;
 import gearth.protocol.packethandler.flash.FlashBuffer;
 import gearth.services.extension_handler.ExtensionHandler;
-import org.eclipse.jetty.websocket.api.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
 
 public class NitroPacketHandler extends PacketHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(NitroPacketHandler.class);
 
     private final HMessage.Direction direction;
-    private final NitroSession session;
+    private final NitroSessionProvider session;
     private final FlashBuffer payloadBuffer;
     private final Object payloadLock;
 
-    public NitroPacketHandler(HMessage.Direction direction, NitroSession session, ExtensionHandler extensionHandler, Observable<TrafficListener>[] trafficObservables) {
+    public NitroPacketHandler(HMessage.Direction direction, NitroSessionProvider session, ExtensionHandler extensionHandler, Observable<TrafficListener>[] trafficObservables) {
         super(extensionHandler, trafficObservables);
         this.direction = direction;
         this.session = session;
@@ -34,7 +33,7 @@ public class NitroPacketHandler extends PacketHandler {
 
     @Override
     public boolean sendToStream(byte[] buffer) {
-        final Session localSession = session.getSession();
+        final NitroSession localSession = session.getSession();
 
         if (localSession == null) {
             logger.warn("Discarding {} bytes because the session for direction {} was null", buffer.length, this.direction);
@@ -47,7 +46,7 @@ public class NitroPacketHandler extends PacketHandler {
         }
 
         try {
-            localSession.getRemote().sendBytes(ByteBuffer.wrap(buffer));
+            localSession.send(buffer);
         } catch (IOException e) {
             logger.error("Error sending packet to nitro client", e);
             return false;

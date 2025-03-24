@@ -2,12 +2,16 @@ package gearth.protocol.connection.proxy.nitro.http;
 
 import com.github.monkeywie.proxyee.server.HttpProxyServer;
 import com.github.monkeywie.proxyee.server.HttpProxyServerConfig;
+import com.github.monkeywie.proxyee.server.accept.HttpProxyAcceptHandler;
 import gearth.misc.ConfirmationDialog;
 import gearth.protocol.connection.proxy.nitro.NitroConstants;
 import gearth.protocol.connection.proxy.nitro.os.NitroOsFunctions;
 import gearth.protocol.connection.proxy.nitro.os.NitroOsFunctionsFactory;
+import gearth.protocol.connection.proxy.nitro.websocket.NitroWebsocketCallback;
 import gearth.ui.titlebar.TitleBarController;
 import gearth.ui.translations.LanguageBundle;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import javafx.application.Platform;
@@ -35,14 +39,14 @@ public class NitroHttpProxy {
     private static final AtomicBoolean SHUTDOWN_HOOK = new AtomicBoolean();
 
     private final NitroOsFunctions osFunctions;
-    private final NitroHttpProxyServerCallback serverCallback;
+    private final NitroWebsocketCallback serverCallback;
     private final NitroCertificateFactory certificateFactory;
 
     private HttpProxyServer proxyServer = null;
 
-    public NitroHttpProxy(NitroHttpProxyServerCallback serverCallback, NitroCertificateFactory certificateManager) {
+    public NitroHttpProxy(NitroWebsocketCallback serverCallback) {
         this.serverCallback = serverCallback;
-        this.certificateFactory = certificateManager;
+        this.certificateFactory = new NitroCertificateFactory();
         this.osFunctions = NitroOsFunctionsFactory.create();
     }
 
@@ -150,9 +154,6 @@ public class NitroHttpProxy {
             log.error("Failed to create nitro proxy SSL context", e);
             return false;
         }
-
-        // Add config to factory so websocket server can use it as well.
-        this.certificateFactory.setServerConfig(config);
 
         if (!registerProxy()) {
             proxyServer.close();

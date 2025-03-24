@@ -1,0 +1,3 @@
+[submodule "deps/Proxyee"]
+	path = deps/Proxyee
+	url = https://github.com/UnfamiliarLegacy/proxyee.git

@@ -11,7 +11,7 @@ public class NitroMacOS implements NitroOsFunctions {
     /**
      * Semicolon separated hosts to ignore for proxying.
      */
-    private static final String PROXY_IGNORE = "discord.com;discordapp.com;canary.discord.com;canary.discordapp.com;github.com;";
+    private static final String PROXY_IGNORE = "discord.com;discordapp.com;canary.discord.com;canary.discordapp.com;github.com;gateway.discord.gg;";
 
     /**
      * Checks if the certificate is trusted by the local machine.

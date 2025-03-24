@@ -1,9 +1,9 @@
 package gearth.protocol.connection.proxy.nitro.websocket;
 
-import org.eclipse.jetty.websocket.api.Session;
+import java.io.IOException;
 
 public interface NitroSession {
 
-    Session getSession();
+    void send(byte[] buffer) throws IOException;
 
 }

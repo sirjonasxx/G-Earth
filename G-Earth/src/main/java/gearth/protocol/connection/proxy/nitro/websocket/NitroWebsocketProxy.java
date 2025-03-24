@@ -1,92 +1,62 @@
 package gearth.protocol.connection.proxy.nitro.websocket;
 
-import gearth.protocol.HConnection;
-import gearth.protocol.connection.HProxySetter;
-import gearth.protocol.connection.HStateSetter;
-import gearth.protocol.connection.proxy.nitro.NitroProxyProvider;
-import gearth.protocol.connection.proxy.nitro.http.NitroCertificateFactory;
-import gearth.protocol.connection.proxy.nitro.http.NitroSslContextFactory;
-import org.eclipse.jetty.server.Handler;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.server.handler.HandlerList;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainerInitializer;
+import com.github.monkeywie.proxyee.intercept.HttpProxyIntercept;
+import com.github.monkeywie.proxyee.intercept.HttpProxyInterceptPipeline;
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
+import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 
-import javax.websocket.server.ServerContainer;
-import javax.websocket.server.ServerEndpointConfig;
+public class NitroWebsocketProxy extends HttpProxyIntercept {
 
-public class NitroWebsocketProxy {
+    private final NitroWebsocketCallback callback;
 
-    private final HProxySetter proxySetter;
-    private final HStateSetter stateSetter;
-    private final HConnection connection;
-    private final NitroProxyProvider proxyProvider;
-    private final NitroCertificateFactory certificateFactory;
-
-    private final Server server;
-    private final int serverPort;
-    
-    public NitroWebsocketProxy(HProxySetter proxySetter,
-                               HStateSetter stateSetter,
-                               HConnection connection,
-                               NitroProxyProvider proxyProvider,
-                               NitroCertificateFactory certificateFactory) {
-        this.proxySetter = proxySetter;
-        this.stateSetter = stateSetter;
-        this.connection = connection;
-        this.proxyProvider = proxyProvider;
-        this.certificateFactory = certificateFactory;
-        this.server = new Server();
-        this.serverPort = 0;
+    public NitroWebsocketProxy(NitroWebsocketCallback callback) {
+        this.callback = callback;
     }
 
-    public boolean start() {
-        try {
-            // Configure SSL.
-            final NitroSslContextFactory sslContextFactory = new NitroSslContextFactory(this.certificateFactory);
-            final ServerConnector sslConnector = new ServerConnector(server, sslContextFactory);
-
-            sslConnector.setPort(this.serverPort);
-
-            // Add SSL to the server.
-            server.addConnector(sslConnector);
-
-            // Configure the WebSocket.
-            final ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
-            context.setContextPath("/");
-
-            final HandlerList handlers = new HandlerList();
-            handlers.setHandlers(new Handler[] { context });
-
-            final ServerContainer wscontainer = WebSocketServerContainerInitializer.configureContext(context);
-            wscontainer.addEndpoint(ServerEndpointConfig.Builder
-                    .create(NitroWebsocketClient.class, "/")
-                    .configurator(new NitroWebsocketServerConfigurator(proxySetter, stateSetter, connection, proxyProvider))
-                    .build());
-
-            server.setHandler(handlers);
-            server.start();
-
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
+    @Override
+    public void onWebsocketRequest(Channel clientChannel, Channel proxyChannel, WebSocketFrame webSocketFrame, HttpProxyInterceptPipeline pipeline) throws Exception {
+        final byte[] data = getBinaryData(webSocketFrame);
+        if (data != null) {
+            this.callback.onClientMessage(data);
         }
-        
-        return false;
+
+        webSocketFrame.release();
     }
 
-    public int getPort() {
-        final ServerConnector serverConnector = (ServerConnector) server.getConnectors()[0];
-
-        return serverConnector.getLocalPort();
-    }
-
-    public void stop() {
-        try {
-            server.stop();
-        } catch (Exception e) {
-            e.printStackTrace();
+    @Override
+    public void onWebsocketResponse(Channel clientChannel, Channel proxyChannel, WebSocketFrame webSocketFrame, HttpProxyInterceptPipeline pipeline) throws Exception {
+        final byte[] data = getBinaryData(webSocketFrame);
+        if (data != null) {
+            this.callback.onServerMessage(data);
         }
+
+        webSocketFrame.release();
+    }
+
+    @Override
+    public void onWebsocketClose(HttpProxyInterceptPipeline pipeline) {
+        this.callback.onClose();
+    }
+
+    private byte[] getBinaryData(WebSocketFrame frame) {
+        if (!(frame instanceof BinaryWebSocketFrame)) {
+            return null;
+        }
+
+        final BinaryWebSocketFrame binaryFrame = (BinaryWebSocketFrame) frame;
+        final ByteBuf content = binaryFrame.content();
+        final byte[] binaryData = new byte[binaryFrame.content().readableBytes()];
+
+        content.markReaderIndex();
+
+        try {
+            content.readBytes(binaryData);
+        } finally {
+            content.resetReaderIndex();
+        }
+
+        return binaryData;
     }
 }

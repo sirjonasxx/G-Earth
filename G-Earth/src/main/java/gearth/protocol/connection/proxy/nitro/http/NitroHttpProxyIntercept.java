@@ -1,205 +1,111 @@
 package gearth.protocol.connection.proxy.nitro.http;
 
+import com.github.monkeywie.proxyee.intercept.HttpProxyIntercept;
 import com.github.monkeywie.proxyee.intercept.HttpProxyInterceptInitializer;
 import com.github.monkeywie.proxyee.intercept.HttpProxyInterceptPipeline;
-import com.github.monkeywie.proxyee.intercept.common.FullRequestIntercept;
-import com.github.monkeywie.proxyee.intercept.common.FullResponseIntercept;
-import com.github.monkeywie.proxyee.util.ByteUtil;
+import gearth.protocol.HPacket;
+import gearth.protocol.HPacketFormat;
+import gearth.protocol.connection.proxy.nitro.websocket.NitroWebsocketCallback;
+import gearth.protocol.connection.proxy.nitro.websocket.NitroWebsocketProxy;
 import io.netty.buffer.ByteBuf;
-import io.netty.handler.codec.http.*;
+import io.netty.buffer.ByteBufUtil;
+import io.netty.channel.Channel;
+import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
+import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class NitroHttpProxyIntercept extends HttpProxyInterceptInitializer {
 
     private static final Logger log = LoggerFactory.getLogger(NitroHttpProxyIntercept.class);
 
-    private static final String NitroConfigSearch = "socket.url";
-    private static final String NitroClientSearch = "configurationUrls:";
-    private static final Pattern NitroConfigPattern = Pattern.compile("[\"']socket\\.url[\"']:(\\s+)?[\"'](wss?:.*?)[\"']", Pattern.MULTILINE);
+    private static final int CLIENT_HELLO_PACKET_ID = 4000;
 
-    // https://developers.cloudflare.com/fundamentals/get-started/reference/cloudflare-cookies/
-    private static final HashSet<String> CloudflareCookies = new HashSet<>(Arrays.asList(
-            "__cflb",
-            "__cf_bm",
-            "__cfseq",
-            "cf_ob_info",
-            "cf_use_ob",
-            "__cfwaitingroom",
-            "__cfruid",
-            "_cfuvid",
-            "cf_clearance",
-            "cf_chl_rc_i",
-            "cf_chl_rc_ni",
-            "cf_chl_rc_m"
-    ));
+    private final NitroWebsocketCallback callback;
 
-    private static final String HeaderAcceptEncoding = "Accept-Encoding";
-    private static final String HeaderAge = "Age";
-    private static final String HeaderCacheControl = "Cache-Control";
-    private static final String HeaderContentSecurityPolicy = "Content-Security-Policy";
-    private static final String HeaderETag = "ETag";
-    private static final String HeaderIfNoneMatch = "If-None-Match";
-    private static final String HeaderIfModifiedSince = "If-Modified-Since";
-    private static final String HeaderLastModified = "Last-Modified";
-
-    private final NitroHttpProxyServerCallback callback;
-
-    public NitroHttpProxyIntercept(NitroHttpProxyServerCallback callback) {
+    public NitroHttpProxyIntercept(NitroWebsocketCallback callback) {
         this.callback = callback;
     }
 
     @Override
     public void init(HttpProxyInterceptPipeline pipeline) {
-        pipeline.addLast(new FullResponseIntercept() {
+        pipeline.addLast(new HttpProxyIntercept() {
             @Override
-            public boolean match(HttpRequest httpRequest, HttpResponse httpResponse, HttpProxyInterceptPipeline httpProxyInterceptPipeline) {
-                log.debug("Intercepting response for {} {}", httpRequest.headers().get(HttpHeaderNames.HOST), httpRequest.uri());
-                return true;
+            public void beforeConnect(Channel clientChannel, HttpProxyInterceptPipeline pipeline) throws Exception {
+                super.beforeConnect(clientChannel, pipeline);
             }
 
             @Override
-            public void handleResponse(HttpRequest httpRequest, FullHttpResponse httpResponse, HttpProxyInterceptPipeline pipeline) {
-                // Strip cache headers.
-                stripCacheHeaders(httpResponse.headers());
+            public void onWebsocketRequest(Channel clientChannel, Channel proxyChannel, WebSocketFrame webSocketFrame, HttpProxyInterceptPipeline pipeline) throws Exception {
+                boolean foundMatch = false;
 
-                // Check for response body.
-                final ByteBuf content = httpResponse.content();
-
-                if (content == null || content.readableBytes() == 0) {
-                    return;
-                }
-
-                // Find nitro configuration.
-                if (ByteUtil.findText(content, NitroConfigSearch) != -1) {
-                    final String responseBody = responseRead(httpResponse);
-                    final Matcher matcher = NitroConfigPattern.matcher(responseBody);
-
-                    // Replace websocket with proxy.
-                    if (matcher.find()) {
-                        final String originalWebsocket = matcher.group(2).replace("\\/", "/");
-                        final String replacementWebsocket = callback.replaceWebsocketServer(originalWebsocket);
-
-                        if (replacementWebsocket != null) {
-                            final String updatedBody = responseBody.replace(matcher.group(2), replacementWebsocket);
-
-                            responseWrite(httpResponse, updatedBody);
-                        }
+                try {
+                    if (!(webSocketFrame instanceof BinaryWebSocketFrame)) {
+                        return;
                     }
 
-                    // Retrieve cookies for request to the origin.
-                    final String requestCookies = parseCookies(httpRequest);
+                    // Obtain url.
+                    final String websocketUrl = pipeline.getRequestProto().getWebsocketUrl();
 
-                    if (requestCookies != null && !requestCookies.isEmpty()) {
-                        callback.setOriginCookies(requestCookies);
+                    log.debug("Checking websocket url: {}", websocketUrl);
+
+                    // Read binary data.
+                    final BinaryWebSocketFrame binaryFrame = (BinaryWebSocketFrame) webSocketFrame;
+                    final ByteBuf content = binaryFrame.content();
+                    final byte[] binaryData = new byte[binaryFrame.content().readableBytes()];
+
+                    content.markReaderIndex();
+
+                    try {
+                        content.readBytes(binaryData);
+                    } finally {
+                        content.resetReaderIndex();
                     }
-                }
 
-                // Strip CSP headers
-                if (ByteUtil.findText(content, NitroClientSearch) != -1) {
-                    stripContentSecurityPolicy(httpResponse);
+                    // Log the packet.
+                    log.debug("Received binary frame");
+                    log.debug(ByteBufUtil.hexDump(binaryFrame.content()));
+
+                    // Detect nitro connection.
+                    final HPacket packet = HPacketFormat.EVA_WIRE.createPacket(binaryData);
+
+                    packet.setReadIndex(0);
+
+                    // Check packet length.
+                    final int packetLen = packet.readInteger();
+                    if (packetLen + 4 != binaryData.length) {
+                        log.debug("websocket[{}] packet length mismatch: {} != {}", websocketUrl, packetLen + 4, binaryData.length);
+                        return;
+                    }
+
+                    // Check packet id.
+                    final short packetId = packet.readShort();
+                    if (packetId != CLIENT_HELLO_PACKET_ID) {
+                        log.debug("websocket[{}] packet id mismatch: {} != {}", websocketUrl, packetId, CLIENT_HELLO_PACKET_ID);
+                        return;
+                    }
+
+                    log.debug("websocket[{}] found nitro hotel", websocketUrl);
+
+                    foundMatch = true;
+
+                    pipeline.remove(this);
+                    pipeline.addLast(new NitroWebsocketProxy(callback));
+
+                    callback.onConnected(clientChannel, proxyChannel);
+                    callback.onClientMessage(binaryData);
+                } catch (Exception e) {
+                    log.error("Failed to read initial binary websocket frame", e);
+                } finally {
+                    pipeline.remove(this);
+
+                    if (foundMatch) {
+                        webSocketFrame.release();
+                    } else {
+                        super.onWebsocketRequest(clientChannel, proxyChannel, webSocketFrame, pipeline);
+                    }
                 }
             }
         });
-
-        pipeline.addLast(new FullRequestIntercept() {
-            @Override
-            public boolean match(HttpRequest httpRequest, HttpProxyInterceptPipeline pipeline) {
-                log.debug("Intercepting request for {} {}", httpRequest.headers().get(HttpHeaderNames.HOST), httpRequest.uri());
-                return true;
-            }
-
-            @Override
-            public void handleRequest(FullHttpRequest httpRequest, HttpProxyInterceptPipeline pipeline) {
-                // Disable caching.
-                stripCacheHeaders(httpRequest.headers());
-            }
-        });
-    }
-
-    /**
-     * Check if cookies from the request need to be recorded for the websocket connection to the origin server.
-     */
-    private static String parseCookies(final HttpRequest request) {
-        final List<String> result = new ArrayList<>();
-        final List<String> cookieHeaders = request.headers().getAll("Cookie");
-
-        for (final String cookieHeader : cookieHeaders) {
-            final String[] cookies = cookieHeader.split(";");
-
-            for (final String cookie : cookies) {
-                final String[] parts = cookie.trim().split("=");
-
-                if (CloudflareCookies.contains(parts[0])) {
-                    result.add(cookie.trim());
-                }
-            }
-        }
-
-        if (result.isEmpty()) {
-            return null;
-        }
-
-        return String.join("; ", result);
-    }
-
-    /**
-     * Modify Content-Security-Policy header, which could prevent Nitro from connecting with G-Earth.
-     */
-    private static void stripContentSecurityPolicy(FullHttpResponse response) {
-        final HttpHeaders headers = response.headers();
-
-        if (!headers.contains(HeaderContentSecurityPolicy)){
-            return;
-        }
-
-        String csp = headers.get(HeaderContentSecurityPolicy);
-
-        if (csp.contains("connect-src")) {
-            csp = csp.replace("connect-src", "connect-src *");
-        } else if (csp.contains("default-src")) {
-            csp = csp.replace("default-src", "default-src *");
-        }
-
-        headers.set(HeaderContentSecurityPolicy, csp);
-    }
-
-    /**
-     * Strip cache headers from the response.
-     */
-    private static void stripCacheHeaders(HttpHeaders headers) {
-        headers.remove(HeaderAcceptEncoding);
-        headers.remove(HeaderAge);
-        headers.remove(HeaderCacheControl);
-        headers.remove(HeaderETag);
-        headers.remove(HeaderIfNoneMatch);
-        headers.remove(HeaderIfModifiedSince);
-        headers.remove(HeaderLastModified);
-    }
-
-    private static String responseRead(FullHttpResponse response) {
-        final ByteBuf contentBuf = response.content();
-        return contentBuf.toString(StandardCharsets.UTF_8);
-    }
-
-    private static void responseWrite(FullHttpResponse response, String content) {
-        final byte[] body = content.getBytes(StandardCharsets.UTF_8);
-
-        // Update content.
-        response.content().clear().writeBytes(body);
-
-        // Update content-length.
-        HttpUtil.setContentLength(response, body.length);
-
-        // Ensure modified response is not cached.
-        stripCacheHeaders(response.headers());
     }
 }

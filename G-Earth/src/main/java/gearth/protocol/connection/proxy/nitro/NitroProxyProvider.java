@@ -6,55 +6,36 @@ import gearth.protocol.connection.HProxySetter;
 import gearth.protocol.connection.HState;
 import gearth.protocol.connection.HStateSetter;
 import gearth.protocol.connection.proxy.ProxyProvider;
-import gearth.protocol.connection.proxy.nitro.http.NitroCertificateFactory;
 import gearth.protocol.connection.proxy.nitro.http.NitroHttpProxy;
-import gearth.protocol.connection.proxy.nitro.http.NitroHttpProxyServerCallback;
-import gearth.protocol.connection.proxy.nitro.websocket.NitroWebsocketProxy;
+import gearth.protocol.connection.proxy.nitro.websocket.NitroWebsocketHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class NitroProxyProvider implements ProxyProvider, NitroHttpProxyServerCallback, StateChangeListener {
+public class NitroProxyProvider implements ProxyProvider, StateChangeListener {
 
     private static final Logger logger = LoggerFactory.getLogger(NitroProxyProvider.class);
 
     private final HProxySetter proxySetter;
     private final HStateSetter stateSetter;
     private final HConnection connection;
+    private final NitroWebsocketHandler nitroWebsocketHandler;
     private final NitroHttpProxy nitroHttpProxy;
-    private final NitroWebsocketProxy nitroWebsocketProxy;
     private final AtomicBoolean abortLock;
 
-    private int websocketPort;
-    private String originalWebsocketUrl;
-    private String originalCookies;
-
     public NitroProxyProvider(HProxySetter proxySetter, HStateSetter stateSetter, HConnection connection) {
-        final NitroCertificateFactory certificateManager = new NitroCertificateFactory();
-
         this.proxySetter = proxySetter;
         this.stateSetter = stateSetter;
         this.connection = connection;
-        this.nitroHttpProxy = new NitroHttpProxy(this, certificateManager);
-        this.nitroWebsocketProxy = new NitroWebsocketProxy(proxySetter, stateSetter, connection, this, certificateManager);
+        this.nitroWebsocketHandler = new NitroWebsocketHandler(proxySetter, stateSetter, connection, this);
+        this.nitroHttpProxy = new NitroHttpProxy(this.nitroWebsocketHandler);
         this.abortLock = new AtomicBoolean();
-    }
-
-    public String getOriginalWebsocketUrl() {
-        return originalWebsocketUrl;
-    }
-
-    public String getOriginalCookies() {
-        return originalCookies;
     }
 
     @Override
     public void start() throws IOException {
-        originalWebsocketUrl = null;
-        originalCookies = null;
-
         connection.getStateObservable().addListener(this);
 
         logger.info("Starting http proxy");
@@ -65,17 +46,6 @@ public class NitroProxyProvider implements ProxyProvider, NitroHttpProxyServerCa
             return;
         }
 
-        logger.info("Starting websocket proxy");
-
-        if (!nitroWebsocketProxy.start()) {
-            logger.error("Failed to start nitro websocket proxy");
-            abort();
-            return;
-        }
-
-        websocketPort = nitroWebsocketProxy.getPort();
-
-        logger.info("Websocket proxy is listening on port {}", websocketPort);
         logger.info("Nitro proxy started");
 
         stateSetter.setState(HState.WAITING_FOR_CLIENT);
@@ -104,14 +74,6 @@ public class NitroProxyProvider implements ProxyProvider, NitroHttpProxyServerCa
                 logger.error("Failed to stop nitro http proxy", e);
             }
 
-            logger.info("Stopping nitro websocket proxy");
-
-            try {
-                nitroWebsocketProxy.stop();
-            } catch (Exception e) {
-                logger.error("Failed to stop nitro websocket proxy", e);
-            }
-
             stateSetter.setState(HState.NOT_CONNECTED);
 
             connection.getStateObservable().removeListener(this);
@@ -121,22 +83,10 @@ public class NitroProxyProvider implements ProxyProvider, NitroHttpProxyServerCa
     }
 
     @Override
-    public String replaceWebsocketServer(String websocketUrl) {
-        originalWebsocketUrl = websocketUrl;
-
-        return String.format("wss://127.0.0.1:%d", websocketPort);
-    }
-
-    @Override
-    public void setOriginCookies(String cookieHeaderValue) {
-        originalCookies = cookieHeaderValue;
-    }
-
-    @Override
     public void stateChanged(HState oldState, HState newState) {
         if (oldState == HState.WAITING_FOR_CLIENT && newState == HState.CONNECTED) {
             // Unregister but do not stop http proxy.
-            // We are not stopping the http proxy because some requests might still require it to be running.
+            // We are not stopping the http proxy itself because the hotel websocket is connected to it.
             nitroHttpProxy.pause();
         }
 
