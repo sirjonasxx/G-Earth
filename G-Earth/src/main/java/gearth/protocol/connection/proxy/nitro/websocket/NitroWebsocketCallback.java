@@ -6,6 +6,8 @@ public interface NitroWebsocketCallback {
 
     void onConnected(Channel client, Channel server);
 
+    void onHandshakeComplete();
+
     void onClose();
 
     void onClientMessage(byte[] buffer);

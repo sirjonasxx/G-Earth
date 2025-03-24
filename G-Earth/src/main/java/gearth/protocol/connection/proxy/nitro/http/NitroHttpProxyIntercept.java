@@ -31,8 +31,8 @@ public class NitroHttpProxyIntercept extends HttpProxyInterceptInitializer {
     public void init(HttpProxyInterceptPipeline pipeline) {
         pipeline.addLast(new HttpProxyIntercept() {
             @Override
-            public void beforeConnect(Channel clientChannel, HttpProxyInterceptPipeline pipeline) throws Exception {
-                super.beforeConnect(clientChannel, pipeline);
+            public void onWebsocketHandshakeCompleted(HttpProxyInterceptPipeline pipeline) {
+                callback.onHandshakeComplete();
             }
 
             @Override

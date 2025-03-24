@@ -16,6 +16,11 @@ public class NitroWebsocketProxy extends HttpProxyIntercept {
     }
 
     @Override
+    public void onWebsocketHandshakeCompleted(HttpProxyInterceptPipeline pipeline) {
+        this.callback.onHandshakeComplete();
+    }
+
+    @Override
     public void onWebsocketRequest(Channel clientChannel, Channel proxyChannel, WebSocketFrame webSocketFrame, HttpProxyInterceptPipeline pipeline) throws Exception {
         final byte[] data = getBinaryData(webSocketFrame);
         if (data != null) {

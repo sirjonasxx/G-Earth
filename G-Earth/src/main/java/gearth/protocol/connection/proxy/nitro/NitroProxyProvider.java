@@ -88,6 +88,7 @@ public class NitroProxyProvider implements ProxyProvider, StateChangeListener {
             // Unregister but do not stop http proxy.
             // We are not stopping the http proxy itself because the hotel websocket is connected to it.
             nitroHttpProxy.pause();
+            logger.info("Nitro proxy paused");
         }
 
         // Catch setState ABORTING inside NitroWebsocketClient.

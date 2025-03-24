@@ -4,6 +4,7 @@ import gearth.protocol.HConnection;
 import gearth.protocol.HMessage;
 import gearth.protocol.connection.*;
 import gearth.protocol.connection.proxy.nitro.NitroConstants;
+import gearth.protocol.connection.proxy.nitro.NitroPacketQueue;
 import gearth.protocol.connection.proxy.nitro.NitroProxyProvider;
 import gearth.protocol.packethandler.nitro.NitroPacketHandler;
 import io.netty.channel.Channel;
@@ -23,7 +24,9 @@ public class NitroWebsocketHandler implements NitroWebsocketCallback {
     private final NitroNettySessionProvider serverSessionProvider;
     private final NitroPacketHandler clientPacketHandler;
     private final NitroPacketHandler serverPacketHandler;
+    private final NitroPacketQueue packetQueue;
     private final AtomicBoolean shutdownLock;
+    private boolean isHandshakeComplete;
 
     public NitroWebsocketHandler(HProxySetter proxySetter, HStateSetter stateSetter, HConnection connection, NitroProxyProvider proxyProvider) {
         this.proxySetter = proxySetter;
@@ -32,6 +35,7 @@ public class NitroWebsocketHandler implements NitroWebsocketCallback {
         this.clientPacketHandler = new NitroPacketHandler(HMessage.Direction.TOCLIENT, this.clientSessionProvider, connection.getExtensionHandler(), connection.getTrafficObservables());
         this.serverSessionProvider = new NitroNettySessionProvider();
         this.serverPacketHandler = new NitroPacketHandler(HMessage.Direction.TOSERVER, this.serverSessionProvider, connection.getExtensionHandler(), connection.getTrafficObservables());
+        this.packetQueue = new NitroPacketQueue(this.serverPacketHandler);
         this.shutdownLock = new AtomicBoolean();
     }
 
@@ -54,9 +58,22 @@ public class NitroWebsocketHandler implements NitroWebsocketCallback {
         );
 
         proxySetter.setProxy(proxy);
+    }
+
+    @Override
+    public void onHandshakeComplete() {
+        logger.info("Websocket handshake completed");
 
         // Set state to connected.
         this.stateSetter.setState(HState.CONNECTED);
+
+        // Flush and send packet queue.
+        try {
+            this.packetQueue.flushAndAct();
+        } catch (IOException e) {
+            logger.error("Failed to flush packet queue", e);
+        }
+        this.isHandshakeComplete = true;
     }
 
     @Override
@@ -68,10 +85,14 @@ public class NitroWebsocketHandler implements NitroWebsocketCallback {
 
     @Override
     public void onClientMessage(byte[] buffer) {
-        try {
-            this.serverPacketHandler.act(buffer);
-        } catch (IOException e) {
-            logger.error("Failed to handle client packet", e);
+        this.packetQueue.enqueue(buffer);
+
+        if (this.isHandshakeComplete) {
+            try {
+                this.packetQueue.flushAndAct();
+            } catch (IOException e) {
+                logger.error("Failed to handle client packet", e);
+            }
         }
     }
 
