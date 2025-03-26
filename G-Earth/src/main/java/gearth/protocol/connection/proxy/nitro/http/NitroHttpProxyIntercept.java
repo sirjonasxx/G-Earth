@@ -98,6 +98,7 @@ public class NitroHttpProxyIntercept extends HttpProxyInterceptInitializer {
                     log.error("Failed to read initial binary websocket frame", e);
                 } finally {
                     pipeline.remove(this);
+                    pipeline.resetWebsocketRequest();
 
                     if (foundMatch) {
                         webSocketFrame.release();
