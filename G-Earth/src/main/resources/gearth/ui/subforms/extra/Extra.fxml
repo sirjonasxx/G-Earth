@@ -109,7 +109,7 @@
                   <Insets left="10.0" top="2.0" />
                </GridPane.margin>
             </CheckBox>
-            <CheckBox fx:id="cbx_admin" layoutX="20.0" layoutY="25.0" mnemonicParsing="false" onAction="#adminCbxClick" selected="true" text="Client-side staff permissions" textFill="#000000ba" GridPane.rowIndex="2">
+            <CheckBox fx:id="cbx_admin" layoutX="20.0" layoutY="25.0" mnemonicParsing="false" onAction="#adminCbxClick" text="Client-side staff permissions" textFill="#000000ba" GridPane.rowIndex="2">
                <GridPane.margin>
                   <Insets left="10.0" top="2.0" />
                </GridPane.margin>
