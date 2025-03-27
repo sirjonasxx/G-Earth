@@ -8,6 +8,7 @@ import gearth.protocol.connection.HStateSetter;
 import gearth.protocol.connection.proxy.ProxyProvider;
 import gearth.protocol.connection.proxy.nitro.http.NitroHttpProxy;
 import gearth.protocol.connection.proxy.nitro.websocket.NitroWebsocketHandler;
+import gearth.services.nitro.NitroHotelManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,6 +22,7 @@ public class NitroProxyProvider implements ProxyProvider, StateChangeListener {
     private final HProxySetter proxySetter;
     private final HStateSetter stateSetter;
     private final HConnection connection;
+    private final NitroHotelManager nitroHotelManager;
     private final NitroWebsocketHandler nitroWebsocketHandler;
     private final NitroHttpProxy nitroHttpProxy;
     private final AtomicBoolean abortLock;
@@ -29,8 +31,9 @@ public class NitroProxyProvider implements ProxyProvider, StateChangeListener {
         this.proxySetter = proxySetter;
         this.stateSetter = stateSetter;
         this.connection = connection;
-        this.nitroWebsocketHandler = new NitroWebsocketHandler(proxySetter, stateSetter, connection, this);
-        this.nitroHttpProxy = new NitroHttpProxy(this.nitroWebsocketHandler);
+        this.nitroHotelManager = new NitroHotelManager();
+        this.nitroWebsocketHandler = new NitroWebsocketHandler(this.nitroHotelManager, proxySetter, stateSetter, connection);
+        this.nitroHttpProxy = new NitroHttpProxy(this.nitroHotelManager, this.nitroWebsocketHandler);
         this.abortLock = new AtomicBoolean();
     }
 

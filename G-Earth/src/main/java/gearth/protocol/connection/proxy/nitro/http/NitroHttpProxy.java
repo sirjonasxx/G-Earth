@@ -8,6 +8,7 @@ import gearth.protocol.connection.proxy.nitro.NitroConstants;
 import gearth.protocol.connection.proxy.nitro.os.NitroOsFunctions;
 import gearth.protocol.connection.proxy.nitro.os.NitroOsFunctionsFactory;
 import gearth.protocol.connection.proxy.nitro.websocket.NitroWebsocketCallback;
+import gearth.services.nitro.NitroHotelManager;
 import gearth.ui.titlebar.TitleBarController;
 import gearth.ui.translations.LanguageBundle;
 import io.netty.channel.Channel;
@@ -38,13 +39,15 @@ public class NitroHttpProxy {
     private static final String ADMIN_WARNING_KEY = "admin_warning_dialog";
     private static final AtomicBoolean SHUTDOWN_HOOK = new AtomicBoolean();
 
-    private final NitroOsFunctions osFunctions;
+    private final NitroHotelManager nitroHotelManager;
     private final NitroWebsocketCallback serverCallback;
     private final NitroCertificateFactory certificateFactory;
+    private final NitroOsFunctions osFunctions;
 
     private HttpProxyServer proxyServer = null;
 
-    public NitroHttpProxy(NitroWebsocketCallback serverCallback) {
+    public NitroHttpProxy(NitroHotelManager nitroHotelManager, NitroWebsocketCallback serverCallback) {
+        this.nitroHotelManager = nitroHotelManager;
         this.serverCallback = serverCallback;
         this.certificateFactory = new NitroCertificateFactory();
         this.osFunctions = NitroOsFunctionsFactory.create();
@@ -132,7 +135,7 @@ public class NitroHttpProxy {
         proxyServer = new HttpProxyServer()
                 .serverConfig(config)
                 .caCertFactory(this.certificateFactory)
-                .proxyInterceptInitializer(new NitroHttpProxyIntercept(serverCallback));
+                .proxyInterceptInitializer(new NitroHttpProxyIntercept(nitroHotelManager, serverCallback));
 
         proxyServer.startAsync(NitroConstants.HTTP_PORT);
 

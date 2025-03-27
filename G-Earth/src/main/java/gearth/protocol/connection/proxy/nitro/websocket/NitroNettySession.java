@@ -13,9 +13,14 @@ public class NitroNettySession implements NitroSession {
     private static final Logger logger = LoggerFactory.getLogger(NitroNettySession.class);
 
     private final Channel channel;
+    private NitroNettyModifier modifier;
 
     public NitroNettySession(Channel channel) {
         this.channel = channel;
+    }
+
+    public void setModifier(NitroNettyModifier modifier) {
+        this.modifier = modifier;
     }
 
     @Override
@@ -25,7 +30,14 @@ public class NitroNettySession implements NitroSession {
             return;
         }
 
+        if (this.modifier != null) {
+            try {
+                buffer = this.modifier.modify(buffer);
+            } catch (Exception e) {
+                throw new IOException("Failed to modify data", e);
+            }
+        }
+
         this.channel.writeAndFlush(new BinaryWebSocketFrame(Unpooled.wrappedBuffer(buffer)));
     }
-
 }

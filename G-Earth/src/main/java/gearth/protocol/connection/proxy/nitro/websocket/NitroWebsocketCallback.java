@@ -4,7 +4,7 @@ import io.netty.channel.Channel;
 
 public interface NitroWebsocketCallback {
 
-    void onConnected(Channel client, Channel server);
+    void onConnected(String websocketUrl, Channel client, Channel server);
 
     void onHandshakeComplete();
 

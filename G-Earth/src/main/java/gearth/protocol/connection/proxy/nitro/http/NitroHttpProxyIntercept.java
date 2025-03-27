@@ -7,6 +7,7 @@ import gearth.protocol.HPacket;
 import gearth.protocol.HPacketFormat;
 import gearth.protocol.connection.proxy.nitro.websocket.NitroWebsocketCallback;
 import gearth.protocol.connection.proxy.nitro.websocket.NitroWebsocketProxy;
+import gearth.services.nitro.NitroHotelManager;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.channel.Channel;
@@ -21,10 +22,62 @@ public class NitroHttpProxyIntercept extends HttpProxyInterceptInitializer {
 
     private static final int CLIENT_HELLO_PACKET_ID = 4000;
 
+    private final NitroHotelManager nitroHotelManager;
     private final NitroWebsocketCallback callback;
 
-    public NitroHttpProxyIntercept(NitroWebsocketCallback callback) {
+    public NitroHttpProxyIntercept(NitroHotelManager nitroHotelManager, NitroWebsocketCallback callback) {
+        this.nitroHotelManager = nitroHotelManager;
         this.callback = callback;
+    }
+
+    private byte[] getBinaryData(final BinaryWebSocketFrame binaryFrame) {
+        // Read binary data.
+        final ByteBuf content = binaryFrame.content();
+        final byte[] binaryData = new byte[binaryFrame.content().readableBytes()];
+
+        content.markReaderIndex();
+
+        try {
+            content.readBytes(binaryData);
+        } finally {
+            content.resetReaderIndex();
+        }
+
+        return binaryData;
+    }
+
+    private boolean checkNitroHotelManager(final String websocketUrl) {
+        return this.nitroHotelManager.hasWebsocket(websocketUrl);
+    }
+
+    private boolean checkPacket(final String websocketUrl, final BinaryWebSocketFrame binaryFrame) {
+        // Read binary data.
+        final byte[] binaryData = getBinaryData(binaryFrame);
+
+        // Log the packet.
+        log.debug("Received binary frame");
+        log.debug(ByteBufUtil.hexDump(binaryFrame.content()));
+
+        // Detect nitro connection.
+        final HPacket packet = HPacketFormat.EVA_WIRE.createPacket(binaryData);
+
+        packet.setReadIndex(0);
+
+        // Check packet length.
+        final int packetLen = packet.readInteger();
+        if (packetLen + 4 != binaryData.length) {
+            log.debug("websocket[{}] packet length mismatch: {} != {}", websocketUrl, packetLen + 4, binaryData.length);
+            return false;
+        }
+
+        // Check packet id.
+        final short packetId = packet.readShort();
+        if (packetId != CLIENT_HELLO_PACKET_ID) {
+            log.debug("websocket[{}] packet id mismatch: {} != {}", websocketUrl, packetId, CLIENT_HELLO_PACKET_ID);
+            return false;
+        }
+
+        return true;
     }
 
     @Override
@@ -49,39 +102,8 @@ public class NitroHttpProxyIntercept extends HttpProxyInterceptInitializer {
 
                     log.debug("Checking websocket url: {}", websocketUrl);
 
-                    // Read binary data.
-                    final BinaryWebSocketFrame binaryFrame = (BinaryWebSocketFrame) webSocketFrame;
-                    final ByteBuf content = binaryFrame.content();
-                    final byte[] binaryData = new byte[binaryFrame.content().readableBytes()];
-
-                    content.markReaderIndex();
-
-                    try {
-                        content.readBytes(binaryData);
-                    } finally {
-                        content.resetReaderIndex();
-                    }
-
-                    // Log the packet.
-                    log.debug("Received binary frame");
-                    log.debug(ByteBufUtil.hexDump(binaryFrame.content()));
-
-                    // Detect nitro connection.
-                    final HPacket packet = HPacketFormat.EVA_WIRE.createPacket(binaryData);
-
-                    packet.setReadIndex(0);
-
-                    // Check packet length.
-                    final int packetLen = packet.readInteger();
-                    if (packetLen + 4 != binaryData.length) {
-                        log.debug("websocket[{}] packet length mismatch: {} != {}", websocketUrl, packetLen + 4, binaryData.length);
-                        return;
-                    }
-
-                    // Check packet id.
-                    final short packetId = packet.readShort();
-                    if (packetId != CLIENT_HELLO_PACKET_ID) {
-                        log.debug("websocket[{}] packet id mismatch: {} != {}", websocketUrl, packetId, CLIENT_HELLO_PACKET_ID);
+                    if (!checkNitroHotelManager(websocketUrl) && !checkPacket(websocketUrl, (BinaryWebSocketFrame) webSocketFrame)) {
+                        log.debug("websocket[{}] not a nitro hotel", websocketUrl);
                         return;
                     }
 
@@ -92,8 +114,8 @@ public class NitroHttpProxyIntercept extends HttpProxyInterceptInitializer {
                     pipeline.remove(this);
                     pipeline.addLast(new NitroWebsocketProxy(callback));
 
-                    callback.onConnected(clientChannel, proxyChannel);
-                    callback.onClientMessage(binaryData);
+                    callback.onConnected(websocketUrl, clientChannel, proxyChannel);
+                    callback.onClientMessage(getBinaryData((BinaryWebSocketFrame) webSocketFrame));
                 } catch (Exception e) {
                     log.error("Failed to read initial binary websocket frame", e);
                 } finally {

@@ -5,8 +5,10 @@ import gearth.protocol.HMessage;
 import gearth.protocol.connection.*;
 import gearth.protocol.connection.proxy.nitro.NitroConstants;
 import gearth.protocol.connection.proxy.nitro.NitroPacketQueue;
-import gearth.protocol.connection.proxy.nitro.NitroProxyProvider;
 import gearth.protocol.packethandler.nitro.NitroPacketHandler;
+import gearth.services.nitro.NitroHotel;
+import gearth.services.nitro.NitroHotelManager;
+import gearth.services.nitro.NitroPacketModifier;
 import io.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +20,7 @@ public class NitroWebsocketHandler implements NitroWebsocketCallback {
 
     private static final Logger logger = LoggerFactory.getLogger(NitroWebsocketHandler.class);
 
+    private final NitroHotelManager nitroHotelManager;
     private final HProxySetter proxySetter;
     private final HStateSetter stateSetter;
     private final NitroNettySessionProvider clientSessionProvider;
@@ -26,9 +29,13 @@ public class NitroWebsocketHandler implements NitroWebsocketCallback {
     private final NitroPacketHandler serverPacketHandler;
     private final NitroPacketQueue packetQueue;
     private final AtomicBoolean shutdownLock;
+
+    private NitroHotel nitroHotel;
+    private NitroPacketModifier packetModifier;
     private boolean isHandshakeComplete;
 
-    public NitroWebsocketHandler(HProxySetter proxySetter, HStateSetter stateSetter, HConnection connection, NitroProxyProvider proxyProvider) {
+    public NitroWebsocketHandler(NitroHotelManager nitroHotelManager, HProxySetter proxySetter, HStateSetter stateSetter, HConnection connection) {
+        this.nitroHotelManager = nitroHotelManager;
         this.proxySetter = proxySetter;
         this.stateSetter = stateSetter;
         this.clientSessionProvider = new NitroNettySessionProvider();
@@ -40,12 +47,27 @@ public class NitroWebsocketHandler implements NitroWebsocketCallback {
     }
 
     @Override
-    public void onConnected(Channel client, Channel server) {
-        logger.info("Websocket connected");
+    public void onConnected(String websocketUrl, Channel client, Channel server) {
+        logger.info("Nitro websocket connected");
 
         // Setup sessions.
-        this.clientSessionProvider.setSession(new NitroNettySession(client));
-        this.serverSessionProvider.setSession(new NitroNettySession(server));
+        final NitroNettySession clientSession = new NitroNettySession(client);
+        final NitroNettySession serverSession = new NitroNettySession(server);
+
+        // Setup nitro hotel.
+        if (this.nitroHotelManager.hasWebsocket(websocketUrl)) {
+            this.nitroHotel = this.nitroHotelManager.getByWebsocket(websocketUrl);
+            this.packetModifier = this.nitroHotel.createPacketModifier();
+
+            clientSession.setModifier(data -> packetModifier.gearthToClient(data));
+            serverSession.setModifier(data -> packetModifier.gearthToServer(data));
+
+            logger.info("Detected hotel as {}, using a custom nitro configuration", this.nitroHotel.getName());
+        } else {
+            logger.info("Using default nitro configuration");
+        }
+        this.clientSessionProvider.setSession(clientSession);
+        this.serverSessionProvider.setSession(serverSession);
 
         // Setup proxy.
         final HProxy proxy = new HProxy(HClient.NITRO, "", "", -1, -1, "");
@@ -87,6 +109,16 @@ public class NitroWebsocketHandler implements NitroWebsocketCallback {
 
     @Override
     public void onClientMessage(byte[] buffer) {
+        if (this.packetModifier != null) {
+            try {
+                buffer = this.packetModifier.clientToGearth(buffer);
+            } catch (Exception e) {
+                logger.error("Failed to modify clientToGearth packet", e);
+                shutdownProxy();
+                return;
+            }
+        }
+
         this.packetQueue.enqueue(buffer);
 
         if (this.isHandshakeComplete) {
@@ -100,6 +132,16 @@ public class NitroWebsocketHandler implements NitroWebsocketCallback {
 
     @Override
     public void onServerMessage(byte[] buffer) {
+        if (this.packetModifier != null) {
+            try {
+                buffer = this.packetModifier.serverToGearth(buffer);
+            } catch (Exception e) {
+                logger.error("Failed to modify serverToGearth packet", e);
+                shutdownProxy();
+                return;
+            }
+        }
+
         try {
             this.clientPacketHandler.act(buffer);
         } catch (IOException e) {
