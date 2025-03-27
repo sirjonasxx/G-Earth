@@ -13,6 +13,7 @@ import gearth.ui.titlebar.TitleBarController;
 import gearth.ui.translations.LanguageBundle;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.websocketx.WebSocketDecoderConfig;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import javafx.application.Platform;
@@ -131,6 +132,10 @@ public class NitroHttpProxy {
         final HttpProxyServerConfig config = new HttpProxyServerConfig();
 
         config.setHandleSsl(true);
+        config.setWsDecoderConfig(WebSocketDecoderConfig.newBuilder()
+                .allowExtensions(true)
+                .maxFramePayloadLength(NitroConstants.WEBSOCKET_BUFFER_SIZE)
+                .build());
 
         proxyServer = new HttpProxyServer()
                 .serverConfig(config)
