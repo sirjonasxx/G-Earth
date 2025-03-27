@@ -21,23 +21,12 @@ jobs:
       with:
         submodules: recursive
 
-    - name: Checkout G-Wasm
-      uses: actions/checkout@v4
-      with:
-        repository: sirjonasxx/G-Wasm
-        path: gwasm
-        ref: minimal
-
     - name: Set up JDK 8
       uses: actions/setup-java@v4
       with:
         java-version: '8'
         java-package: jdk+fx
         distribution: 'liberica'
-
-    - name: Install G-Wasm
-      working-directory: gwasm
-      run: mvn -B install
 
     # Check if GITHUB_REF_TYPE is a tag
     - name: Build G-Earth

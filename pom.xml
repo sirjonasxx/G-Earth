@@ -26,6 +26,7 @@
     <modules>
         <module>G-Earth</module>
         <module>deps/Proxyee</module>
+        <module>deps/g-wasm</module>
     </modules>
 
     <build>
