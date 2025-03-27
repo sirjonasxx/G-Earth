@@ -4,18 +4,14 @@ import gearth.protocol.HPacket;
 import gearth.protocol.HPacketFormat;
 import gearth.services.nitro.NitroHotel;
 import gearth.services.nitro.NitroPacketModifier;
-import org.bouncycastle.jcajce.provider.digest.SHA256;
 import org.bouncycastle.util.encoders.Hex;
 
 import javax.crypto.Cipher;
-import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.util.Collections;
 
 /**
@@ -152,7 +148,5 @@ public class HabboCity extends NitroHotel {
 
             return data;
         }
-
     }
-
 }

@@ -1,6 +1,7 @@
 package gearth.services.nitro;
 
 import gearth.services.nitro.hotels.HabboCity;
+import gearth.services.nitro.hotels.Hartico;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +13,7 @@ public class NitroHotelManager {
     public NitroHotelManager() {
         this.hotels = new ArrayList<>();
         this.hotels.add(new HabboCity());
+        this.hotels.add(new Hartico());
     }
 
     public boolean hasWebsocket(final String websocketUrl) {
