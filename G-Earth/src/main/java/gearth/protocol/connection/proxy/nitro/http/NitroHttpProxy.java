@@ -4,7 +4,6 @@ import com.github.monkeywie.proxyee.proxy.ProxyConfig;
 import com.github.monkeywie.proxyee.proxy.ProxyType;
 import com.github.monkeywie.proxyee.server.HttpProxyServer;
 import com.github.monkeywie.proxyee.server.HttpProxyServerConfig;
-import com.github.monkeywie.proxyee.server.accept.HttpProxyAcceptHandler;
 import gearth.misc.ConfirmationDialog;
 import gearth.protocol.connection.proxy.ProxyProviderFactory;
 import gearth.protocol.connection.proxy.SocksConfiguration;
@@ -15,8 +14,6 @@ import gearth.protocol.connection.proxy.nitro.websocket.NitroWebsocketCallback;
 import gearth.services.nitro.NitroHotelManager;
 import gearth.ui.titlebar.TitleBarController;
 import gearth.ui.translations.LanguageBundle;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.websocketx.WebSocketDecoderConfig;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
@@ -31,6 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.SSLException;
 import java.io.File;
+import java.net.ServerSocket;
 import java.security.Security;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -114,8 +112,8 @@ public class NitroHttpProxy {
     /**
      * Register HTTP(s) proxy on the system.
      */
-    private boolean registerProxy() {
-        return this.osFunctions.registerSystemProxy("127.0.0.1", NitroConstants.HTTP_PORT);
+    private boolean registerProxy(int port) {
+        return this.osFunctions.registerSystemProxy("127.0.0.1", port);
     }
 
     /**
@@ -154,7 +152,15 @@ public class NitroHttpProxy {
                     socks.getSocksPort()));
         }
 
-        proxyServer.startAsync(NitroConstants.HTTP_PORT);
+        final int httpPort = getFreePort();
+
+        if (httpPort == -1) {
+            log.error("Failed to get free port for nitro http proxy");
+            return false;
+        }
+
+        log.info("Starting nitro http proxy on port {}", httpPort);
+        proxyServer.startAsync(httpPort);
 
         // Hack to swap the SSL context.
         // Need to set this after proxyServer is started because starting it will override the configured SSL context.
@@ -175,7 +181,7 @@ public class NitroHttpProxy {
             return false;
         }
 
-        if (!registerProxy()) {
+        if (!registerProxy(httpPort)) {
             proxyServer.close();
 
             log.error("Failed to register system proxy");
@@ -200,6 +206,27 @@ public class NitroHttpProxy {
 
         proxyServer.close();
         proxyServer = null;
+    }
+
+    private static int getFreePort() {
+        ServerSocket socket = null;
+
+        try {
+            socket = new ServerSocket(0);
+            return socket.getLocalPort();
+        } catch (Exception e) {
+            log.error("Failed to get free port", e);
+        } finally {
+            if (socket != null) {
+                try {
+                    socket.close();
+                } catch (Exception e) {
+                    log.error("Failed to close socket", e);
+                }
+            }
+        }
+
+        return -1;
     }
 
     /**
