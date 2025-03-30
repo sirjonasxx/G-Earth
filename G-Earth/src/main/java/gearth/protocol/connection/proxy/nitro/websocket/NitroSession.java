@@ -4,6 +4,6 @@ import java.io.IOException;
 
 public interface NitroSession {
 
-    void send(byte[] buffer) throws IOException;
+    boolean send(byte[] buffer) throws IOException;
 
 }

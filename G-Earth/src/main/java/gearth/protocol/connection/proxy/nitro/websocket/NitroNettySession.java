@@ -24,10 +24,10 @@ public class NitroNettySession implements NitroSession {
     }
 
     @Override
-    public void send(byte[] buffer) throws IOException {
-        if (!this.channel.isWritable()) {
+    public boolean send(byte[] buffer) throws IOException {
+        if (!this.channel.isActive()) {
             logger.error("Nitro netty channel is closed, cannot send data");
-            return;
+            return false;
         }
 
         if (this.modifier != null) {
@@ -39,5 +39,6 @@ public class NitroNettySession implements NitroSession {
         }
 
         this.channel.writeAndFlush(new BinaryWebSocketFrame(Unpooled.wrappedBuffer(buffer)));
+        return true;
     }
 }

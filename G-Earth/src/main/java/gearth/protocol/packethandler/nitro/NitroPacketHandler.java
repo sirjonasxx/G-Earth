@@ -46,7 +46,10 @@ public class NitroPacketHandler extends PacketHandler {
         }
 
         try {
-            localSession.send(buffer);
+            if (!localSession.send(buffer)) {
+                logger.warn("Discarding {} bytes because the session for direction {} was closed", buffer.length, this.direction);
+                return false;
+            }
         } catch (IOException e) {
             logger.error("Error sending packet to nitro client", e);
             return false;
