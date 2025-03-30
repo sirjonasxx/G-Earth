@@ -1,9 +1,13 @@
 package gearth.protocol.connection.proxy.nitro.http;
 
+import com.github.monkeywie.proxyee.proxy.ProxyConfig;
+import com.github.monkeywie.proxyee.proxy.ProxyType;
 import com.github.monkeywie.proxyee.server.HttpProxyServer;
 import com.github.monkeywie.proxyee.server.HttpProxyServerConfig;
 import com.github.monkeywie.proxyee.server.accept.HttpProxyAcceptHandler;
 import gearth.misc.ConfirmationDialog;
+import gearth.protocol.connection.proxy.ProxyProviderFactory;
+import gearth.protocol.connection.proxy.SocksConfiguration;
 import gearth.protocol.connection.proxy.nitro.NitroConstants;
 import gearth.protocol.connection.proxy.nitro.os.NitroOsFunctions;
 import gearth.protocol.connection.proxy.nitro.os.NitroOsFunctionsFactory;
@@ -141,6 +145,14 @@ public class NitroHttpProxy {
                 .serverConfig(config)
                 .caCertFactory(this.certificateFactory)
                 .proxyInterceptInitializer(new NitroHttpProxyIntercept(nitroHotelManager, serverCallback));
+
+        final SocksConfiguration socks = ProxyProviderFactory.getSocksConfig();
+
+        if (socks != null && socks.useSocks()) {
+            proxyServer.proxyConfig(new ProxyConfig(ProxyType.SOCKS5,
+                    socks.getSocksHost(),
+                    socks.getSocksPort()));
+        }
 
         proxyServer.startAsync(NitroConstants.HTTP_PORT);
 
