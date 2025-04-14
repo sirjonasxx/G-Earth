@@ -9,6 +9,7 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.Collections;
 
 /**
@@ -17,12 +18,17 @@ import java.util.Collections;
 public class Hartico extends NitroHotel {
 
     public Hartico() {
-        super("hartico.tv", Collections.singletonList("wss://server.hartico.tv/"));
+        super("hartico.tv", Collections.singletonList("wss://server.hartico.tv/"), new ArrayList<>());
     }
 
     @Override
     public NitroPacketModifier createPacketModifier() {
         return new HarticoPacketModifier();
+    }
+
+    @Override
+    protected void loadAsset(String host, String uri, byte[] data) {
+
     }
 
     public static class HarticoPacketModifier implements NitroPacketModifier {

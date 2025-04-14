@@ -3,6 +3,7 @@ package gearth.protocol.connection.proxy.nitro.http;
 import com.github.monkeywie.proxyee.intercept.HttpProxyIntercept;
 import com.github.monkeywie.proxyee.intercept.HttpProxyInterceptInitializer;
 import com.github.monkeywie.proxyee.intercept.HttpProxyInterceptPipeline;
+import com.github.monkeywie.proxyee.intercept.common.FullResponseIntercept;
 import gearth.protocol.HPacket;
 import gearth.protocol.HPacketFormat;
 import gearth.protocol.connection.proxy.nitro.websocket.NitroWebsocketCallback;
@@ -11,6 +12,9 @@ import gearth.services.nitro.NitroHotelManager;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.channel.Channel;
+import io.netty.handler.codec.http.FullHttpResponse;
+import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 import org.slf4j.Logger;
@@ -82,6 +86,22 @@ public class NitroHttpProxyIntercept extends HttpProxyInterceptInitializer {
 
     @Override
     public void init(HttpProxyInterceptPipeline pipeline) {
+        pipeline.addLast(new FullResponseIntercept() {
+            @Override
+            public boolean match(HttpRequest httpRequest, HttpResponse httpResponse, HttpProxyInterceptPipeline pipeline) {
+                return httpResponse.status().code() == 200;
+            }
+
+            @Override
+            public void handleResponse(HttpRequest httpRequest, FullHttpResponse httpResponse, HttpProxyInterceptPipeline pipeline) {
+                final byte[] data = ByteBufUtil.getBytes(httpResponse.content());
+
+                nitroHotelManager.checkAsset(pipeline.getRequestProto().getHost(),
+                        pipeline.getHttpRequest().uri(),
+                        data);
+            }
+        });
+
         pipeline.addLast(new HttpProxyIntercept() {
             @Override
             public void onWebsocketHandshakeCompleted(HttpProxyInterceptPipeline pipeline) {

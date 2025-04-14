@@ -19,7 +19,6 @@ public class NitroProxyProvider implements ProxyProvider, StateChangeListener {
 
     private static final Logger logger = LoggerFactory.getLogger(NitroProxyProvider.class);
 
-    private final HProxySetter proxySetter;
     private final HStateSetter stateSetter;
     private final HConnection connection;
     private final NitroHotelManager nitroHotelManager;
@@ -28,7 +27,6 @@ public class NitroProxyProvider implements ProxyProvider, StateChangeListener {
     private final AtomicBoolean abortLock;
 
     public NitroProxyProvider(HProxySetter proxySetter, HStateSetter stateSetter, HConnection connection) {
-        this.proxySetter = proxySetter;
         this.stateSetter = stateSetter;
         this.connection = connection;
         this.nitroHotelManager = new NitroHotelManager();

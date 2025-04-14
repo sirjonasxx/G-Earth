@@ -16,6 +16,12 @@ public class NitroHotelManager {
         this.hotels.add(new Hartico());
     }
 
+    public void checkAsset(final String host, final String uri, final byte[] data) {
+        for (NitroHotel hotel : hotels) {
+            hotel.checkAsset(host, uri, data);
+        }
+    }
+
     public boolean hasWebsocket(final String websocketUrl) {
         for (NitroHotel hotel : hotels) {
             if (hotel.hasWebsocket(websocketUrl)) {

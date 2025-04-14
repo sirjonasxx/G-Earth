@@ -3,4 +3,4 @@
 	url = https://github.com/UnfamiliarLegacy/proxyee.git
 [submodule "deps/g-wasm"]
 	path = deps/g-wasm
-	url = https://github.com/sirjonasxx/G-Wasm.git
+	url = https://github.com/UnfamiliarLegacy/G-Wasm.git
