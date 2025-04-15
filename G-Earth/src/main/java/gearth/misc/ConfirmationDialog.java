@@ -1,14 +1,12 @@
 package gearth.misc;
 
-import gearth.GEarth;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.DialogPane;
-import javafx.scene.image.Image;
-import javafx.stage.Stage;
+import javafx.scene.control.Label;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -33,6 +31,10 @@ public class ConfirmationDialog {
         alert.setDialogPane(new DialogPane() {
             @Override
             protected Node createDetailsButton() {
+                if (dialogKey == null || optOutMessage == null) {
+                    return new Label();
+                }
+
                 CheckBox optOut = new CheckBox();
                 optOut.setText(optOutMessage);
                 optOut.setOnAction(event -> {
