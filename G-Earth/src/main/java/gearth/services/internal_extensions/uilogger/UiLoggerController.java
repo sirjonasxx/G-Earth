@@ -1,33 +1,33 @@
 package gearth.services.internal_extensions.uilogger;
 
- import at.favre.lib.bytes.Bytes;
- import gearth.misc.Cacher;
- import gearth.services.internal_extensions.uilogger.hexdumper.Hexdump;
- import gearth.services.packet_info.PacketInfo;
- import gearth.protocol.HMessage;
+import gearth.misc.Cacher;
+import gearth.services.internal_extensions.uilogger.hexdumper.Hexdump;
+import gearth.services.packet_info.PacketInfo;
+import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 import gearth.ui.subforms.logger.loggerdisplays.PacketLogger;
- import gearth.ui.translations.LanguageBundle;
- import gearth.ui.translations.TranslatableString;
- import javafx.application.Platform;
+import gearth.ui.translations.LanguageBundle;
+import gearth.ui.translations.TranslatableString;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
- import javafx.fxml.Initializable;
- import javafx.scene.control.*;
- import javafx.scene.layout.BorderPane;
+import javafx.fxml.Initializable;
+import javafx.scene.control.*;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
- import javafx.stage.FileChooser;
- import javafx.stage.Stage;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
+import org.bouncycastle.util.encoders.Hex;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.StyleClassedTextArea;
- import org.fxmisc.richtext.model.StyleSpansBuilder;
+import org.fxmisc.richtext.model.StyleSpansBuilder;
 
- import java.io.BufferedWriter;
- import java.io.File;
- import java.io.FileWriter;
- import java.io.IOException;
- import java.net.URL;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.net.URL;
 import java.util.*;
- import java.util.stream.Collectors;
+import java.util.stream.Collectors;
 
 public class UiLoggerController implements Initializable {
 
@@ -273,7 +273,7 @@ public class UiLoggerController implements Initializable {
             boolean isSkipped = chkSkipBigPackets.isSelected() && (packet.length() > 4000 || (packet.length() > 1000 && chkReprHex.isSelected()));
             String packetRepresentation = chkReprHex.isSelected() ?
                     Hexdump.hexdump(packet.toBytes()) :
-                    (chkReprRawHex.isSelected() ? Bytes.wrap(packet.toBytes()).encodeHex() : packet.toString());
+                    (chkReprRawHex.isSelected() ? Hex.toHexString(packet.toBytes()) : packet.toString());
 
             String packetType = isIncoming ? "incoming" : "outgoing";
             String type = isIncoming ?
