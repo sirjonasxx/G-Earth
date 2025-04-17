@@ -7,14 +7,8 @@ import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 import gearth.services.packet_info.PacketInfo;
 import gearth.services.packet_info.PacketInfoManager;
-import javafx.beans.property.ObjectProperty;
-import org.reactfx.util.Lists;
 
 import java.util.*;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.stream.Stream;
 
 public abstract class ExtensionBase extends IExtension {
 

@@ -5,8 +5,6 @@ import gearth.ui.themes.ThemeFactory;
 import gearth.ui.titlebar.DefaultTitleBarConfig;
 import gearth.ui.titlebar.TitleBarController;
 import javafx.application.Platform;
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;

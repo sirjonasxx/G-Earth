@@ -167,14 +167,6 @@ public class GEarth extends Application {
 
     public static String[] args;
 
-    public static void main(String[] args) {
-        GEarth.args = args;
-
-        Logging.setLogLevel(hasFlag("--debug"));
-
-        launch(args);
-    }
-
     public static boolean hasFlag(String flag) {
         for(String s : args) {
             if (s.equals(flag)) {

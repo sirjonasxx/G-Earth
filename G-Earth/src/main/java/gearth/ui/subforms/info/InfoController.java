@@ -10,7 +10,6 @@ import gearth.ui.SubForm;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
-import javafx.scene.web.WebView;
 
 import java.io.IOException;
 

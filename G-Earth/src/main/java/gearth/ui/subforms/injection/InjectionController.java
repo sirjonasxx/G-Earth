@@ -6,7 +6,6 @@ import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 import gearth.protocol.HPacketFormat;
 import gearth.protocol.connection.HClient;
-import gearth.protocol.packethandler.shockwave.packets.ShockPacket;
 import gearth.ui.SubForm;
 import gearth.ui.translations.LanguageBundle;
 import gearth.ui.translations.TranslatableString;

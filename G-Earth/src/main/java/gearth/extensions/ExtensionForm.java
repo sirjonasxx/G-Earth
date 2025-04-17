@@ -5,12 +5,9 @@ import gearth.misc.listenerpattern.Observable;
 import gearth.services.packet_info.PacketInfoManager;
 import javafx.application.HostServices;
 import javafx.application.Platform;
-import javafx.beans.InvalidationListener;
 import javafx.stage.Stage;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
-
-import java.util.function.Consumer;
 
 /**
  * Created by Jonas on 22/09/18.
