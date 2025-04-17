@@ -17,6 +17,8 @@
         <storeVersion>1.5.3</storeVersion>
         <!-- Default repository for version checking. -->
         <repository>sirjonasxx/G-Earth</repository>
+        <!-- Encoding. -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <name>G-Earth-Parent</name>
@@ -28,43 +30,4 @@
         <module>deps/Proxyee</module>
         <module>deps/g-wasm</module>
     </modules>
-
-    <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.14.0</version>
-                    <configuration>
-                        <source>21</source>
-                        <target>21</target>
-                    </configuration>
-                </plugin>
-
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-resources-plugin</artifactId>
-                    <version>3.3.1</version>
-                    <executions>
-                        <execution>
-                            <id>copy-resources</id>
-                            <phase>validate</phase>
-                            <goals>
-                                <goal>copy-resources</goal>
-                            </goals>
-                            <configuration>
-                                <outputDirectory>${project.build.directory}</outputDirectory>
-                                <resources>
-                                    <resource>
-                                        <directory>src/main/resources</directory>
-                                    </resource>
-                                </resources>
-                            </configuration>
-                        </execution>
-                    </executions>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-    </build>
 </project>

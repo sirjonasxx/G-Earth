@@ -28,6 +28,10 @@ jobs:
         java-package: jdk
         distribution: 'temurin'
 
+    - name: Install JavaPackager
+      working-directory: deps/JavaPackager
+      run: ./gradlew publishToMavenLocal
+
     # Check if GITHUB_REF_TYPE is a tag
     - name: Build G-Earth
       run: |
@@ -41,26 +45,19 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: Mac OSX
-        path: Build/Mac/*
+        path: G-Earth/target/G-Earth-mac.zip
         retention-days: 7
 
     - name: Upload Linux
       uses: actions/upload-artifact@v4
       with:
         name: Linux
-        path: Build/Linux/*
+        path: G-Earth/target/G-Earth-linux.zip
         retention-days: 7
 
-    - name: Upload Windows x32
+    - name: Upload Windows
       uses: actions/upload-artifact@v4
       with:
         name: Windows x32
-        path: Build/Windows_32bit/*
-        retention-days: 7
-
-    - name: Upload Windows x64
-      uses: actions/upload-artifact@v4
-      with:
-        name: Windows x64
-        path: Build/Windows_64bit/*
+        path: G-Earth/target/G-Earth-windows.zip
         retention-days: 7
