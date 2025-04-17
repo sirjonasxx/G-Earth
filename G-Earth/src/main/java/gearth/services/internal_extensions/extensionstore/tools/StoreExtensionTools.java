@@ -50,6 +50,8 @@ public class StoreExtensionTools {
                             .replace("{cookie}", cookie))
                     .collect(Collectors.toList());
 
+            NormalExtensionRunner.locateJavaForJar(command, new File(Paths.get(extensionPath, "extension").toString()), null);
+
             ProcessBuilder pb = new ProcessBuilder(command);
             pb.directory(new File(Paths.get(extensionPath, "extension").toString()));
             Process p = NormalExtensionRunner.startProcess(pb);

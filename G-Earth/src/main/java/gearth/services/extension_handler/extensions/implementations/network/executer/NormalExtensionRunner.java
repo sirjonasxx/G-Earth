@@ -7,17 +7,19 @@ import gearth.services.internal_extensions.extensionstore.tools.StoreExtensionTo
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
+import java.util.jar.Attributes;
+import java.util.jar.JarInputStream;
+import java.util.jar.Manifest;
+import java.util.zip.ZipEntry;
 
 /**
  * Created by Jonas on 22/09/18.
@@ -109,7 +111,11 @@ public final class NormalExtensionRunner implements ExtensionRunner {
                         .replace("{cookie}", cookie);
             }
 
-            final ProcessBuilder processBuilder = new ProcessBuilder(execCommand);
+            final List<String> execCommandList = Arrays.asList(execCommand);
+
+            NormalExtensionRunner.locateJavaForJar(execCommandList, null, new File(path));
+
+            final ProcessBuilder processBuilder = new ProcessBuilder(execCommandList);
             final Process process = startProcess(processBuilder);
 
             maybeLogExtension(path, process);
@@ -204,5 +210,94 @@ public final class NormalExtensionRunner implements ExtensionRunner {
         for (int i = 0; i < 12; i++)
             builder.append(random.nextInt(10));
         return builder.toString();
+    }
+
+    public static void locateJavaForJar(List<String> command, File workingDir, File jarFile) {
+        if (!command.get(0).equals("java")) {
+            return;
+        }
+
+        // Obtain jar file for store extension.
+        if (jarFile == null) {
+            if (!command.get(1).equals("-jar")) {
+                return;
+            }
+
+            jarFile = new File(workingDir, command.get(2));
+        }
+
+        // Check if the jar file is a Java 8 extension.
+        if (!isJava8AndJavaFX(jarFile)) {
+            LOGGER.debug("Jar file {} is not a Java 8 extension, no need to locate Java 1.8", jarFile);
+            return;
+        }
+
+        final File currentJavaPath = new File(System.getProperty("java.home"));
+        final File javaInstallPath = currentJavaPath.getParentFile();
+
+        // Find a folder that starts with "jre1.8" or "jdk1.8".
+        final File[] javaVersions = javaInstallPath.listFiles((dir, name) -> name.startsWith("jre1.8") || name.startsWith("jdk1.8"));
+
+        if (javaVersions == null || javaVersions.length == 0) {
+            LOGGER.warn("No java 1.8 installation to run extension jar file {}", jarFile);
+            return;
+        }
+
+        // Prefer jre1.8 over jdk1.8.
+        final File javaPath = Arrays.stream(javaVersions).min((o1, o2) -> {
+            if (o1.getName().startsWith("jre1.8")) {
+                return -1;
+            } else if (o2.getName().startsWith("jre1.8")) {
+                return 1;
+            } else {
+                return 0;
+            }
+        }).orElse(javaVersions[0]);
+
+        // Change command to use the java executable from the found folder.
+        command.set(0, new File(javaPath, OSValidator.isWindows() ? "bin/java.exe" : "bin/java").getAbsolutePath());
+    }
+
+    /**
+     * Checks if the jar file is a Java 8 extension and requires JavaFX.
+     * @param jarFile the jar file to check
+     * @return true if the jar file is a Java 8 extension and requires JavaFX, false otherwise
+     */
+    private static boolean isJava8AndJavaFX(final File jarFile) {
+        try (final InputStream inputStream = new FileInputStream(jarFile);
+             final JarInputStream jarInputStream = new JarInputStream(inputStream, false)) {
+            // Read "META-INF/MANIFEST.MF" file and check for "Build-Jdk" attribute.
+            final Manifest manifest = jarInputStream.getManifest();
+            final Attributes attributes = manifest.getMainAttributes();
+            final String attribute = attributes.getValue("Build-Jdk");
+
+            // Return false if we are not a java 8 extension.
+            if (attribute != null && !attribute.startsWith("1.8")) {
+                return false;
+            }
+
+            // Check for JavaFX.
+            boolean hasJavaFX = false;
+
+            // Check if jar file has any .fxml file.
+            while (true) {
+                final ZipEntry entry = jarInputStream.getNextEntry();
+
+                if (entry == null) {
+                    break;
+                }
+
+                if (entry.getName().endsWith(".fxml")) {
+                    hasJavaFX = true;
+                    break;
+                }
+            }
+
+            return hasJavaFX;
+        } catch (IOException e) {
+            LOGGER.error("Failed to read jar file {}", jarFile, e);
+        }
+
+        return false;
     }
 }
