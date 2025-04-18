@@ -4,11 +4,10 @@ import gearth.protocol.connection.HClient;
 import gearth.services.packet_info.PacketInfo;
 import gearth.services.packet_info.providers.RemotePacketInfoProvider;
 import gearth.protocol.HMessage;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -103,11 +102,12 @@ public class SulekPacketInfoProvider extends RemotePacketInfoProvider {
     private String fetchLatestHotelVersion(final String variant) {
         try (CloseableHttpClient client = HttpClients.createDefault()) {
             final HttpGet request = new HttpGet(SULEK_API_URL_RELEASES.replace("$variant$", variant));
-            final HttpResponse response = client.execute(request);
+            final String response = client.execute(request, res -> res.getCode() == 200
+                    ? EntityUtils.toString(res.getEntity())
+                    : null);
 
-            if (response.getStatusLine().getStatusCode() == 200) {
-                final String jsonResponse = EntityUtils.toString(response.getEntity());
-                final JSONArray jsonArray = new JSONArray(jsonResponse);
+            if (response != null) {
+                final JSONArray jsonArray = new JSONArray(response);
                 final JSONObject jsonObject = jsonArray.getJSONObject(0);
 
                 return jsonObject.getString("version");

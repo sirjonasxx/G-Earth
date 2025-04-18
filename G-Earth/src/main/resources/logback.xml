@@ -31,4 +31,5 @@
     <logger name="org.eclipse.jetty" level="WARN"/>
     <logger name="com.github.monkeywie" level="DEBUG"/>
     <logger name="org.bouncycastle" level="WARN"/>
+    <logger name="org.apache.hc" level="INFO"/>
 </configuration>

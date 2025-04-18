@@ -8,13 +8,12 @@ import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,15 +92,15 @@ public class RemoteNitroHelper {
                     .addBinaryBody("wasm", wasmFile, ContentType.APPLICATION_OCTET_STREAM, "data.wasm")
                     .build());
 
-            final HttpResponse response = client.execute(request);
+            return client.execute(request, res -> {
+                if (res.getCode() == 200) {
+                    final String resBody = EntityUtils.toString(res.getEntity());
+                    return HabboCityResponse.fromJson(new JSONObject(resBody));
+                }
 
-            if (response.getStatusLine().getStatusCode() != 200) {
-                LOG.error("Failed to fetch from {}, status code: {}", URL_HABBOCITY, response.getStatusLine().getStatusCode());
+                LOG.error("Failed to fetch from {}, status code: {}", URL_HABBOCITY, res.getCode());
                 return null;
-            }
-
-            final JSONObject jsonData = new JSONObject(EntityUtils.toString(response.getEntity()));
-            return HabboCityResponse.fromJson(jsonData);
+            });
         } catch (Exception e) {
             LOG.error("Failed to fetch from {}", URL_HABBOCITY, e);
         }

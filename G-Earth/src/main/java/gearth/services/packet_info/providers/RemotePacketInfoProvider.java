@@ -1,11 +1,10 @@
 package gearth.services.packet_info.providers;
 
 import gearth.misc.Cacher;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,11 +36,12 @@ public abstract class RemotePacketInfoProvider extends PacketInfoProvider {
             LOG.info("Fetching packet info from {}", remoteUrl);
 
             final HttpGet request = new HttpGet(getRemoteUrl());
-            final HttpResponse response = client.execute(request);
+            final String response = client.execute(request, res -> res.getCode() == 200
+                    ? EntityUtils.toString(res.getEntity())
+                    : null);
 
-            if (response.getStatusLine().getStatusCode() == 200) {
-                String messagesBodyJson = EntityUtils.toString(response.getEntity());
-                Cacher.updateCache(messagesBodyJson, getCacheName());
+            if (response != null) {
+                Cacher.updateCache(response, getCacheName());
             } else {
                 return null;
             }
