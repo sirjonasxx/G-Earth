@@ -19,6 +19,9 @@
         <repository>sirjonasxx/G-Earth</repository>
         <!-- Encoding. -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- Java version. -->
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
     </properties>
 
     <name>G-Earth-Parent</name>
