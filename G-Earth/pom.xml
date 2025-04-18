@@ -40,6 +40,7 @@
                 <filtering>false</filtering>
                 <excludes>
                     <exclude>**/build.properties</exclude>
+                    <exclude>build/**</exclude>
                 </excludes>
             </resource>
         </resources>

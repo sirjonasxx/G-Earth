@@ -50,6 +50,7 @@ jobs:
 
     # Check if GITHUB_REF_TYPE is a tag
     - name: Build G-Earth
+      shell: bash
       run: |
         if [[ $GITHUB_REF_TYPE == 'tag' ]]; then
           mvn -B package -Drepository=${GITHUB_REPOSITORY} -Dos=${TARGET_OS} -Dchangelist=
