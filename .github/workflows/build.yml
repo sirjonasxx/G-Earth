@@ -10,13 +10,26 @@ on:
 
 jobs:
   build:
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
 
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     permissions:
       contents: read
-      packages: write
 
     steps:
+    - name: Set OS variable
+      id: osmap
+      run: |
+        if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+          echo "TARGET_OS=windows" >> $GITHUB_ENV
+        elif [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
+          echo "TARGET_OS=linux" >> $GITHUB_ENV
+        elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+          echo "TARGET_OS=mac" >> $GITHUB_ENV
+        fi
+
     - name: Checkout G-Earth
       uses: actions/checkout@v4
       with:
@@ -37,28 +50,14 @@ jobs:
     - name: Build G-Earth
       run: |
         if [[ $GITHUB_REF_TYPE == 'tag' ]]; then
-          mvn -B package -Drepository=${GITHUB_REPOSITORY} -Dchangelist=
+          mvn -B package -Drepository=${GITHUB_REPOSITORY} -Dos=${TARGET_OS} -Dchangelist=
         else
-          mvn -B package -Drepository=${GITHUB_REPOSITORY}
+          mvn -B package -Drepository=${GITHUB_REPOSITORY} -Dos=${TARGET_OS}
         fi
-        
-    - name: Upload Mac OSX
-      uses: actions/upload-artifact@v4
-      with:
-        name: Mac OSX
-        path: G-Earth/target/G-Earth-mac.zip
-        retention-days: 7
 
-    - name: Upload Linux
+    - name: Upload platform artifact
       uses: actions/upload-artifact@v4
       with:
-        name: Linux
-        path: G-Earth/target/G-Earth-linux.zip
-        retention-days: 7
-
-    - name: Upload Windows
-      uses: actions/upload-artifact@v4
-      with:
-        name: Windows
-        path: G-Earth/target/G-Earth-windows.zip
+        name: ${{ env.TARGET_OS }}
+        path: G-Earth/target/G-Earth/*
         retention-days: 7
