@@ -99,8 +99,8 @@
                             <createZipball>true</createZipball>
                             <additionalResources>
                                 <additionalResource>${project.basedir}/src/main/resources/build/common/messages.json</additionalResource>
-                                <additionalResource>${project.basedir}/src/main/resources/build/windows/G-MemZ32.exe</additionalResource>
-                                <additionalResource>${project.basedir}/src/main/resources/build/windows/G-MemZ64.exe</additionalResource>
+                                <additionalResource>${project.basedir}/src/main/resources/build/windows/G-MemZ-x32.exe</additionalResource>
+                                <additionalResource>${project.basedir}/src/main/resources/build/windows/G-MemZ-x64.exe</additionalResource>
                             </additionalResources>
                         </configuration>
                     </execution>
