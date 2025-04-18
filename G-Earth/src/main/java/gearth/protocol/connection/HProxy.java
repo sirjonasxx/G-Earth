@@ -27,7 +27,6 @@ public class HProxy {
     private volatile PacketHandler inHandler = null;     //connection with client (only initialized when verified habbo connection)
     private volatile PacketHandler outHandler = null;    //connection with server (only initialized when verified habbo connection)
 
-    private volatile String hotelVersion = "";
     private volatile String clientIdentifier = "";
     private volatile PacketInfoManager packetInfoManager = null;
 
@@ -47,7 +46,6 @@ public class HProxy {
     public void verifyProxy(PacketHandler incomingHandler, PacketHandler outgoingHandler, String hotelVersion, String clientIdentifier) {
         this.inHandler = incomingHandler;
         this.outHandler = outgoingHandler;
-        this.hotelVersion = hotelVersion;
         this.clientIdentifier = clientIdentifier;
         this.packetInfoManager = PacketInfoManager.fromHotelVersion(hotelVersion, hClient);
 
@@ -110,7 +108,7 @@ public class HProxy {
     }
 
     public String getHotelVersion() {
-        return hotelVersion;
+        return getPacketInfoManager().getHotelVersion();
     }
 
     public HClient getHClient() {

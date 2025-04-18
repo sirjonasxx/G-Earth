@@ -213,14 +213,22 @@ public final class NetworkExtensionCodec {
                     hPacket.appendString(message.getClientType().name());
                     message.getPacketInfoManager().appendToPacket(hPacket);
                 },
-                (hPacket -> new Outgoing.ConnectionStart(
-                        hPacket.readString(),
-                        hPacket.readInteger(),
-                        hPacket.readString(),
-                        hPacket.readString(),
-                        HClient.valueOf(hPacket.readString()),
-                        PacketInfoManager.readFromPacket(hPacket)
-                )));
+                (hPacket -> {
+                    final String host = hPacket.readString();
+                    final int port = hPacket.readInteger();
+                    final String hotelVersion = hPacket.readString();
+                    final String clientIdentifier = hPacket.readString();
+                    final String clientType = hPacket.readString();
+
+                    return new Outgoing.ConnectionStart(
+                            host,
+                            port,
+                            hotelVersion,
+                            clientIdentifier,
+                            HClient.valueOf(clientType),
+                            PacketInfoManager.readFromPacket(hotelVersion, hPacket)
+                    );
+                }));
         register(Outgoing.ConnectionEnd.HEADER_ID,
                 Outgoing.ConnectionEnd.class,
                 (message, hPacket) -> {

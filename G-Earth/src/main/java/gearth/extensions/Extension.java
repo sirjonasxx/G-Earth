@@ -138,7 +138,7 @@ public abstract class Extension extends ExtensionBase {
                     String hotelVersion = packet.readString();
                     String clientIdentifier = packet.readString();
                     clientType = HClient.valueOf(packet.readString());
-                    setPacketInfoManager(PacketInfoManager.readFromPacket(packet));
+                    setPacketInfoManager(PacketInfoManager.readFromPacket(hotelVersion, packet));
 
                     Constants.UNITY_PACKETS = clientType == HClient.UNITY;
                     if (delayed_init) {

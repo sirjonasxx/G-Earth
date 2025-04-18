@@ -7,24 +7,31 @@ import gearth.services.packet_info.providers.implementations.GEarthUnityPacketIn
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 import gearth.protocol.connection.HClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class PacketInfoManager {
 
-    private Map<Integer, List<PacketInfo>> headerIdToMessage_incoming = new HashMap<>();
-    private Map<Integer, List<PacketInfo>> headerIdToMessage_outgoing = new HashMap<>();
+    private static final Logger LOG = LoggerFactory.getLogger(PacketInfoManager.class);
 
-    private Map<String, List<PacketInfo>> hashToMessage_incoming = new HashMap<>();
-    private Map<String, List<PacketInfo>> hashToMessage_outgoing = new HashMap<>();
+    private final Map<Integer, List<PacketInfo>> headerIdToMessage_incoming = new HashMap<>();
+    private final Map<Integer, List<PacketInfo>> headerIdToMessage_outgoing = new HashMap<>();
 
-    private Map<String, List<PacketInfo>> nameToMessage_incoming = new HashMap<>();
-    private Map<String, List<PacketInfo>> nameToMessage_outgoing = new HashMap<>();
+    private final Map<String, List<PacketInfo>> hashToMessage_incoming = new HashMap<>();
+    private final Map<String, List<PacketInfo>> hashToMessage_outgoing = new HashMap<>();
 
-    private List<PacketInfo> packetInfoList;
+    private final Map<String, List<PacketInfo>> nameToMessage_incoming = new HashMap<>();
+    private final Map<String, List<PacketInfo>> nameToMessage_outgoing = new HashMap<>();
 
-    public PacketInfoManager(List<PacketInfo> packetInfoList) {
+    private final String hotelVersion;
+    private final List<PacketInfo> packetInfoList;
+
+    public PacketInfoManager(final String hotelVersion, final List<PacketInfo> packetInfoList) {
+        this.hotelVersion = hotelVersion;
         this.packetInfoList = packetInfoList;
         for (PacketInfo packetInfo : packetInfoList) {
             addMessage(packetInfo);
@@ -63,6 +70,10 @@ public class PacketInfoManager {
 
     }
 
+    public String getHotelVersion() {
+        return hotelVersion;
+    }
+
     public List<PacketInfo> getAllPacketInfoFromHeaderId(HMessage.Direction direction, int headerId) {
         Map<Integer, List<PacketInfo>> headerIdToMessage =
                 (direction == HMessage.Direction.TOSERVER
@@ -92,17 +103,17 @@ public class PacketInfoManager {
 
     public PacketInfo getPacketInfoFromHeaderId(HMessage.Direction direction, int headerId) {
         List<PacketInfo> all = getAllPacketInfoFromHeaderId(direction, headerId);
-        return all.size() == 0 ? null : all.get(0);
+        return all.isEmpty() ? null : all.get(0);
     }
 
     public PacketInfo getPacketInfoFromHash(HMessage.Direction direction, String hash) {
         List<PacketInfo> all = getAllPacketInfoFromHash(direction, hash);
-        return all.size() == 0 ? null : all.get(0);
+        return all.isEmpty() ? null : all.get(0);
     }
 
     public PacketInfo getPacketInfoFromName(HMessage.Direction direction, String name) {
         List<PacketInfo> all = getAllPacketInfoFromName(direction, name);
-        return all.size() == 0 ? null : all.get(0);
+        return all.isEmpty() ? null : all.get(0);
     }
 
     public List<PacketInfo> getPacketInfoList() {
@@ -110,7 +121,8 @@ public class PacketInfoManager {
     }
 
     public static PacketInfoManager fromHotelVersion(String hotelversion, HClient clientType) {
-        List<PacketInfo> result = new ArrayList<>();
+        final AtomicReference<String> version = new AtomicReference<>(hotelversion);
+        final List<PacketInfo> result = new ArrayList<>();
 
         if (clientType == HClient.UNITY) {
             result.addAll(new GEarthUnityPacketInfoProvider(hotelversion).provide());
@@ -128,7 +140,11 @@ public class PacketInfoManager {
                 List<PacketInfo> synchronizedResult = Collections.synchronizedList(result);
                 for (RemotePacketInfoProvider provider : providers) {
                     new Thread(() -> {
-                        synchronizedResult.addAll(provider.provide());
+                        final List<PacketInfo> packets = provider.provide();
+                        if (!packets.isEmpty()) {
+                            synchronizedResult.addAll(packets);
+                            version.set(provider.getHotelVersion());
+                        }
                         blockUntilComplete.release();
                     }).start();
                 }
@@ -136,15 +152,14 @@ public class PacketInfoManager {
                 blockUntilComplete.acquire(providers.size());
 
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                LOG.error("Error while waiting for packet info providers to finish", e);
             }
         }
 
-
-        return new PacketInfoManager(result);
+        return new PacketInfoManager(version.get(), result);
     }
 
-    public static PacketInfoManager readFromPacket(HPacket hPacket) {
+    public static PacketInfoManager readFromPacket(String hotelVersion, HPacket hPacket) {
         List<PacketInfo> packetInfoList = new ArrayList<>();
         int size = hPacket.readInteger();
 
@@ -165,7 +180,7 @@ public class PacketInfoManager {
                     source));
         }
 
-        return new PacketInfoManager(packetInfoList);
+        return new PacketInfoManager(hotelVersion, packetInfoList);
     }
 
     public void appendToPacket(HPacket hPacket) {
@@ -181,5 +196,5 @@ public class PacketInfoManager {
     }
 
 
-    public static PacketInfoManager EMPTY = new PacketInfoManager(new ArrayList<>());
+    public static PacketInfoManager EMPTY = new PacketInfoManager("", new ArrayList<>());
 }

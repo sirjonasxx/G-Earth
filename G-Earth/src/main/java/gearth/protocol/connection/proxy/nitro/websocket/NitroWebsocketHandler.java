@@ -2,6 +2,7 @@ package gearth.protocol.connection.proxy.nitro.websocket;
 
 import gearth.protocol.HConnection;
 import gearth.protocol.HMessage;
+import gearth.protocol.StateChangeListener;
 import gearth.protocol.connection.*;
 import gearth.protocol.connection.proxy.nitro.NitroConstants;
 import gearth.protocol.connection.proxy.nitro.NitroPacketQueue;
@@ -16,19 +17,21 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class NitroWebsocketHandler implements NitroWebsocketCallback {
+public class NitroWebsocketHandler implements NitroWebsocketCallback, StateChangeListener {
 
     private static final Logger logger = LoggerFactory.getLogger(NitroWebsocketHandler.class);
 
     private final NitroHotelManager nitroHotelManager;
     private final HProxySetter proxySetter;
     private final HStateSetter stateSetter;
+    private final HConnection connection;
     private final NitroNettySessionProvider clientSessionProvider;
     private final NitroNettySessionProvider serverSessionProvider;
     private final NitroPacketHandler clientPacketHandler;
     private final NitroPacketHandler serverPacketHandler;
     private final NitroPacketQueue packetQueue;
     private final AtomicBoolean shutdownLock;
+    private final AtomicBoolean isAborting;
 
     private NitroHotel nitroHotel;
     private NitroPacketModifier packetModifier;
@@ -38,12 +41,14 @@ public class NitroWebsocketHandler implements NitroWebsocketCallback {
         this.nitroHotelManager = nitroHotelManager;
         this.proxySetter = proxySetter;
         this.stateSetter = stateSetter;
+        this.connection = connection;
         this.clientSessionProvider = new NitroNettySessionProvider();
         this.clientPacketHandler = new NitroPacketHandler(HMessage.Direction.TOCLIENT, this.clientSessionProvider, connection.getExtensionHandler(), connection.getTrafficObservables());
         this.serverSessionProvider = new NitroNettySessionProvider();
         this.serverPacketHandler = new NitroPacketHandler(HMessage.Direction.TOSERVER, this.serverSessionProvider, connection.getExtensionHandler(), connection.getTrafficObservables());
         this.packetQueue = new NitroPacketQueue(this.serverPacketHandler);
         this.shutdownLock = new AtomicBoolean();
+        this.isAborting = new AtomicBoolean(false);
     }
 
     @Override
@@ -80,6 +85,9 @@ public class NitroWebsocketHandler implements NitroWebsocketCallback {
         );
 
         proxySetter.setProxy(proxy);
+
+        // Register state listener.
+        this.connection.getStateObservable().addListener(this);
 
         // Set state to connected.
         this.stateSetter.setState(HState.CONNECTED);
@@ -160,7 +168,19 @@ public class NitroWebsocketHandler implements NitroWebsocketCallback {
         if (shutdownLock.compareAndSet(false, true)) {
             // Reset program state.
             this.proxySetter.setProxy(null);
-            this.stateSetter.setState(HState.ABORTING);
+
+            // Check if we are already aborting.
+            if (!this.isAborting.get()) {
+                this.stateSetter.setState(HState.ABORTING);
+            }
+        }
+    }
+
+    @Override
+    public void stateChanged(HState oldState, HState newState) {
+        if (newState == HState.ABORTING || newState == HState.NOT_CONNECTED) {
+            this.isAborting.set(true);
+            this.connection.getStateObservable().removeListener(this);
         }
     }
 }

@@ -17,6 +17,10 @@ public abstract class PacketInfoProvider {
         this.hotelVersion = hotelVersion;
     }
 
+    public String getHotelVersion() {
+        return hotelVersion;
+    }
+
     protected abstract File getFile();
 
     public List<PacketInfo> provide() {

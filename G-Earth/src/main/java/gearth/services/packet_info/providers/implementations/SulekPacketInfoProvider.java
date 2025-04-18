@@ -4,19 +4,31 @@ import gearth.protocol.connection.HClient;
 import gearth.services.packet_info.PacketInfo;
 import gearth.services.packet_info.providers.RemotePacketInfoProvider;
 import gearth.protocol.HMessage;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 public class SulekPacketInfoProvider extends RemotePacketInfoProvider {
 
-    public static final String CACHE_PREFIX = "SULEK_API-";
+    private static final Logger LOG = LoggerFactory.getLogger(SulekPacketInfoProvider.class);
+    public static final String CACHE_PREFIX = "SULEK_API";
     public static final String SULEK_API_URL_GLOBAL = "https://api.sulek.dev/releases/$hotelversion$/messages";
     public static final String SULEK_API_URL_VARIANT = "https://api.sulek.dev/releases/$variant$/$hotelversion$/messages";
+    public static final String SULEK_API_URL_RELEASES = "https://api.sulek.dev/releases?variant=$variant$";
 
     private final HClient client;
+
+    private String latestHotelVersion;
 
     public SulekPacketInfoProvider(HClient client, String hotelVersion) {
         super(hotelVersion);
@@ -24,17 +36,35 @@ public class SulekPacketInfoProvider extends RemotePacketInfoProvider {
     }
 
     @Override
-    protected String getRemoteUrl() {
-        if (client == HClient.SHOCKWAVE) {
-            return SULEK_API_URL_VARIANT.replace("$variant$", "shockwave-windows").replace("$hotelversion$", hotelVersion);
+    public String getHotelVersion() {
+        if (latestHotelVersion != null) {
+            return latestHotelVersion;
         }
 
-        return SULEK_API_URL_GLOBAL.replace("$hotelversion$", hotelVersion);
+        return hotelVersion;
+    }
+
+    @Override
+    protected String getRemoteUrl() {
+        if (client == HClient.SHOCKWAVE) {
+            return SULEK_API_URL_VARIANT.replace("$variant$", "shockwave-windows").replace("$hotelversion$", getHotelVersion());
+        }
+
+        return SULEK_API_URL_GLOBAL.replace("$hotelversion$", getHotelVersion());
+    }
+
+    @Override
+    protected File getFile() {
+        if (latestHotelVersion == null && client == HClient.SHOCKWAVE) {
+            latestHotelVersion = fetchLatestHotelVersion("shockwave-windows");
+        }
+
+        return super.getFile();
     }
 
     @Override
     protected String getCacheName() {
-        return CACHE_PREFIX + hotelVersion;
+        return String.format("%s-%s-%s", CACHE_PREFIX, client.toString(), getHotelVersion());
     }
 
     private PacketInfo jsonToPacketInfo(JSONObject object, HMessage.Direction destination) {
@@ -68,5 +98,24 @@ public class SulekPacketInfoProvider extends RemotePacketInfoProvider {
         }
 
         return packetInfos;
+    }
+
+    private String fetchLatestHotelVersion(final String variant) {
+        try (CloseableHttpClient client = HttpClients.createDefault()) {
+            final HttpGet request = new HttpGet(SULEK_API_URL_RELEASES.replace("$variant$", variant));
+            final HttpResponse response = client.execute(request);
+
+            if (response.getStatusLine().getStatusCode() == 200) {
+                final String jsonResponse = EntityUtils.toString(response.getEntity());
+                final JSONArray jsonArray = new JSONArray(jsonResponse);
+                final JSONObject jsonObject = jsonArray.getJSONObject(0);
+
+                return jsonObject.getString("version");
+            }
+        } catch (Exception e) {
+            LOG.error("Failed to fetch latest hotel version", e);
+        }
+
+        return null;
     }
 }
