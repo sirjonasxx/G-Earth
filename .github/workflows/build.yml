@@ -43,6 +43,8 @@ jobs:
         java-version: '21'
         java-package: jdk
         distribution: 'temurin'
+        cache: 'maven'
+        cache-dependency-path: 'G-Earth/pom.xml'
 
     - name: Install JavaPackager
       working-directory: deps/JavaPackager

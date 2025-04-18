@@ -1,7 +1,6 @@
 package gearth;
 
 import gearth.misc.Cacher;
-import gearth.misc.Logging;
 import gearth.misc.listenerpattern.ObservableObject;
 import gearth.ui.GEarthController;
 import gearth.ui.GEarthTrayIcon;
@@ -45,8 +44,6 @@ public class GEarth extends Application {
                         ThemeFactory.getDefaultTheme()
         );
 
-        // Bridge JUL to SLF4J.
-        Logging.bridgeJavaLoggingToSlf4j();
 
         // Load build.properties
         try {
