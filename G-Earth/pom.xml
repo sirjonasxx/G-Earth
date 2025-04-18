@@ -46,6 +46,15 @@
         </resources>
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.14.0</version>
+                <configuration>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.8</version>
@@ -87,6 +96,7 @@
                     <bundleJre>false</bundleJre>
                     <mainClass>gearth.Main</mainClass>
                     <generateInstaller>false</generateInstaller>
+                    <jreMinVersion>17.0.0</jreMinVersion>
                 </configuration>
             </plugin>
         </plugins>
