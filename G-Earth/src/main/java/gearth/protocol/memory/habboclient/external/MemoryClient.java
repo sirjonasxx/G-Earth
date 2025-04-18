@@ -52,7 +52,12 @@ public class MemoryClient implements HabboClient {
         String filePath = new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI()).getParent();
 
         if (OSValidator.isWindows()) {
-            filePath += "\\G-MemZ.exe";
+            // Detect Windows 32 or 64 bit
+            if (System.getProperty("os.arch").contains("64")) {
+                filePath += "\\G-MemZ-x64.exe";
+            } else {
+                filePath += "\\G-MemZ-x32.exe";
+            }
         } else {
             filePath += "/G-MemZ";
         }
