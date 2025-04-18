@@ -11,6 +11,7 @@ on:
 jobs:
   build:
     strategy:
+      fail-fast: false
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
 
@@ -21,6 +22,7 @@ jobs:
     steps:
     - name: Set OS variable
       id: osmap
+      shell: bash
       run: |
         if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
           echo "TARGET_OS=windows" >> $GITHUB_ENV
