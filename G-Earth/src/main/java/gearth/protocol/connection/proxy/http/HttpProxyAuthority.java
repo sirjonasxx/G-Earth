@@ -1,6 +1,6 @@
-package gearth.protocol.connection.proxy.nitro.http;
+package gearth.protocol.connection.proxy.http;
 
-public class NitroAuthority {
+public class HttpProxyAuthority {
 
     public static final String CERT_ALIAS = "gearth-nitro-v2";
     public static final String CERT_ORGANIZATION = "G-Earth Nitro";

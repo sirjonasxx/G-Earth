@@ -1,5 +1,6 @@
-package gearth.protocol.connection.proxy.nitro.http;
+package gearth.protocol.connection.proxy.http;
 
+import com.github.monkeywie.proxyee.intercept.HttpProxyInterceptInitializer;
 import com.github.monkeywie.proxyee.proxy.ProxyConfig;
 import com.github.monkeywie.proxyee.proxy.ProxyType;
 import com.github.monkeywie.proxyee.server.HttpProxyServer;
@@ -10,8 +11,6 @@ import gearth.protocol.connection.proxy.SocksConfiguration;
 import gearth.protocol.connection.proxy.nitro.NitroConstants;
 import gearth.protocol.connection.proxy.nitro.os.NitroOsFunctions;
 import gearth.protocol.connection.proxy.nitro.os.NitroOsFunctionsFactory;
-import gearth.protocol.connection.proxy.nitro.websocket.NitroWebsocketCallback;
-import gearth.services.nitro.NitroHotelManager;
 import gearth.ui.titlebar.TitleBarController;
 import gearth.ui.translations.LanguageBundle;
 import io.netty.handler.codec.http.websocketx.WebSocketDecoderConfig;
@@ -35,24 +34,20 @@ import java.util.HashSet;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class NitroHttpProxy {
+public class HttpProxyManager {
 
-    private static final Logger log = LoggerFactory.getLogger(NitroHttpProxy.class);
+    private static final Logger log = LoggerFactory.getLogger(HttpProxyManager.class);
 
     private static final String ADMIN_WARNING_KEY = "admin_warning_dialog";
     private static final AtomicBoolean SHUTDOWN_HOOK = new AtomicBoolean();
 
-    private final NitroHotelManager nitroHotelManager;
-    private final NitroWebsocketCallback serverCallback;
-    private final NitroCertificateFactory certificateFactory;
+    private final HttpProxyCertificateFactory certificateFactory;
     private final NitroOsFunctions osFunctions;
 
     private HttpProxyServer proxyServer = null;
 
-    public NitroHttpProxy(NitroHotelManager nitroHotelManager, NitroWebsocketCallback serverCallback) {
-        this.nitroHotelManager = nitroHotelManager;
-        this.serverCallback = serverCallback;
-        this.certificateFactory = new NitroCertificateFactory();
+    public HttpProxyManager() {
+        this.certificateFactory = new HttpProxyCertificateFactory();
         this.osFunctions = NitroOsFunctionsFactory.create();
     }
 
@@ -123,7 +118,7 @@ public class NitroHttpProxy {
         return this.osFunctions.unregisterSystemProxy();
     }
 
-    public boolean start() {
+    public boolean start(HttpProxyInterceptInitializer proxyInterceptInitializer) {
         setupShutdownHook();
 
         if (!initializeCertificate()) {
@@ -142,7 +137,7 @@ public class NitroHttpProxy {
         proxyServer = new HttpProxyServer()
                 .serverConfig(config)
                 .caCertFactory(this.certificateFactory)
-                .proxyInterceptInitializer(new NitroHttpProxyIntercept(nitroHotelManager, serverCallback));
+                .proxyInterceptInitializer(proxyInterceptInitializer);
 
         final SocksConfiguration socks = ProxyProviderFactory.getSocksConfig();
 
@@ -155,11 +150,11 @@ public class NitroHttpProxy {
         final int httpPort = getFreePort();
 
         if (httpPort == -1) {
-            log.error("Failed to get free port for nitro http proxy");
+            log.error("Failed to get free port for http proxy");
             return false;
         }
 
-        log.info("Starting nitro http proxy on port {}", httpPort);
+        log.info("Starting http proxy on port {}", httpPort);
         proxyServer.startAsync(httpPort);
 
         // Hack to swap the SSL context.
@@ -177,7 +172,7 @@ public class NitroHttpProxy {
         } catch (SSLException e) {
             proxyServer.close();
 
-            log.error("Failed to create nitro proxy SSL context", e);
+            log.error("Failed to create proxy SSL context", e);
             return false;
         }
 

@@ -1,4 +1,4 @@
-package gearth.protocol.connection.proxy.nitro.http;
+package gearth.protocol.connection.proxy.http;
 
 import com.github.monkeywie.proxyee.crt.CertUtil;
 import com.github.monkeywie.proxyee.server.HttpProxyCACertFactory;
@@ -15,9 +15,9 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
-public class NitroCertificateFactory implements HttpProxyCACertFactory {
+public class HttpProxyCertificateFactory implements HttpProxyCACertFactory {
 
-    private static final Logger log = LoggerFactory.getLogger(NitroCertificateFactory.class);
+    private static final Logger log = LoggerFactory.getLogger(HttpProxyCertificateFactory.class);
 
     private final File caCertFile;
     private final File caKeyFile;
@@ -25,9 +25,9 @@ public class NitroCertificateFactory implements HttpProxyCACertFactory {
     private X509Certificate caCert;
     private PrivateKey caKey;
 
-    public NitroCertificateFactory() {
-        this.caCertFile = new File(String.format("./%s.crt", NitroAuthority.CERT_ALIAS));
-        this.caKeyFile = new File(String.format("./%s.key", NitroAuthority.CERT_ALIAS));
+    public HttpProxyCertificateFactory() {
+        this.caCertFile = new File(String.format("./%s.crt", HttpProxyAuthority.CERT_ALIAS));
+        this.caKeyFile = new File(String.format("./%s.key", HttpProxyAuthority.CERT_ALIAS));
     }
 
     public File getCaCertFile() {
@@ -61,8 +61,8 @@ public class NitroCertificateFactory implements HttpProxyCACertFactory {
             final KeyPair keyPair = CertUtil.genKeyPair();
 
             final String subject = String.format("O=%s, OU=Certificate Authority, CN=%s",
-                    NitroAuthority.CERT_ORGANIZATION,
-                    NitroAuthority.CERT_DESCRIPTION);
+                    HttpProxyAuthority.CERT_ORGANIZATION,
+                    HttpProxyAuthority.CERT_DESCRIPTION);
 
             final X509Certificate rootCertificate = CertUtil.genCACert(subject,
                     new Date(),

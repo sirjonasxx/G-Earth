@@ -24,6 +24,10 @@ public class NitroHttpProxyIntercept extends HttpProxyInterceptInitializer {
 
     private static final Logger log = LoggerFactory.getLogger(NitroHttpProxyIntercept.class);
 
+    /**
+     * Default max content length size is 100MB
+     */
+    private static final int DEFAULT_MAX_CONTENT_LENGTH = 1024 * 1024 * 100;
     private static final int CLIENT_HELLO_PACKET_ID = 4000;
 
     private final NitroHotelManager nitroHotelManager;
@@ -86,7 +90,7 @@ public class NitroHttpProxyIntercept extends HttpProxyInterceptInitializer {
 
     @Override
     public void init(HttpProxyInterceptPipeline pipeline) {
-        pipeline.addLast(new FullResponseIntercept() {
+        pipeline.addLast(new FullResponseIntercept(DEFAULT_MAX_CONTENT_LENGTH) {
             @Override
             public boolean match(HttpRequest httpRequest, HttpResponse httpResponse, HttpProxyInterceptPipeline pipeline) {
                 return httpResponse.status().code() == 200;
