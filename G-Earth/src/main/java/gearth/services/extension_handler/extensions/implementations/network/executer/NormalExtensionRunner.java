@@ -27,7 +27,7 @@ import java.util.zip.ZipEntry;
  */
 public final class NormalExtensionRunner implements ExtensionRunner {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(NormalExtensionRunner.class);
+    private final static Logger LOG = LoggerFactory.getLogger(NormalExtensionRunner.class);
 
     public static final String JAR_PATH;
 
@@ -38,10 +38,10 @@ public final class NormalExtensionRunner implements ExtensionRunner {
             value = new File(url.toURI()).getParent();
         } catch (URISyntaxException e) {
             value = new File(url.getPath()).getParent();
-            LOGGER.warn("Failed to load JAR_PATH from url {} as URI, using Path instead", url, e);
+            LOG.warn("Failed to load JAR_PATH from url {} as URI, using Path instead", url, e);
         }
         JAR_PATH = value;
-        LOGGER.debug("Set JAR_PATH as {}", JAR_PATH);
+        LOG.debug("Set JAR_PATH as {}", JAR_PATH);
     }
 
     @Override
@@ -53,14 +53,14 @@ public final class NormalExtensionRunner implements ExtensionRunner {
             final File[] extensionFiles = extensionsDirectory.listFiles();
 
             if (extensionFiles == null) {
-                LOGGER.error("Provided extensionsDirectory does not exist (extensionsDirectory={})", extensionsDirectory);
+                LOG.error("Provided extensionsDirectory does not exist (extensionsDirectory={})", extensionsDirectory);
                 return;
             }
 
             for (File file : extensionFiles)
                 tryRunExtension(file.getPath(), port);
         } else
-            LOGGER.warn("Did not run extensions because extensions directory does not exist at {}", ExecutionInfo.EXTENSIONS_DIRECTORY);
+            LOG.warn("Did not run extensions because extensions directory does not exist at {}", ExecutionInfo.EXTENSIONS_DIRECTORY);
     }
 
     @Override
@@ -80,19 +80,18 @@ public final class NormalExtensionRunner implements ExtensionRunner {
         final Path newPath = Paths.get(JAR_PATH, ExecutionInfo.EXTENSIONS_DIRECTORY, newName);
 
         try {
-
             Files.copy(path, newPath);
 
             tryRunExtension(newPath.toString(), port);
-
         } catch (IOException e) {
-            e.printStackTrace();
+            LOG.error("Failed to copy extension from {} to {}", path, newPath, e);
         }
     }
 
     public void tryRunExtension(String path, int port) {
-        try {
+        LOG.info("Running extension {}", path);
 
+        try {
             if (new File(path).isDirectory()) {
                 // this extension is installed from the extension store and requires different behavior
                 StoreExtensionTools.executeExtension(path, port);
@@ -123,7 +122,7 @@ public final class NormalExtensionRunner implements ExtensionRunner {
 
             logExtension(installedExtensionId, path, process);
         } catch (IOException e) {
-            LOGGER.error("Failed to run extension at path {} using port {}", path, port, e);
+            LOG.error("Failed to run extension at path {} using port {}", path, port, e);
         }
     }
 
@@ -145,7 +144,7 @@ public final class NormalExtensionRunner implements ExtensionRunner {
                 while ((line = processInputReader.readLine()) != null)
                     logger.info(line);
             } catch (IOException e) {
-                LOGGER.error("Failed to read input line from process {}", process, e);
+                LOG.error("Failed to read input line from process {}", process, e);
             }
         }, path+"-input").start();
 
@@ -158,7 +157,7 @@ public final class NormalExtensionRunner implements ExtensionRunner {
                 while ((line = processErrorReader.readLine()) != null)
                     logger.error(line);
             } catch (IOException e) {
-                LOGGER.error("Failed to read error line from process {}", process, e);
+                LOG.error("Failed to read error line from process {}", process, e);
             }
         }).start();
     }
@@ -173,7 +172,7 @@ public final class NormalExtensionRunner implements ExtensionRunner {
             } else
                 Files.delete(path);
         } catch (IOException e) {
-            LOGGER.error("Failed to uninstall extension at {}", filename, e);
+            LOG.error("Failed to uninstall extension at {}", filename, e);
         }
     }
 
@@ -182,7 +181,7 @@ public final class NormalExtensionRunner implements ExtensionRunner {
             try {
                 Files.createDirectories(Paths.get(JAR_PATH, path));
             } catch (IOException e) {
-                LOGGER.error("Failed to create directory at {}", path, e);
+                LOG.error("Failed to create directory at {}", path, e);
             }
         }
     }
@@ -225,18 +224,21 @@ public final class NormalExtensionRunner implements ExtensionRunner {
 
         // Check if the jar file is a Java 8 extension.
         if (!isJava8AndJavaFX(jarFile)) {
-            LOGGER.debug("Jar file {} is not a Java 8 extension, no need to locate Java 1.8", jarFile);
+            LOG.debug("Jar file {} is not a Java 8 extension, no need to locate Java 1.8", jarFile);
             return;
         }
 
         final File currentJavaPath = new File(System.getProperty("java.home"));
         final File javaInstallPath = currentJavaPath.getParentFile();
 
+        LOG.info("Current java.home is {}", currentJavaPath);
+        LOG.info("Looking for other java installs in {}", javaInstallPath);
+
         // Find a folder that starts with "jre1.8" or "jdk1.8".
         final File[] javaVersions = javaInstallPath.listFiles((dir, name) -> name.startsWith("jre1.8") || name.startsWith("jdk1.8"));
 
         if (javaVersions == null || javaVersions.length == 0) {
-            LOGGER.warn("No java 1.8 installation to run extension jar file {}", jarFile);
+            LOG.warn("No java 1.8 installation to run extension jar file {}", jarFile);
             return;
         }
 
@@ -252,6 +254,8 @@ public final class NormalExtensionRunner implements ExtensionRunner {
         }).orElse(javaVersions[0]);
 
         // Change command to use the java executable from the found folder.
+        LOG.info("Using java at {} to run extension jar file {}", javaPath, jarFile);
+
         command.set(0, new File(javaPath, OSValidator.isWindows() ? "bin/java.exe" : "bin/java").getAbsolutePath());
     }
 
@@ -292,7 +296,7 @@ public final class NormalExtensionRunner implements ExtensionRunner {
 
             return hasJavaFX;
         } catch (IOException e) {
-            LOGGER.error("Failed to read jar file {}", jarFile, e);
+            LOG.error("Failed to read jar file {}", jarFile, e);
         }
 
         return false;
