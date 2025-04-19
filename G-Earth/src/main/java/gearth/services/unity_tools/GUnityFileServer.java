@@ -30,7 +30,7 @@ public class GUnityFileServer extends HttpProxyInterceptInitializer
             "/habbo-webgl-clients/.*?/WebGL/habbo2020-global-prod/Build/habbo2020-global-prod.loader.js"
     );
 
-    private static final UnityWebModifyer modifier = new UnityWebModifyer();
+    private static final UnityWebModifier modifier = new UnityWebModifier();
 
     private static final String HeaderAge = "Age";
     private static final String HeaderCacheControl = "Cache-Control";

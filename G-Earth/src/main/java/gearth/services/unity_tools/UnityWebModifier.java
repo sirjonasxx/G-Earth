@@ -6,7 +6,7 @@ import wasm.disassembly.InvalidOpCodeException;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 
-public class UnityWebModifyer {
+public class UnityWebModifier {
 
     private void modifyCodeFile() throws IOException, InvalidOpCodeException {
         // new WasmCodePatcher(codeFile.getAbsolutePath()).patch();
@@ -50,7 +50,7 @@ public class UnityWebModifyer {
         final String firstPart = contents.substring(0, index);
         final String lastPart = contents.substring(index);
 
-        try (final InputStream inputStream = UnityWebModifyer.class.getResourceAsStream(codeName)) {
+        try (final InputStream inputStream = UnityWebModifier.class.getResourceAsStream(codeName)) {
             if (inputStream == null) {
                 throw new UnityWebModifierException("Could not find " + codeName);
             }
