@@ -1,160 +1,72 @@
 package gearth.services.unity_tools;
 
 import org.apache.commons.io.IOUtils;
-import org.codehaus.plexus.util.FileUtils;
 import wasm.disassembly.InvalidOpCodeException;
 
 import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
 
 public class UnityWebModifyer {
 
-    public final static String UNITY_DATA = "habbo2020-global-prod.data.gz";
-    public final static String UNITY_CODE = "habbo2020-global-prod.wasm.gz";
-    public final static String UNITY_FRAMEWORK = "habbo2020-global-prod.framework.js.gz";
-    public final static String UNITY_LOADER = "habbo2020-global-prod.loader.js";
-
-    private final static String UNITYFILES_URL = "https://images.habbo.com/habbo-webgl-clients/{revision}/WebGL/habbo2020-global-prod/Build/";
-
-    private String revision;
-    private File saveFolder;
-    private String currentUrl;
-
-
-    public synchronized boolean modifyAllFiles(String revision, String saveFolderName) {
-        this.revision = revision;
-        currentUrl = UNITYFILES_URL.replace("{revision}", revision);
-        saveFolder = new File(saveFolderName);
-
-        if (saveFolder.exists()) {
-            return true;
-        }
-        saveFolder.mkdirs();
-
-        try {
-            modifyDataFile();
-            modifyCodeFile();
-            modifyFrameworkFile();
-            modifyUnityLoader();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            try {
-                FileUtils.deleteDirectory(saveFolder);
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-            return false;
-        }
-        return true;
-    }
-
-    private void downloadToFile(URL url, File file) throws IOException {
-        BufferedInputStream in = new BufferedInputStream(url.openStream());
-        FileOutputStream fileOutputStream = new FileOutputStream(file);
-        byte[] dataBuffer = new byte[1024];
-        int bytesRead;
-        while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
-            fileOutputStream.write(dataBuffer, 0, bytesRead);
-        }
-        fileOutputStream.close();
-        in.close();
-    }
-    //
-    private void modifyDataFile() throws IOException {
-        File dataFile = new File(saveFolder, UNITY_DATA);
-        URL dataUrl = new URL(currentUrl + UNITY_DATA);
-        downloadToFile(dataUrl, dataFile);
-    }
-
     private void modifyCodeFile() throws IOException, InvalidOpCodeException {
-        File codeFile = new File(saveFolder, UNITY_CODE);
-        URL codeUrl = new URL(currentUrl + UNITY_CODE);
-        downloadToFile(codeUrl, codeFile);
-
-        new WasmCodePatcher(codeFile.getAbsolutePath()).patch();
+        // new WasmCodePatcher(codeFile.getAbsolutePath()).patch();
     }
 
+    public String modifyFrameworkFile(final String revision, String contents) throws UnityWebModifierException {
+        contents = insertFrameworkCode(contents, 0, "js_code/unity_code.js");
+        contents = insertFrameworkCodeAfter(contents, "var asm=createWasm();", "js_code/unity_exports.js");
+        contents = insertFrameworkCodeAfter(contents, "function createWasm(){", "js_code/unity_imports.js");
 
-    private String insertFrameworkCode(String fileContents, int index, String codeName) throws IOException {
-        BufferedReader code = new BufferedReader(new InputStreamReader(UnityWebModifyer.class.getResourceAsStream(codeName), StandardCharsets.UTF_8));
+        // Make these variables global.
+        contents = replaceOrThrow(contents, "var _free", "_free");
+        contents = replaceOrThrow(contents, "var _malloc", "_malloc");
+        contents = replaceOrThrow(contents, "var Module=typeof unityFramework!=\"undefined\"?unityFramework:{};", "var Module=typeof unityFramework!=\"undefined\"?unityFramework:{}; _module = Module;");
+        contents = replaceOrThrow(contents, "{{RevisionName}}", revision);
 
-        String firstPart = fileContents.substring(0, index);
-        String lastPart = fileContents.substring(index);
+        return contents;
+    }
 
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(firstPart);
+    public String modifyLoaderFile(String contents) throws UnityWebModifierException {
+        // Cache bust by checking for unused headers.
+        contents = replaceOrThrow(contents, "\"Last-Modified\"", "\"G-Last-Modified\"");
+        contents = replaceOrThrow(contents, "\"ETag\"", "\"G-ETag\"");
 
-        stringBuilder.append("\n");
-        String line;
-        while ((line = code.readLine()) != null) {
-            stringBuilder.append(line);
-            stringBuilder.append("\n");
+        return contents;
+    }
+
+    private static String insertFrameworkCodeAfter(final String contents, final String search, final String codeName) throws UnityWebModifierException {
+        final int index = contents.indexOf(search);
+
+        if (index == -1) {
+            throw new UnityWebModifierException("Could not find " + search);
         }
 
-        stringBuilder.append(lastPart);
-        return stringBuilder.toString();
+        final int replaceIndex = index + search.length();
+
+        return insertFrameworkCode(contents, replaceIndex, codeName);
     }
 
-    private void modifyFrameworkFile() throws IOException {
-        File frameworkFile = new File(saveFolder, UNITY_FRAMEWORK);
-        URL frameworkUrl = new URL(currentUrl + UNITY_FRAMEWORK);
-        downloadToFile(frameworkUrl, frameworkFile);
+    private static String insertFrameworkCode(final String contents, final int index, final String codeName) throws UnityWebModifierException {
+        final String firstPart = contents.substring(0, index);
+        final String lastPart = contents.substring(index);
 
+        try (final InputStream inputStream = UnityWebModifyer.class.getResourceAsStream(codeName)) {
+            if (inputStream == null) {
+                throw new UnityWebModifierException("Could not find " + codeName);
+            }
 
-        byte[] encoded = IOUtils.toByteArray(new GZIPInputStream(new FileInputStream(frameworkFile)));
-        String contents = new String(encoded, StandardCharsets.UTF_8);
-
-        contents = insertFrameworkCode(contents, 0, "js_code/unity_code.js");
-
-        String exportSearch = "Module.asmLibraryArg,buffer);Module[\"asm\"]=asm;";
-        int exportIndex = contents.indexOf(exportSearch) + exportSearch.length();
-        contents = insertFrameworkCode(contents, exportIndex, "js_code/unity_exports.js");
-
-        String importSearch = "if(!env[\"tableBase\"]){env[\"tableBase\"]=0}";
-        int importIndex = contents.indexOf(importSearch) + importSearch.length();
-        contents = insertFrameworkCode(contents, importIndex, "js_code/unity_imports.js");
-
-        contents = contents
-                .replace("var _free", "_free")
-                .replace("var _malloc", "_malloc")
-                .replace("var Module=typeof Module!==\"undefined\"?Module:{};", "var Module=typeof Module!==\"undefined\"?Module:{}; _module = Module")
-                .replace("{{RevisionName}}", revision);
-
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new GZIPOutputStream(new FileOutputStream(frameworkFile))));
-        writer.write(contents);
-        writer.close();
+            final String code = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
+            return firstPart + code + lastPart;
+        } catch (IOException e) {
+            throw new UnityWebModifierException("Could not read " + codeName);
+        }
     }
 
-    private void modifyUnityLoader() throws IOException {
-        File loaderFile = new File(saveFolder, UNITY_LOADER);
-        URL loaderUrl = new URL(currentUrl + UNITY_LOADER);
-        downloadToFile(loaderUrl, loaderFile);
+    private static String replaceOrThrow(String contents, final String search, final String replace) throws UnityWebModifierException {
+        if (contents.contains(search)) {
+            return contents.replace(search, replace);
+        }
 
-        byte[] encoded = Files.readAllBytes(Paths.get(loaderFile.getAbsolutePath()));
-        String contents = new String(encoded, StandardCharsets.UTF_8);
-
-        contents = contents.replace("o.result.responseHeaders[e]==s.getResponseHeader(e)", "false");
-        contents = contents.replace("a.responseHeaders[e]=o.getResponseHeader(e)",
-                "const genRanHex = size => [...Array(size)].map(() => Math.floor(Math.random() * 16).toString(16)).join('');\n" +
-                        "                if (e === \"ETag\") {\n" +
-                        "                    a.responseHeaders[e] = \"W/\\\"\" + genRanHex(6) + \"-\" + genRanHex(13) + \"\\\"\"\n" +
-                        "                }\n" +
-                        "                else {\n" +
-                        "                    a.responseHeaders[e] = o.getResponseHeader(e)\n" +
-                        "                }");
-
-        BufferedWriter writer = new BufferedWriter(new FileWriter(loaderFile));
-        writer.write(contents);
-        writer.close();
+        throw new UnityWebModifierException("Could not find " + search);
     }
-
-
 }

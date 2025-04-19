@@ -6,25 +6,28 @@ import gearth.protocol.connection.HProxySetter;
 import gearth.protocol.connection.HState;
 import gearth.protocol.connection.HStateSetter;
 import gearth.protocol.connection.proxy.ProxyProvider;
+import gearth.protocol.connection.proxy.http.HttpProxyManager;
 import gearth.services.unity_tools.GUnityFileServer;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainerInitializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.websocket.server.ServerContainer;
 import javax.websocket.server.ServerEndpointConfig;
 import java.io.IOException;
 
-import static gearth.services.unity_tools.GUnityFileServer.FILESERVER_PORT;
+public class UnityProxyProvider implements ProxyProvider, StateChangeListener {
 
-public class UnityProxyProvider implements ProxyProvider {
+    private static final Logger LOG = LoggerFactory.getLogger(UnityProxyProvider.class);
 
     private final HProxySetter proxySetter;
     private final HStateSetter stateSetter;
     private final HConnection hConnection;
+    private final HttpProxyManager httpProxy;
 
     private Server packetHandlerServer = null;
 
@@ -32,6 +35,7 @@ public class UnityProxyProvider implements ProxyProvider {
         this.proxySetter = proxySetter;
         this.stateSetter = stateSetter;
         this.hConnection = hConnection;
+        this.httpProxy = new HttpProxyManager();
     }
 
 
@@ -40,6 +44,18 @@ public class UnityProxyProvider implements ProxyProvider {
         // https://happyhyppo.ro/2016/03/21/minimal-websockets-communication-with-javajetty-and-angularjs/
 
         try {
+            LOG.info("Starting unity http proxy");
+
+            hConnection.getStateObservable().addListener(this);
+
+            if (!this.httpProxy.start(new GUnityFileServer())) {
+                LOG.error("Failed to start nitro proxy");
+                abort();
+                return;
+            }
+
+            LOG.info("Unity http proxy started");
+
             int port = 9040;
             boolean fail = true;
             while (fail && port < 9100) {
@@ -71,7 +87,6 @@ public class UnityProxyProvider implements ProxyProvider {
 
 
             startPortRequestServer(port);
-            startUnityFileServer();
             stateSetter.setState(HState.WAITING_FOR_CLIENT);
 
         } catch (Exception e) {
@@ -94,43 +109,25 @@ public class UnityProxyProvider implements ProxyProvider {
         final Server abortThis = packetHandlerServer;
         stateSetter.setState(HState.ABORTING);
         new Thread(() -> {
+            LOG.info("Stopping unity http proxy");
+
+            try {
+                httpProxy.stop();
+            } catch (Exception e) {
+                LOG.error("Failed to stop unity http proxy", e);
+            }
+
+            LOG.info("Unity http proxy stopped");
+
             try {
                 abortThis.stop();
             } catch (Exception e) {
-                e.printStackTrace();
+                LOG.error("Failed to stop unity packet handler server", e);
             } finally {
                 stateSetter.setState(HState.NOT_CONNECTED);
             }
         }).start();
         packetHandlerServer = null;
-    }
-
-    private void startUnityFileServer() throws Exception {
-        Server server = new Server(FILESERVER_PORT);
-        ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
-        context.setContextPath("/");
-
-        context.addServlet(new ServletHolder(new GUnityFileServer()), "/*");
-
-        HandlerList handlers = new HandlerList();
-        handlers.setHandlers(new Handler[] { context });
-        server.setHandler(handlers);
-
-        server.start();
-        StateChangeListener fileServerCloser = new StateChangeListener() {
-            @Override
-            public void stateChanged(HState oldState, HState newState) {
-                if (oldState == HState.WAITING_FOR_CLIENT || newState == HState.NOT_CONNECTED) {
-                    hConnection.getStateObservable().removeListener(this);
-                    try {
-                        server.stop();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        };
-        hConnection.getStateObservable().addListener(fileServerCloser);
     }
 
     private void startPortRequestServer(int packetHandlerPort) throws Exception {
@@ -164,5 +161,15 @@ public class UnityProxyProvider implements ProxyProvider {
             }
         };
         hConnection.getStateObservable().addListener(portRequesterCloser);
+    }
+
+    @Override
+    public void stateChanged(HState oldState, HState newState) {
+        if (oldState == HState.WAITING_FOR_CLIENT && newState == HState.CONNECTED) {
+            // Unregister but do not stop http proxy.
+            // We are not stopping the http proxy itself because the hotel websocket is connected to it.
+            httpProxy.pause();
+            LOG.info("Unity proxy paused");
+        }
     }
 }

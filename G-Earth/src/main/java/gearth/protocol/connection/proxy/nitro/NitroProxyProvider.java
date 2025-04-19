@@ -40,7 +40,7 @@ public class NitroProxyProvider implements ProxyProvider, StateChangeListener {
     public void start() throws IOException {
         connection.getStateObservable().addListener(this);
 
-        logger.info("Starting http proxy");
+        logger.info("Starting nitro http proxy");
 
         if (!nitroHttpProxy.start(new NitroHttpProxyIntercept(nitroHotelManager, nitroWebsocketHandler))) {
             logger.error("Failed to start nitro proxy");
@@ -48,7 +48,7 @@ public class NitroProxyProvider implements ProxyProvider, StateChangeListener {
             return;
         }
 
-        logger.info("Nitro proxy started");
+        logger.info("Nitro http proxy started");
 
         stateSetter.setState(HState.WAITING_FOR_CLIENT);
     }
