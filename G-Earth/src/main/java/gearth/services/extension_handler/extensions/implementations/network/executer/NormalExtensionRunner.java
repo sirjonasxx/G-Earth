@@ -6,6 +6,7 @@ import gearth.services.extension_handler.extensions.implementations.network.Netw
 import gearth.services.internal_extensions.extensionstore.tools.StoreExtensionTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 import java.io.*;
 import java.net.URISyntaxException;
@@ -118,52 +119,48 @@ public final class NormalExtensionRunner implements ExtensionRunner {
             final ProcessBuilder processBuilder = new ProcessBuilder(execCommandList);
             final Process process = startProcess(processBuilder);
 
-            maybeLogExtension(path, process);
+            final String installedExtensionId = Paths.get(path).getFileName().toString();
 
+            logExtension(installedExtensionId, path, process);
         } catch (IOException e) {
             LOGGER.error("Failed to run extension at path {} using port {}", path, port, e);
         }
     }
 
     public static Process startProcess(ProcessBuilder processBuilder) throws IOException {
-        // Redirect output streams if logging is not enabled to prevent lockup.
-        if (!GEarth.hasFlag(ExtensionRunner.SHOW_EXTENSIONS_LOG)) {
-            processBuilder.redirectErrorStream(true);
-            processBuilder.redirectOutput(new File(OSValidator.isWindows() ? "NUL" : "/dev/null"));
-        }
-
         return processBuilder.start();
     }
 
-    public static void maybeLogExtension(String path, Process process) {
-        if (GEarth.hasFlag(ExtensionRunner.SHOW_EXTENSIONS_LOG)) {
+    public static void logExtension(final String name, String path, Process process) {
+        final Logger logger = LoggerFactory.getLogger("gearth.extension");
 
-            final Logger logger = LoggerFactory.getLogger(path);
+        logger.info("Launching {}...", name);
 
-            logger.info("Launching...");
+        final BufferedReader processInputReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+        new Thread(() -> {
+            MDC.put("extensionName", name);
 
-            final BufferedReader processInputReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            new Thread(() -> {
-                try {
-                    String line;
-                    while ((line = processInputReader.readLine()) != null)
-                        logger.info(line);
-                } catch (IOException e) {
-                    LOGGER.error("Failed to read input line from process {}", process, e);
-                }
-            }, path+"-input").start();
+            try {
+                String line;
+                while ((line = processInputReader.readLine()) != null)
+                    logger.info(line);
+            } catch (IOException e) {
+                LOGGER.error("Failed to read input line from process {}", process, e);
+            }
+        }, path+"-input").start();
 
-            final BufferedReader processErrorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-            new Thread(() -> {
-                try {
-                    String line;
-                    while ((line = processErrorReader.readLine()) != null)
-                        logger.error(line);
-                } catch (IOException e) {
-                    LOGGER.error("Failed to read error line from process {}", process, e);
-                }
-            }).start();
-        }
+        final BufferedReader processErrorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+        new Thread(() -> {
+            MDC.put("extensionName", name);
+
+            try {
+                String line;
+                while ((line = processErrorReader.readLine()) != null)
+                    logger.error(line);
+            } catch (IOException e) {
+                LOGGER.error("Failed to read error line from process {}", process, e);
+            }
+        }).start();
     }
 
     @Override

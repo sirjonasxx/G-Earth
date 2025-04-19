@@ -5,8 +5,6 @@ package gearth.services.extension_handler.extensions.implementations.network.exe
  */
 public interface ExtensionRunner {
 
-    String SHOW_EXTENSIONS_LOG = "--log-extensions";
-
     void runAllExtensions(int port);
 
     void installAndRunExtension(String path, int port);

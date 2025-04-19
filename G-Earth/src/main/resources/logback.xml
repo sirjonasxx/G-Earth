@@ -6,7 +6,7 @@
     </appender>
 
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>app.log</file>
+        <file>logs/app.log</file>
 
         <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
             <fileNamePattern>logs/app.%i.log</fileNamePattern>
@@ -21,7 +21,23 @@
         </encoder>
     </appender>
 
-    <root level="debug">
+    <appender name="FILE_EXTENSIONS" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/extensions.log</file>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <fileNamePattern>logs/extensions.%i.log</fileNamePattern>
+            <minIndex>1</minIndex>
+            <maxIndex>5</maxIndex>
+        </rollingPolicy>
+
+        <triggeringPolicy class="gearth.misc.Logging$RollOncePerSessionTriggeringPolicy"/>
+
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%X{extensionName}] - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="DEBUG">
         <appender-ref ref="STDOUT" />
         <appender-ref ref="FILE" />
     </root>
@@ -32,4 +48,9 @@
     <logger name="com.github.monkeywie" level="DEBUG"/>
     <logger name="org.bouncycastle" level="WARN"/>
     <logger name="org.apache.hc" level="INFO"/>
+
+    <logger name="gearth.extension" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE_EXTENSIONS" />
+        <appender-ref ref="STDOUT" />
+    </logger>
 </configuration>

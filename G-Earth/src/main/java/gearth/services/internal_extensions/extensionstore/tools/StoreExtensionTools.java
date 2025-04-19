@@ -55,7 +55,7 @@ public class StoreExtensionTools {
             ProcessBuilder pb = new ProcessBuilder(command);
             pb.directory(new File(Paths.get(extensionPath, "extension").toString()));
             Process p = NormalExtensionRunner.startProcess(pb);
-            NormalExtensionRunner.maybeLogExtension(extensionPath, p);
+            NormalExtensionRunner.logExtension(installedExtensionId, extensionPath, p);
 
         } catch (IOException e) {
             e.printStackTrace();

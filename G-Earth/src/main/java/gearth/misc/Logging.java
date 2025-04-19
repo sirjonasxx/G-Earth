@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import java.io.File;
+import java.util.HashMap;
 
 public class Logging {
 
@@ -24,16 +25,11 @@ public class Logging {
     }
 
     public static class RollOncePerSessionTriggeringPolicy<E> extends TriggeringPolicyBase<E> {
-        private static boolean doRolling = true;
+        private static final HashMap<String, Boolean> doRolling = new HashMap<>();
 
         @Override
         public boolean isTriggeringEvent(File activeFile, E event) {
-            // roll the first time when the event gets called
-            if (doRolling) {
-                doRolling = false;
-                return true;
-            }
-            return false;
+            return doRolling.putIfAbsent(activeFile.getAbsolutePath(), true) == null;
         }
     }
 }
