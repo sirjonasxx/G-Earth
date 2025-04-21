@@ -1,21 +1,36 @@
 package gearth.services.unity_tools;
 
 import org.apache.commons.io.IOUtils;
-import wasm.disassembly.InvalidOpCodeException;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 
 public class UnityWebModifier {
 
-    private void modifyCodeFile() throws IOException, InvalidOpCodeException {
-        // new WasmCodePatcher(codeFile.getAbsolutePath()).patch();
+    /**
+     * Debug flag to enable debug code in the unity patches.
+     */
+    private static final boolean DEBUG = false;
+
+    public byte[] modifyCodeFile(byte[] content) throws UnityWebModifierException {
+        try {
+            final WasmCodePatcher wasmCodePatcher = new WasmCodePatcher(content);
+            return wasmCodePatcher.patch(DEBUG);
+        } catch (UnityWebModifierException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new UnityWebModifierException("Could not patch code file", e);
+        }
     }
 
     public String modifyFrameworkFile(final String revision, String contents) throws UnityWebModifierException {
         contents = insertFrameworkCode(contents, 0, "js_code/unity_code.js");
         contents = insertFrameworkCodeAfter(contents, "var asm=createWasm();", "js_code/unity_exports.js");
         contents = insertFrameworkCodeAfter(contents, "function createWasm(){", "js_code/unity_imports.js");
+
+        if (DEBUG) {
+            contents = insertFrameworkCodeAfter(contents, "function createWasm(){", "js_code/unity_imports_debug.js");
+        }
 
         // Make these variables global.
         contents = replaceOrThrow(contents, "var _free", "_free");
@@ -58,7 +73,7 @@ public class UnityWebModifier {
             final String code = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
             return firstPart + code + lastPart;
         } catch (IOException e) {
-            throw new UnityWebModifierException("Could not read " + codeName);
+            throw new UnityWebModifierException("Could not read " + codeName, e);
         }
     }
 

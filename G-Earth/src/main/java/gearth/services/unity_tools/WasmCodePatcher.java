@@ -1,30 +1,58 @@
 package gearth.services.unity_tools;
 
-import gearth.services.unity_tools.codepatcher.IncomingPacketPatcher;
-import gearth.services.unity_tools.codepatcher.OutgoingPacketPatcher;
-import gearth.services.unity_tools.codepatcher.ReturnBytePatcher;
-import gearth.services.unity_tools.codepatcher.SetKeyPatcher;
+import gearth.services.unity_tools.codepatcher.*;
+import gearth.services.unity_tools.codepatcher.debug.IncomingPacketPatcherDebug;
+import gearth.services.unity_tools.codepatcher.debug.OutgoingPacketPatcherDebug;
 import wasm.disassembly.InvalidOpCodeException;
 import wasm.disassembly.modules.Module;
+import wasm.misc.StreamReplacement;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 
 public class WasmCodePatcher {
 
-    private String file;
+    private final byte[] content;
 
-    public WasmCodePatcher(String file) {
-        this.file = file;
+    public WasmCodePatcher(final byte[] content) {
+        this.content = content;
     }
 
-    public void patch() throws IOException, InvalidOpCodeException {
-        Module module = new Module(file, true, Arrays.asList(
-                new SetKeyPatcher(),
-                new ReturnBytePatcher(),
+    public byte[] patch(final boolean injectDebug) throws IOException, InvalidOpCodeException, UnityWebModifierException {
+        final ByteArrayInputStream baseStream = new ByteArrayInputStream(content);
+        final BufferedInputStream inputStream = new BufferedInputStream(baseStream);
+
+        // Patch.
+        final List<StreamReplacement> patches = Arrays.asList(
+                new SalsaSetKeyPatcher(),
+                new SalsaReturnBytePatcher(),
                 new OutgoingPacketPatcher(),
                 new IncomingPacketPatcher()
-        ));
-        module.assembleToFile(file, true);
+        );
+
+        if (injectDebug) {
+            patches.add(new IncomingPacketPatcherDebug());
+            patches.add(new OutgoingPacketPatcherDebug());
+        }
+
+        final Module module = new Module(inputStream, patches);
+
+        // Check if any patch failed.
+        for (StreamReplacement patch : patches) {
+            if (!patch.isPatched()) {
+                throw new UnityWebModifierException("Failed to patch " + patch.getClass().getSimpleName());
+            }
+        }
+
+        // Assemble.
+        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+        module.assemble(outputStream);
+
+        return outputStream.toByteArray();
     }
 }

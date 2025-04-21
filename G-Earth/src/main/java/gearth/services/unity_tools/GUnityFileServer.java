@@ -79,7 +79,9 @@ public class GUnityFileServer extends HttpProxyInterceptInitializer
                     } else if (httpRequest.uri().endsWith("/Build/habbo2020-global-prod.wasm.gz")) {
                         LOG.info("Modifying wasm code");
 
-                        // TODO: Do
+                        final byte[] content = responseReadBytes(httpResponse);
+
+                        responseWriteBytes(httpResponse, modifier.modifyCodeFile(content));
                     } else if (httpRequest.uri().endsWith("/Build/habbo2020-global-prod.framework.js.gz")) {
                         LOG.info("Modifying framework");
 
@@ -134,14 +136,23 @@ public class GUnityFileServer extends HttpProxyInterceptInitializer
         return contentBuf.toString(StandardCharsets.UTF_8);
     }
 
-    private static void responseWrite(FullHttpResponse response, String content) {
-        final byte[] body = content.getBytes(StandardCharsets.UTF_8);
+    private static byte[] responseReadBytes(FullHttpResponse response) {
+        final ByteBuf contentBuf = response.content();
+        final byte[] bytes = new byte[contentBuf.readableBytes()];
+        contentBuf.readBytes(bytes);
+        return bytes;
+    }
 
+    private static void responseWrite(FullHttpResponse response, String content) {
+        responseWriteBytes(response, content.getBytes(StandardCharsets.UTF_8));
+    }
+
+    private static void responseWriteBytes(FullHttpResponse response, byte[] content) {
         // Update content.
-        response.content().clear().writeBytes(body);
+        response.content().clear().writeBytes(content);
 
         // Update content-length.
-        HttpUtil.setContentLength(response, body.length);
+        HttpUtil.setContentLength(response, content.length);
 
         // Ensure modified response is not cached.
         stripCacheHeaders(response.headers());

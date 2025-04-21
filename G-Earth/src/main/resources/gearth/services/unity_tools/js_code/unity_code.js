@@ -3,7 +3,6 @@ let gearth_isconnected = false;
 let revision = "{{RevisionName}}";
 let g_ws;
 
-
 let chachas = [];
 let chachaClass = -1;
 
@@ -83,11 +82,9 @@ function printPacket(type, packet) {
     }
 }
 
-
 let _g_packet_split = 600;
 
 function inject_out(packet) {
-
     if (chachas.length > 1) {
         packet[5] =  _gearth_returnbyte_copy(chachas[0], packet[5], chachaClass);
         packet[4] =  _gearth_returnbyte_copy(chachas[0], packet[4], chachaClass);
