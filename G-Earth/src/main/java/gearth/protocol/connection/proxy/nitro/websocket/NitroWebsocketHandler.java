@@ -62,10 +62,15 @@ public class NitroWebsocketHandler implements NitroWebsocketCallback, StateChang
         // Setup nitro hotel.
         if (this.nitroHotelManager.hasWebsocket(websocketUrl)) {
             this.nitroHotel = this.nitroHotelManager.getByWebsocket(websocketUrl);
-            this.packetModifier = this.nitroHotel.createPacketModifier();
 
-            clientSession.setModifier(data -> packetModifier.gearthToClient(data));
-            serverSession.setModifier(data -> packetModifier.gearthToServer(data));
+            final NitroPacketModifier modifier = this.nitroHotel.createPacketModifier();
+
+            if (modifier != null) {
+                this.packetModifier = modifier;
+
+                clientSession.setModifier(data -> this.packetModifier.gearthToClient(data));
+                serverSession.setModifier(data -> this.packetModifier.gearthToServer(data));
+            }
 
             logger.info("Detected hotel as {}, using a custom nitro configuration", this.nitroHotel.getName());
         } else {

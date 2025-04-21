@@ -2,6 +2,7 @@ package gearth.services.nitro;
 
 import gearth.services.nitro.hotels.HabboCity;
 import gearth.services.nitro.hotels.Hartico;
+import gearth.services.nitro.hotels.LeetNL;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +15,7 @@ public class NitroHotelManager {
         this.hotels = new ArrayList<>();
         this.hotels.add(new HabboCity());
         this.hotels.add(new Hartico());
+        this.hotels.add(new LeetNL());
     }
 
     public void checkAsset(final String host, final String uri, final byte[] data) {
