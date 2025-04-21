@@ -1,77 +1,147 @@
 package gearth.services.nitro.hotels;
 
+import gearth.services.nitro.NitroAsset;
 import gearth.services.nitro.NitroHotel;
 import gearth.services.nitro.NitroPacketModifier;
-import org.bouncycastle.util.encoders.Base64;
-import org.bouncycastle.util.encoders.Hex;
+import javafx.scene.image.Image;
+import javafx.scene.image.PixelFormat;
 
 import javax.crypto.Cipher;
-import javax.crypto.spec.GCMParameterSpec;
+import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.security.SecureRandom;
-import java.util.ArrayList;
+import java.io.ByteArrayInputStream;
+import java.security.*;
 import java.util.Collections;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Created by Mikee on 2025-03-27.
  */
 public class Hartico extends NitroHotel {
 
+    private byte[] tripleDesKey;
+
     public Hartico() {
-        super("hartico.tv", Collections.singletonList("wss://server.hartico.tv/"), new ArrayList<>());
+        super("hartico.tv",
+                Collections.singletonList("wss://server.hartico.tv/"),
+                Collections.singletonList(new NitroAsset("images.hartico.tv", "/cosmos/img/logos/logo.png")));
     }
 
     @Override
     public NitroPacketModifier createPacketModifier() {
-        return new HarticoPacketModifier();
+        if (tripleDesKey == null) {
+            throw new IllegalStateException("Failed to create packet modifier, keys not initialized");
+        }
+
+        return new HarticoPacketModifier(tripleDesKey);
     }
 
     @Override
     protected void loadAsset(String host, String uri, byte[] data) {
+        if ("/cosmos/img/logos/logo.png".equals(uri)) {
+            tripleDesKey = extractKeyFromImage(data);
+        }
+    }
 
+    private static byte[] extractKeyFromImage(final byte[] imageData) {
+        // Load data as Image
+        final Image image = new Image(new ByteArrayInputStream(imageData));
+        final byte[] pixelData = new byte[(int) (image.getWidth() * image.getHeight() * 4)];
+
+        image.getPixelReader().getPixels(0, 0, (int) image.getWidth(), (int) image.getHeight(), PixelFormat.getByteBgraInstance(), pixelData, 0, (int) image.getWidth() * 4);
+
+        // Convert from BGRA to RGBA
+        for (int i = 0; i < pixelData.length; i += 4) {
+            byte b = pixelData[i];
+            byte g = pixelData[i + 1];
+            byte r = pixelData[i + 2];
+            byte a = pixelData[i + 3];
+
+            pixelData[i]     = r;
+            pixelData[i + 1] = g;
+            pixelData[i + 2] = b;
+            pixelData[i + 3] = a;
+        }
+
+        // Extract 128 red pixels.
+        final byte[] redBits = new byte[128];
+
+        for (int i = 0; i < redBits.length; i++) {
+            redBits[i] = (byte) (pixelData[i * 4] & 1);
+        }
+
+        // Group bits into bytes.
+        final byte[] redBytes = new byte[16];
+
+        for (int i = 0; i < 16; i++) {
+            int value = 0;
+            for (int j = 0; j < 8; j++) {
+                value = (value << 1) | redBits[i * 8 + j];
+            }
+            redBytes[i] = (byte) value;
+        }
+
+        final byte[] redBytesExtended = new byte[24];
+
+        System.arraycopy(redBytes, 0, redBytesExtended, 0, 16);
+        System.arraycopy(redBytes, 0, redBytesExtended, 16, 8);
+
+        return redBytesExtended;
     }
 
     public static class HarticoPacketModifier implements NitroPacketModifier {
 
-        private static final SecretKeySpec StaticKey = new SecretKeySpec(Base64.decode("eNYjKGxfQsmtdpuLHuznYA=="), "AES");
-        private static final SecureRandom Random = new SecureRandom();
+        private final SecretKeySpec secretKeySpec;
 
-        private byte[] doEncrypt(byte[] data) throws Exception {
-            // Generate iv.
-            final byte[] iv = new byte[12];
-            Random.nextBytes(iv);
+        private boolean isAuthenticated;
 
-            // Init cipher.
-            final Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding", "BC");
-
-            cipher.init(Cipher.ENCRYPT_MODE, StaticKey, new GCMParameterSpec(128, iv));
-
-            // Encrypt data.
-            final byte[] encrypted = new byte[iv.length + cipher.getOutputSize(data.length)];
-
-            cipher.doFinal(data, 0, data.length, encrypted, iv.length);
-
-            // Copy iv to the start.
-            System.arraycopy(iv, 0, encrypted, 0, iv.length);
-
-            return encrypted;
+        public HarticoPacketModifier(byte[] tripleDesKey) {
+            secretKeySpec = new SecretKeySpec(tripleDesKey, "TripleDES");
         }
 
-        private byte[] doDecrypt(byte[] data) throws Exception {
-            final Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding", "BC");
+        private byte[] encrypt(final byte[] data) throws GeneralSecurityException {
+            final byte[] iv = new byte[8];
+            ThreadLocalRandom.current().nextBytes(iv);
 
-            cipher.init(Cipher.DECRYPT_MODE, StaticKey, new GCMParameterSpec(128, data, 0, 12));
+            final Cipher cipher = Cipher.getInstance("TripleDES/CBC/PKCS5Padding");
+            cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, new IvParameterSpec(iv, 0, 8));
+            final byte[] encrypted = cipher.doFinal(data);
+            final byte[] result = new byte[iv.length + encrypted.length];
 
-            return cipher.doFinal(data, 12, data.length - 12);
+            System.arraycopy(iv, 0, result, 0, iv.length);
+            System.arraycopy(encrypted, 0, result, iv.length, encrypted.length);
+
+            return result;
+        }
+
+        private byte[] decrypt(final byte[] data) throws GeneralSecurityException {
+            final Cipher cipher = Cipher.getInstance("TripleDES/CBC/PKCS5Padding");
+            cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, new IvParameterSpec(data, 0, 8));
+            return cipher.doFinal(data, 8, data.length - 8);
         }
 
         @Override
-        public byte[] clientToGearth(byte[] data) throws Exception {
-            return doDecrypt(data);
+        public byte[] clientToGearth(byte[] data) throws GeneralSecurityException {
+            if (isAuthenticated) {
+                data = decrypt(data);
+            }
+
+            return data;
         }
 
         @Override
         public byte[] gearthToClient(byte[] data) {
+            if (!isAuthenticated &&
+                    data.length == 6 &&
+                    data[0] == 0x00 &&
+                    data[1] == 0x00 &&
+                    data[2] == 0x00 &&
+                    data[3] == 0x02 &&
+                    data[4] == 0x09 &&
+                    data[5] == -69) {
+                isAuthenticated = true;
+            }
+
             return data;
         }
 
@@ -81,8 +151,12 @@ public class Hartico extends NitroHotel {
         }
 
         @Override
-        public byte[] gearthToServer(byte[] data) throws Exception {
-            return doEncrypt(data);
+        public byte[] gearthToServer(byte[] data)  throws GeneralSecurityException {
+            if (isAuthenticated) {
+                data = encrypt(data);
+            }
+
+            return data;
         }
     }
 }
