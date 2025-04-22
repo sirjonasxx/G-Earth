@@ -1,5 +1,8 @@
 package gearth.services.extension_handler.extensions.implementations.network.executer;
 
+import gearth.GEarth;
+
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,9 +16,15 @@ public final class ExecutionInfo {
     private static final Map<String, String[]> EXTENSION_TYPE_TO_EXECUTION_COMMAND;
 
     public final static List<String> ALLOWED_EXTENSION_TYPES;
-    public final static String EXTENSIONS_DIRECTORY = "Extensions";
+    public final static File EXTENSIONS_DIRECTORY;
 
     static {
+        final String overrideDataDir = System.getProperty("gearth.data.dir");
+        final File dataDir = overrideDataDir != null
+                ? new File(overrideDataDir)
+                : new File(GEarth.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParentFile();
+
+        EXTENSIONS_DIRECTORY = new File(dataDir, "Extensions");
 
         EXTENSION_TYPE_TO_EXECUTION_COMMAND = new HashMap<>();
         EXTENSION_TYPE_TO_EXECUTION_COMMAND.put("*.jar", new String[]{"java", "-jar", "{path}"});

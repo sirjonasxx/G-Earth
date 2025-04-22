@@ -1,5 +1,6 @@
 package gearth.services.internal_extensions.extensionstore.application.entities.installed;
 
+import gearth.services.extension_handler.extensions.implementations.network.executer.ExecutionInfo;
 import gearth.services.internal_extensions.extensionstore.GExtensionStore;
 import gearth.services.internal_extensions.extensionstore.application.entities.ContentItem;
 import gearth.services.internal_extensions.extensionstore.application.entities.HOverview;
@@ -9,10 +10,10 @@ import gearth.services.internal_extensions.extensionstore.tools.InstalledExtensi
 import gearth.services.internal_extensions.extensionstore.tools.StoreExtensionTools;
 import gearth.ui.translations.LanguageBundle;
 import org.apache.maven.artifact.versioning.ComparableVersion;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
-import java.io.File;
-import java.io.IOException;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -20,6 +21,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class InstalledOverview extends HOverview {
+
+    private static final Logger LOG = LoggerFactory.getLogger(InstalledOverview.class);
 
     private final StoreRepository storeRepository;
 
@@ -60,9 +63,9 @@ public class InstalledOverview extends HOverview {
     @Override
     public void buttonClick(GExtensionStore gExtensionStore) {
         try {
-            Desktop.getDesktop().open(new File(StoreExtensionTools.EXTENSIONS_PATH));
+            Desktop.getDesktop().open(ExecutionInfo.EXTENSIONS_DIRECTORY);
         } catch (Exception e) {
-//            e.printStackTrace(); // no extensions installed yet, directory isnt created
+            LOG.error("Error opening extensions directory", e);
         }
     }
 

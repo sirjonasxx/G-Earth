@@ -36,6 +36,10 @@ public class Cacher {
 
             CACHE_DIR = new File(appDir, "Cache");
         }
+
+        if (!CACHE_DIR.exists()) {
+            CACHE_DIR.mkdirs();
+        }
     }
 
     public static File getCacheDir() {

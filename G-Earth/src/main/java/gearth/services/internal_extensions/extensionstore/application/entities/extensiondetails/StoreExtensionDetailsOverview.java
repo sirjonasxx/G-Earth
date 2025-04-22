@@ -17,6 +17,7 @@ import javafx.scene.control.Alert;
 import org.apache.maven.artifact.versioning.ComparableVersion;
 import org.w3c.dom.Element;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
@@ -131,7 +132,7 @@ public class StoreExtensionDetailsOverview extends HOverview {
 
         StoreExtensionTools.InstallExtListener listener =  new StoreExtensionTools.InstallExtListener() {
             @Override
-            public void success(String installationFolder) {
+            public void success(File installationFolder) {
                 Platform.runLater(() -> successPopup(modeString));
                 StoreExtensionTools.executeExtension(installationFolder, ExtensionProducerFactory.getExtensionServer().getPort());
             }

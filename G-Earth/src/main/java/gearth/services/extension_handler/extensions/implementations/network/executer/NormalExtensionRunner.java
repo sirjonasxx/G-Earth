@@ -1,6 +1,5 @@
 package gearth.services.extension_handler.extensions.implementations.network.executer;
 
-import gearth.GEarth;
 import gearth.misc.OSValidator;
 import gearth.services.extension_handler.extensions.implementations.network.NetworkExtensionAuthenticator;
 import gearth.services.internal_extensions.extensionstore.tools.StoreExtensionTools;
@@ -8,11 +7,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
-import java.io.*;
-import java.net.URISyntaxException;
-import java.net.URL;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
@@ -29,83 +30,66 @@ public final class NormalExtensionRunner implements ExtensionRunner {
 
     private final static Logger LOG = LoggerFactory.getLogger(NormalExtensionRunner.class);
 
-    public static final String JAR_PATH;
-
-    static {
-        final URL url = getLocation();
-        String value;
-        try {
-            value = new File(url.toURI()).getParent();
-        } catch (URISyntaxException e) {
-            value = new File(url.getPath()).getParent();
-            LOG.warn("Failed to load JAR_PATH from url {} as URI, using Path instead", url, e);
-        }
-        JAR_PATH = value;
-        LOG.debug("Set JAR_PATH as {}", JAR_PATH);
-    }
-
     @Override
     public void runAllExtensions(int port) {
-
-        if (dirExists(ExecutionInfo.EXTENSIONS_DIRECTORY)) {
-
-            final File extensionsDirectory = Paths.get(JAR_PATH, ExecutionInfo.EXTENSIONS_DIRECTORY).toFile();
-            final File[] extensionFiles = extensionsDirectory.listFiles();
+        if (ExecutionInfo.EXTENSIONS_DIRECTORY.isDirectory()) {
+            final File[] extensionFiles = ExecutionInfo.EXTENSIONS_DIRECTORY.listFiles();
 
             if (extensionFiles == null) {
-                LOG.error("Provided extensionsDirectory does not exist (extensionsDirectory={})", extensionsDirectory);
+                LOG.error("Provided extensionsDirectory does not exist (extensionsDirectory={})", ExecutionInfo.EXTENSIONS_DIRECTORY);
                 return;
             }
 
-            for (File file : extensionFiles)
-                tryRunExtension(file.getPath(), port);
-        } else
+            for (final File file : extensionFiles) {
+                tryRunExtension(file, port);
+            }
+        } else {
             LOG.warn("Did not run extensions because extensions directory does not exist at {}", ExecutionInfo.EXTENSIONS_DIRECTORY);
+        }
     }
 
     @Override
-    public void installAndRunExtension(String stringPath, int port) {
-
-        if (!dirExists(ExecutionInfo.EXTENSIONS_DIRECTORY))
+    public void installAndRunExtension(final File path, int port) {
+        if (!ExecutionInfo.EXTENSIONS_DIRECTORY.isDirectory()) {
             tryCreateDirectory(ExecutionInfo.EXTENSIONS_DIRECTORY);
+        }
 
-        final Path path = Paths.get(stringPath);
-        final String name = path.getFileName().toString();
+        final String name = path.getName();
         final String[] split = name.split("\\.");
         final String ext = "*." + split[split.length - 1];
 
         final String realName = String.join(".", Arrays.copyOf(split, split.length - 1));
         final String newName = realName + "-" + getRandomString() + ext.substring(1);
 
-        final Path newPath = Paths.get(JAR_PATH, ExecutionInfo.EXTENSIONS_DIRECTORY, newName);
+        final File newPath = new File(ExecutionInfo.EXTENSIONS_DIRECTORY, newName);
 
         try {
-            Files.copy(path, newPath);
+            Files.copy(path.toPath(), newPath.toPath());
 
-            tryRunExtension(newPath.toString(), port);
+            tryRunExtension(newPath, port);
         } catch (IOException e) {
             LOG.error("Failed to copy extension from {} to {}", path, newPath, e);
         }
     }
 
-    public void tryRunExtension(String path, int port) {
+    public void tryRunExtension(final File path, int port) {
         LOG.info("Running extension {}", path);
 
         try {
-            if (new File(path).isDirectory()) {
+            if (path.isDirectory()) {
                 // this extension is installed from the extension store and requires different behavior
                 StoreExtensionTools.executeExtension(path, port);
                 return;
             }
 
-            final String filename = Paths.get(path).getFileName().toString();
+            final String filename = path.getName();
             final String[] execCommand = ExecutionInfo
-                    .getExecutionCommand(getFileExtension(path))
+                    .getExecutionCommand(getFileExtension(filename))
                     .clone();
             final String cookie = NetworkExtensionAuthenticator.generateCookieForExtension(filename);
             for (int i = 0; i < execCommand.length; i++) {
                 execCommand[i] = execCommand[i]
-                        .replace("{path}", path)
+                        .replace("{path}", path.getAbsolutePath())
                         .replace("{port}", port + "")
                         .replace("{filename}", filename)
                         .replace("{cookie}", cookie);
@@ -113,14 +97,12 @@ public final class NormalExtensionRunner implements ExtensionRunner {
 
             final List<String> execCommandList = Arrays.asList(execCommand);
 
-            NormalExtensionRunner.locateJavaForJar(execCommandList, null, new File(path));
+            NormalExtensionRunner.locateJavaForJar(execCommandList, null, path);
 
             final ProcessBuilder processBuilder = new ProcessBuilder(execCommandList);
             final Process process = startProcess(processBuilder);
 
-            final String installedExtensionId = Paths.get(path).getFileName().toString();
-
-            logExtension(installedExtensionId, path, process);
+            logExtension(filename, path, process);
         } catch (IOException e) {
             LOG.error("Failed to run extension at path {} using port {}", path, port, e);
         }
@@ -130,7 +112,7 @@ public final class NormalExtensionRunner implements ExtensionRunner {
         return processBuilder.start();
     }
 
-    public static void logExtension(final String name, String path, Process process) {
+    public static void logExtension(final String name, final File path, Process process) {
         final Logger logger = LoggerFactory.getLogger("gearth.extension");
 
         logger.info("Launching {}...", name);
@@ -163,35 +145,28 @@ public final class NormalExtensionRunner implements ExtensionRunner {
     }
 
     @Override
-    public void uninstallExtension(String filename) {
+    public void uninstallExtension(final String filename) {
         try {
-            final Path path = Paths.get(JAR_PATH, ExecutionInfo.EXTENSIONS_DIRECTORY, filename);
-            if (new File(path.toString()).isDirectory()) {
+            final File path = new File(ExecutionInfo.EXTENSIONS_DIRECTORY, filename);
+            if (path.isDirectory()) {
                 // is installed through extension store
-                StoreExtensionTools.removeExtension(path.toString());
-            } else
-                Files.delete(path);
+                StoreExtensionTools.removeExtension(path);
+            } else {
+                Files.delete(path.toPath());
+            }
         } catch (IOException e) {
             LOG.error("Failed to uninstall extension at {}", filename, e);
         }
     }
 
-    private static void tryCreateDirectory(String path) {
-        if (!dirExists(path)) {
-            try {
-                Files.createDirectories(Paths.get(JAR_PATH, path));
-            } catch (IOException e) {
-                LOG.error("Failed to create directory at {}", path, e);
-            }
+    private static void tryCreateDirectory(final File path) {
+        if (path.exists()) {
+            return;
         }
-    }
 
-    private static boolean dirExists(String dir) {
-        return Files.isDirectory(Paths.get(JAR_PATH, dir));
-    }
-
-    private static URL getLocation() {
-        return GEarth.class.getProtectionDomain().getCodeSource().getLocation();
+        if (!path.mkdirs()) {
+            LOG.error("Failed to create directory at {}", path);
+        }
     }
 
     private static String getFileExtension(String path) {

@@ -93,7 +93,7 @@ public class ExtensionsController extends SubForm {
                 new FileChooser.ExtensionFilter(LanguageBundle.get("tab.extensions.button.install.filetype"), ExecutionInfo.ALLOWED_EXTENSION_TYPES));
         File selectedFile = fileChooser.showOpenDialog(parentController.getStage());
         if (selectedFile != null) {
-            extensionRunner.installAndRunExtension(selectedFile.getPath(), networkExtensionsProducer.getPort());
+            extensionRunner.installAndRunExtension(selectedFile, networkExtensionsProducer.getPort());
         }
     }
 

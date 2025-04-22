@@ -1,8 +1,15 @@
 package gearth.ui.subforms.extensions;
 
-import gearth.GEarth;
+import gearth.misc.ConfirmationDialog;
 import gearth.services.extension_handler.extensions.ExtensionType;
 import gearth.services.extension_handler.extensions.GEarthExtension;
+import gearth.services.extension_handler.extensions.implementations.network.executer.ExecutionInfo;
+import gearth.services.extension_handler.extensions.implementations.network.executer.ExtensionRunner;
+import gearth.services.extension_handler.extensions.implementations.network.executer.ExtensionRunnerFactory;
+import gearth.ui.buttons.DeleteButton;
+import gearth.ui.buttons.ExitButton;
+import gearth.ui.buttons.ReloadButton;
+import gearth.ui.buttons.SimpleClickButton;
 import gearth.ui.titlebar.TitleBarController;
 import gearth.ui.translations.LanguageBundle;
 import gearth.ui.translations.TranslatableString;
@@ -10,19 +17,21 @@ import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.*;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.RowConstraints;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
-import gearth.misc.ConfirmationDialog;
-import gearth.ui.buttons.*;
-import gearth.services.extension_handler.extensions.implementations.network.executer.ExecutionInfo;
-import gearth.services.extension_handler.extensions.implementations.network.executer.ExtensionRunner;
-import gearth.services.extension_handler.extensions.implementations.network.executer.ExtensionRunnerFactory;
-import gearth.services.extension_handler.extensions.implementations.network.executer.NormalExtensionRunner;
 
+import java.io.File;
 import java.io.IOException;
-import java.nio.file.Paths;
 
 /**
  * Created by Jonas on 19/07/18.
@@ -100,7 +109,7 @@ public class ExtensionItemContainer extends GridPane {
         reloadButton.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
             reloadButton.setVisible(false);
             ExtensionRunner runner = ExtensionRunnerFactory.get();
-            runner.tryRunExtension(Paths.get(NormalExtensionRunner.JAR_PATH, ExecutionInfo.EXTENSIONS_DIRECTORY, item.getFileName()).toString(), port);
+            runner.tryRunExtension(new File(ExecutionInfo.EXTENSIONS_DIRECTORY, item.getFileName()), port);
         });
 
         DeleteButton deleteButton = new DeleteButton();

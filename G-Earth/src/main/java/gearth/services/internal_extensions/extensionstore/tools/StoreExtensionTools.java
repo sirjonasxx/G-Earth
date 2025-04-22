@@ -12,6 +12,8 @@ import gearth.ui.translations.LanguageBundle;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.artifact.versioning.ComparableVersion;
 import org.json.JSONArray;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.MalformedURLException;
@@ -27,21 +29,20 @@ import java.util.zip.ZipInputStream;
 
 public class StoreExtensionTools {
 
+    private final static Logger LOG = LoggerFactory.getLogger(StoreExtensionTools.class);
+
     public interface InstallExtListener {
 
-        void success(String installationFolder);
+        void success(File installationFolder);
         void fail(String reason);
 
     }
 
-    public final static String EXTENSIONS_PATH = Paths.get(NormalExtensionRunner.JAR_PATH, ExecutionInfo.EXTENSIONS_DIRECTORY).toString();
-
-
-    public static void executeExtension(String extensionPath, int port) {
+    public static void executeExtension(final File extensionPath, int port) {
         try {
-            String installedExtensionId = Paths.get(extensionPath).getFileName().toString();
+            String installedExtensionId = extensionPath.getName();
 
-            String commandPath = Paths.get(extensionPath, "command.txt").toString();
+            String commandPath = new File(extensionPath, "command.txt").getAbsolutePath();
             String cookie = NetworkExtensionAuthenticator.generateCookieForExtension(installedExtensionId);
             List<String> command = new JSONArray(FileUtils.readFileToString(new File(commandPath), "UTF-8"))
                     .toList().stream().map(o -> (String)o).map(s -> s
@@ -50,17 +51,15 @@ public class StoreExtensionTools {
                             .replace("{cookie}", cookie))
                     .collect(Collectors.toList());
 
-            NormalExtensionRunner.locateJavaForJar(command, new File(Paths.get(extensionPath, "extension").toString()), null);
+            NormalExtensionRunner.locateJavaForJar(command, new File(extensionPath, "extension"), null);
 
             ProcessBuilder pb = new ProcessBuilder(command);
-            pb.directory(new File(Paths.get(extensionPath, "extension").toString()));
+            pb.directory(new File(extensionPath, "extension"));
             Process p = NormalExtensionRunner.startProcess(pb);
             NormalExtensionRunner.logExtension(installedExtensionId, extensionPath, p);
-
         } catch (IOException e) {
-            e.printStackTrace();
+            LOG.error("Failed to execute extension", e);
         }
-
     }
 
     private static void unzipInto(InputStream inputStream, File directory) throws IOException {
@@ -113,9 +112,9 @@ public class StoreExtensionTools {
                 String version = ext.getVersion();
 
                 String folderName = name + "_" + version;
-                String path = Paths.get(EXTENSIONS_PATH, folderName).toString();
+                File path = new File(ExecutionInfo.EXTENSIONS_DIRECTORY, folderName);
 
-                File extensionPath = new File(Paths.get(path, "extension").toString());
+                File extensionPath = new File(path, "extension");
 
                 if (extensionPath.mkdirs()) {
                     try {
@@ -125,7 +124,7 @@ public class StoreExtensionTools {
                         try {
                             unzipInto(inputStream, extensionPath);
 
-                            File commandFile = new File(Paths.get(path, "command.txt").toString());
+                            File commandFile = new File(path, "command.txt");
                             List<String> command = OSValidator.isMac() ? ext.getCommands().getMac() : (OSValidator.isUnix() ? ext.getCommands().getLinux() :
                                             (OSValidator.isWindows() ? ext.getCommands().getWindows() : ext.getCommands().getDefault()));
                             command = command == null ? ext.getCommands().getDefault() : command;
@@ -139,7 +138,7 @@ public class StoreExtensionTools {
                             listener.success(path);
 
                         } catch (IOException e) {
-                            e.printStackTrace();
+                            LOG.error("Failed to unzip extension", e);
                             listener.fail(LanguageBundle.get("ext.store.fail.unzip"));
                             removeExtension(path);
                         }
@@ -169,16 +168,14 @@ public class StoreExtensionTools {
 
     }
 
-    public static void removeExtension(String extensionPath) throws IOException {
-        FileUtils.deleteDirectory(new File(extensionPath));
+    public static void removeExtension(final File extensionPath) throws IOException {
+        FileUtils.deleteDirectory(extensionPath);
     }
 
     public static List<InstalledExtension> getInstalledExtension() {
         List<InstalledExtension> installedExtensions = new ArrayList<>();
 
-        File extensionsDir = new File(EXTENSIONS_PATH);
-
-        File[] existingExtensions = extensionsDir.listFiles();
+        File[] existingExtensions = ExecutionInfo.EXTENSIONS_DIRECTORY.listFiles();
         if (existingExtensions != null) {
             for (File extension : existingExtensions) {
 
@@ -213,10 +210,8 @@ public class StoreExtensionTools {
     public static void updateExtension(String name, StoreRepository storeRepository, InstallExtListener listener) {
         // remove old occurences
 
-        File extensionsDir = new File(EXTENSIONS_PATH);
-
         try {
-            File[] existingExtensions = extensionsDir.listFiles();
+            File[] existingExtensions = ExecutionInfo.EXTENSIONS_DIRECTORY.listFiles();
             if (existingExtensions != null) {
                 for (File extension : existingExtensions) {
 
@@ -227,12 +222,10 @@ public class StoreExtensionTools {
                             parts.remove(parts.size() - 1);
                             String extensionName = String.join("_", parts);
                             if (name.equals(extensionName)) {
-                                removeExtension(extension.getPath());
+                                removeExtension(extension);
                             }
                         }
-
                     }
-
                 }
             }
         } catch (Exception e) {
@@ -249,7 +242,7 @@ public class StoreExtensionTools {
             public void success(StoreRepository storeRepository) {
                 installExtension("G-BuildTools", storeRepository, new InstallExtListener() {
                     @Override
-                    public void success(String installationFolder) {
+                    public void success(File installationFolder) {
                         System.out.println(String.format("Installed in: %s", installationFolder));
                     }
 
