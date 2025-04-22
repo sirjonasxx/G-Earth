@@ -97,6 +97,7 @@
                     <generateInstaller>false</generateInstaller>
                     <jreMinVersion>17.0.0</jreMinVersion>
                     <additionalModules>
+                        <!-- Otherwise SSL errors: https://stackoverflow.com/a/55517159 -->
                         <additionalModule>jdk.crypto.ec</additionalModule>
                     </additionalModules>
                 </configuration>
@@ -214,7 +215,7 @@
         <!-- Dependency profiles -->
         <!-- We need to disable building with JavaFX for JDKs that ship with JavaFX -->
         <profile>
-            <id>include-javafx</id>
+            <id>include-javafx-dependencies</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
@@ -235,6 +236,26 @@
                     <version>${javafx.version}</version>
                 </dependency>
             </dependencies>
+        </profile>
+
+        <!-- For liberica we need to explicitly tell jlink to add JavaFX to the custom JRE -->
+        <profile>
+            <id>package-javafx-modules</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>io.github.fvarrui</groupId>
+                        <artifactId>javapackager</artifactId>
+                        <configuration>
+                            <additionalModules>
+                                <additionalModule>javafx.fxml</additionalModule>
+                                <additionalModule>javafx.web</additionalModule>
+                                <additionalModule>javafx.swing</additionalModule>
+                            </additionalModules>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
     </profiles>
 

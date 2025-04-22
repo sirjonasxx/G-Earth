@@ -80,9 +80,9 @@ jobs:
         MATRIX_JDK_ARCH: ${{ matrix.jdk-arch }}
       run: |
         if [[ $MATRIX_OS == "windows-latest" && $MATRIX_JDK_ARCH == "x86" ]]; then
-          MVN_PROFILE="-P!include-javafx"
+          MVN_PROFILE="-P!include-javafx-dependencies -Ppackage-javafx-modules"
         else
-          MVN_PROFILE="-Pinclude-javafx"
+          MVN_PROFILE="-Pinclude-javafx-dependencies"
         fi
         
         if [[ $GITHUB_REF_TYPE == 'tag' ]]; then
