@@ -105,6 +105,7 @@
     </build>
 
     <profiles>
+        <!-- Build profiles -->
         <profile>
             <id>windows-bundle</id>
             <activation>
@@ -209,39 +210,35 @@
                 </plugins>
             </build>
         </profile>
+
+        <!-- Dependency profiles -->
+        <!-- We need to disable building with JavaFX for JDKs that ship with JavaFX -->
+        <profile>
+            <id>include-javafx</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>javafx-fxml</artifactId>
+                    <version>${javafx.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>javafx-web</artifactId>
+                    <version>${javafx.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>javafx-swing</artifactId>
+                    <version>${javafx.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
     </profiles>
 
     <dependencies>
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-fxml</artifactId>
-            <version>${javafx.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-web</artifactId>
-            <version>${javafx.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-swing</artifactId>
-            <version>${javafx.version}</version>
-        </dependency>
-<!--        <dependency>-->
-<!--            <groupId>org.openjfx</groupId>-->
-<!--            <artifactId>javafx-fxml</artifactId>-->
-<!--            <version>${javafx.version}</version>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>org.openjfx</groupId>-->
-<!--            <artifactId>javafx-graphics</artifactId>-->
-<!--            <version>${javafx.version}</version>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>org.openjfx</groupId>-->
-<!--            <artifactId>javafx-web</artifactId>-->
-<!--            <version>${javafx.version}</version>-->
-<!--        </dependency>-->
         <!-- https://mvnrepository.com/artifact/org.slf4j/jul-to-slf4j -->
         <dependency>
             <groupId>org.slf4j</groupId>

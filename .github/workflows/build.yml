@@ -15,15 +15,25 @@ jobs:
       matrix:
         include:
           - os: windows-latest
-            jdk-arch: x86
+            jdk-package: 'jdk+fx'
+            jdk-arch: 'x86'
+            jdk-distribution: 'liberica'
           - os: windows-latest
-            jdk-arch: x64
+            jdk-package: 'jdk'
+            jdk-arch: 'x64'
+            jdk-distribution: 'temurin'
           - os: macos-latest
-            jdk-arch: x64
+            jdk-package: 'jdk'
+            jdk-arch: 'x64'
+            jdk-distribution: 'temurin'
           - os: macos-latest
-            jdk-arch: aarch64
+            jdk-package: 'jdk'
+            jdk-arch: 'aarch64'
+            jdk-distribution: 'temurin'
           - os: ubuntu-latest
-            jdk-arch: x64
+            jdk-package: 'jdk'
+            jdk-arch: 'x64'
+            jdk-distribution: 'temurin'
 
     runs-on: ${{ matrix.os }}
     permissions:
@@ -52,9 +62,9 @@ jobs:
       uses: actions/setup-java@v4
       with:
         java-version: '17'
-        java-package: jdk
+        java-package: ${{ matrix.jdk-package }}
         architecture: ${{ matrix.jdk-arch }}
-        distribution: 'temurin'
+        distribution: ${{ matrix.jdk-distribution }}
         cache: 'maven'
         cache-dependency-path: 'G-Earth/pom.xml'
 
@@ -65,16 +75,34 @@ jobs:
     # Check if GITHUB_REF_TYPE is a tag
     - name: Build G-Earth
       shell: bash
+      env:
+        MATRIX_OS: ${{ matrix.os }}
+        MATRIX_JDK_ARCH: ${{ matrix.jdk-arch }}
       run: |
+        MVN_PROFILE=""
+        
+        if [[ $MATRIX_OS == "windows-latest" && $MATRIX_JDK_ARCH == "x86" ]]; then
+        MVN_PROFILE="-P!include-javafx"
+        fi
+        
         if [[ $GITHUB_REF_TYPE == 'tag' ]]; then
-          mvn -B package -Drepository=${GITHUB_REPOSITORY} -Dmaven.compiler.source=17 -Dmaven.compiler.target=17 -Dos=${TARGET_OS} -Dchangelist=
+          mvn -B package $MVN_PROFILE \
+            -Drepository=${GITHUB_REPOSITORY} \
+            -Dmaven.compiler.source=17 \
+            -Dmaven.compiler.target=17 \
+            -Dos=${TARGET_OS} \
+            -Dchangelist=
         else
-          mvn -B package -Drepository=${GITHUB_REPOSITORY} -Dmaven.compiler.source=17 -Dmaven.compiler.target=17 -Dos=${TARGET_OS}
+          mvn -B package $MVN_PROFILE \
+            -Drepository=${GITHUB_REPOSITORY} \
+            -Dmaven.compiler.source=17 \
+            -Dmaven.compiler.target=17 \
+            -Dos=${TARGET_OS}
         fi
 
     - name: Upload platform artifact
       uses: actions/upload-artifact@v4
       with:
-        name: ${{ env.TARGET_OS }} ${{ matrix.jdk-arch }}
-        path: G-Earth/target/G-Earth/*
+        name: G-Earth ${{ env.TARGET_OS }}-${{ matrix.jdk-arch }}
+        path: G-Earth/target/G-Earth
         retention-days: 7
