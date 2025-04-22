@@ -79,10 +79,10 @@ jobs:
         MATRIX_OS: ${{ matrix.os }}
         MATRIX_JDK_ARCH: ${{ matrix.jdk-arch }}
       run: |
-        MVN_PROFILE=""
-        
         if [[ $MATRIX_OS == "windows-latest" && $MATRIX_JDK_ARCH == "x86" ]]; then
-        MVN_PROFILE="-P!include-javafx"
+          MVN_PROFILE="-P!include-javafx"
+        else
+          MVN_PROFILE="-Pinclude-javafx"
         fi
         
         if [[ $GITHUB_REF_TYPE == 'tag' ]]; then
