@@ -206,6 +206,9 @@
                                     <additionalResources>
                                         <additionalResource>${project.basedir}/src/main/resources/build/common/messages.json</additionalResource>
                                     </additionalResources>
+                                    <vmArgs>
+                                        <vmArg>-Dlog.dir=$HOME/Library/Logs/G-Earth</vmArg>
+                                    </vmArgs>
                                     <macConfig>
                                         <appId>G-Earth</appId>
                                         <icnsFile>${project.basedir}/src/main/resources/gearth/ui/themes/G-Earth/logo.ico</icnsFile>
