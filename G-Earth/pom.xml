@@ -134,6 +134,9 @@
                                         <additionalResource>${project.basedir}/src/main/resources/build/windows/G-MemZ-x32.exe</additionalResource>
                                         <additionalResource>${project.basedir}/src/main/resources/build/windows/G-MemZ-x64.exe</additionalResource>
                                     </additionalResources>
+                                    <winConfig>
+                                        <icoFile>${project.basedir}/src/main/resources/gearth/ui/themes/G-Earth/logo.ico</icoFile>
+                                    </winConfig>
                                 </configuration>
                             </execution>
                         </executions>
@@ -167,6 +170,9 @@
                                     <additionalResources>
                                         <additionalResource>${project.basedir}/src/main/resources/build/common/messages.json</additionalResource>
                                     </additionalResources>
+                                    <linuxConfig>
+                                        <pngFile>${project.basedir}/src/main/resources/gearth/ui/themes/G-Earth/logoSmall.png</pngFile>
+                                    </linuxConfig>
                                 </configuration>
                             </execution>
                         </executions>
@@ -201,7 +207,9 @@
                                         <additionalResource>${project.basedir}/src/main/resources/build/common/messages.json</additionalResource>
                                     </additionalResources>
                                     <macConfig>
-                                        <codesignApp>false</codesignApp>
+                                        <appId>G-Earth</appId>
+                                        <icnsFile>${project.basedir}/src/main/resources/gearth/ui/themes/G-Earth/logo.ico</icnsFile>
+                                        <codesignApp>true</codesignApp>
                                         <notarizeApp>false</notarizeApp>
                                     </macConfig>
                                 </configuration>
