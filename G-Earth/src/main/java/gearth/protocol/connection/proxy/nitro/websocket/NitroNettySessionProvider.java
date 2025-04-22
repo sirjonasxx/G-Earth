@@ -1,15 +1,17 @@
 package gearth.protocol.connection.proxy.nitro.websocket;
 
+import gearth.protocol.connection.proxy.http.WebSession;
+
 public class NitroNettySessionProvider implements NitroSessionProvider {
 
-    private NitroSession session;
+    private WebSession session;
 
-    public void setSession(NitroSession session) {
+    public void setSession(WebSession session) {
         this.session = session;
     }
 
     @Override
-    public NitroSession getSession() {
+    public WebSession getSession() {
         return this.session;
     }
 

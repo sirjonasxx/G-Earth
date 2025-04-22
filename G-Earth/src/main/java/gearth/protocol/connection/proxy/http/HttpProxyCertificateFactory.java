@@ -2,18 +2,34 @@ package gearth.protocol.connection.proxy.http;
 
 import com.github.monkeywie.proxyee.crt.CertUtil;
 import com.github.monkeywie.proxyee.server.HttpProxyCACertFactory;
+import io.netty.buffer.ByteBufAllocator;
+import io.netty.handler.ssl.SslContext;
+import io.netty.handler.ssl.SslContextBuilder;
+import io.netty.handler.ssl.SslHandler;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.GeneralName;
+import org.bouncycastle.asn1.x509.GeneralNames;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
+import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.KeyPair;
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class HttpProxyCertificateFactory implements HttpProxyCACertFactory {
 
@@ -104,5 +120,59 @@ public class HttpProxyCertificateFactory implements HttpProxyCACertFactory {
     @Override
     public PrivateKey getCAPriKey() {
         return this.caKey;
+    }
+
+    public SslHandler createSslHandler(final String commonName) {
+        if (this.caCert == null) {
+            throw new IllegalStateException("CA certificate not loaded");
+        }
+
+        if (this.caKey == null) {
+            throw new IllegalStateException("CA private key not loaded");
+        }
+
+        try {
+            final KeyPair keyPair = CertUtil.genKeyPair();
+
+            final X509Certificate cert = generateServerCert(keyPair.getPublic(),
+                    commonName,
+                    new GeneralName(GeneralName.dNSName, "localhost"),
+                    new GeneralName(GeneralName.iPAddress, "127.0.0.1"));
+
+            final SslContext ctx = SslContextBuilder.forServer(keyPair.getPrivate(), cert).build();
+
+            return ctx.newHandler(ByteBufAllocator.DEFAULT);
+        } catch (Exception e) {
+            log.error("Failed to create SSLHandler", e);
+            return null;
+        }
+    }
+
+    private X509Certificate generateServerCert(final PublicKey serverPubKey, final String commonName, final GeneralName... san) throws Exception {
+        final String issuer = CertUtil.getSubject(this.caCert);
+        final PrivateKey caPriKey = this.getCAPriKey();
+
+        // Replace "CN" in cert authority
+        final String subject = Stream.of(issuer.split(", ")).map(item -> {
+            String[] arr = item.split("=");
+            if ("CN".equals(arr[0])) {
+                return "CN=" + commonName;
+            } else {
+                return item;
+            }
+        }).collect(Collectors.joining(", "));
+
+        final JcaX509v3CertificateBuilder jv3Builder = new JcaX509v3CertificateBuilder(new X500Name(issuer),
+                BigInteger.valueOf(System.currentTimeMillis() + (long) (Math.random() * 10000) + 1000),
+                this.caCert.getNotBefore(),
+                this.caCert.getNotAfter(),
+                new X500Name(subject),
+                serverPubKey);
+
+        jv3Builder.addExtension(Extension.subjectAlternativeName, false, new GeneralNames(san));
+
+        final ContentSigner signer = new JcaContentSignerBuilder("SHA256WithRSAEncryption").build(caPriKey);
+
+        return new JcaX509CertificateConverter().getCertificate(jv3Builder.build(signer));
     }
 }

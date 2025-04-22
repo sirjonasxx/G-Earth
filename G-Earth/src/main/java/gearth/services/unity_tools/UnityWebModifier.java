@@ -23,7 +23,7 @@ public class UnityWebModifier {
         }
     }
 
-    public String modifyFrameworkFile(final String revision, String contents) throws UnityWebModifierException {
+    public String modifyFrameworkFile(final String revision, final int websocketPort, String contents) throws UnityWebModifierException {
         contents = insertFrameworkCode(contents, 0, "js_code/unity_code.js");
         contents = insertFrameworkCodeAfter(contents, "var asm=createWasm();", "js_code/unity_exports.js");
         contents = insertFrameworkCodeAfter(contents, "function createWasm(){", "js_code/unity_imports.js");
@@ -37,6 +37,7 @@ public class UnityWebModifier {
         contents = replaceOrThrow(contents, "var _malloc", "_malloc");
         contents = replaceOrThrow(contents, "var Module=typeof unityFramework!=\"undefined\"?unityFramework:{};", "var Module=typeof unityFramework!=\"undefined\"?unityFramework:{}; _module = Module;");
         contents = replaceOrThrow(contents, "{{RevisionName}}", revision);
+        contents = replaceOrThrow(contents, "{{WebsocketPort}}", Integer.toString(websocketPort));
 
         return contents;
     }

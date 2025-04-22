@@ -4,38 +4,58 @@ import gearth.misc.listenerpattern.Observable;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 import gearth.protocol.TrafficListener;
+import gearth.protocol.connection.proxy.http.WebSession;
 import gearth.protocol.packethandler.ByteArrayUtils;
 import gearth.protocol.packethandler.PacketHandler;
 import gearth.services.extension_handler.ExtensionHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.websocket.Session;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 
 public class UnityPacketHandler extends PacketHandler {
 
-    private final Session session;
-    private final HMessage.Direction direction;
+    private static final Logger LOG = LoggerFactory.getLogger(UnityPacketHandler.class);
 
-    public UnityPacketHandler(ExtensionHandler extensionHandler, Observable<TrafficListener>[] trafficObservables, Session session, HMessage.Direction direction) {
+    private static final byte[] DIR_TO_CLIENT = new byte[]{0};
+    private static final byte[] DIR_TO_SERVER = new byte[]{1};
+
+    private final WebSession session;
+    private final HMessage.Direction direction;
+    private final Object actLock;
+
+    public UnityPacketHandler(ExtensionHandler extensionHandler, Observable<TrafficListener>[] trafficObservables, WebSession session, HMessage.Direction direction) {
         super(extensionHandler, trafficObservables);
         this.session = session;
         this.direction = direction;
+        this.actLock = new Object();
     }
 
     @Override
     public boolean sendToStream(byte[] buffer) {
-        byte[] prefix = new byte[]{(direction == HMessage.Direction.TOCLIENT ? ((byte)0) : ((byte)1))};
-        byte[] combined = ByteArrayUtils.combineByteArrays(prefix, buffer);
+        final byte[] prefix = (direction == HMessage.Direction.TOCLIENT ? DIR_TO_CLIENT : DIR_TO_SERVER);
+        final byte[] combined = ByteArrayUtils.combineByteArrays(prefix, buffer);
 
-        session.getAsyncRemote().sendBinary(ByteBuffer.wrap(combined));
-        return true;
+        try {
+            if (!session.send(combined)) {
+                LOG.warn("Discarding {} bytes because the session for direction {} was closed", buffer.length, this.direction);
+                return false;
+            }
+
+            return true;
+        } catch (IOException e) {
+            LOG.error("Error sending packet to unity direction {}", this.direction, e);
+            return false;
+        }
     }
 
     @Override
     public void act(byte[] buffer) throws IOException {
-        HMessage hMessage = new HMessage(new HPacket(buffer), direction, currentIndex);
-        awaitListeners(hMessage, hMessage1 -> sendToStream(hMessage1.getPacket().toBytes()));
-        currentIndex++;
+        synchronized (actLock) {
+            final HMessage hMessage = new HMessage(new HPacket(buffer), direction, currentIndex);
+
+            awaitListeners(hMessage, hMessage1 -> sendToStream(hMessage1.getPacket().toBytes()));
+            currentIndex++;
+        }
     }
 }

@@ -4,7 +4,7 @@ import gearth.misc.listenerpattern.Observable;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 import gearth.protocol.TrafficListener;
-import gearth.protocol.connection.proxy.nitro.websocket.NitroSession;
+import gearth.protocol.connection.proxy.http.WebSession;
 import gearth.protocol.connection.proxy.nitro.websocket.NitroSessionProvider;
 import gearth.protocol.packethandler.PacketHandler;
 import gearth.protocol.packethandler.flash.FlashBuffer;
@@ -33,7 +33,7 @@ public class NitroPacketHandler extends PacketHandler {
 
     @Override
     public boolean sendToStream(byte[] buffer) {
-        final NitroSession localSession = session.getSession();
+        final WebSession localSession = session.getSession();
 
         if (localSession == null) {
             logger.warn("Discarding {} bytes because the session for direction {} was null", buffer.length, this.direction);

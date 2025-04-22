@@ -39,6 +39,12 @@ public class GUnityFileServer extends HttpProxyInterceptInitializer
     private static final String HeaderIfModifiedSince = "If-Modified-Since";
     private static final String HeaderLastModified = "Last-Modified";
 
+    private final int websocketPort;
+
+    public GUnityFileServer(final int websocketPort) {
+        this.websocketPort = websocketPort;
+    }
+
     @Override
     public void init(HttpProxyInterceptPipeline pipeline) {
         pipeline.addLast(new FullRequestIntercept(DEFAULT_MAX_CONTENT_LENGTH) {
@@ -88,7 +94,7 @@ public class GUnityFileServer extends HttpProxyInterceptInitializer
                         final String revision = httpRequest.uri().split("/")[2];
                         final String content = responseRead(httpResponse);
 
-                        responseWrite(httpResponse, modifier.modifyFrameworkFile(revision, content));
+                        responseWrite(httpResponse, modifier.modifyFrameworkFile(revision, websocketPort, content));
                     } else if (httpRequest.uri().endsWith("/Build/habbo2020-global-prod.loader.js")) {
                         LOG.info("Modifying loader");
 
