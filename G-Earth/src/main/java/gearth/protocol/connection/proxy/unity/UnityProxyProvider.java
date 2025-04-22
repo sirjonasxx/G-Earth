@@ -67,6 +67,8 @@ public class UnityProxyProvider implements ProxyProvider, StateChangeListener {
         stateSetter.setState(HState.ABORTING);
 
         new Thread(() -> {
+            hConnection.getStateObservable().removeListener(this);
+
             LOG.info("Stopping unity websocket server");
 
             try {
