@@ -3,11 +3,12 @@ package gearth.misc;
 import gearth.GEarth;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.util.List;
 
@@ -16,33 +17,30 @@ import java.util.List;
  */
 public class Cacher {
 
+    private static final Logger LOG = LoggerFactory.getLogger(Cacher.class);
+
     private static final String DEFAULT_CACHE_FILENAME = "cache.json";
-    private static String cacheDir;
+    private static final File CACHE_DIR;
 
     static {
-        File GEarthDir = null;
-        try {
-            GEarthDir = new File(GEarth.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParentFile();
-            if (GEarthDir.getName().equals("Extensions")) {
-                GEarthDir = GEarthDir.getParentFile();
+        final String overrideCacheDir = System.getProperty("gearth.cache.dir");
+
+        if (overrideCacheDir != null) {
+            CACHE_DIR = new File(overrideCacheDir);
+        } else {
+            File appDir = new File(GEarth.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParentFile();
+
+            if (appDir.getName().equals("Extensions")) {
+                appDir = appDir.getParentFile();
             }
 
-        } catch (URISyntaxException e) { }
-
-        cacheDir = GEarthDir
-                + File.separator
-                + "Cache";
+            CACHE_DIR = new File(appDir, "Cache");
+        }
     }
 
-    public static void setCacheDir(String s) {
-        cacheDir = s;
+    public static File getCacheDir() {
+        return CACHE_DIR;
     }
-
-    public static String getCacheDir() {
-        return cacheDir;
-    }
-
-
 
     public static boolean cacheFileExists(String cache_filename) {
         File f = new File(getCacheDir(), cache_filename);
@@ -57,27 +55,27 @@ public class Cacher {
 
                 return new JSONObject(contents);
             } catch (IOException e) {
-                e.printStackTrace();
+                LOG.error("Error reading cache file", e);
             }
         }
         return new JSONObject();
     }
+
     private static void updateCache(JSONObject contents, String cache_filename) {
         updateCache(contents.toString(), cache_filename);
     }
+
     public static void updateCache(String content, String cache_filename){
-        File parent_dir = new File(getCacheDir());
-        parent_dir.mkdirs();
+        getCacheDir().mkdirs();
 
         try (FileWriter file = new FileWriter(new File(getCacheDir(), cache_filename))) {
-
             file.write(content);
             file.flush();
-
         } catch (IOException e) {
-            e.printStackTrace();
+            LOG.error("Error writing cache file", e);
         }
     }
+
     public static void put(String key, Object val, String cache_filename) {
         JSONObject object = getCacheContents(cache_filename);
         if (object.has(key)) object.remove(key);
@@ -85,25 +83,28 @@ public class Cacher {
         object.put(key, val);
         updateCache(object, cache_filename);
     }
+
     public static void remove(String key, String cache_filename) {
         JSONObject object = getCacheContents(cache_filename);
         if (object.has(key)) object.remove(key);
         updateCache(object, cache_filename);
     }
+
     public static Object get(String key, String cache_filename) {
         JSONObject object = getCacheContents(cache_filename);
         if (object.has(key)) return object.get(key);
         else return null;
     }
+
     public static List<Object> getList(String key, String cache_filename) {
         JSONObject object = getCacheContents(cache_filename);
         if (object.has(key)) return ((JSONArray)object.get(key)).toList();
         else return null;
     }
+
     public static void clear(String cache_filename) {
         updateCache(new JSONObject(), cache_filename);
     }
-
 
     public static boolean cacheFileExists() {
         return cacheFileExists(DEFAULT_CACHE_FILENAME);
@@ -112,21 +113,27 @@ public class Cacher {
     public static JSONObject getCacheContents() {
         return getCacheContents(DEFAULT_CACHE_FILENAME);
     }
+
     private static void updateCache(JSONObject contents) {
         updateCache(contents, DEFAULT_CACHE_FILENAME);
     }
+
     public static void put(String key, Object val) {
         put(key, val, DEFAULT_CACHE_FILENAME);
     }
+
     public static void remove(String key) {
         remove(key, DEFAULT_CACHE_FILENAME);
     }
+
     public static Object get(String key) {
         return get(key, DEFAULT_CACHE_FILENAME);
     }
+
     public static List<Object> getList(String key) {
         return getList(key, DEFAULT_CACHE_FILENAME);
     }
+
     public static void clear() {
          clear(DEFAULT_CACHE_FILENAME);
     }

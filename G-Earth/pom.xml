@@ -208,6 +208,7 @@
                                     </additionalResources>
                                     <vmArgs>
                                         <vmArg>-Dlog.dir=$HOME/Library/Logs/G-Earth</vmArg>
+                                        <vmArg>-Dgearth.cache.dir=$HOME/Library/Caches/G-Earth</vmArg>
                                     </vmArgs>
                                     <macConfig>
                                         <appId>G-Earth</appId>
