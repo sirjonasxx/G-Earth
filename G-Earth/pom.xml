@@ -209,6 +209,7 @@
                                     <macConfig>
                                         <appId>G-Earth</appId>
                                         <icnsFile>${project.basedir}/src/main/resources/gearth/ui/themes/G-Earth/logo.ico</icnsFile>
+                                        <macStartup>UNIVERSAL</macStartup>
                                         <codesignApp>true</codesignApp>
                                         <notarizeApp>false</notarizeApp>
                                     </macConfig>
