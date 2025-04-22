@@ -207,9 +207,9 @@
                                         <additionalResource>${project.basedir}/src/main/resources/build/common/messages.json</additionalResource>
                                     </additionalResources>
                                     <vmArgs>
-                                        <vmArg>-Dlog.dir=$HOME/Library/Logs/G-Earth</vmArg>
-                                        <vmArg>-Dgearth.data.dir=$HOME/Library/Application Support/G-Earth</vmArg>
-                                        <vmArg>-Dgearth.cache.dir=$HOME/Library/Caches/G-Earth</vmArg>
+                                        <vmArg>-Dlog.dir="$HOME/Library/Logs/G-Earth"</vmArg>
+                                        <vmArg>-Dgearth.data.dir="$HOME/Library/Application Support/G-Earth"</vmArg>
+                                        <vmArg>-Dgearth.cache.dir="$HOME/Library/Caches/G-Earth"</vmArg>
                                     </vmArgs>
                                     <macConfig>
                                         <appId>G-Earth</appId>

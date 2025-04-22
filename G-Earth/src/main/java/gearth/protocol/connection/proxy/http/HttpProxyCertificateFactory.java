@@ -2,6 +2,7 @@ package gearth.protocol.connection.proxy.http;
 
 import com.github.monkeywie.proxyee.crt.CertUtil;
 import com.github.monkeywie.proxyee.server.HttpProxyCACertFactory;
+import gearth.misc.GPath;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
@@ -42,7 +43,7 @@ public class HttpProxyCertificateFactory implements HttpProxyCACertFactory {
     private PrivateKey caKey;
 
     public HttpProxyCertificateFactory() {
-        final String overrideDataDir = System.getProperty("gearth.data.dir");
+        final File overrideDataDir = GPath.getPathFromProperty("gearth.data.dir");
 
         if (overrideDataDir != null) {
             this.caCertFile = new File(overrideDataDir, String.format("%s.crt", HttpProxyAuthority.CERT_ALIAS));

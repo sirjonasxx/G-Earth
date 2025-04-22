@@ -23,10 +23,10 @@ public class Cacher {
     private static final File CACHE_DIR;
 
     static {
-        final String overrideCacheDir = System.getProperty("gearth.cache.dir");
+        final File overrideCacheDir = GPath.getPathFromProperty("gearth.cache.dir");
 
         if (overrideCacheDir != null) {
-            CACHE_DIR = new File(overrideCacheDir);
+            CACHE_DIR = overrideCacheDir;
         } else {
             File appDir = new File(GEarth.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParentFile();
 
