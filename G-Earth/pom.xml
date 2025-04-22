@@ -92,7 +92,7 @@
                 <version>${io.github.fvarrui.javapackager}</version>
                 <!-- https://github.com/javapackager/JavaPackager/tree/master/docs -->
                 <configuration>
-                    <bundleJre>false</bundleJre>
+                    <bundleJre>true</bundleJre>
                     <mainClass>gearth.Main</mainClass>
                     <generateInstaller>false</generateInstaller>
                     <jreMinVersion>17.0.0</jreMinVersion>
