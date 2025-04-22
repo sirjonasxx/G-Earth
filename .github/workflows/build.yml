@@ -42,7 +42,7 @@ jobs:
       with:
         java-version: '17'
         java-package: jdk
-        distribution: 'oracle'
+        distribution: 'zulu'
         cache: 'maven'
         cache-dependency-path: 'G-Earth/pom.xml'
 
