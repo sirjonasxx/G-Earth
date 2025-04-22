@@ -96,6 +96,9 @@
                     <mainClass>gearth.Main</mainClass>
                     <generateInstaller>false</generateInstaller>
                     <jreMinVersion>17.0.0</jreMinVersion>
+                    <additionalModules>
+                        <additionalModule>jdk.crypto.ec</additionalModule>
+                    </additionalModules>
                 </configuration>
             </plugin>
         </plugins>
