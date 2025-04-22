@@ -1,11 +1,14 @@
 package gearth.protocol.connection.proxy.unity;
 
 import gearth.protocol.connection.proxy.http.HttpProxyCertificateFactory;
+import gearth.protocol.connection.proxy.nitro.NitroConstants;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
+import io.netty.handler.codec.http.websocketx.WebSocketFrameAggregator;
+import io.netty.handler.codec.http.websocketx.extensions.compression.WebSocketServerCompressionHandler;
 
 public class UnityWebsocketInitializer extends ChannelInitializer<SocketChannel> {
 
@@ -28,6 +31,8 @@ public class UnityWebsocketInitializer extends ChannelInitializer<SocketChannel>
         pipeline.addLast("ssl", factory.createSslHandler("localhost"));
         pipeline.addLast("httpServerCodec", new HttpServerCodec());
         pipeline.addLast("httpAggregator", new HttpObjectAggregator(65536));
+        pipeline.addLast("websocketCompression", new WebSocketServerCompressionHandler());
+        pipeline.addLast("websocketAggregator", new WebSocketFrameAggregator(NitroConstants.WEBSOCKET_BUFFER_SIZE));
         pipeline.addLast("httpHandler", new UnityWebsocketHandler.HttpServer(config));
     }
 }

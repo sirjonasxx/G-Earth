@@ -6,8 +6,12 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class NitroWebsocketProxy extends HttpProxyIntercept {
+
+    private static final Logger LOG = LoggerFactory.getLogger(NitroWebsocketProxy.class);
 
     private final NitroWebsocketCallback callback;
 
@@ -46,22 +50,22 @@ public class NitroWebsocketProxy extends HttpProxyIntercept {
     }
 
     private byte[] getBinaryData(WebSocketFrame frame) {
-        if (!(frame instanceof BinaryWebSocketFrame)) {
-            return null;
+        if (frame instanceof BinaryWebSocketFrame binaryFrame) {
+            final ByteBuf content = binaryFrame.content();
+            final byte[] binaryData = new byte[binaryFrame.content().readableBytes()];
+
+            content.markReaderIndex();
+
+            try {
+                content.readBytes(binaryData);
+            } finally {
+                content.resetReaderIndex();
+            }
+
+            return binaryData;
         }
 
-        final BinaryWebSocketFrame binaryFrame = (BinaryWebSocketFrame) frame;
-        final ByteBuf content = binaryFrame.content();
-        final byte[] binaryData = new byte[binaryFrame.content().readableBytes()];
-
-        content.markReaderIndex();
-
-        try {
-            content.readBytes(binaryData);
-        } finally {
-            content.resetReaderIndex();
-        }
-
-        return binaryData;
+        LOG.error("Unexpected nitro frame type: {}", frame.getClass());
+        return null;
     }
 }

@@ -10,6 +10,7 @@ import gearth.protocol.connection.HState;
 import gearth.protocol.connection.HStateSetter;
 import gearth.protocol.connection.proxy.ProxyProvider;
 import gearth.protocol.connection.proxy.http.WebNettySession;
+import gearth.protocol.connection.proxy.nitro.NitroConstants;
 import gearth.protocol.packethandler.unity.UnityPacketHandler;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
@@ -45,10 +46,8 @@ public class UnityWebsocketHandler {
             final String wsUrl = getWebsocketUrl(true, request);
 
             final WebSocketDecoderConfig wsConfig = WebSocketDecoderConfig.newBuilder()
-                    .expectMaskedFrames(false)
                     .allowExtensions(true)
-                    .allowMaskMismatch(true)
-                    .maxFramePayloadLength(1024 * 1024 * 20)
+                    .maxFramePayloadLength(NitroConstants.WEBSOCKET_BUFFER_SIZE)
                     .build();
 
             final WebSocketServerHandshakerFactory wsFactory = new WebSocketServerHandshakerFactory(wsUrl, null, wsConfig);
@@ -135,6 +134,7 @@ public class UnityWebsocketHandler {
 
         private HProxy hProxy;
         private String revision;
+        private int fragmentDirection;
 
         public WebsocketServer(final UnityCommunicatorConfig config) {
             this.proxySetter = config.proxySetter();
@@ -145,55 +145,63 @@ public class UnityWebsocketHandler {
 
         @Override
         public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-            if (!(msg instanceof BinaryWebSocketFrame frame)) {
-                super.channelRead(ctx, msg);
-                return;
-            }
-
             try {
-                if (revision == null) {
-                    revision = frame.content().toString(StandardCharsets.ISO_8859_1);
-                    return;
-                }
-
-                final byte packetDirection = frame.content().readByte();
-                final byte[] packet = new byte[frame.content().readableBytes()];
-
-                frame.content().readBytes(packet);
-
-                // Handle proxy.
-                if (hProxy == null && packetDirection == 1) {
-                    final HPacket clientHello = new HPacket(packet);
-
-                    if (clientHello.getBytesLength() > 6 && clientHello.headerId() == 4000) {
-                        hProxy = new HProxy(HClient.UNITY, "", "", -1, -1, "");
-
-                        final String ignore = clientHello.readString();
-                        final String clientIdentifier = clientHello.readString();
-                        final WebNettySession session = new WebNettySession(ctx.channel());
-
-                        hProxy.verifyProxy(
-                                new UnityPacketHandler(hConnection.getExtensionHandler(), hConnection.getTrafficObservables(), session, HMessage.Direction.TOCLIENT),
-                                new UnityPacketHandler(hConnection.getExtensionHandler(), hConnection.getTrafficObservables(), session, HMessage.Direction.TOSERVER),
-                                revision,
-                                clientIdentifier
-                        );
-
-                        proxySetter.setProxy(hProxy);
-                        stateSetter.setState(HState.CONNECTED);
+                if (msg instanceof BinaryWebSocketFrame frame) {
+                    if (revision == null) {
+                        revision = frame.content().toString(StandardCharsets.ISO_8859_1);
+                        return;
                     }
-                }
 
-                if (hProxy != null && packetDirection == 0) {
-                    hProxy.getInHandler().act(packet);
-                } else if (hProxy != null && packetDirection == 1) {
-                    hProxy.getOutHandler().act(packet);
+                    final byte packetDirection = frame.content().readByte();
+                    final byte[] packet = new byte[frame.content().readableBytes()];
+
+                    frame.content().readBytes(packet);
+
+                    // Handle proxy.
+                    if (hProxy == null && packetDirection == 1) {
+                        final HPacket clientHello = new HPacket(packet);
+
+                        if (clientHello.getBytesLength() > 6 && clientHello.headerId() == 4000) {
+                            hProxy = new HProxy(HClient.UNITY, "", "", -1, -1, "");
+
+                            final String ignore = clientHello.readString();
+                            final String clientIdentifier = clientHello.readString();
+                            final WebNettySession session = new WebNettySession(ctx.channel());
+
+                            hProxy.verifyProxy(
+                                    new UnityPacketHandler(hConnection.getExtensionHandler(), hConnection.getTrafficObservables(), session, HMessage.Direction.TOCLIENT),
+                                    new UnityPacketHandler(hConnection.getExtensionHandler(), hConnection.getTrafficObservables(), session, HMessage.Direction.TOSERVER),
+                                    revision,
+                                    clientIdentifier
+                            );
+
+                            proxySetter.setProxy(hProxy);
+                            stateSetter.setState(HState.CONNECTED);
+                        }
+                    }
+
+                    if (hProxy != null && packetDirection == 0) {
+                        hProxy.getInHandler().act(packet);
+                    } else if (hProxy != null && packetDirection == 1) {
+                        hProxy.getOutHandler().act(packet);
+                    } else {
+                        proxyProvider.abort();
+                    }
+
+                    if (!frame.isFinalFragment()) {
+                        LOG.warn("Received fragmented frame with direction {} and length {}", packetDirection, packet.length);
+                    }
                 } else {
-                    proxyProvider.abort();
+                    LOG.warn("Received unexpected WebSocket frame of type {}: {}", msg.getClass().getSimpleName(), msg);
                 }
             } finally {
                 ReferenceCountUtil.release(msg);
             }
+        }
+
+        @Override
+        public void channelReadComplete(ChannelHandlerContext ctx) {
+            ctx.flush();
         }
 
         @Override
