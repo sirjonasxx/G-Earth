@@ -22,6 +22,7 @@ public class Logging {
         final Logger logger = loggerContext.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
 
         logger.setLevel(debug ? Level.DEBUG : Level.INFO);
+        logger.info("Logging level set to {}", debug ? "DEBUG" : "INFO");
     }
 
     public static class RollOncePerSessionTriggeringPolicy<E> extends TriggeringPolicyBase<E> {

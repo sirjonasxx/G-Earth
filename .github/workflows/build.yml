@@ -42,7 +42,7 @@ jobs:
       with:
         java-version: '17'
         java-package: jdk
-        distribution: 'temurin'
+        distribution: 'oracle'
         cache: 'maven'
         cache-dependency-path: 'G-Earth/pom.xml'
 
