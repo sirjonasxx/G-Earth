@@ -1,6 +1,13 @@
 package gearth.protocol.hostreplacer.hostsfile;
 
-import java.io.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,6 +15,8 @@ import java.util.List;
  * Created by Jonas on 04/04/18.
  */
 class UnixHostReplacer implements HostReplacer {
+
+    private static final Logger LOG = LoggerFactory.getLogger(UnixHostReplacer.class);
 
     protected String hostsFileLocation;
 
@@ -46,11 +55,11 @@ class UnixHostReplacer implements HostReplacer {
             out = new BufferedWriter(fw);
 
             for (String li : adders) {
-                out.write(li + System.getProperty("line.separator"));
+                out.write(li + System.lineSeparator());
             }
 
             for (int i = 0; i < fileLines.size(); i++)	{
-                out.write(((i == 0) ? "" : System.getProperty("line.separator"))+ fileLines.get(i));
+                out.write(((i == 0) ? "" : System.lineSeparator())+ fileLines.get(i));
             }
             out.flush();
             fw.close();
@@ -58,7 +67,7 @@ class UnixHostReplacer implements HostReplacer {
         }
         catch (Exception ex)
         {
-            ex.printStackTrace();
+            LOG.error("Error while adding redirect to hosts file", ex);
         }
     }
 
@@ -94,7 +103,7 @@ class UnixHostReplacer implements HostReplacer {
 
             for (int i = 0; i < fileLines.size(); i++)	{
                 out.write(fileLines.get(i));
-                if (i != fileLines.size() - 1) out.write(System.getProperty("line.separator"));
+                if (i != fileLines.size() - 1) out.write(System.lineSeparator());
             }
             out.flush();
             fw.close();
@@ -102,7 +111,7 @@ class UnixHostReplacer implements HostReplacer {
         }
         catch (Exception ex)
         {
-            ex.printStackTrace();
+            LOG.error("Error while removing redirect from hosts file", ex);
         }
     }
 }

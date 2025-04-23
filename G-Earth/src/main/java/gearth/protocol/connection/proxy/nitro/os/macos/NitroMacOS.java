@@ -2,11 +2,17 @@ package gearth.protocol.connection.proxy.nitro.os.macos;
 
 import gearth.misc.RuntimeUtil;
 import gearth.protocol.connection.proxy.nitro.os.NitroOsFunctions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class NitroMacOS implements NitroOsFunctions {
+
+    private static final Logger LOG = LoggerFactory.getLogger(NitroMacOS.class);
 
     /**
      * Semicolon separated hosts to ignore for proxying.
@@ -21,11 +27,12 @@ public class NitroMacOS implements NitroOsFunctions {
     @Override
     public boolean isRootCertificateTrusted(File certificate) {
         try {
-            final String output = RuntimeUtil.getCommandOutput(new String[] {"sh", "-c", "security verify-cert -c \"" + certificate.getAbsolutePath() + "\""});
+            final String certificatePath = certificate.getCanonicalFile().getAbsolutePath();
+            final String output = RuntimeUtil.getCommandOutput(new String[] {"sh", "-c", "security verify-cert -c \"" + certificatePath + "\""});
 
             return !output.contains("CSSMERR_TP_NOT_TRUSTED");
         } catch (IOException e) {
-            e.printStackTrace();
+            LOG.error("Error while checking certificate trust", e);
         }
 
         return false;
@@ -33,24 +40,41 @@ public class NitroMacOS implements NitroOsFunctions {
 
     @Override
     public boolean installRootCertificate(File certificate) {
-        final String certificatePath = certificate.getAbsolutePath();
-
         try {
+            final String certificatePath = certificate.getCanonicalFile().getAbsolutePath();
+
+            // Create shell script.
+            final Path scriptPath = Files.createTempFile("install_cert", ".sh");
+
+            final String scriptContent = "#!/bin/bash\n" +
+                    "echo \"Installing G-Earth root certificate...\"\n" +
+                    "echo \"Please enter your password to install the certificate.\"\n" +
+                    "sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain \"" + certificatePath + "\"\n";
+
+            Files.write(scriptPath, scriptContent.getBytes());
+
+            if (!scriptPath.toFile().setExecutable(true)) {
+                LOG.error("Failed to set executable permission for script {}", scriptPath);
+                return false;
+            }
+
             // Install the certificate
-            Process process = new ProcessBuilder("sh", "-c", "sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain \"" + certificatePath + "\"")
-                    .inheritIO()
-                    .start();
-            
+            final Process process = new ProcessBuilder("open", "-a", "Terminal", scriptPath.toString()).start();
+            final StringBuilder output = new StringBuilder();
+
+            RuntimeUtil.readStream(output, process.getInputStream());
+            RuntimeUtil.readStream(output, process.getErrorStream());
+
             // Wait for the process to complete
             int exitCode = process.waitFor();
             if (exitCode != 0) {
-                System.out.printf("security add-trusted-cert command exited with exit code %d%n", exitCode);
+                LOG.warn("Install root certificate terminal exited with exit code {}", exitCode);
                 return false;
             }
 
             return true;
         } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
+            LOG.error("Error while checking installing certificate", e);
         }
 
         return false;
@@ -72,7 +96,7 @@ public class NitroMacOS implements NitroOsFunctions {
 
             return true;
         } catch (IOException e) {
-            e.printStackTrace();
+            LOG.error("Error while registering system proxy", e);
         }
 
         return false;
@@ -87,10 +111,9 @@ public class NitroMacOS implements NitroOsFunctions {
 
             return true;
         } catch (IOException e) {
-            e.printStackTrace();
+            LOG.error("Error while unregistering system proxy", e);
         }
 
         return false;
     }
-
 }
