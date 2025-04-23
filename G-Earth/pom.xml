@@ -207,16 +207,19 @@
                                         <additionalResource>${project.basedir}/src/main/resources/build/common/messages.json</additionalResource>
                                     </additionalResources>
                                     <vmArgs>
-                                        <vmArg>-Dlog.dir=$HOME/Library/Logs/G-Earth</vmArg>
-                                        <vmArg>-Dgearth.data.dir=$HOME/Library/Application Support/G-Earth</vmArg>
-                                        <vmArg>-Dgearth.cache.dir=$HOME/Library/Caches/G-Earth</vmArg>
+                                        <vmArg>-Dlog.dir=$USER_HOME/Library/Logs/G-Earth</vmArg>
+                                        <vmArg>-Dgearth.data.dir=$USER_HOME/Library/Application Support/G-Earth</vmArg>
+                                        <vmArg>-Dgearth.cache.dir=$USER_HOME/Library/Caches/G-Earth</vmArg>
                                     </vmArgs>
                                     <macConfig>
                                         <appId>G-Earth</appId>
-                                        <icnsFile>${project.basedir}/src/main/resources/gearth/ui/themes/G-Earth/logo.ico</icnsFile>
+                                        <icnsFile>${project.basedir}/src/main/resources/gearth/ui/themes/G-Earth/logo.icns</icnsFile>
                                         <macStartup>UNIVERSAL</macStartup>
                                         <codesignApp>true</codesignApp>
                                         <notarizeApp>false</notarizeApp>
+                                        <!-- We require this because it's better at passing the VMOPTIONS to Java. -->
+                                        <!-- https://github.com/javapackager/universalJavaApplicationStub/releases/tag/20241210.182001 -->
+                                        <customLauncher>${project.basedir}/src/main/resources/build/mac/nativeJavaApplicationStub</customLauncher>
                                     </macConfig>
                                 </configuration>
                             </execution>
