@@ -1,9 +1,13 @@
 package gearth.services.unity_tools;
 
+import gearth.misc.Cacher;
 import org.apache.commons.io.IOUtils;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 
 public class UnityWebModifier {
 
@@ -12,10 +16,31 @@ public class UnityWebModifier {
      */
     private static final boolean DEBUG = false;
 
-    public byte[] modifyCodeFile(byte[] content) throws UnityWebModifierException {
+    public byte[] modifyCodeFile(final String revision, byte[] content) throws UnityWebModifierException {
+        final File cacheDir = new File(Cacher.getCacheDir(), String.format("UNITY-%s", revision));
+        final File cacheFile = new File(cacheDir, "code.wasm");
+
+        if (cacheDir.isDirectory() && cacheFile.exists()) {
+            try {
+                return Files.readAllBytes(cacheFile.toPath());
+            } catch (IOException e) {
+                throw new UnityWebModifierException("Failed to read code file from cache", e);
+            }
+        }
+
         try {
             final WasmCodePatcher wasmCodePatcher = new WasmCodePatcher(content);
-            return wasmCodePatcher.patch(DEBUG);
+            final byte[] wasmCodePatched = wasmCodePatcher.patch(DEBUG);
+
+            if (!cacheDir.isDirectory()) {
+                if (!cacheDir.mkdirs()) {;
+                    throw new UnityWebModifierException("Failed to create cache directory");
+                }
+            }
+
+            Files.write(cacheFile.toPath(), wasmCodePatched);
+
+            return wasmCodePatched;
         } catch (UnityWebModifierException e) {
             throw e;
         } catch (Exception e) {

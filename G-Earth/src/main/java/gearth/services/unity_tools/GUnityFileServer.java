@@ -38,6 +38,8 @@ public class GUnityFileServer extends HttpProxyInterceptInitializer
     private static final String HeaderIfNoneMatch = "If-None-Match";
     private static final String HeaderIfModifiedSince = "If-Modified-Since";
     private static final String HeaderLastModified = "Last-Modified";
+    private static final String HeaderDate = "Date";
+    private static final String HeaderExpires = "Expires";
 
     private final int websocketPort;
 
@@ -77,6 +79,8 @@ public class GUnityFileServer extends HttpProxyInterceptInitializer
 
                 httpResponse.headers().add("X-Modified-By", "G-Earth");
 
+                final String revision = httpRequest.uri().split("/")[2];
+
                 try {
                     if (httpRequest.uri().endsWith("/StreamingAssets/Version.txt")) {
                         LOG.info("Modifying version");
@@ -87,11 +91,10 @@ public class GUnityFileServer extends HttpProxyInterceptInitializer
 
                         final byte[] content = responseReadBytes(httpResponse);
 
-                        responseWriteBytes(httpResponse, modifier.modifyCodeFile(content));
+                        responseWriteBytes(httpResponse, modifier.modifyCodeFile(revision, content));
                     } else if (httpRequest.uri().endsWith("/Build/habbo2020-global-prod.framework.js.gz")) {
                         LOG.info("Modifying framework");
 
-                        final String revision = httpRequest.uri().split("/")[2];
                         final String content = responseRead(httpResponse);
 
                         responseWrite(httpResponse, modifier.modifyFrameworkFile(revision, websocketPort, content));
@@ -135,6 +138,8 @@ public class GUnityFileServer extends HttpProxyInterceptInitializer
         headers.remove(HeaderIfNoneMatch);
         headers.remove(HeaderIfModifiedSince);
         headers.remove(HeaderLastModified);
+        headers.remove(HeaderDate);
+        headers.remove(HeaderExpires);
     }
 
     private static String responseRead(FullHttpResponse response) {
