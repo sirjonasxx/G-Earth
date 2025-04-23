@@ -3,6 +3,7 @@ package gearth.services.extension_handler.extensions.implementations.network.exe
 import gearth.GEarth;
 
 import java.io.File;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,12 +20,16 @@ public final class ExecutionInfo {
     public final static File EXTENSIONS_DIRECTORY;
 
     static {
-        final String overrideDataDir = System.getProperty("gearth.data.dir");
-        final File dataDir = overrideDataDir != null
-                ? new File(overrideDataDir)
-                : new File(GEarth.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParentFile();
+        try {
+            final String overrideDataDir = System.getProperty("gearth.data.dir");
+            final File dataDir = overrideDataDir != null
+                    ? new File(overrideDataDir)
+                    : new File(GEarth.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParentFile();
 
-        EXTENSIONS_DIRECTORY = new File(dataDir, "Extensions");
+            EXTENSIONS_DIRECTORY = new File(dataDir, "Extensions");
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
 
         EXTENSION_TYPE_TO_EXECUTION_COMMAND = new HashMap<>();
         EXTENSION_TYPE_TO_EXECUTION_COMMAND.put("*.jar", new String[]{"java", "-jar", "{path}"});

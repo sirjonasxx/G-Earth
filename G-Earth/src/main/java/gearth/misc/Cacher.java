@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.util.List;
 
@@ -28,13 +29,17 @@ public class Cacher {
         if (overrideCacheDir != null) {
             CACHE_DIR = new File(overrideCacheDir);
         } else {
-            File appDir = new File(GEarth.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParentFile();
+            try {
+                File appDir = new File(GEarth.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParentFile();
 
-            if (appDir.getName().equals("Extensions")) {
-                appDir = appDir.getParentFile();
+                if (appDir.getName().equals("Extensions")) {
+                    appDir = appDir.getParentFile();
+                }
+
+                CACHE_DIR = new File(appDir, "Cache");
+            } catch (URISyntaxException e) {
+                throw new RuntimeException(e);
             }
-
-            CACHE_DIR = new File(appDir, "Cache");
         }
 
         if (!CACHE_DIR.exists()) {

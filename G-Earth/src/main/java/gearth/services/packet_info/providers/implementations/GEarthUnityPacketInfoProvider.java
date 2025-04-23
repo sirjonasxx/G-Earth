@@ -1,11 +1,13 @@
 package gearth.services.packet_info.providers.implementations;
 
 import gearth.GEarth;
+import gearth.protocol.HMessage;
 import gearth.services.packet_info.PacketInfo;
 import gearth.services.packet_info.providers.PacketInfoProvider;
-import gearth.protocol.HMessage;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.net.URISyntaxException;
@@ -13,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GEarthUnityPacketInfoProvider extends PacketInfoProvider {
+
+    private static final Logger LOG = LoggerFactory.getLogger(GEarthUnityPacketInfoProvider.class);
 
     public GEarthUnityPacketInfoProvider(String hotelVersion) {
         super(hotelVersion);
@@ -24,7 +28,7 @@ public class GEarthUnityPacketInfoProvider extends PacketInfoProvider {
             return new File(new File(GEarth.class.getProtectionDomain().getCodeSource().getLocation().toURI())
                     .getParentFile(), "messages.json");
         } catch (URISyntaxException e) {
-            e.printStackTrace();
+            LOG.error("Could not find messages.json file", e);
             return null;
         }
     }
