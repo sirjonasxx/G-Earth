@@ -1,7 +1,6 @@
 package gearth.services.extension_handler.extensions.implementations.network.executer;
 
 import gearth.GEarth;
-import gearth.misc.GPath;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -20,9 +19,9 @@ public final class ExecutionInfo {
     public final static File EXTENSIONS_DIRECTORY;
 
     static {
-        final File dataDirOverride = GPath.getPathFromProperty("gearth.data.dir");
-        final File dataDir = dataDirOverride != null
-                ? dataDirOverride
+        final String overrideDataDir = System.getProperty("gearth.data.dir");
+        final File dataDir = overrideDataDir != null
+                ? new File(overrideDataDir)
                 : new File(GEarth.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParentFile();
 
         EXTENSIONS_DIRECTORY = new File(dataDir, "Extensions");
