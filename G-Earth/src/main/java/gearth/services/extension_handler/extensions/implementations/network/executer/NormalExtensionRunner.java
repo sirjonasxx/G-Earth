@@ -1,5 +1,7 @@
 package gearth.services.extension_handler.extensions.implementations.network.executer;
 
+import gearth.misc.JavaInstall;
+import gearth.misc.JavaLocator;
 import gearth.misc.OSValidator;
 import gearth.services.extension_handler.extensions.implementations.network.NetworkExtensionAuthenticator;
 import gearth.services.internal_extensions.extensionstore.tools.StoreExtensionTools;
@@ -14,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
@@ -203,35 +206,19 @@ public final class NormalExtensionRunner implements ExtensionRunner {
             return;
         }
 
-        final File currentJavaPath = new File(System.getProperty("java.home"));
-        final File javaInstallPath = currentJavaPath.getParentFile();
+        final JavaInstall install = JavaLocator.findJava8();
 
-        LOG.info("Current java.home is {}", currentJavaPath);
-        LOG.info("Looking for other java installs in {}", javaInstallPath);
-
-        // Find a folder that starts with "jre1.8" or "jdk1.8".
-        final File[] javaVersions = javaInstallPath.listFiles((dir, name) -> name.startsWith("jre1.8") || name.startsWith("jdk1.8"));
-
-        if (javaVersions == null || javaVersions.length == 0) {
-            LOG.warn("No java 1.8 installation to run extension jar file {}", jarFile);
+        if (install == null) {
+            LOG.warn("No Java 1.8 installation found, cannot run extension jar file {}", jarFile);
             return;
         }
 
-        // Prefer jre1.8 over jdk1.8.
-        final File javaPath = Arrays.stream(javaVersions).min((o1, o2) -> {
-            if (o1.getName().startsWith("jre1.8")) {
-                return -1;
-            } else if (o2.getName().startsWith("jre1.8")) {
-                return 1;
-            } else {
-                return 0;
-            }
-        }).orElse(javaVersions[0]);
-
         // Change command to use the java executable from the found folder.
+        final Path javaPath = install.path().resolve("bin").resolve(OSValidator.isWindows() ? "java.exe" : "java");
+
         LOG.info("Using java at {} to run extension jar file {}", javaPath, jarFile);
 
-        command.set(0, new File(javaPath, OSValidator.isWindows() ? "bin/java.exe" : "bin/java").getAbsolutePath());
+        command.set(0, javaPath.toAbsolutePath().toString());
     }
 
     /**
