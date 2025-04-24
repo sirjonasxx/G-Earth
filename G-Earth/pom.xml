@@ -95,7 +95,7 @@
                     <bundleJre>true</bundleJre>
                     <mainClass>gearth.Main</mainClass>
                     <generateInstaller>false</generateInstaller>
-                    <jreMinVersion>17.0.0</jreMinVersion>
+                    <jreMinVersion>21.0.0</jreMinVersion>
                     <additionalModules>
                         <!-- Otherwise SSL errors: https://stackoverflow.com/a/55517159 -->
                         <additionalModule>jdk.crypto.ec</additionalModule>
