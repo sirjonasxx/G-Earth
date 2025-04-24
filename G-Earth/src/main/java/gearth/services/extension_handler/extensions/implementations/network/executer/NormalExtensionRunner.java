@@ -200,25 +200,37 @@ public final class NormalExtensionRunner implements ExtensionRunner {
             jarFile = new File(workingDir, command.get(2));
         }
 
+        Path javaPath;
+
         // Check if the jar file is a Java 8 extension.
-        if (!isJava8AndJavaFX(jarFile)) {
+        if (isJava8AndJavaFX(jarFile)) {
+            LOG.debug("Jar file {} is a Java 8 extension, locating Java 1.8", jarFile);
+
+            // Find Java 8.
+            final JavaInstall install = JavaLocator.findJava8();
+
+            if (install == null) {
+                LOG.warn("No Java 1.8 installation found, cannot run extension jar file {}", jarFile);
+                return;
+            }
+
+            // Change command to use the java executable from the found folder.
+            javaPath = install.path();
+        } else {
             LOG.debug("Jar file {} is not a Java 8 extension, no need to locate Java 1.8", jarFile);
-            return;
+
+            // Find current Java.
+            final String javaHome = System.getProperty("java.home");
+
+            javaPath = Paths.get(javaHome);
         }
 
-        final JavaInstall install = JavaLocator.findJava8();
-
-        if (install == null) {
-            LOG.warn("No Java 1.8 installation found, cannot run extension jar file {}", jarFile);
-            return;
-        }
-
-        // Change command to use the java executable from the found folder.
-        final Path javaPath = install.path().resolve("bin").resolve(OSValidator.isWindows() ? "java.exe" : "java");
+        // Launch with found javaPath.
+        final Path javaExecutable = javaPath.resolve("bin").resolve(OSValidator.isWindows() ? "java.exe" : "java");
 
         LOG.info("Using java at {} to run extension jar file {}", javaPath, jarFile);
 
-        command.set(0, javaPath.toAbsolutePath().toString());
+        command.set(0, javaExecutable.toAbsolutePath().toString());
     }
 
     /**
