@@ -95,6 +95,14 @@ public class HttpProxyCertificateFactory implements HttpProxyCACertFactory {
             this.caCert = rootCertificate;
             this.caKey = keyPair.getPrivate();
 
+            final File dataDir = new File(this.caCertFile.getParent());
+
+            if (!dataDir.exists()) {
+                if (!dataDir.mkdirs()) {
+                    log.error("Failed to create certificate data directory");
+                }
+            }
+
             Files.write(Paths.get(this.caCertFile.toURI()), this.caCert.getEncoded());
             Files.write(Paths.get(this.caKeyFile.toURI()), new PKCS8EncodedKeySpec(this.caKey.getEncoded()).getEncoded());
 

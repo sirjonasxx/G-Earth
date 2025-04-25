@@ -1,6 +1,9 @@
 package gearth.services.extension_handler.extensions.implementations.network.executer;
 
 import gearth.GEarth;
+import gearth.misc.Cacher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.net.URISyntaxException;
@@ -13,6 +16,8 @@ import java.util.Map;
  * Created by Jonas on 22/09/18.
  */
 public final class ExecutionInfo {
+
+    private static final Logger LOG = LoggerFactory.getLogger(ExecutionInfo.class);
 
     private static final Map<String, String[]> EXTENSION_TYPE_TO_EXECUTION_COMMAND;
 
@@ -27,6 +32,12 @@ public final class ExecutionInfo {
                     : new File(GEarth.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParentFile();
 
             EXTENSIONS_DIRECTORY = new File(dataDir, "Extensions");
+
+            if (!EXTENSIONS_DIRECTORY.exists()) {
+                if (!EXTENSIONS_DIRECTORY.mkdirs()) {
+                    LOG.error("Could not create extensions directory");
+                }
+            }
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
