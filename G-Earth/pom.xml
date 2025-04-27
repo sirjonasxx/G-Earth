@@ -205,6 +205,7 @@
                                     <platform>mac</platform>
                                     <additionalResources>
                                         <additionalResource>${project.basedir}/src/main/resources/build/common/messages.json</additionalResource>
+                                        <additionalResource>${project.basedir}/src/main/resources/build/mac/G-MemZ</additionalResource>
                                     </additionalResources>
                                     <vmArgs>
                                         <vmArg>-Dlog.dir=$USER_HOME/Library/Logs/G-Earth</vmArg>
