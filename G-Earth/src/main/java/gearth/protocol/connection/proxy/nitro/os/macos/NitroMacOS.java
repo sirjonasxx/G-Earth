@@ -28,7 +28,7 @@ public class NitroMacOS implements NitroOsFunctions {
     public boolean isRootCertificateTrusted(File certificate) {
         try {
             final String certificatePath = certificate.getCanonicalFile().getAbsolutePath();
-            final String output = RuntimeUtil.getCommandOutput(new String[] {"sh", "-c", "security verify-cert -c \"" + certificatePath + "\""});
+            final String output = RuntimeUtil.getCommandOutput("sh", "-c", "security verify-cert -c \"" + certificatePath + "\"");
 
             return !output.contains("CSSMERR_TP_NOT_TRUSTED");
         } catch (IOException e) {

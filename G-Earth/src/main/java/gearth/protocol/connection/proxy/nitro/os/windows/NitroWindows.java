@@ -26,7 +26,7 @@ public class NitroWindows implements NitroOsFunctions {
     @Override
     public boolean isRootCertificateTrusted(File certificate) {
         try {
-            final String output = RuntimeUtil.getCommandOutput(new String[] {"cmd", "/c", " certutil.exe -f -verify \"" + certificate.getAbsolutePath() + "\""});
+            final String output = RuntimeUtil.getCommandOutput("cmd", "/c", " certutil.exe -f -verify \"" + certificate.getAbsolutePath() + "\"");
 
             return !output.contains("CERT_TRUST_IS_UNTRUSTED_ROOT") &&
                     output.contains("dwInfoStatus=10c dwErrorStatus=0");

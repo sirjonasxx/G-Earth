@@ -2,8 +2,19 @@ package gearth.misc;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -169,7 +180,68 @@ public class JavaLocator {
     private static List<JavaInstall> findOnMac() throws IOException {
         LOG.info("Searching for Java installations on MacOS");
 
-        return new ArrayList<>();
+        final List<JavaInstall> results = new ArrayList<>();
+
+        final String javaHomes = RuntimeUtil.getCommandOutput("/usr/libexec/java_home", "-X").trim();
+
+        if (!javaHomes.startsWith("<?xml")) {
+            return results;
+        }
+
+        try {
+            final DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
+
+            builderFactory.setIgnoringComments(true);
+            builderFactory.setIgnoringElementContentWhitespace(true);
+
+            final DocumentBuilder builder = builderFactory.newDocumentBuilder();
+            final Document doc = builder.parse(new ByteArrayInputStream(javaHomes.getBytes(Charset.defaultCharset())));
+
+            doc.getDocumentElement().normalize();
+
+            final XPathFactory xPathfactory = XPathFactory.newInstance();
+            final XPath xpath = xPathfactory.newXPath();
+
+            // Get all <dict> nodes inside <array>
+            final NodeList dictNodes = (NodeList) xpath.evaluate("/plist/array/dict", doc, XPathConstants.NODESET);
+
+            for (int i = 0; i < dictNodes.getLength(); i++) {
+                final Node node = dictNodes.item(i);
+
+                final String jvmHomePath = getPlistNode(xpath, node, "JVMHomePath");
+                final String jvmVersion = getPlistNode(xpath, node, "JVMVersion");
+
+                if (jvmHomePath == null || jvmVersion == null) {
+                    LOG.warn("No JVMHomePath or JVMVersion found in a node");
+                    continue;
+                }
+
+                LOG.info("Found Java installation {} at {}", jvmVersion, jvmHomePath);
+
+                results.add(new JavaInstall(Path.of(jvmHomePath), jvmVersion));
+            }
+        } catch (Exception e) {
+            LOG.error("Error while parsing '/usr/libexec/java_home -X' output", e);
+            return results;
+        }
+
+        return results;
+    }
+
+    private static String getPlistNode(final XPath xpath, final Node node, final String key) throws XPathExpressionException {
+        final NodeList keyNodes = (NodeList) xpath.evaluate(String.format("key[text()='%s']", key), node, XPathConstants.NODESET);
+
+        if (keyNodes.getLength() == 0) {
+            return null;
+        }
+
+        final NodeList valueNode = (NodeList) xpath.evaluate("following-sibling::string[1]", keyNodes.item(0), XPathConstants.NODESET);
+
+        if (valueNode.getLength() == 0) {
+            return null;
+        }
+
+        return valueNode.item(0).getTextContent();
     }
 
 }

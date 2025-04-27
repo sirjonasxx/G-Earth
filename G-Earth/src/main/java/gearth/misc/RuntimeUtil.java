@@ -7,7 +7,7 @@ import java.io.InputStreamReader;
 
 public final class RuntimeUtil {
 
-    public static String getCommandOutput(String[] command) throws IOException {
+    public static String getCommandOutput(String... command) throws IOException {
         final Runtime rt = Runtime.getRuntime();
         final Process proc = rt.exec(command);
 
