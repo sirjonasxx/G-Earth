@@ -100,8 +100,14 @@ public class NitroHttpProxyIntercept extends HttpProxyInterceptInitializer {
             public void handleResponse(HttpRequest httpRequest, FullHttpResponse httpResponse, HttpProxyInterceptPipeline pipeline) {
                 final byte[] data = ByteBufUtil.getBytes(httpResponse.content());
 
+                String uriPath = httpRequest.uri();
+
+                if (uriPath.contains("?")) {
+                    uriPath = uriPath.substring(0, uriPath.indexOf("?"));
+                }
+
                 nitroHotelManager.checkAsset(pipeline.getRequestProto().getHost(),
-                        pipeline.getHttpRequest().uri(),
+                        uriPath,
                         data);
             }
         });

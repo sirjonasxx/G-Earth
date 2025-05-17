@@ -63,30 +63,30 @@ public class Hartico extends NitroHotel {
             pixelData[i + 3] = a;
         }
 
-        // Extract 128 red pixels.
-        final byte[] redBits = new byte[128];
+        // Extract 128 pixels.
+        final byte[] colorBits = new byte[128];
 
-        for (int i = 0; i < redBits.length; i++) {
-            redBits[i] = (byte) (pixelData[i * 4] & 1);
+        for (int i = 0; i < colorBits.length; i++) {
+            colorBits[i] = (byte) (pixelData[(i * 4) + 2] & 1);
         }
 
         // Group bits into bytes.
-        final byte[] redBytes = new byte[16];
+        final byte[] colorBytes = new byte[16];
 
         for (int i = 0; i < 16; i++) {
             int value = 0;
             for (int j = 0; j < 8; j++) {
-                value = (value << 1) | redBits[i * 8 + j];
+                value = (value << 1) | colorBits[i * 8 + j];
             }
-            redBytes[i] = (byte) value;
+            colorBytes[i] = (byte) value;
         }
 
-        final byte[] redBytesExtended = new byte[24];
+        final byte[] colorBytesExtended = new byte[24];
 
-        System.arraycopy(redBytes, 0, redBytesExtended, 0, 16);
-        System.arraycopy(redBytes, 0, redBytesExtended, 16, 8);
+        System.arraycopy(colorBytes, 0, colorBytesExtended, 0, 16);
+        System.arraycopy(colorBytes, 0, colorBytesExtended, 16, 8);
 
-        return redBytesExtended;
+        return colorBytesExtended;
     }
 
     public static class HarticoPacketModifier implements NitroPacketModifier {
