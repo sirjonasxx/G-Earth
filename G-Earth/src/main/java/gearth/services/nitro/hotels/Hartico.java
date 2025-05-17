@@ -67,7 +67,7 @@ public class Hartico extends NitroHotel {
         final byte[] colorBits = new byte[128];
 
         for (int i = 0; i < colorBits.length; i++) {
-            colorBits[i] = (byte) (pixelData[(i * 4) + 2] & 1);
+            colorBits[i] = (byte) (pixelData[(i * 4) + 1] & 1);
         }
 
         // Group bits into bytes.
