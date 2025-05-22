@@ -2,8 +2,8 @@ package gearth.protocol.hostreplacer.hostsfile;
 
 public interface HostReplacer {
 
-    void addRedirect(String[] lines);
+    boolean addRedirect(String[] lines);
 
-    void removeRedirect(String[] lines);
+    boolean removeRedirect(String[] lines);
 
 }

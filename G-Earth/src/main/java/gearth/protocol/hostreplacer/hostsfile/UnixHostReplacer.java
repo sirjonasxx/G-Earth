@@ -25,7 +25,7 @@ class UnixHostReplacer implements HostReplacer {
     }
 
     @Override
-    public void addRedirect(String[] lines) {
+    public boolean addRedirect(String[] lines) {
         List<String> adders = new ArrayList<>();
         for (int i = 0; i < lines.length; i++) {
             adders.add(lines[i] + "\t# G-Earth replacement");
@@ -68,11 +68,14 @@ class UnixHostReplacer implements HostReplacer {
         catch (Exception ex)
         {
             LOG.error("Error while adding redirect to hosts file", ex);
+            return false;
         }
+
+        return true;
     }
 
     @Override
-    public void removeRedirect(String[] lines) {
+    public boolean removeRedirect(String[] lines) {
         ArrayList<String> removers = new ArrayList<>();
         for (int i = 0; i < lines.length; i++) {
             removers.add(lines[i] + "\t# G-Earth replacement");
@@ -112,6 +115,9 @@ class UnixHostReplacer implements HostReplacer {
         catch (Exception ex)
         {
             LOG.error("Error while removing redirect from hosts file", ex);
+            return false;
         }
+
+        return true;
     }
 }

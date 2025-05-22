@@ -58,7 +58,26 @@ public class ConnectionInterceptor {
 
     public void start() throws IOException {
         prepare();
-        addToHosts();
+
+        if (!addToHosts()) {
+            Platform.runLater(() -> {
+                try {
+                    final Alert alert = new Alert(Alert.AlertType.ERROR, "Unable to modify hosts file, try to run G-Earth as administrator.", ButtonType.OK);
+
+                    alert.setHeaderText("Error modifying hosts file");
+
+                    TitleBarController
+                            .create(alert)
+                            .showAlertAndWait();
+                } catch (IOException ex) {
+                    logger.error("Error showing hosts error alert", ex);
+                }
+            });
+
+            hStateSetter.setState(HState.NOT_CONNECTED);
+            return;
+        }
+
         launchProxy();
     }
 
@@ -188,7 +207,7 @@ public class ConnectionInterceptor {
 
     }
 
-    private void addToHosts() {
+    private boolean addToHosts() {
         List<String> linesTemp = new ArrayList<>();
         for (HProxy proxy : potentialProxies) {
             linesTemp.add(proxy.getIntercept_host() + " " + proxy.getInput_domain());
@@ -198,11 +217,16 @@ public class ConnectionInterceptor {
         for (int i = 0; i < linesTemp.size(); i++) {
             lines[i] = linesTemp.get(i);
         }
-        hostsReplacer.addRedirect(lines);
-        hostRedirected = true;
+
+        if (hostsReplacer.addRedirect(lines)) {
+            hostRedirected = true;
+            return true;
+        }
+
+        return false;
     }
 
-    private void removeFromHosts(){
+    private boolean removeFromHosts(){
         List<String> linesTemp = new ArrayList<>();
         for (HProxy proxy : potentialProxies) {
             linesTemp.add(proxy.getIntercept_host() + " " + proxy.getInput_domain());
@@ -212,8 +236,13 @@ public class ConnectionInterceptor {
         for (int i = 0; i < linesTemp.size(); i++) {
             lines[i] = linesTemp.get(i);
         }
-        hostsReplacer.removeRedirect(lines);
-        hostRedirected = false;
+
+        if (hostsReplacer.removeRedirect(lines)) {
+            hostRedirected = false;
+            return true;
+        }
+
+        return false;
     }
 
     private void clearAllProxies() {
