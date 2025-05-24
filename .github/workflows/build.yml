@@ -79,7 +79,7 @@ jobs:
         MATRIX_OS: ${{ matrix.os }}
         MATRIX_JDK_ARCH: ${{ matrix.jdk-arch }}
       run: |
-        MVN_PROFILE="-Ppackage-javafx-modules"
+        MVN_PROFILE=""
         
         if [[ $GITHUB_REF_TYPE == 'tag' ]]; then
           mvn -B package $MVN_PROFILE \
