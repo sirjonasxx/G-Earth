@@ -16,13 +16,13 @@ public abstract class IExtension {
     public abstract void writeToConsole(String s);
     public abstract void onConnect(OnConnectionListener listener);
 
-    abstract void initExtension();
-    abstract void onClick();
-    abstract void onStartConnection();
-    abstract void onEndConnection();
-    abstract ExtensionInfo getInfoAnnotations();
-    abstract boolean canLeave();
-    abstract boolean canDelete();
+    public abstract void initExtension();
+    public abstract void onClick();
+    public abstract void onStartConnection();
+    public abstract void onEndConnection();
+    public abstract ExtensionInfo getInfoAnnotations();
+    public abstract boolean canLeave();
+    public abstract boolean canDelete();
 
     public abstract PacketInfoManager getPacketInfoManager();
 }

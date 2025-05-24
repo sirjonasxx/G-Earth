@@ -14,9 +14,9 @@ import gearth.protocol.HPacket;
  */
 public abstract class ExtensionForm extends ExtensionBase {
 
-    volatile ExtensionBase extension;
-    protected volatile Stage primaryStage;
-    volatile HostServices hostServices;
+    public volatile ExtensionBase extension;
+    public volatile Stage primaryStage;
+    public volatile HostServices hostServices;
 
     //wrap extension methods
     public boolean requestFlags(Extension.FlagsCheckListener flagRequestCallback){
@@ -52,14 +52,14 @@ public abstract class ExtensionForm extends ExtensionBase {
         return extension.getPacketInfoManager();
     }
 
-    protected void onShow(){};
-    protected void onHide(){};
+    public void onShow(){};
+    public void onHide(){};
 
     /**
      * Gets called when a connection has been established with G-Earth.
      * This does not imply a connection with Habbo is setup.
      */
-    protected void initExtension(){}
+    public void initExtension(){}
 
     /**
      * The application got doubleclicked from the G-Earth interface. Doing something here is optional
@@ -76,18 +76,18 @@ public abstract class ExtensionForm extends ExtensionBase {
     /**
      * A connection with Habbo has been started
      */
-    protected void onStartConnection(){}
+    public void onStartConnection(){}
 
     /**
      * A connection with Habbo has ended
      */
-    protected void onEndConnection(){}
+    public void onEndConnection(){}
 
-    protected boolean canLeave() {
+    public boolean canLeave() {
         return true;
     }
 
-    protected boolean canDelete() {
+    public boolean canDelete() {
         return true;
     }
 
@@ -99,5 +99,5 @@ public abstract class ExtensionForm extends ExtensionBase {
         return extension.observableHostInfo.getObject();
     }
 
-    Observable<Runnable> fieldsInitialized = new Observable<>(Runnable::run);
+    public Observable<Runnable> fieldsInitialized = new Observable<>(Runnable::run);
 }

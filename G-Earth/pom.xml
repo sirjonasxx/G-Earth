@@ -84,7 +84,7 @@
                 <!-- https://github.com/javapackager/JavaPackager/tree/master/docs -->
                 <configuration>
                     <bundleJre>true</bundleJre>
-                    <mainClass>gearth.Main</mainClass>
+                    <mainClass>gearth.app.Main</mainClass>
                     <generateInstaller>false</generateInstaller>
                     <jreMinVersion>21.0.0</jreMinVersion>
                     <additionalModules>

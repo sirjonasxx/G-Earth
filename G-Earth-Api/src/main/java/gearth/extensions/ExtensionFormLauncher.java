@@ -22,37 +22,37 @@ public class ExtensionFormLauncher extends Application {
 
         Extension extension = new Extension(args) {
             @Override
-            protected void initExtension() {
+            public void initExtension() {
                 extensionForm.initExtension();
             }
 
             @Override
-            protected void onClick() {
+            public void onClick() {
                 extensionForm.onClick();
             }
 
             @Override
-            protected void onStartConnection() {
+            public void onStartConnection() {
                 extensionForm.onStartConnection();
             }
 
             @Override
-            protected void onEndConnection() {
+            public void onEndConnection() {
                 extensionForm.onEndConnection();
             }
 
             @Override
-            protected ExtensionInfo getInfoAnnotations() {
+            public ExtensionInfo getInfoAnnotations() {
                 return extInfo;
             }
 
             @Override
-            protected boolean canLeave() {
+            public boolean canLeave() {
                 return extensionForm.canLeave();
             }
 
             @Override
-            protected boolean canDelete() {
+            public boolean canDelete() {
                 return extensionForm.canDelete();
             }
         };

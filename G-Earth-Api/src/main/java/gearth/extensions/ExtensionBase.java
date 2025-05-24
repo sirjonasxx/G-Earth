@@ -29,7 +29,7 @@ public abstract class ExtensionBase extends IExtension {
     volatile PacketInfoManager packetInfoManager = PacketInfoManager.EMPTY;
     ObservableObject<HostInfo> observableHostInfo = new ObservableObject<>(null);
 
-    void updateHostInfo(HostInfo hostInfo) {
+    public void updateHostInfo(HostInfo hostInfo) {
         observableHostInfo.setObject(hostInfo);
     }
 
@@ -163,10 +163,10 @@ public abstract class ExtensionBase extends IExtension {
      * The application got doubleclicked from the G-Earth interface. Doing something here is optional
      */
     @Override
-    protected void onClick() {}
+    public void onClick() {}
 
     @Override
-    protected ExtensionInfo getInfoAnnotations() {
+    public ExtensionInfo getInfoAnnotations() {
         return getClass().getAnnotation(ExtensionInfo.class);
     }
 
@@ -175,11 +175,11 @@ public abstract class ExtensionBase extends IExtension {
         onConnectionObservable.addListener(listener);
     }
 
-    Observable<OnConnectionListener> getOnConnectionObservable() {
+    public Observable<OnConnectionListener> getOnConnectionObservable() {
         return onConnectionObservable;
     }
 
-    void setPacketInfoManager(PacketInfoManager packetInfoManager) {
+    public void setPacketInfoManager(PacketInfoManager packetInfoManager) {
         this.packetInfoManager = packetInfoManager;
     }
 

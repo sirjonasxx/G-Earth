@@ -12,7 +12,6 @@ import java.util.List;
 /**
  * Represents a message send or received by G-Earth and a remote extension.
  *
- * @see NetworkExtensionCodec the encoding/decoding structures
  * @see Incoming messages coming from the remote extension to G-Earth
  * @see Outgoing messages coming from G-Earth to the remote extension
  *
