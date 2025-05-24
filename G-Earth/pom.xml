@@ -9,7 +9,6 @@
     <packaging>jar</packaging>
 
     <properties>
-        <javafx.version>21.0.7</javafx.version>
         <logback.version>1.5.18</logback.version>
         <bouncycastle.version>1.80</bouncycastle.version>
         <apache.http>5.4.3</apache.http>
@@ -51,14 +50,6 @@
                 <configuration>
                     <source>${maven.compiler.source}</source>
                     <target>${maven.compiler.target}</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.openjfx</groupId>
-                <artifactId>javafx-maven-plugin</artifactId>
-                <version>0.0.8</version>
-                <configuration>
-                    <mainClass>gearth.Main</mainClass>
                 </configuration>
             </plugin>
             <plugin>
@@ -228,32 +219,6 @@
                     </plugin>
                 </plugins>
             </build>
-        </profile>
-
-        <!-- Dependency profiles -->
-        <!-- We need to disable building with JavaFX for JDKs that ship with JavaFX -->
-        <profile>
-            <id>include-javafx-dependencies</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>org.openjfx</groupId>
-                    <artifactId>javafx-fxml</artifactId>
-                    <version>${javafx.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.openjfx</groupId>
-                    <artifactId>javafx-web</artifactId>
-                    <version>${javafx.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.openjfx</groupId>
-                    <artifactId>javafx-swing</artifactId>
-                    <version>${javafx.version}</version>
-                </dependency>
-            </dependencies>
         </profile>
 
         <!-- For liberica we need to explicitly tell jlink to add JavaFX to the custom JRE -->

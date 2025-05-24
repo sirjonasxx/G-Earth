@@ -19,21 +19,21 @@ jobs:
             jdk-arch: 'x86'
             jdk-distribution: 'liberica'
           - os: windows-latest
-            jdk-package: 'jdk'
+            jdk-package: 'jdk+fx'
             jdk-arch: 'x64'
-            jdk-distribution: 'temurin'
+            jdk-distribution: 'liberica'
           - os: macos-latest
-            jdk-package: 'jdk'
+            jdk-package: 'jdk+fx'
             jdk-arch: 'x64'
-            jdk-distribution: 'temurin'
+            jdk-distribution: 'liberica'
           - os: macos-latest
-            jdk-package: 'jdk'
+            jdk-package: 'jdk+fx'
             jdk-arch: 'aarch64'
-            jdk-distribution: 'temurin'
+            jdk-distribution: 'liberica'
           - os: ubuntu-latest
-            jdk-package: 'jdk'
+            jdk-package: 'jdk+fx'
             jdk-arch: 'x64'
-            jdk-distribution: 'temurin'
+            jdk-distribution: 'liberica'
 
     runs-on: ${{ matrix.os }}
     permissions:
@@ -79,11 +79,7 @@ jobs:
         MATRIX_OS: ${{ matrix.os }}
         MATRIX_JDK_ARCH: ${{ matrix.jdk-arch }}
       run: |
-        if [[ $MATRIX_OS == "windows-latest" && $MATRIX_JDK_ARCH == "x86" ]]; then
-          MVN_PROFILE="-P!include-javafx-dependencies -Ppackage-javafx-modules"
-        else
-          MVN_PROFILE="-Pinclude-javafx-dependencies"
-        fi
+        MVN_PROFILE="-Ppackage-javafx-modules"
         
         if [[ $GITHUB_REF_TYPE == 'tag' ]]; then
           mvn -B package $MVN_PROFILE \
