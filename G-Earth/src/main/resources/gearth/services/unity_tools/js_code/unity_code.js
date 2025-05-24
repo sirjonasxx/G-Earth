@@ -1,8 +1,9 @@
 let gearth_isconnected = false;
 
-let revision = "{{RevisionName}}";
-let g_ws;
+const revision = "{{RevisionName}}";
+const websocket_port = "{{WebsocketPort}}";
 
+let g_ws;
 
 let chachas = [];
 let chachaClass = -1;
@@ -21,7 +22,6 @@ let _gearth_incoming_copy;
 let _malloc;
 let _free;
 let _module;
-
 
 var packetBuff = {"out": [], "in": []};
 
@@ -55,8 +55,6 @@ function writeBigEndian(n) {
     return arr;
 }
 
-
-
 function packetToString(packet) {
     let chars = [];
     let textDecode = new TextDecoder('latin1');
@@ -83,11 +81,9 @@ function printPacket(type, packet) {
     }
 }
 
-
 let _g_packet_split = 600;
 
 function inject_out(packet) {
-
     if (chachas.length > 1) {
         packet[5] =  _gearth_returnbyte_copy(chachas[0], packet[5], chachaClass);
         packet[4] =  _gearth_returnbyte_copy(chachas[0], packet[4], chachaClass);
@@ -151,7 +147,6 @@ function handle_in(packet) {
     }
 }
 
-
 function collect_packets(type) {
     let finishedPackets = [];
 
@@ -164,10 +159,6 @@ function collect_packets(type) {
 
     return finishedPackets;
 }
-
-
-
-
 
 let onOpen = function() {
     g_ws.send(new TextEncoder('latin1').encode(revision));
@@ -197,19 +188,9 @@ let onError = function(event) {
     gearth_isconnected = false;
 };
 
-let portRequester = new WebSocket("ws://localhost:9039/ws/portrequest");
-portRequester.onmessage = function(message) {
-    let port = message.data.split(" ")[1];
-
-    let _g_packet_url = "ws://localhost:" + port + "/ws/packethandler";
-    g_ws = new WebSocket(_g_packet_url);
-    g_ws.binaryType = "arraybuffer";
-
-    g_ws.onopen = onOpen;
-    g_ws.onclose = onClose;
-    g_ws.onmessage = onMessage;
-    g_ws.onerror = onError;
-
-    portRequester.close();
-};
-
+g_ws = new WebSocket("wss://localhost:" + websocket_port + "/");
+g_ws.binaryType = "arraybuffer";
+g_ws.onopen = onOpen;
+g_ws.onclose = onClose;
+g_ws.onmessage = onMessage;
+g_ws.onerror = onError;
