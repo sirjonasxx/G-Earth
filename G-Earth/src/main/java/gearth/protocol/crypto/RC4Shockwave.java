@@ -1,8 +1,5 @@
 package gearth.protocol.crypto;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
-
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -14,8 +11,9 @@ import java.util.Arrays;
  * <a href="https://github.com/aromaa/Skylight3/blob/72ec3a07d126de09f6de4251c91001329f77a8a2/src/Skylight.Server/Net/Crypto/RC4Base64.cs">
  *     https://github.com/aromaa/Skylight3/blob/72ec3a07d126de09f6de4251c91001329f77a8a2/src/Skylight.Server/Net/Crypto/RC4Base64.cs
  * </a>
+ * Modified by Mikee to 512 byte support.
  */
-public class RC4Base64 implements RC4Cipher {
+public class RC4Shockwave implements RC4Cipher {
 
     private static final byte[] BASE64_ENCODING_MAP = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/".getBytes(StandardCharsets.US_ASCII);
 
@@ -38,18 +36,33 @@ public class RC4Base64 implements RC4Cipher {
             -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
     };
 
-    private final byte[] state;
+    private final int[] state;
     private int q;
     private int j;
 
-    public RC4Base64(byte[] state, int q, int j) {
-        if (state.length != 256) {
-            throw new IllegalArgumentException(String.format("State must be 256 bytes long, was %d", state.length));
+    public RC4Shockwave(byte[] state, int q, int j) {
+        this(convertToIntState(state), q, j);
+    }
+
+    public RC4Shockwave(int[] state, int q, int j) {
+        if (state.length != 512) {
+            throw new IllegalArgumentException(String.format("Int state must be of size 512, was %d", state.length));
         }
 
         this.q = q;
         this.j = j;
         this.state = state;
+    }
+
+    private static int[] convertToIntState(byte[] stateDump) {
+        final ByteBuffer buffer = ByteBuffer.wrap(stateDump);
+        final int[] state = new int[stateDump.length / 4];
+
+        for (int i = 0; i < state.length; i++) {
+            state[i] = buffer.getInt();
+        }
+
+        return state;
     }
 
     @Override
@@ -124,7 +137,7 @@ public class RC4Base64 implements RC4Cipher {
     }
 
     @Override
-    public byte[] getState () {
+    public int[] getState() {
         return state;
     }
 
@@ -139,21 +152,21 @@ public class RC4Base64 implements RC4Cipher {
     }
 
     @Override
-    public RC4Base64 deepCopy() {
-        return new RC4Base64(Arrays.copyOf(state, 256), q, j);
+    public RC4Shockwave deepCopy() {
+        return new RC4Shockwave(Arrays.copyOf(state, state.length), q, j);
     }
 
     public byte moveUp() {
         q = (q + 1) & 0xff;
         j = ((state[q] & 0xff) + j) & 0xff;
 
-        byte tmp = state[q];
+        int tmp = state[q];
         state[q] = state[j];
         state[j] = tmp;
 
-        if ((q & 0x3F) == 0x3F) {
-            int x2 = 297 * (q + 67) & 0xff;
-            int y2 = (j + state[x2]) & 0xff;
+        if ((q & 128) == 128) {
+            int x2 = 279 * (q + 67) & 0xff;
+            int y2 = (j + (state[x2] & 0xff)) & 0xff;
 
             tmp = state[x2];
             state[x2] = state[y2];
@@ -162,13 +175,13 @@ public class RC4Base64 implements RC4Cipher {
 
         int xorIndex = ((state[q] &0xff) + (state[j] & 0xff)) & 0xff;
 
-        return state[xorIndex];
+        return (byte) (state[xorIndex] & 0xff);
     }
 
     public boolean moveDown() {
-        byte tmp;
+        int tmp;
 
-        if ((q & 0x3F) == 0x3F) {
+        if ((q & 128) == 128) {
             // Unsupported.
             return false;
         }
@@ -177,8 +190,8 @@ public class RC4Base64 implements RC4Cipher {
         state[q] = state[j];
         state[j] = tmp;
 
-        j = (j - (state[q] & 0xff)) & 0xff;
-        q = (q - 1) & 0xff;
+        j = ((j - (state[q])) % 256) & 0xff;
+        q = (q - 1) % 256;
 
         return true;
     }

@@ -33,6 +33,7 @@ package gearth.protocol.crypto;
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 /**
@@ -56,7 +57,7 @@ import java.util.Arrays;
  */
 public class RC4 implements RC4Cipher {
 
-    private byte[] state = new byte[256];
+    private int[] state = new int[256];
     private int x;
     private int y;
 
@@ -88,8 +89,7 @@ public class RC4 implements RC4Cipher {
 
         int index1 = 0;
         int index2 = 0;
-
-        byte tmp;
+        int tmp;
 
         if (key == null || key.length == 0) {
             throw new NullPointerException();
@@ -107,9 +107,28 @@ public class RC4 implements RC4Cipher {
     }
 
     public RC4(byte[] state, int x, int y) {
+        this(convertToIntState(state), x, y);
+    }
+
+    public RC4(int[] state, int x, int y) {
+        if (state.length != 256) {
+            throw new IllegalArgumentException("State must have a length of 256");
+        }
+
         this.x = x;
         this.y = y;
         this.state = state;
+    }
+
+    private static int[] convertToIntState(byte[] stateDump) {
+        final ByteBuffer buffer = ByteBuffer.wrap(stateDump);
+        final int[] state = new int[stateDump.length / 4];
+
+        for (int i = 0; i < state.length; i++) {
+            state[i] = buffer.getInt();
+        }
+
+        return state;
     }
 
     /**
@@ -126,7 +145,7 @@ public class RC4 implements RC4Cipher {
     @Override
     public byte[] cipher(byte[] data, int offset, int length) {
         int xorIndex;
-        byte tmp;
+        int tmp;
 
         if (data == null) {
             return null;
@@ -161,7 +180,7 @@ public class RC4 implements RC4Cipher {
     }
 
     @Override
-    public byte[] getState () {
+    public int[] getState () {
         return state;
     }
 
@@ -176,7 +195,7 @@ public class RC4 implements RC4Cipher {
     }
 
     public RC4 deepCopy() {
-        return new RC4(Arrays.copyOf(state, 256), x, y);
+        return new RC4(Arrays.copyOf(state, state.length), x, y);
     }
 
     public boolean couldBeFresh() {
@@ -184,7 +203,7 @@ public class RC4 implements RC4Cipher {
     }
 
     public void undoRc4(byte[] buf) {
-        byte tmp;
+        int tmp;
 
         for (int i = 0; i < buf.length; i++) {
             tmp = state[x];

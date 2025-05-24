@@ -4,7 +4,7 @@ import gearth.GEarth;
 import gearth.protocol.HConnection;
 import gearth.protocol.HMessage;
 import gearth.protocol.crypto.RC4;
-import gearth.protocol.crypto.RC4Base64;
+import gearth.protocol.crypto.RC4Shockwave;
 import gearth.protocol.memory.habboclient.HabboClient;
 import gearth.protocol.memory.habboclient.HabboClientFactory;
 import gearth.protocol.packethandler.EncryptedPacketHandler;
@@ -172,9 +172,8 @@ public class Rc4Obtainer {
     }
 
     private boolean bruteShockwaveHeaderFast(EncryptedPacketHandler packetHandler, byte[] encBuffer, byte[] tableState) {
-        // Table state Q starts at 152 after premixing.
-        // Add 12 for the 3 headers being encrypted and you get 164.
-        final int EstimatedQ = 164;
+        // Table state Q starts at 128 after premixing.
+        final int EstimatedQ = 128;
 
         for (int j = 0; j < 256; j++) {
             if (bruteShockwaveHeader(packetHandler, encBuffer, tableState, EstimatedQ, j)) {
@@ -201,17 +200,10 @@ public class Rc4Obtainer {
 
     private boolean bruteShockwaveHeader(EncryptedPacketHandler packetHandler, byte[] encBuffer, byte[] tableState, int q, int j) {
         final byte[] tableStateCopy = Arrays.copyOf(tableState, tableState.length);
-        final RC4Base64 rc4 = new RC4Base64(tableStateCopy, q, j);
-
-        if (packetHandler.getDirection() == HMessage.Direction.TOSERVER) {
-            // Encoded 3 headers, 4 * 3 = 12
-            if (!rc4.undoRc4(12)) {
-                return false;
-            }
-        }
+        final RC4Shockwave rc4 = new RC4Shockwave(tableStateCopy, q, j);
 
         final byte[] encDataCopy = Arrays.copyOf(encBuffer, encBuffer.length);
-        final RC4Base64 rc4Test = rc4.deepCopy();
+        final RC4Shockwave rc4Test = rc4.deepCopy();
 
         // Attempt to exhaust buffer.
         final ShockwaveOutBuffer buffer = new ShockwaveOutBuffer();

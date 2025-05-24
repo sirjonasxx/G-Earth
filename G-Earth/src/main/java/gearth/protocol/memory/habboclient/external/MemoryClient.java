@@ -74,7 +74,13 @@ public class MemoryClient implements HabboClient {
             String line;
 
             while ((line = reader.readLine()) != null) {
-                if (line.length() == 512) {
+                logger.info("G-MemZ: {}", line);
+
+                // 2048 = Flash     (256 * 4 * 2)
+                // 4096 = Shockwave (512 * 4 * 2)
+                final int lineLength = line.length();
+
+                if (lineLength == 2048 || lineLength == 4096) {
                     possibleData.add(line);
                 }
             }

@@ -10,7 +10,7 @@ public interface RC4Cipher {
 
     byte[] decipher(byte[] data, int offset, int length);
 
-    byte[] getState();
+    int[] getState();
 
     int getQ();
 
