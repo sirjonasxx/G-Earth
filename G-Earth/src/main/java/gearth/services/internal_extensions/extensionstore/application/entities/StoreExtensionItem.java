@@ -1,13 +1,9 @@
 package gearth.services.internal_extensions.extensionstore.application.entities;
 
-import gearth.GEarth;
-import gearth.protocol.HMessage;
-import gearth.protocol.HPacket;
 import gearth.services.internal_extensions.extensionstore.GExtensionStore;
 import gearth.services.internal_extensions.extensionstore.application.GExtensionStoreController;
 import gearth.services.internal_extensions.extensionstore.application.WebUtils;
 import gearth.services.internal_extensions.extensionstore.application.entities.extensiondetails.StoreExtensionDetailsOverview;
-import gearth.services.internal_extensions.extensionstore.application.entities.queriedoverviews.CategorizedOverview;
 import gearth.services.internal_extensions.extensionstore.repository.StoreRepository;
 import gearth.services.internal_extensions.extensionstore.repository.models.StoreExtension;
 import gearth.ui.translations.LanguageBundle;

@@ -3,7 +3,8 @@ package gearth.extensions.parsers;
 import gearth.extensions.parsers.stuffdata.IStuffData;
 import gearth.protocol.HPacket;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class HFloorItem implements IFurni {
     private int id;

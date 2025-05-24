@@ -19,12 +19,12 @@ public class MapStuffData extends StuffDataBase implements Map<String, String> {
     protected MapStuffData() {}
 
     public MapStuffData(HashMap<String, String> map) {
-        this.map = map == null ? new HashMap<>() : map.entrySet().stream().filter(e -> e.getValue() != null).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (x, y) -> y, HashMap::new));
+        this.map = map == null ? new HashMap<>() : map.entrySet().stream().filter(e -> e.getValue() != null).collect(Collectors.toMap(Entry::getKey, Entry::getValue, (x, y) -> y, HashMap::new));
     }
 
     public MapStuffData(int uniqueSerialNumber, int uniqueSerialSize, HashMap<String, String> map) {
         super(uniqueSerialNumber, uniqueSerialSize);
-        this.map = map == null ? new HashMap<>() : map.entrySet().stream().filter(e -> e.getValue() != null).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (x, y) -> y, HashMap::new));
+        this.map = map == null ? new HashMap<>() : map.entrySet().stream().filter(e -> e.getValue() != null).collect(Collectors.toMap(Entry::getKey, Entry::getValue, (x, y) -> y, HashMap::new));
     }
 
     @Override

@@ -4,19 +4,11 @@ import gearth.services.internal_extensions.extensionstore.GExtensionStore;
 import gearth.services.internal_extensions.extensionstore.application.GExtensionStoreController;
 import gearth.services.internal_extensions.extensionstore.application.WebUtils;
 import gearth.services.internal_extensions.extensionstore.application.entities.ContentItem;
-import gearth.services.internal_extensions.extensionstore.application.entities.HOverview;
 import gearth.services.internal_extensions.extensionstore.repository.models.ExtCategory;
 import gearth.services.internal_extensions.extensionstore.repository.models.StoreExtension;
-import gearth.services.internal_extensions.extensionstore.tools.EncodingUtil;
 import gearth.ui.translations.LanguageBundle;
 import netscape.javascript.JSObject;
-import org.apache.commons.io.IOUtils;
-import org.json.JSONObject;
 
-import java.io.IOException;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 

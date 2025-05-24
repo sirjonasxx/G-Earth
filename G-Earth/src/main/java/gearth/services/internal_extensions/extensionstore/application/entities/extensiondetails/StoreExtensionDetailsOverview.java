@@ -10,7 +10,7 @@ import gearth.services.internal_extensions.extensionstore.repository.StoreReposi
 import gearth.services.internal_extensions.extensionstore.repository.models.StoreExtension;
 import gearth.services.internal_extensions.extensionstore.tools.InstalledExtension;
 import gearth.services.internal_extensions.extensionstore.tools.StoreExtensionTools;
-import gearth.ui.titlebar.TitleBarController;
+import gearth.ui.titlebar.TitleBarAlert;
 import gearth.ui.translations.LanguageBundle;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
@@ -116,7 +116,7 @@ public class StoreExtensionDetailsOverview extends HOverview {
         alert.setContentText(context);
 
         try {
-            TitleBarController.create(alert).showAlertAndWait();
+            TitleBarAlert.create(alert).showAlertAndWait();
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -2,7 +2,7 @@ package gearth.services.nitro;
 
 import gearth.misc.Cacher;
 import gearth.misc.ConfirmationDialog;
-import gearth.ui.titlebar.TitleBarController;
+import gearth.ui.titlebar.TitleBarAlert;
 import gearth.ui.translations.LanguageBundle;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
@@ -53,7 +53,7 @@ public class RemoteNitroHelper {
 
                 LOG.debug("Showing nitro permission dialog");
 
-                final boolean permissionResult = TitleBarController
+                final boolean permissionResult = TitleBarAlert
                         .create(alert)
                         .showAlertAndWait()
                         .filter(t -> t == ButtonType.YES)

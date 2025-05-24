@@ -1,7 +1,7 @@
 package gearth.misc;
 
 import gearth.GEarth;
-import gearth.ui.titlebar.TitleBarController;
+import gearth.ui.titlebar.TitleBarAlert;
 import gearth.ui.translations.LanguageBundle;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -25,7 +25,6 @@ public class UpdateChecker {
     private static final Logger logger = LoggerFactory.getLogger(UpdateChecker.class);
 
     public static void checkForUpdates() {
-
         new Thread(() -> {
             // Check official repository first.
             if (!GEarth.repository.equals(GEarth.OFFICIAL_REPOSITORY)) {
@@ -35,7 +34,7 @@ public class UpdateChecker {
             }
 
             // Check repository of the fork.
-            checkRepository("UnfamiliarLegacy/G-Earth");
+            checkRepository("G-Realm/G-Earth");
         }).start();
     }
 
@@ -80,7 +79,7 @@ public class UpdateChecker {
                         alert.setOnCloseRequest(event -> System.exit(0));
                     }
                     try {
-                        TitleBarController.create(alert).showAlert();
+                        TitleBarAlert.create(alert).showAlert();
                     } catch (IOException e) {
                         logger.error("Failed to show alert", e);
                     }

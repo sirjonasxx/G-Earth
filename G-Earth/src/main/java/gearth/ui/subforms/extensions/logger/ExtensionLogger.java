@@ -1,14 +1,11 @@
 package gearth.ui.subforms.extensions.logger;
 
-import gearth.GEarth;
-import gearth.ui.titlebar.DefaultTitleBarConfig;
 import gearth.ui.titlebar.GEarthThemedTitleBarConfig;
 import gearth.ui.titlebar.TitleBarController;
 import gearth.ui.translations.TranslatableString;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.image.Image;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 

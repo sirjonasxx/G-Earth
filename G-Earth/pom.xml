@@ -227,16 +227,21 @@
     </profiles>
 
     <dependencies>
+        <dependency>
+            <groupId>G-Earth</groupId>
+            <artifactId>G-Earth-Api</artifactId>
+            <version>${revision}${changelist}</version>
+        </dependency>
         <!-- https://mvnrepository.com/artifact/org.slf4j/jul-to-slf4j -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>jul-to-slf4j</artifactId>
-            <version>2.1.0-alpha1</version>
+            <version>${slf4j.version}</version>
         </dependency>
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
-            <version>20250107</version>
+            <version>${org.json.version}</version>
         </dependency>
         <dependency>
             <groupId>org.fxmisc.richtext</groupId>

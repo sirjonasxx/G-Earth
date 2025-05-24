@@ -1,19 +1,16 @@
 package gearth.ui.titlebar;
 
-import gearth.GEarth;
 import gearth.ui.themes.ThemeFactory;
-import gearth.ui.translations.Language;
-import gearth.ui.translations.LanguageBundle;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuButton;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
@@ -21,7 +18,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import javafx.stage.WindowEvent;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -34,11 +30,10 @@ public class TitleBarController {
     public ImageView themeBtn;
     public ImageView minimizeBtn;
     public MenuButton languagePicker;
+    public Alert alert;
 
     private Stage stage;
     private TitleBarConfig config;
-
-    private Alert alert = null;
 
     public static TitleBarController create(Stage stage, TitleBarConfig config) throws IOException {
         FXMLLoader loader = new FXMLLoader(TitleBarController.class.getResource("Titlebar.fxml"));
@@ -52,32 +47,7 @@ public class TitleBarController {
         return controller;
     }
 
-    public static TitleBarController create(Alert alert) throws IOException {
-        GEarth.setAlertOwner(alert);
-
-        FXMLLoader loader = new FXMLLoader(TitleBarController.class.getResource("Titlebar.fxml"));
-        Parent titleBar = loader.load();
-        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-
-        TitleBarConfig config = new GEarthThemedTitleBarConfig(stage) {
-            @Override
-            public boolean displayMinimizeButton() {
-                return false;
-            }
-        };
-        TitleBarController controller = initNewController(loader, stage, config);
-
-        controller.alert = alert;
-        Parent parent = alert.getDialogPane().getScene().getRoot();
-        VBox newParent = new VBox(titleBar, parent);
-        newParent.setId("titlebar-main-container");
-        stage.setScene(new Scene(newParent));
-        stage.getScene().setFill(Color.TRANSPARENT);
-
-        return controller;
-    }
-
-    private static TitleBarController initNewController(FXMLLoader loader, Stage stage, TitleBarConfig config) throws IOException {
+    public static TitleBarController initNewController(FXMLLoader loader, Stage stage, TitleBarConfig config) throws IOException {
         TitleBarController controller = loader.getController();
 
         controller.stage = stage;
@@ -86,9 +56,6 @@ public class TitleBarController {
 
         stage.titleProperty().addListener((i) -> controller.setTitle(stage.getTitle()));
         controller.setTitle(stage.getTitle());
-
-        controller.languagePicker.getItems().addAll(Language.getMenuItems());
-        controller.languagePicker.setGraphic(LanguageBundle.getLanguage().getIcon());
 
         stage.getIcons().addListener((InvalidationListener) observable -> controller.updateIcon());
         controller.updateIcon();
@@ -109,14 +76,10 @@ public class TitleBarController {
         return controller;
     }
 
-    private static void initLanguagePicker() {
-
-    }
-
     public void updateIcon() {
-        Platform.runLater(() -> titleIcon.setImage(stage.getIcons().size() > 0 ? stage.getIcons().get(0) :
-                new Image(GEarth.class.getResourceAsStream(
-                        String.format("/gearth/ui/themes/%s/logoSmall.png", ThemeFactory.getDefaultTheme().internalName())))));
+        Platform.runLater(() -> titleIcon.setImage(stage.getIcons().size() > 0
+                ? stage.getIcons().get(0)
+                : new Image(TitleBarController.class.getResourceAsStream(String.format("/gearth/ui/themes/%s/logoSmall.png", ThemeFactory.getDefaultTheme().internalName())))));
     }
 
     public void setTitle(String title) {

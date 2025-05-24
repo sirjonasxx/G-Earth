@@ -29,7 +29,7 @@ public class NetworkExtensionMessage {
          * This contains info about the remote extension trying to connect.
          *
          * Once this {@link NetworkExtensionMessage message} is received,
-         * a new {@link  NetworkExtensionClient} is created to handle the communication.
+         * a new NetworkExtensionClient is created to handle the communication.
          *
          * @see Outgoing.InfoRequest the request.
          */

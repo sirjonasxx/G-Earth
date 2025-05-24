@@ -1,6 +1,5 @@
 package gearth.services.internal_extensions.extensionstore.application.entities.categories;
 
-import gearth.GEarth;
 import gearth.services.internal_extensions.extensionstore.GExtensionStore;
 import gearth.services.internal_extensions.extensionstore.application.entities.ContentItem;
 import gearth.services.internal_extensions.extensionstore.application.entities.HOverview;

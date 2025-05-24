@@ -11,7 +11,6 @@ import gearth.services.internal_extensions.extensionstore.repository.querying.Ex
 import gearth.ui.translations.LanguageBundle;
 import netscape.javascript.JSObject;
 
-import java.util.Arrays;
 import java.util.Collections;
 
 public class CategoryItem implements ContentItem {

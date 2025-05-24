@@ -2,19 +2,22 @@ package gearth.services.g_python;
 
 import gearth.GEarth;
 import gearth.ui.subforms.extra.ExtraController;
-import gearth.ui.titlebar.TitleBarController;
+import gearth.ui.titlebar.TitleBarAlert;
 import gearth.ui.translations.LanguageBundle;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Region;
-import javafx.stage.Stage;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -186,7 +189,7 @@ public class GPythonShell {
             alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
             alert.getDialogPane().setContent(fp);
             try {
-                TitleBarController.create(alert).showAlert();
+                TitleBarAlert.create(alert).showAlert();
             } catch (IOException e) {
                 e.printStackTrace();
             }

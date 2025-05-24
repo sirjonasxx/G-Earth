@@ -22,6 +22,9 @@
         <!-- Java version. -->
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
+        <!-- Dependency versions -->
+        <slf4j.version>2.1.0-alpha1</slf4j.version>
+        <org.json.version>20250517</org.json.version>
     </properties>
 
     <name>G-Earth-Parent</name>
@@ -30,6 +33,7 @@
 
     <modules>
         <module>G-Earth</module>
+        <module>G-Earth-Api</module>
         <module>deps/Proxyee</module>
         <module>deps/g-wasm</module>
     </modules>

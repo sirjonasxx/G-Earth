@@ -1,6 +1,7 @@
 package gearth;
 
 import gearth.misc.Cacher;
+import gearth.misc.UpdateChecker;
 import gearth.misc.listenerpattern.ObservableObject;
 import gearth.ui.GEarthController;
 import gearth.ui.GEarthTrayIcon;
@@ -8,6 +9,8 @@ import gearth.ui.themes.Theme;
 import gearth.ui.themes.ThemeFactory;
 import gearth.ui.titlebar.TitleBarConfig;
 import gearth.ui.titlebar.TitleBarController;
+import gearth.ui.translations.Language;
+import gearth.ui.translations.LanguageBundle;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -61,7 +64,7 @@ public class GEarth extends Application {
     }
 
     @Override
-    public void start(Stage primaryStage) throws Exception{
+    public void start(Stage primaryStage) throws Exception {
         main = this;
         stage = primaryStage;
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/gearth/ui/G-Earth.fxml"));
@@ -77,7 +80,7 @@ public class GEarth extends Application {
         stage.initStyle(StageStyle.TRANSPARENT);
 
         primaryStage.setScene(new Scene(root));
-        TitleBarController.create(primaryStage, new TitleBarConfig() {
+        final TitleBarController titleBar = TitleBarController.create(primaryStage, new TitleBarConfig() {
             @Override
             public boolean displayThemePicker() {
                 return true;
@@ -113,6 +116,8 @@ public class GEarth extends Application {
                 return observableTheme.getObject();
             }
         });
+        titleBar.languagePicker.getItems().addAll(Language.getMenuItems());
+        titleBar.languagePicker.setGraphic(LanguageBundle.getLanguage().getIcon());
         primaryStage.setResizable(false);
         primaryStage.sizeToScene();
 
@@ -122,8 +127,7 @@ public class GEarth extends Application {
         primaryStage.setOnCloseRequest(event -> closeGEarth());
 
         //AdminValidator.validate();
-        //UpdateChecker.checkForUpdates();
-
+        UpdateChecker.checkForUpdates();
     }
 
     private void closeGEarth() {

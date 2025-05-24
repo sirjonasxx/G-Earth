@@ -10,7 +10,7 @@ import gearth.protocol.connection.proxy.flash.FlashProxy;
 import gearth.protocol.connection.proxy.flash.unix.LinuxRawIpFlashProxyProvider;
 import gearth.protocol.connection.proxy.flash.windows.WindowsRawIpFlashProxyProvider;
 import gearth.protocol.connection.proxy.shockwave.ShockwaveProxy;
-import gearth.ui.titlebar.TitleBarController;
+import gearth.ui.titlebar.TitleBarAlert;
 import gearth.ui.translations.LanguageBundle;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
@@ -130,7 +130,7 @@ public class ProxyProviderFactory {
                     alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
                     alert.setResizable(false);
                     try {
-                        TitleBarController.create(alert).showAlert();
+                        TitleBarAlert.create(alert).showAlert();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }

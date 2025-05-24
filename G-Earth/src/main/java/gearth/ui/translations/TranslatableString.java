@@ -2,12 +2,9 @@ package gearth.ui.translations;
 
 import gearth.misc.StringifyAble;
 import javafx.beans.value.ObservableValueBase;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 
 public class TranslatableString extends ObservableValueBase<String> implements StringifyAble {
     private String format;

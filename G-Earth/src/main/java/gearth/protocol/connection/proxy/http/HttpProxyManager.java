@@ -11,7 +11,7 @@ import gearth.protocol.connection.proxy.SocksConfiguration;
 import gearth.protocol.connection.proxy.nitro.NitroConstants;
 import gearth.protocol.connection.proxy.nitro.os.NitroOsFunctions;
 import gearth.protocol.connection.proxy.nitro.os.NitroOsFunctionsFactory;
-import gearth.ui.titlebar.TitleBarController;
+import gearth.ui.titlebar.TitleBarAlert;
 import gearth.ui.translations.LanguageBundle;
 import io.netty.handler.codec.http.websocketx.WebSocketDecoderConfig;
 import io.netty.handler.ssl.SslContextBuilder;
@@ -79,7 +79,7 @@ public class HttpProxyManager {
 
                 log.debug("Showing certificate install dialog");
 
-                shouldInstall.set(TitleBarController.create(alert).showAlertAndWait()
+                shouldInstall.set(TitleBarAlert.create(alert).showAlertAndWait()
                         .filter(t -> t == ButtonType.YES).isPresent());
             } catch (Exception e) {
                 log.error("Failed to show install dialog", e);

@@ -5,7 +5,6 @@ import gearth.services.internal_extensions.extensionstore.application.entities.C
 import gearth.services.internal_extensions.extensionstore.application.entities.HOverview;
 import gearth.services.internal_extensions.extensionstore.application.entities.categories.CategoryOverview;
 import gearth.services.internal_extensions.extensionstore.application.entities.installed.InstalledOverview;
-import gearth.services.internal_extensions.extensionstore.application.entities.queriedoverviews.ByDateOverview;
 import gearth.services.internal_extensions.extensionstore.application.entities.queriedoverviews.ByRatingOverview;
 import gearth.services.internal_extensions.extensionstore.application.entities.queriedoverviews.ByUpdateOverview;
 import gearth.services.internal_extensions.extensionstore.application.entities.search.SearchOverview;
@@ -20,7 +19,12 @@ import org.w3c.dom.Element;
 import org.w3c.dom.events.EventTarget;
 
 import java.net.URL;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.function.Supplier;
 
 public class GExtensionStoreController implements Initializable {
@@ -240,9 +244,5 @@ public class GExtensionStoreController implements Initializable {
 
     public String getContentItemsContainer() {
         return contentItemsContainer;
-    }
-
-    public static void reloadPage() {
-        instance.webView.getEngine().reload();
     }
 }

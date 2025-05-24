@@ -1,10 +1,7 @@
 package gearth.ui.titlebar;
 
 import gearth.GEarth;
-import gearth.ui.themes.Theme;
 import javafx.stage.Stage;
-
-import java.util.function.Consumer;
 
 public class GEarthThemedTitleBarConfig extends DefaultTitleBarConfig {
 

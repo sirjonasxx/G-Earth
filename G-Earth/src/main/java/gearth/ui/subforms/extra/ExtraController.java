@@ -10,12 +10,19 @@ import gearth.services.always_admin.AdminService;
 import gearth.services.g_python.GPythonVersionUtils;
 import gearth.ui.SubForm;
 import gearth.ui.subforms.info.InfoController;
-import gearth.ui.titlebar.TitleBarController;
+import gearth.ui.titlebar.TitleBarAlert;
 import gearth.ui.translations.LanguageBundle;
 import gearth.ui.translations.TranslatableString;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.Hyperlink;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Region;
@@ -212,7 +219,7 @@ public class ExtraController extends SubForm implements SocksConfiguration {
                         alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
                         alert.getDialogPane().setContent(fp);
                         try {
-                            TitleBarController.create(alert).showAlert();
+                            TitleBarAlert.create(alert).showAlert();
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -246,7 +253,7 @@ public class ExtraController extends SubForm implements SocksConfiguration {
                 alert.getDialogPane().setContent(lbl);
 
                 try {
-                    Optional<ButtonType> result = TitleBarController.create(alert).showAlertAndWait();
+                    Optional<ButtonType> result = TitleBarAlert.create(alert).showAlertAndWait();
                     if (!result.isPresent() || result.get() == ButtonType.NO) {
                         cbx_develop.setSelected(false);
                     }

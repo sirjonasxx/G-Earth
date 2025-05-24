@@ -10,7 +10,7 @@ import gearth.ui.buttons.DeleteButton;
 import gearth.ui.buttons.ExitButton;
 import gearth.ui.buttons.ReloadButton;
 import gearth.ui.buttons.SimpleClickButton;
-import gearth.ui.titlebar.TitleBarController;
+import gearth.ui.titlebar.TitleBarAlert;
 import gearth.ui.translations.LanguageBundle;
 import gearth.ui.translations.TranslatableString;
 import javafx.application.Platform;
@@ -128,7 +128,7 @@ public class ExtensionItemContainer extends GridPane {
                 );
 
                 try {
-                    if (!(TitleBarController.create(alert).showAlertAndWait()
+                    if (!(TitleBarAlert.create(alert).showAlertAndWait()
                             .filter(t -> t == ButtonType.YES).isPresent())) {
                         delet_dis = false;
                     }

@@ -1,7 +1,7 @@
 package gearth.services.extension_handler.extensions.implementations.network;
 
 import gearth.misc.ConfirmationDialog;
-import gearth.ui.titlebar.TitleBarController;
+import gearth.ui.titlebar.TitleBarAlert;
 import gearth.ui.translations.LanguageBundle;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
@@ -9,7 +9,11 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -73,7 +77,7 @@ public final class NetworkExtensionAuthenticator {
                 alert.getDialogPane().setContent(new Label(String.format(LanguageBundle.get("alert.extconnection.content"), extension.getTitle()).replaceAll("\\\\n", System.lineSeparator())));
 
                 try {
-                    if (!(TitleBarController.create(alert).showAlertAndWait()
+                    if (!(TitleBarAlert.create(alert).showAlertAndWait()
                             .filter(t -> t == ButtonType.YES).isPresent())) {
                         allowConnection[0] = false;
                     }

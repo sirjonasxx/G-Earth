@@ -1,6 +1,5 @@
 package gearth.services.scheduler;
 
-import gearth.extensions.parsers.HDirection;
 import gearth.protocol.HConnection;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;

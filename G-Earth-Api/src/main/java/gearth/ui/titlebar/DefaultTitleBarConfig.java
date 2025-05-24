@@ -1,6 +1,5 @@
 package gearth.ui.titlebar;
 
-import gearth.GEarth;
 import gearth.ui.themes.Theme;
 import gearth.ui.themes.ThemeFactory;
 import javafx.application.Platform;
@@ -58,11 +57,11 @@ public class DefaultTitleBarConfig implements TitleBarConfig {
             if (currentStylesheet != null) {
                 stage.getScene().getStylesheets().remove(currentStylesheet);
             }
-            currentStylesheet = GEarth.class.getResource(String.format("/gearth/ui/themes/%s/styling.css", theme.internalName())).toExternalForm();
+            currentStylesheet = DefaultTitleBarConfig.class.getResource(String.format("/gearth/ui/themes/%s/styling.css", theme.internalName())).toExternalForm();
             stage.getScene().getStylesheets().add(currentStylesheet);
 
             stage.getIcons().clear();
-            stage.getIcons().add(new Image(GEarth.class.getResourceAsStream(String.format("/gearth/ui/themes/%s/logoSmall.png", theme.overridesLogo() ? theme.internalName() : defaultTheme.internalName()))));
+            stage.getIcons().add(new Image(DefaultTitleBarConfig.class.getResourceAsStream(String.format("/gearth/ui/themes/%s/logoSmall.png", theme.overridesLogo() ? theme.internalName() : defaultTheme.internalName()))));
 
         });
     }

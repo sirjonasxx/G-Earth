@@ -1,12 +1,10 @@
 package gearth.services.internal_extensions.extensionstore.application;
 
-import gearth.GEarth;
 import gearth.ui.translations.LanguageBundle;
 import org.w3c.dom.Element;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;

@@ -7,18 +7,16 @@ import gearth.protocol.connection.HState;
 import gearth.protocol.connection.HStateSetter;
 import gearth.protocol.connection.proxy.ProxyProvider;
 import gearth.protocol.memory.Rc4Obtainer;
+import gearth.protocol.packethandler.flash.FlashPacketHandler;
 import gearth.protocol.packethandler.flash.IncomingFlashPacketHandler;
 import gearth.protocol.packethandler.flash.OutgoingFlashPacketHandler;
-import gearth.protocol.packethandler.flash.FlashPacketHandler;
-import gearth.ui.titlebar.TitleBarController;
+import gearth.ui.titlebar.TitleBarAlert;
 import gearth.ui.translations.LanguageBundle;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
 import javafx.scene.layout.Region;
-import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -130,7 +128,7 @@ public abstract class FlashProxyProvider implements ProxyProvider {
             alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
             alert.setResizable(false);
             try {
-                TitleBarController.create(alert).showAlert();
+                TitleBarAlert.create(alert).showAlert();
             } catch (IOException e) {
                 e.printStackTrace();
             }

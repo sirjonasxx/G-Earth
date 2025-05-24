@@ -12,6 +12,7 @@ import gearth.protocol.hostreplacer.hostsfile.HostReplacer;
 import gearth.protocol.hostreplacer.hostsfile.HostReplacerFactory;
 import gearth.protocol.portchecker.PortChecker;
 import gearth.protocol.portchecker.PortCheckerFactory;
+import gearth.ui.titlebar.TitleBarAlert;
 import gearth.ui.titlebar.TitleBarController;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
@@ -66,7 +67,7 @@ public class ConnectionInterceptor {
 
                     alert.setHeaderText("Error modifying hosts file");
 
-                    TitleBarController
+                    TitleBarAlert
                             .create(alert)
                             .showAlertAndWait();
                 } catch (IOException ex) {
@@ -145,7 +146,7 @@ public class ConnectionInterceptor {
                     Alert a = new Alert(Alert.AlertType.ERROR, "The port is in use by " + processName,
                             ButtonType.OK);
                     try {
-                        TitleBarController.create(a).showAlertAndWait();
+                        TitleBarAlert.create(a).showAlertAndWait();
                     } catch (IOException ex) {
                         ex.printStackTrace();
                     }

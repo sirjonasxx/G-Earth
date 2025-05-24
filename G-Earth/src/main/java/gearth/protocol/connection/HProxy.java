@@ -8,6 +8,7 @@ import gearth.protocol.connection.packetsafety.SafePacketsContainer;
 import gearth.services.packet_info.PacketInfo;
 import gearth.services.packet_info.PacketInfoManager;
 import gearth.protocol.packethandler.PacketHandler;
+import gearth.services.packet_info.PacketInfoManagerRemote;
 
 import java.net.ServerSocket;
 
@@ -47,7 +48,7 @@ public class HProxy {
         this.inHandler = incomingHandler;
         this.outHandler = outgoingHandler;
         this.clientIdentifier = clientIdentifier;
-        this.packetInfoManager = PacketInfoManager.fromHotelVersion(hotelVersion, hClient);
+        this.packetInfoManager = PacketInfoManagerRemote.fromHotelVersion(hotelVersion, hClient);
 
         SafePacketsContainer packetsContainer = PacketSafetyManager.PACKET_SAFETY_MANAGER.getPacketContainer(hotelVersion);
         for (PacketInfo packetInfo : packetInfoManager.getPacketInfoList()) {

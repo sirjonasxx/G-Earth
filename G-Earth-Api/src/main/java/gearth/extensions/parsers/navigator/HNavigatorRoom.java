@@ -2,7 +2,8 @@ package gearth.extensions.parsers.navigator;
 
 import gearth.protocol.HPacket;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class HNavigatorRoom {
     private int flatId;

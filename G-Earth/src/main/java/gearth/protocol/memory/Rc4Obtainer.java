@@ -8,13 +8,13 @@ import gearth.protocol.crypto.RC4Shockwave;
 import gearth.protocol.memory.habboclient.HabboClient;
 import gearth.protocol.memory.habboclient.HabboClientFactory;
 import gearth.protocol.packethandler.EncryptedPacketHandler;
-import gearth.protocol.packethandler.flash.FlashBuffer;
+import gearth.protocol.packethandler.PayloadBuffer;
 import gearth.protocol.packethandler.flash.BufferChangeListener;
+import gearth.protocol.packethandler.flash.FlashBuffer;
 import gearth.protocol.packethandler.flash.FlashPacketHandler;
 import gearth.protocol.packethandler.shockwave.ShockwavePacketOutgoingHandler;
-import gearth.protocol.packethandler.PayloadBuffer;
 import gearth.protocol.packethandler.shockwave.buffers.ShockwaveOutBuffer;
-import gearth.ui.titlebar.TitleBarController;
+import gearth.ui.titlebar.TitleBarAlert;
 import gearth.ui.translations.LanguageBundle;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
@@ -60,7 +60,7 @@ public class Rc4Obtainer {
         alert.getDialogPane().setContent(fp);
         alert.setOnCloseRequest(event -> GEarth.main.getHostServices().showDocument(link.getText()));
         try {
-            TitleBarController.create(alert).showAlert();
+            TitleBarAlert.create(alert).showAlert();
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -1,6 +1,6 @@
 package gearth.misc;
 
-import gearth.ui.titlebar.TitleBarController;
+import gearth.ui.titlebar.TitleBarAlert;
 import gearth.ui.translations.LanguageBundle;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
@@ -49,7 +49,7 @@ public class AdminValidator {
                     Alert alert = new Alert(Alert.AlertType.WARNING, "", ButtonType.OK);
                     alert.getDialogPane().setContent(new Label(LanguageBundle.get("alert.adminvalidator.content").replaceAll("\\\\n", System.lineSeparator())));
                     try {
-                        TitleBarController.create(alert).showAlert();
+                        TitleBarAlert.create(alert).showAlert();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
