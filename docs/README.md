@@ -1,3 +1,4 @@
+# FOR NEWER VERSIONS CHECK https://github.com/G-Realm/G-Earth
 # G-Earth
 Feature-rich habbo packet logger & manipulator for Windows, Linux and Mac.
 
