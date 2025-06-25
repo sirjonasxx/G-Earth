@@ -7,7 +7,25 @@
     <groupId>G-Earth</groupId>
     <artifactId>G-Earth-Parent</artifactId>
     <packaging>pom</packaging>
-    <version>1.5.3</version>
+    <version>${revision}${changelist}</version>
+
+    <properties>
+        <!-- Version of the application. -->
+        <revision>1.5.4-beta-18</revision>
+        <changelist>-SNAPSHOT</changelist>
+        <!-- Version for https://github.com/sirjonasxx/G-ExtensionStore to keep compatibility with beta versions. -->
+        <storeVersion>1.5.3</storeVersion>
+        <!-- Default repository for version checking. -->
+        <repository>sirjonasxx/G-Earth</repository>
+        <!-- Encoding. -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- Java version. -->
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <!-- Dependency versions -->
+        <slf4j.version>2.1.0-alpha1</slf4j.version>
+        <org.json.version>20250517</org.json.version>
+    </properties>
 
     <name>G-Earth-Parent</name>
     <url>https://github.com/sirjonasxx/G-Earth</url>
@@ -15,43 +33,8 @@
 
     <modules>
         <module>G-Earth</module>
+        <module>G-Earth-Api</module>
+        <module>deps/Proxyee</module>
+        <module>deps/g-wasm</module>
     </modules>
-
-    <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.7.0</version>
-                    <configuration>
-                        <source>1.8</source>
-                        <target>1.8</target>
-                    </configuration>
-                </plugin>
-
-                <plugin>
-                    <artifactId>maven-resources-plugin</artifactId>
-                    <version>3.1.0</version>
-                    <executions>
-                        <execution>
-                            <id>copy-resources</id>
-                            <phase>validate</phase>
-                            <goals>
-                                <goal>copy-resources</goal>
-                            </goals>
-                            <configuration>
-                                <outputDirectory>${project.build.directory}</outputDirectory>
-                                <resources>
-                                    <resource>
-                                        <directory>src/main/resources</directory>
-                                    </resource>
-                                </resources>
-                            </configuration>
-                        </execution>
-                    </executions>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-    </build>
 </project>

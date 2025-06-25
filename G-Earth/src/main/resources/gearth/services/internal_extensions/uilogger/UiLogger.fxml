@@ -5,7 +5,7 @@
 <?import javafx.scene.input.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane fx:id="borderPane" prefHeight="560.0" prefWidth="820.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gearth.services.internal_extensions.uilogger.UiLoggerController">
+<BorderPane fx:id="borderPane" prefHeight="560.0" prefWidth="820.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gearth.app.services.internal_extensions.uilogger.UiLoggerController">
     <top>
         <MenuBar BorderPane.alignment="CENTER">
          <Menu fx:id="menu_window" mnemonicParsing="false" text="Window">
@@ -26,7 +26,7 @@
            </items>
          </Menu>
             <Menu fx:id="menu_view" mnemonicParsing="false" text="View">
-            <CheckMenuItem fx:id="chkViewIncoming" mnemonicParsing="false" text="View incoming">
+            <CheckMenuItem fx:id="chkViewIncoming" mnemonicParsing="false" selected="true" text="View incoming">
                <accelerator>
                   <KeyCodeCombination alt="UP" code="I" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
                </accelerator></CheckMenuItem>

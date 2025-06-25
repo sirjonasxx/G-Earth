@@ -1,16 +1,56 @@
 <configuration>
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            <pattern>%d{HH:mm:ss.SSS} %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
 
-    <root level="debug">
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log.dir:-logs}/app.log</file>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <fileNamePattern>${log.dir:-logs}/app.%i.log</fileNamePattern>
+            <minIndex>1</minIndex>
+            <maxIndex>5</maxIndex>
+        </rollingPolicy>
+
+        <triggeringPolicy class="gearth.app.misc.Logging$RollOncePerSessionTriggeringPolicy"/>
+
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="FILE_EXTENSIONS" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log.dir:-logs}/extensions.log</file>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <fileNamePattern>${log.dir:-logs}/extensions.%i.log</fileNamePattern>
+            <minIndex>1</minIndex>
+            <maxIndex>5</maxIndex>
+        </rollingPolicy>
+
+        <triggeringPolicy class="gearth.app.misc.Logging$RollOncePerSessionTriggeringPolicy"/>
+
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%X{extensionName}] - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="DEBUG">
         <appender-ref ref="STDOUT" />
+        <appender-ref ref="FILE" />
     </root>
 
     <logger name="com.tulskiy.keymaster" level="WARN"/>
     <logger name="io.netty" level="WARN"/>
-    <logger name="org.littleshoot" level="OFF"/>
     <logger name="org.eclipse.jetty" level="WARN"/>
+    <logger name="com.github.monkeywie" level="DEBUG"/>
+    <logger name="org.bouncycastle" level="WARN"/>
+    <logger name="org.apache.hc" level="INFO"/>
+
+    <logger name="gearth.extension" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE_EXTENSIONS" />
+        <appender-ref ref="STDOUT" />
+    </logger>
 </configuration>
