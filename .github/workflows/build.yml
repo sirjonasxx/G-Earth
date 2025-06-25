@@ -1,6 +1,7 @@
 name: Build G-Earth
 
 on:
+  workflow_dispatch:
   push:
     paths:
       - '.github/workflows/**'
