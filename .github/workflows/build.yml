@@ -102,4 +102,4 @@ jobs:
       with:
         name: G-Earth ${{ env.TARGET_OS }}-${{ matrix.jdk-arch }}
         path: G-Earth/target/G-Earth
-        retention-days: 7
+        retention-days: 30
