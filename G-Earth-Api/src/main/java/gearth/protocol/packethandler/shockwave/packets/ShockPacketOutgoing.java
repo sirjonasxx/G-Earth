@@ -28,15 +28,15 @@ public class ShockPacketOutgoing extends ShockPacket {
     }
 
     public ShockPacketOutgoing(int header, byte[] bytes) {
-        super(HPacketFormat.WEDGIE_INCOMING, header, bytes);
+        super(HPacketFormat.WEDGIE_OUTGOING, header, bytes);
     }
 
     public ShockPacketOutgoing(int header, Object... objects) throws InvalidParameterException {
-        super(HPacketFormat.WEDGIE_INCOMING, header, objects);
+        super(HPacketFormat.WEDGIE_OUTGOING, header, objects);
     }
 
     public ShockPacketOutgoing(String identifier, Object... objects) throws InvalidParameterException {
-        super(HPacketFormat.WEDGIE_INCOMING, identifier, HMessage.Direction.TOSERVER, objects);
+        super(HPacketFormat.WEDGIE_OUTGOING, identifier, HMessage.Direction.TOSERVER, objects);
     }
 
     @Override
