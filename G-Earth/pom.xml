@@ -9,217 +9,244 @@
     <packaging>jar</packaging>
 
     <properties>
-        <javafx.version>1.8</javafx.version>
-        <jettyVersion>9.4.53.v20231009</jettyVersion>
-        <logback.version>1.3.12</logback.version>
+        <logback.version>1.5.18</logback.version>
+        <bouncycastle.version>1.80</bouncycastle.version>
+        <apache.http>5.4.3</apache.http>
+        <io.github.fvarrui.javapackager>1.7.7</io.github.fvarrui.javapackager>
+        <!-- Encoding. -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <parent>
         <groupId>G-Earth</groupId>
         <artifactId>G-Earth-Parent</artifactId>
-        <version>1.5.3</version>
+        <version>${revision}${changelist}</version>
     </parent>
 
     <build>
         <finalName>G-Earth</finalName>
+        <resources>
+            <resource>
+                <directory>${basedir}/src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/build.properties</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>${basedir}/src/main/resources</directory>
+                <filtering>false</filtering>
+                <excludes>
+                    <exclude>**/build.properties</exclude>
+                    <exclude>build/**</exclude>
+                </excludes>
+            </resource>
+        </resources>
         <plugins>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.2.0</version>
-                <executions>
-                    <execution>
-                        <id>copy-dependencies</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>copy-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/bin/Dependencies</outputDirectory>
-                            <overWriteReleases>false</overWriteReleases>
-                            <overWriteSnapshots>false</overWriteSnapshots>
-                            <overWriteIfNewer>true</overWriteIfNewer>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>3.2.2</version>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.14.0</version>
                 <configuration>
-                    <outputDirectory>${project.build.directory}/bin</outputDirectory>
-                    <archive>
-                        <manifest>
-                            <addClasspath>true</addClasspath>
-                            <classpathPrefix>Dependencies/</classpathPrefix>
-                            <mainClass>gearth.GEarth</mainClass>
-                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-                        </manifest>
-                    </archive>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
                 </configuration>
             </plugin>
-
-
-
-<!--             global build folder-->
             <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <version>3.0.0</version>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>flatten-maven-plugin</artifactId>
+                <version>1.7.0</version>
+                <configuration>
+                    <updatePomFile>true</updatePomFile>
+                    <flattenMode>clean</flattenMode>
+                </configuration>
                 <executions>
                     <execution>
-                        <id>copy_files</id>
-                        <phase>package</phase>
-                        <configuration>
-                            <target name="copy G-Earth.jar to Build folder">
-
-                                <copy todir="../Build/Mac/">
-                                    <fileset dir="target/bin" includes="**/*"/>
-                                    <fileset dir="src/main/resources/build/common" includes="**/*"/>
-                                    <fileset dir="src/main/resources/build/mac" includes="**/*" excludes=".gitkeep"/>
-                                </copy>
-                                <copy todir="../Build/Linux/">
-                                    <fileset dir="target/bin" includes="**/*"/>
-                                    <fileset dir="src/main/resources/build/common" includes="**/*"/>
-                                    <fileset dir="src/main/resources/build/linux" includes="**/*" excludes=".gitkeep"/>
-                                </copy>
-                                <copy todir="../Build/Windows_32bit/">
-                                    <fileset dir="target/bin" includes="**/*"/>
-                                    <fileset dir="src/main/resources/build/common" includes="**/*"/>
-                                    <fileset dir="src/main/resources/build/windows/32bit" includes="**/*" excludes=".gitkeep"/>
-                                </copy>
-                                <copy todir="../Build/Windows_64bit/">
-                                    <fileset dir="target/bin" includes="**/*"/>
-                                    <fileset dir="src/main/resources/build/common" includes="**/*"/>
-                                    <fileset dir="src/main/resources/build/windows/64bit" includes="**/*" excludes=".gitkeep"/>
-                                </copy>
-
-                            </target>
-                        </configuration>
+                        <id>flatten</id>
+                        <phase>process-resources</phase>
                         <goals>
-                            <goal>run</goal>
+                            <goal>flatten</goal>
                         </goals>
                     </execution>
                     <execution>
-                        <id>clean_files</id>
+                        <id>flatten.clean</id>
                         <phase>clean</phase>
-                        <configuration>
-                            <target name="clean our own build folder">
-                                <delete dir="../Build" includeemptydirs="true"/>
-                            </target>
-                        </configuration>
                         <goals>
-                            <goal>run</goal>
+                            <goal>clean</goal>
                         </goals>
                     </execution>
                 </executions>
             </plugin>
-
-
             <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>3.3.0</version>
-                <executions>
-                    <execution>
-                        <id>ziprelease-mac</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                        <configuration>
-                            <appendAssemblyId>false</appendAssemblyId>
-                            <outputDirectory>../Build</outputDirectory>
-                            <finalName>G-Earth-${project.version}-Mac</finalName>
-                            <descriptors>
-                                <descriptor>${basedir}/assembly/mac.xml</descriptor>
-                            </descriptors>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>ziprelease-linux</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                        <configuration>
-                            <appendAssemblyId>false</appendAssemblyId>
-                            <outputDirectory>../Build</outputDirectory>
-                            <finalName>G-Earth-${project.version}-Linux</finalName>
-                            <descriptors>
-                                <descriptor>${basedir}/assembly/linux.xml</descriptor>
-                            </descriptors>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>ziprelease-windows_32bit</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                        <configuration>
-                            <appendAssemblyId>false</appendAssemblyId>
-                            <outputDirectory>../Build</outputDirectory>
-                            <finalName>G-Earth-${project.version}-Windows_32bit</finalName>
-                            <descriptors>
-                                <descriptor>${basedir}/assembly/windows_32bit.xml</descriptor>
-                            </descriptors>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>ziprelease-windows_64bit</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                        <configuration>
-                            <appendAssemblyId>false</appendAssemblyId>
-                            <outputDirectory>../Build</outputDirectory>
-                            <finalName>G-Earth-${project.version}-Windows_64bit</finalName>
-                            <descriptors>
-                                <descriptor>${basedir}/assembly/windows_64bit.xml</descriptor>
-                            </descriptors>
-                        </configuration>
-                    </execution>
-                </executions>
+                <groupId>io.github.fvarrui</groupId>
+                <artifactId>javapackager</artifactId>
+                <version>${io.github.fvarrui.javapackager}</version>
+                <!-- https://github.com/javapackager/JavaPackager/tree/master/docs -->
+                <configuration>
+                    <bundleJre>true</bundleJre>
+                    <mainClass>gearth.app.Main</mainClass>
+                    <generateInstaller>false</generateInstaller>
+                    <jreMinVersion>21.0.0</jreMinVersion>
+                    <additionalModules>
+                        <!-- Otherwise SSL errors: https://stackoverflow.com/a/55517159 -->
+                        <additionalModule>jdk.crypto.ec</additionalModule>
+                        <!-- JavaFX -->
+                        <additionalModule>javafx.fxml</additionalModule>
+                        <additionalModule>javafx.web</additionalModule>
+                        <additionalModule>javafx.swing</additionalModule>
+                    </additionalModules>
+                </configuration>
             </plugin>
-
-
         </plugins>
     </build>
 
+    <profiles>
+        <!-- Build profiles -->
+        <profile>
+            <id>windows-bundle</id>
+            <activation>
+                <property>
+                    <name>os</name>
+                    <value>windows</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>io.github.fvarrui</groupId>
+                        <artifactId>javapackager</artifactId>
+                        <executions>
+                            <execution>
+                                <id>bundling-for-windows</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>package</goal>
+                                </goals>
+                                <configuration>
+                                    <platform>windows</platform>
+                                    <additionalResources>
+                                        <additionalResource>${project.basedir}/src/main/resources/build/common/messages.json</additionalResource>
+                                        <additionalResource>${project.basedir}/src/main/resources/build/windows/G-MemZ-x32.exe</additionalResource>
+                                        <additionalResource>${project.basedir}/src/main/resources/build/windows/G-MemZ-x64.exe</additionalResource>
+                                    </additionalResources>
+                                    <winConfig>
+                                        <icoFile>${project.basedir}/src/main/resources/gearth/ui/themes/G-Earth/logo.ico</icoFile>
+                                    </winConfig>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>linux-bundle</id>
+            <activation>
+                <property>
+                    <name>os</name>
+                    <value>linux</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>io.github.fvarrui</groupId>
+                        <artifactId>javapackager</artifactId>
+                        <executions>
+                            <execution>
+                                <id>bundling-for-linux</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>package</goal>
+                                </goals>
+                                <configuration>
+                                    <platform>linux</platform>
+                                    <additionalResources>
+                                        <additionalResource>${project.basedir}/src/main/resources/build/common/messages.json</additionalResource>
+                                    </additionalResources>
+                                    <linuxConfig>
+                                        <pngFile>${project.basedir}/src/main/resources/gearth/ui/themes/G-Earth/logoSmall.png</pngFile>
+                                    </linuxConfig>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>mac-bundle</id>
+            <activation>
+                <property>
+                    <name>os</name>
+                    <value>mac</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>io.github.fvarrui</groupId>
+                        <artifactId>javapackager</artifactId>
+                        <executions>
+                            <execution>
+                                <id>bundling-for-mac</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>package</goal>
+                                </goals>
+                                <configuration>
+                                    <platform>mac</platform>
+                                    <additionalResources>
+                                        <additionalResource>${project.basedir}/src/main/resources/build/common/messages.json</additionalResource>
+                                        <additionalResource>${project.basedir}/src/main/resources/build/mac/G-MemZ</additionalResource>
+                                    </additionalResources>
+                                    <vmArgs>
+                                        <vmArg>-Dlog.dir=$USER_HOME/Library/Logs/G-Earth</vmArg>
+                                        <vmArg>-Dgearth.data.dir=$USER_HOME/Library/Application Support/G-Earth</vmArg>
+                                        <vmArg>-Dgearth.cache.dir=$USER_HOME/Library/Caches/G-Earth</vmArg>
+                                    </vmArgs>
+                                    <macConfig>
+                                        <appId>G-Earth</appId>
+                                        <icnsFile>${project.basedir}/src/main/resources/gearth/ui/themes/G-Earth/logo.icns</icnsFile>
+                                        <macStartup>UNIVERSAL</macStartup>
+                                        <codesignApp>true</codesignApp>
+                                        <notarizeApp>false</notarizeApp>
+                                        <!-- We require this because it's better at passing the VMOPTIONS to Java. -->
+                                        <!-- https://github.com/javapackager/universalJavaApplicationStub/releases/tag/20241210.182001 -->
+                                        <customLauncher>${project.basedir}/src/main/resources/build/mac/nativeJavaApplicationStub</customLauncher>
+                                    </macConfig>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
     <dependencies>
-<!--        <dependency>-->
-<!--            <groupId>org.openjfx</groupId>-->
-<!--            <artifactId>javafx-fxml</artifactId>-->
-<!--            <version>${javafx.version}</version>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>org.openjfx</groupId>-->
-<!--            <artifactId>javafx-graphics</artifactId>-->
-<!--            <version>${javafx.version}</version>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>org.openjfx</groupId>-->
-<!--            <artifactId>javafx-web</artifactId>-->
-<!--            <version>${javafx.version}</version>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>G-Earth</groupId>
+            <artifactId>G-Earth-Api</artifactId>
+            <version>${revision}${changelist}</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.slf4j/jul-to-slf4j -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jul-to-slf4j</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
-            <version>20231013</version>
+            <version>${org.json.version}</version>
         </dependency>
         <dependency>
             <groupId>org.fxmisc.richtext</groupId>
             <artifactId>richtextfx</artifactId>
-            <version>0.10.5</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jsoup</groupId>
-            <artifactId>jsoup</artifactId>
-            <version>1.15.3</version>
+            <version>0.11.5</version>
         </dependency>
         <dependency>
             <groupId>com.github.tulskiy</groupId>
@@ -238,56 +265,39 @@
             <artifactId>maven-artifact</artifactId>
             <version>3.6.3</version>
         </dependency>
-        <dependency>
-            <groupId>javax.websocket</groupId>
-            <artifactId>javax.websocket-api</artifactId>
-            <version>1.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-server</artifactId>
-            <version>${jettyVersion}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty.websocket</groupId>
-            <artifactId>javax-websocket-server-impl</artifactId>
-            <version>${jettyVersion}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-http</artifactId>
-            <version>${jettyVersion}</version>
-        </dependency>
         <!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.10.0</version>
+            <version>2.19.0</version>
         </dependency>
         <dependency>
-            <groupId>at.favre.lib</groupId>
-            <artifactId>bytes</artifactId>
-            <version>1.5.0</version>
+            <groupId>com.github.monkeywie</groupId>
+            <artifactId>proxyee</artifactId>
+            <version>1.7.6</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk18on -->
         <dependency>
-            <groupId>com.github.ganskef</groupId>
-            <artifactId>littleproxy-mitm</artifactId>
-            <version>1.1.0</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-log4j12</artifactId>
-                </exclusion>
-            </exclusions>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk18on</artifactId>
+            <version>${bouncycastle.version}</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.bouncycastle/bcpkix-jdk18on -->
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcpkix-jdk18on</artifactId>
+            <version>${bouncycastle.version}</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.bouncycastle/bctls-jdk18on -->
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bctls-jdk18on</artifactId>
+            <version>${bouncycastle.version}</version>
         </dependency>
         <dependency>
             <groupId>G-Earth</groupId>
             <artifactId>G-Wasm-Minimal</artifactId>
-            <version>1.0.3</version>
+            <version>1.0.4</version>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
@@ -299,12 +309,22 @@
             <artifactId>logback-classic</artifactId>
             <version>${logback.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>5.12.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>5.17.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents.client5</groupId>
+            <artifactId>httpclient5</artifactId>
+            <version>${apache.http}</version>
+        </dependency>
     </dependencies>
-
-    <repositories>
-        <repository>
-            <id>snapshots-repo</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </repository>
-    </repositories>
 </project>

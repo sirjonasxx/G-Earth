@@ -1,9 +1,13 @@
+# logs
+logs/
+
 # intelliJ
 .idea/
 *.iml
 out/
 
 # maven
+.flattened-pom.xml
 bin/
 **/target/
 
@@ -25,3 +29,5 @@ Extensions/BlockReplacePackets/.classpath
 # Certificates
 *.p12
 *.pem
+*.crt
+*.key

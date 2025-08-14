@@ -43,7 +43,7 @@ function g_chacha_returnbyte(param1, param2, param3) {
     return param2;
 }
 
-env["g_outgoing_packet"] = g_outgoing_packet;
-env["g_incoming_packet"] = g_incoming_packet;
-env["g_chacha_setkey"] = g_chacha_setkey;
-env["g_chacha_returnbyte"] = g_chacha_returnbyte;
+asmLibraryArg["g_outgoing_packet"] = g_outgoing_packet;
+asmLibraryArg["g_incoming_packet"] = g_incoming_packet;
+asmLibraryArg["g_chacha_setkey"] = g_chacha_setkey;
+asmLibraryArg["g_chacha_returnbyte"] = g_chacha_returnbyte;
