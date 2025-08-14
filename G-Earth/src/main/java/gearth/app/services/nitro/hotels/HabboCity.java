@@ -28,16 +28,16 @@ public class HabboCity extends NitroHotel {
 
     private static final Logger log = LoggerFactory.getLogger(HabboCity.class);
 
-    private final RemoteNitroHelper nitroHelper = new RemoteNitroHelper("habbocity.me");
+    private final RemoteNitroHelper nitroHelper = new RemoteNitroHelper("habbocity.fr");
     private byte[] aesKey;
     private byte[] aesIv;
     private List<byte[]> saltKey;
     private List<byte[]> saltIv;
 
     public HabboCity() {
-        super("habbocity.me",
-                Collections.singletonList("wss://websocket.habbocity.me/websocket/"),
-                Collections.singletonList(new NitroAsset("nitro.habbocity.me", "/crypto/file/city_crypto_bg.wasm")));
+        super("habbocity.fr",
+                Collections.singletonList("wss://websocket.habbocity.fr/websocket/"),
+                Collections.singletonList(new NitroAsset("cdn.habbocity.fr", "/crypto/file/city_crypto_bg.wasm")));
     }
 
     @Override
