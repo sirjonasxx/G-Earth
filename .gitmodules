@@ -1,0 +1,9 @@
+[submodule "deps/Proxyee"]
+	path = deps/Proxyee
+	url = https://github.com/UnfamiliarLegacy/proxyee.git
+[submodule "deps/g-wasm"]
+	path = deps/g-wasm
+	url = https://github.com/UnfamiliarLegacy/G-Wasm.git
+[submodule "deps/JavaPackager"]
+	path = deps/JavaPackager
+	url = https://github.com/UnfamiliarLegacy/JavaPackager.git

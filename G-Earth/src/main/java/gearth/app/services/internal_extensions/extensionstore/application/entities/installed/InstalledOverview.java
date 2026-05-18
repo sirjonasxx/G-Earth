@@ -1,0 +1,102 @@
+package gearth.app.services.internal_extensions.extensionstore.application.entities.installed;
+
+import gearth.app.services.extension_handler.extensions.implementations.network.executer.ExecutionInfo;
+import gearth.app.services.internal_extensions.extensionstore.GExtensionStore;
+import gearth.app.services.internal_extensions.extensionstore.application.entities.ContentItem;
+import gearth.app.services.internal_extensions.extensionstore.application.entities.HOverview;
+import gearth.app.services.internal_extensions.extensionstore.repository.StoreRepository;
+import gearth.app.services.internal_extensions.extensionstore.repository.models.StoreExtension;
+import gearth.app.services.internal_extensions.extensionstore.tools.InstalledExtension;
+import gearth.app.services.internal_extensions.extensionstore.tools.StoreExtensionTools;
+import gearth.app.ui.translations.LanguageBundle;
+import org.apache.maven.artifact.versioning.ComparableVersion;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.awt.*;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+public class InstalledOverview extends HOverview {
+
+    private static final Logger LOG = LoggerFactory.getLogger(InstalledOverview.class);
+
+    private final StoreRepository storeRepository;
+
+    public InstalledOverview(HOverview parent, int startIndex, int size, StoreRepository storeRepository) {
+        super(parent, startIndex, size);
+        this.storeRepository = storeRepository;
+    }
+
+
+    @Override
+    public String buttonText() {
+        return LanguageBundle.get("ext.store.overview.folder");
+    }
+
+    @Override
+    public boolean buttonEnabled() {
+        return true;
+    }
+
+    @Override
+    public List<? extends ContentItem> getContentItems() {
+        List<InstalledExtension> installed = StoreExtensionTools.getInstalledExtension();
+        installed.sort(Comparator.comparing(o -> new ComparableVersion(o.getVersion())));
+
+        installed = installed.subList(startIndex, Math.min(startIndex + limit, installed.size()));
+        Map<String, StoreExtension> nameToExt = new HashMap<>();
+        // getExtensions() with no filtering includes outdated extensions
+        storeRepository.getExtensions().forEach(e -> nameToExt.put(e.getTitle(), e));
+
+        return installed.stream().map(i -> new StoreExtensionInstalledItem(nameToExt.get(i.getName()), i)).collect(Collectors.toList());
+    }
+
+    @Override
+    public int getMaxAmount() {
+        return StoreExtensionTools.getInstalledExtension().size();
+    }
+
+    @Override
+    public void buttonClick(GExtensionStore gExtensionStore) {
+        try {
+            Desktop.getDesktop().open(ExecutionInfo.EXTENSIONS_DIRECTORY);
+        } catch (Exception e) {
+            LOG.error("Error opening extensions directory", e);
+        }
+    }
+
+    @Override
+    public Header header() {
+        return new Header() {
+            @Override
+            public String iconUrl() {
+                return "images/overviews/success.png";
+            }
+
+            @Override
+            public String title() {
+                return LanguageBundle.get("ext.store.overview.title");
+            }
+
+            @Override
+            public String description() {
+                return LanguageBundle.get("ext.store.overview.description");
+            }
+
+            @Override
+            public String contentTitle() {
+                return LanguageBundle.get("ext.store.overview.contenttitle");
+            }
+        };
+    }
+
+    @Override
+    public HOverview getNewPage(int startIndex, int size) {
+        return new InstalledOverview(parent, startIndex, size, storeRepository);
+    }
+
+}
