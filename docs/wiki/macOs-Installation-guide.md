@@ -1,6 +1,6 @@
-# macOS installation guide
+# macOS Apple Silicon installation guide
 
-G-Earth is packaged as a native macOS application with its own Java 21 runtime. The application and its memory helper support both Apple Silicon (`arm64`) and Intel (`x86_64`) without Rosetta.
+This repository packages G-Earth specifically for Apple Silicon (`arm64`) with its own Java 21 runtime. The `G-MemZ` helper remains a universal `arm64`/`x86_64` binary, but Intel users should download G-Earth from the [official releases](https://github.com/G-Realm/G-Earth/releases).
 
 This guide covers the additional steps required for Habbo AIR memory inspection and legacy Java 8 extensions.
 

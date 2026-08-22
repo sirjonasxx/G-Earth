@@ -1,4 +1,4 @@
-name: Build G-Earth
+name: Build G-Earth for Apple Silicon
 
 on:
   workflow_dispatch:
@@ -23,53 +23,14 @@ on:
 
 jobs:
   build:
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: windows-latest
-            jdk-package: 'jdk+fx'
-            jdk-arch: 'x86'
-            jdk-distribution: 'liberica'
-          - os: windows-latest
-            jdk-package: 'jdk+fx'
-            jdk-arch: 'x64'
-            jdk-distribution: 'liberica'
-          - os: macos-15-intel
-            jdk-package: 'jdk+fx'
-            jdk-arch: 'x64'
-            jdk-distribution: 'liberica'
-          - os: macos-latest
-            jdk-package: 'jdk+fx'
-            jdk-arch: 'aarch64'
-            jdk-distribution: 'liberica'
-          - os: ubuntu-latest
-            jdk-package: 'jdk+fx'
-            jdk-arch: 'x64'
-            jdk-distribution: 'liberica'
-          - os: ubuntu-24.04-arm
-            jdk-package: 'jdk+fx'
-            jdk-arch: 'aarch64'
-            jdk-distribution: 'liberica'
-
-    runs-on: ${{ matrix.os }}
+    name: Build macOS Apple Silicon (aarch64)
+    runs-on: macos-latest
     permissions:
       contents: read
+    env:
+      TARGET_OS: mac
 
-    name: Build ${{ matrix.os }} (${{ matrix.jdk-arch }})
     steps:
-    - name: Set OS variable
-      id: osmap
-      shell: bash
-      run: |
-        if [[ "${{ matrix.os }}" == windows-* ]]; then
-          echo "TARGET_OS=windows" >> "$GITHUB_ENV"
-        elif [[ "${{ matrix.os }}" == ubuntu-* ]]; then
-          echo "TARGET_OS=linux" >> "$GITHUB_ENV"
-        elif [[ "${{ matrix.os }}" == macos-* ]]; then
-          echo "TARGET_OS=mac" >> "$GITHUB_ENV"
-        fi
-
     - name: Checkout G-Earth
       uses: actions/checkout@v4
       with:
@@ -79,9 +40,9 @@ jobs:
       uses: actions/setup-java@v4
       with:
         java-version: '21'
-        java-package: ${{ matrix.jdk-package }}
-        architecture: ${{ matrix.jdk-arch }}
-        distribution: ${{ matrix.jdk-distribution }}
+        java-package: 'jdk+fx'
+        architecture: 'aarch64'
+        distribution: 'liberica'
         cache: 'maven'
         cache-dependency-path: 'G-Earth/pom.xml'
 
@@ -92,9 +53,6 @@ jobs:
     # Check if GITHUB_REF_TYPE is a tag
     - name: Build G-Earth
       shell: bash
-      env:
-        MATRIX_OS: ${{ matrix.os }}
-        MATRIX_JDK_ARCH: ${{ matrix.jdk-arch }}
       run: |
         MVN_PROFILE=""
         
@@ -114,7 +72,6 @@ jobs:
         fi
 
     - name: Verify universal macOS G-MemZ
-      if: env.TARGET_OS == 'mac'
       shell: bash
       run: |
         APP="G-Earth/target/G-Earth/G-Earth.app"
@@ -134,7 +91,7 @@ jobs:
     - name: Upload platform artifact
       uses: actions/upload-artifact@v4
       with:
-        name: G-Earth ${{ env.TARGET_OS }}-${{ matrix.jdk-arch }}
+        name: G-Earth mac-aarch64
         path: G-Earth/target/G-Earth
         if-no-files-found: error
         retention-days: 30
@@ -171,8 +128,8 @@ jobs:
         done
 
         archive_count="$(find release -maxdepth 1 -type f -name '*.zip' | wc -l | tr -d ' ')"
-        if [[ "$archive_count" -ne 6 ]]; then
-          echo "Expected 6 release archives, found $archive_count" >&2
+        if [[ "$archive_count" -ne 1 ]]; then
+          echo "Expected 1 Apple Silicon release archive, found $archive_count" >&2
           find release -maxdepth 1 -type f -print
           exit 1
         fi

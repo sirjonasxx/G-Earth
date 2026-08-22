@@ -9,15 +9,13 @@ Join the G-Earth [Discord server](https://discord.gg/AVkcF8y)
 
 # Installation and execution
 
-* **Windows:** Double-click `G-Earth.exe` from the Windows release package.
-* **Linux:** Start G-Earth from the launcher included in the Linux package for your architecture.
+* **Windows, Linux and Intel macOS:** download the appropriate package from the [official G-Earth releases](https://github.com/G-Realm/G-Earth/releases).
 
-## macOS — Apple Silicon and Intel
+## macOS — Apple Silicon
 
-The macOS build no longer requires a system Java installation, manual signing of G-Mem or disabling System Integrity Protection. Download the artifact matching your Mac:
+This repository publishes only the customized Apple Silicon build for `M1`, `M2`, `M3`, `M4` and later Macs. Download `G-Earth-mac-aarch64-<version>.zip` from this repository's [latest Release](https://github.com/xg629pzgn6-droid/G-Earth/releases/latest).
 
-- `mac-aarch64` for Apple Silicon (`M1`, `M2`, `M3`, `M4` and later);
-- `mac-x64` for Intel Macs.
+The package no longer requires a system Java installation, manual signing of G-Mem or disabling System Integrity Protection.
 
 Extract the package and keep `G-Earth.app` and `G-Earth.command` together in the same directory. G-Earth includes its own Java 21 runtime; do not replace it with Java 8 and do not start it with `java -jar`.
 
@@ -71,7 +69,7 @@ cd ../../..
 ./G-Earth.command --check-extension-java
 ```
 
-The installer selects the correct architecture, verifies the download checksum and installs the secondary runtime under `G-Earth.app/Contents/Resources/ExtensionRuntime`.
+The installer verifies the download checksum and installs the Apple Silicon Java 8 runtime under `G-Earth.app/Contents/Resources/ExtensionRuntime`.
 
 For detailed verification, updates, restoration and troubleshooting, see the [current macOS installation guide](wiki/macOs-Installation-guide.md). The current setup does **not** require disabling SIP.
 
