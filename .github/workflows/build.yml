@@ -9,6 +9,13 @@ on:
       - 'G-Earth/**'
       - 'G-Earth-Api/**'
       - 'pom.xml'
+  pull_request:
+    paths:
+      - '.github/workflows/**'
+      - 'deps/**'
+      - 'G-Earth/**'
+      - 'G-Earth-Api/**'
+      - 'pom.xml'
 
 jobs:
   build:
@@ -97,6 +104,24 @@ jobs:
             -Dmaven.compiler.target=21 \
             -Dos=${TARGET_OS}
         fi
+
+    - name: Verify universal macOS G-MemZ
+      if: env.TARGET_OS == 'mac'
+      shell: bash
+      run: |
+        APP="G-Earth/target/G-Earth/G-Earth.app"
+        RESOURCES="$APP/Contents/Resources"
+
+        lipo "$RESOURCES/G-MemZ" -verify_arch arm64 x86_64
+        codesign --verify --strict "$RESOURCES/G-MemZ"
+        codesign -d --entitlements :- "$RESOURCES/G-MemZ" 2>&1 \
+          | grep -q 'com.apple.security.cs.debugger'
+        "$RESOURCES/G-MemZ" --self-test
+
+        test -x "$RESOURCES/Install-Extension-Java.command"
+        test -x "$RESOURCES/Prepare-Habbo-for-G-Mem.command"
+        test -x "G-Earth/target/G-Earth/G-Earth.command"
+        codesign --verify --deep --strict "$APP"
 
     - name: Upload platform artifact
       uses: actions/upload-artifact@v4

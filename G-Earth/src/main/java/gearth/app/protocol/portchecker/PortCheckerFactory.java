@@ -11,10 +11,14 @@ public final class PortCheckerFactory {
             return new WindowsPortChecker();
         }
 
+        if (OSValidator.isMac()) {
+            return new MacOsPortChecker();
+        }
+
         if (OSValidator.isUnix()) {
             return new UnixPortChecker();
         }
 
-        throw new NotImplementedException("macOS port checker not implemented yet");
+        throw new NotImplementedException("Port checker not implemented for this operating system");
     }
 }

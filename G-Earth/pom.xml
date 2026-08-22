@@ -13,6 +13,8 @@
         <bouncycastle.version>1.80</bouncycastle.version>
         <apache.http>5.4.3</apache.http>
         <io.github.fvarrui.javapackager>1.7.7</io.github.fvarrui.javapackager>
+        <gmem.macos.binary>${project.basedir}/src/main/resources/build/mac/G-MemZ</gmem.macos.binary>
+        <gmem.macos.signing.identity>-</gmem.macos.signing.identity>
         <!-- Encoding. -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -126,6 +128,7 @@
                                     <platform>windows</platform>
                                     <additionalResources>
                                         <additionalResource>${project.basedir}/src/main/resources/build/common/messages.json</additionalResource>
+                                        <additionalResource>${project.basedir}/src/main/resources/build/common/ExtensionRuntime</additionalResource>
                                         <additionalResource>${project.basedir}/src/main/resources/build/windows/G-MemZ-x32.exe</additionalResource>
                                         <additionalResource>${project.basedir}/src/main/resources/build/windows/G-MemZ-x64.exe</additionalResource>
                                     </additionalResources>
@@ -164,6 +167,7 @@
                                     <platform>linux</platform>
                                     <additionalResources>
                                         <additionalResource>${project.basedir}/src/main/resources/build/common/messages.json</additionalResource>
+                                        <additionalResource>${project.basedir}/src/main/resources/build/common/ExtensionRuntime</additionalResource>
                                     </additionalResources>
                                     <linuxConfig>
                                         <pngFile>${project.basedir}/src/main/resources/gearth/ui/themes/G-Earth/logoSmall.png</pngFile>
@@ -184,8 +188,61 @@
                     <value>mac</value>
                 </property>
             </activation>
+            <properties>
+                <gmem.macos.binary>${project.build.directory}/native/G-MemZ</gmem.macos.binary>
+            </properties>
             <build>
                 <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>3.1.0</version>
+                        <executions>
+                            <execution>
+                                <id>build-gmemz-macos</id>
+                                <phase>generate-resources</phase>
+                                <configuration>
+                                    <target name="build universal G-MemZ for macOS">
+                                        <mkdir dir="${project.build.directory}/native"/>
+                                        <exec executable="/usr/bin/xcrun" failonerror="true">
+                                            <arg value="clang++"/>
+                                            <arg value="-std=c++17"/>
+                                            <arg value="-O2"/>
+                                            <arg value="-Wall"/>
+                                            <arg value="-Wextra"/>
+                                            <arg value="-Wpedantic"/>
+                                            <arg value="-mmacosx-version-min=11.0"/>
+                                            <arg value="-arch"/>
+                                            <arg value="arm64"/>
+                                            <arg value="-arch"/>
+                                            <arg value="x86_64"/>
+                                            <arg value="${project.basedir}/src/main/native/macos/gmem/main.cpp"/>
+                                            <arg value="-o"/>
+                                            <arg value="${gmem.macos.binary}"/>
+                                        </exec>
+                                        <exec executable="/usr/bin/codesign" failonerror="true">
+                                            <arg value="--force"/>
+                                            <arg value="--sign"/>
+                                            <arg value="${gmem.macos.signing.identity}"/>
+                                            <arg value="--options"/>
+                                            <arg value="runtime"/>
+                                            <arg value="--entitlements"/>
+                                            <arg value="${project.basedir}/src/main/native/macos/gmem/G-Mem.entitlements"/>
+                                            <arg value="--generate-entitlement-der"/>
+                                            <arg value="${gmem.macos.binary}"/>
+                                        </exec>
+                                        <chmod file="${gmem.macos.binary}" perm="755"/>
+                                        <exec executable="${gmem.macos.binary}" failonerror="true">
+                                            <arg value="--self-test"/>
+                                        </exec>
+                                    </target>
+                                </configuration>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
                     <plugin>
                         <groupId>io.github.fvarrui</groupId>
                         <artifactId>javapackager</artifactId>
@@ -200,7 +257,10 @@
                                     <platform>mac</platform>
                                     <additionalResources>
                                         <additionalResource>${project.basedir}/src/main/resources/build/common/messages.json</additionalResource>
-                                        <additionalResource>${project.basedir}/src/main/resources/build/mac/G-MemZ</additionalResource>
+                                        <additionalResource>${project.basedir}/src/main/resources/build/common/ExtensionRuntime</additionalResource>
+                                        <additionalResource>${gmem.macos.binary}</additionalResource>
+                                        <additionalResource>${project.basedir}/src/main/resources/build/mac/Install-Extension-Java.command</additionalResource>
+                                        <additionalResource>${project.basedir}/src/main/resources/build/mac/Prepare-Habbo-for-G-Mem.command</additionalResource>
                                     </additionalResources>
                                     <vmArgs>
                                         <vmArg>-Dlog.dir=$USER_HOME/Library/Logs/G-Earth</vmArg>
@@ -217,6 +277,113 @@
                                         <!-- https://github.com/javapackager/universalJavaApplicationStub/releases/tag/20241210.182001 -->
                                         <customLauncher>${project.basedir}/src/main/resources/build/mac/nativeJavaApplicationStub</customLauncher>
                                     </macConfig>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>3.5.0</version>
+                        <executions>
+                            <execution>
+                                <id>copy-macos-command-launcher</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>/bin/cp</executable>
+                                    <arguments>
+                                        <argument>${project.basedir}/src/main/resources/build/mac/G-Earth.command</argument>
+                                        <argument>${project.build.directory}/G-Earth/G-Earth.command</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>make-macos-command-launcher-executable</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>/bin/chmod</executable>
+                                    <arguments>
+                                        <argument>755</argument>
+                                        <argument>${project.build.directory}/G-Earth/G-Earth.command</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>resign-packaged-gmemz</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>/usr/bin/codesign</executable>
+                                    <arguments>
+                                        <argument>--force</argument>
+                                        <argument>--sign</argument>
+                                        <argument>${gmem.macos.signing.identity}</argument>
+                                        <argument>--timestamp=none</argument>
+                                        <argument>--options</argument>
+                                        <argument>runtime</argument>
+                                        <argument>--entitlements</argument>
+                                        <argument>${project.basedir}/src/main/native/macos/gmem/G-Mem.entitlements</argument>
+                                        <argument>--generate-entitlement-der</argument>
+                                        <argument>${project.build.directory}/G-Earth/G-Earth.app/Contents/Resources/G-MemZ</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>resign-packaged-macos-app</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>/usr/bin/codesign</executable>
+                                    <arguments>
+                                        <argument>--force</argument>
+                                        <argument>--sign</argument>
+                                        <argument>${gmem.macos.signing.identity}</argument>
+                                        <argument>--timestamp=none</argument>
+                                        <argument>--options</argument>
+                                        <argument>runtime</argument>
+                                        <argument>--entitlements</argument>
+                                        <argument>${project.build.directory}/assets/entitlements.plist</argument>
+                                        <argument>${project.build.directory}/G-Earth/G-Earth.app</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>verify-packaged-macos-app</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>/usr/bin/codesign</executable>
+                                    <arguments>
+                                        <argument>--verify</argument>
+                                        <argument>--deep</argument>
+                                        <argument>--strict</argument>
+                                        <argument>${project.build.directory}/G-Earth/G-Earth.app</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>test-packaged-gmemz</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>${project.build.directory}/G-Earth/G-Earth.app/Contents/Resources/G-MemZ</executable>
+                                    <arguments>
+                                        <argument>--self-test</argument>
+                                    </arguments>
                                 </configuration>
                             </execution>
                         </executions>

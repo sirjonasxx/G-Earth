@@ -25,6 +25,7 @@ import java.util.List;
 public class ProxyProviderFactory {
 
     public static final String HOTELS_CACHE_KEY = "hotelsConnectionInfo";
+    private static final String MACOS_IFCONFIG = "/sbin/ifconfig";
     private static SocksConfiguration socksConfig = null;
 
     private static List<String> autoDetectHosts;
@@ -65,11 +66,22 @@ public class ProxyProviderFactory {
 
         if (OSValidator.isMac()) {
             for (int i = 2; i <= allHosts.size() + 5; i++) {
-                ProcessBuilder allowLocalHost = new ProcessBuilder("ifconfig", "lo0", "alias", ("127.0.0." + i), "up");
+                ProcessBuilder allowLocalHost = new ProcessBuilder(
+                        MACOS_IFCONFIG, "lo0", "alias", ("127.0.0." + i), "up"
+                );
                 try {
-                    allowLocalHost.start();
+                    int exitCode = allowLocalHost.inheritIO().start().waitFor();
+                    if (exitCode != 0) {
+                        System.err.println("Unable to configure macOS loopback alias 127.0.0." + i
+                                + " (ifconfig exited with " + exitCode
+                                + "). Flash mode must be launched with sudo.");
+                        break;
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    break;
                 }
             }
         }

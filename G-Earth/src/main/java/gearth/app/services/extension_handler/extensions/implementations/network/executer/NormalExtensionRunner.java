@@ -1,7 +1,5 @@
 package gearth.app.services.extension_handler.extensions.implementations.network.executer;
 
-import gearth.app.misc.JavaInstall;
-import gearth.app.misc.JavaLocator;
 import gearth.app.misc.OSValidator;
 import gearth.app.services.extension_handler.extensions.implementations.network.NetworkExtensionAuthenticator;
 import gearth.app.services.internal_extensions.extensionstore.tools.StoreExtensionTools;
@@ -100,9 +98,9 @@ public final class NormalExtensionRunner implements ExtensionRunner {
 
             final List<String> execCommandList = Arrays.asList(execCommand);
 
-            NormalExtensionRunner.locateJavaForJar(execCommandList, null, path);
-
-            final ProcessBuilder processBuilder = new ProcessBuilder(execCommandList);
+            final ProcessBuilder processBuilder = NormalExtensionRunner.createProcessBuilder(
+                    execCommandList, null, path
+            );
             final Process process = startProcess(processBuilder);
 
             logExtension(filename, path, process);
@@ -186,51 +184,37 @@ public final class NormalExtensionRunner implements ExtensionRunner {
         return builder.toString();
     }
 
-    public static void locateJavaForJar(List<String> command, File workingDir, File jarFile) {
+    public static ProcessBuilder createProcessBuilder(List<String> command, File workingDir, File jarFile)
+            throws IOException {
         if (!command.get(0).equals("java")) {
-            return;
+            return new ProcessBuilder(command);
         }
 
         // Obtain jar file for store extension.
         if (jarFile == null) {
             if (!command.get(1).equals("-jar")) {
-                return;
+                return new ProcessBuilder(command);
             }
 
             jarFile = new File(workingDir, command.get(2));
         }
 
-        Path javaPath;
-
         // Check if the jar file is a Java 8 extension.
         if (isJava8AndJavaFX(jarFile)) {
-            LOG.debug("Jar file {} is a Java 8 extension, locating Java 1.8", jarFile);
-
-            // Find Java 8.
-            final JavaInstall install = JavaLocator.findJava8();
-
-            if (install == null) {
-                LOG.warn("No Java 1.8 installation found, cannot run extension jar file {}", jarFile);
-                return;
-            }
-
-            // Change command to use the java executable from the found folder.
-            javaPath = install.path();
-        } else {
-            LOG.debug("Jar file {} is not a Java 8 extension, no need to locate Java 1.8", jarFile);
-
-            // Find current Java.
-            final String javaHome = System.getProperty("java.home");
-
-            javaPath = Paths.get(javaHome);
+            LOG.debug("Jar file {} is a Java 8 extension, locating the extension runtime", jarFile);
+            return ExtensionJavaRuntime.createProcessBuilder(
+                    command,
+                    ExtensionJavaRuntime.applicationDirectory(NormalExtensionRunner.class)
+            );
         }
 
-        // Launch with found javaPath.
-        final Path javaExecutable = javaPath.resolve("bin").resolve(OSValidator.isWindows() ? "java.exe" : "java");
-
-        LOG.info("Using java at {} to run extension jar file {}", javaPath, jarFile);
-
-        command.set(0, javaExecutable.toAbsolutePath().toString());
+        LOG.debug("Jar file {} does not require the Java 8 extension runtime", jarFile);
+        final Path javaHome = Paths.get(System.getProperty("java.home"));
+        final Path javaExecutable = javaHome.resolve("bin")
+                .resolve(OSValidator.isWindows() ? "java.exe" : "java");
+        List<String> resolvedCommand = new java.util.ArrayList<>(command);
+        resolvedCommand.set(0, javaExecutable.toAbsolutePath().toString());
+        return new ProcessBuilder(resolvedCommand);
     }
 
     /**
@@ -243,7 +227,7 @@ public final class NormalExtensionRunner implements ExtensionRunner {
              final JarInputStream jarInputStream = new JarInputStream(inputStream, false)) {
             // Read "META-INF/MANIFEST.MF" file and check for "Build-Jdk" attribute.
             final Manifest manifest = jarInputStream.getManifest();
-            final Attributes attributes = manifest.getMainAttributes();
+            final Attributes attributes = manifest == null ? new Attributes() : manifest.getMainAttributes();
             final String attribute = attributes.getValue("Build-Jdk");
 
             // Return false if we are not a java 8 extension.

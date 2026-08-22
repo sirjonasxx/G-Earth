@@ -21,6 +21,8 @@ import java.util.List;
 public class MemoryClient implements HabboClient {
 
     private static final Logger logger = LoggerFactory.getLogger(MemoryClient.class);
+    private static final String GMEM_PATH_PROPERTY = "gearth.gmem.path";
+    private static final String GMEM_PATH_ENVIRONMENT = "GEARTH_GMEM_PATH";
 
     private final HConnection connection;
 
@@ -49,21 +51,43 @@ public class MemoryClient implements HabboClient {
     }
 
     private HashSet<String> dumpTables() throws IOException, URISyntaxException {
-        String filePath = new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI()).getParent();
+        File applicationDirectory = new File(
+                this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI()
+        ).getParentFile();
+        if ("Java".equals(applicationDirectory.getName())
+                && applicationDirectory.getParentFile() != null) {
+            applicationDirectory = applicationDirectory.getParentFile();
+        }
+        File executable;
 
         if (OSValidator.isWindows()) {
             // Detect Windows 32 or 64 bit
             if (System.getProperty("os.arch").contains("64")) {
-                filePath += "\\G-MemZ-x64.exe";
+                executable = new File(applicationDirectory, "G-MemZ-x64.exe");
             } else {
-                filePath += "\\G-MemZ-x32.exe";
+                executable = new File(applicationDirectory, "G-MemZ-x32.exe");
             }
         } else {
-            filePath += "/G-MemZ";
+            String configuredPath = System.getProperty(GMEM_PATH_PROPERTY);
+            if (configuredPath == null || configuredPath.trim().isEmpty()) {
+                configuredPath = System.getenv(GMEM_PATH_ENVIRONMENT);
+            }
+            executable = configuredPath == null || configuredPath.trim().isEmpty()
+                    ? new File(applicationDirectory, "G-MemZ")
+                    : new File(configuredPath);
         }
+        ensureExecutable(executable);
 
         final String hotelType = connection.getClientType() == HClient.SHOCKWAVE ? "shockwave" : "flash";
-        final ProcessBuilder pb = new ProcessBuilder(filePath, hotelType);
+        final ProcessBuilder pb = OSValidator.isMac()
+                ? new ProcessBuilder(
+                        executable.getAbsolutePath(),
+                        connection.getClientHost(),
+                        Integer.toString(connection.getClientPort())
+                )
+                : new ProcessBuilder(executable.getAbsolutePath(), hotelType);
+        pb.directory(applicationDirectory);
+        pb.redirectError(ProcessBuilder.Redirect.INHERIT);
         final Process p = pb.start();
 
         final HashSet<String> possibleData = new HashSet<>();
@@ -84,10 +108,30 @@ public class MemoryClient implements HabboClient {
                     possibleData.add(line);
                 }
             }
+            final int exitCode;
+            try {
+                exitCode = p.waitFor();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new IOException("Interrupted while waiting for G-MemZ", e);
+            }
+            if (exitCode != 0) {
+                throw new IOException("G-MemZ exited with code " + exitCode
+                        + ". On macOS, verify the helper signature and Habbo's get-task-allow entitlement.");
+            }
         } finally {
             p.destroy();
         }
 
         return possibleData;
+    }
+
+    private static void ensureExecutable(File executable) throws IOException {
+        if (!executable.isFile()) {
+            throw new IOException("G-MemZ was not found: " + executable.getAbsolutePath());
+        }
+        if (!executable.canExecute() && !executable.setExecutable(true, true)) {
+            throw new IOException("G-MemZ is not executable: " + executable.getAbsolutePath());
+        }
     }
 }
