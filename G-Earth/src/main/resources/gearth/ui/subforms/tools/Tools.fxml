@@ -12,7 +12,7 @@
 
 <GridPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="258.0" prefWidth="650.0"
           xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml/1"
-          fx:controller="gearth.ui.subforms.tools.ToolsController">
+          fx:controller="gearth.app.ui.subforms.tools.ToolsController">
     <rowConstraints>
         <RowConstraints maxHeight="158.0" minHeight="10.0" prefHeight="134.0" vgrow="SOMETIMES"/>
         <RowConstraints maxHeight="141.0" minHeight="10.0" prefHeight="128.0" vgrow="SOMETIMES"/>

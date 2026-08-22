@@ -5,7 +5,7 @@
 
 <!--maxHeight="19.0" minHeight="19.0"-->
 
-<VBox prefWidth="650.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gearth.ui.GEarthController">
+<VBox prefWidth="650.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gearth.app.ui.GEarthController">
     <TabPane id="main-tab-pane" fx:id="tabBar" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="295.0" prefWidth="650.0" tabClosingPolicy="UNAVAILABLE">
         <Tab fx:id="tab_Connection" text="Connection">
             <text>tab.connection</text>

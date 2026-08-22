@@ -1,19 +1,79 @@
-# FOR NEWER VERSIONS CHECK https://github.com/G-Realm/G-Earth
 # G-Earth
 Feature-rich habbo packet logger & manipulator for Windows, Linux and Mac.
 
-- Requires Java 8
-
-[CLICK HERE FOR TROUBLESHOOTING](https://github.com/sirjonasxx/G-Earth/wiki/Troubleshooting)
+- The packaged application includes Java 21. Java 8 is only needed as a separate runtime for legacy extensions.
 
 Join the G-Earth [Discord server](https://discord.gg/AVkcF8y)
 
 **Download the [chrome extension](https://chrome.google.com/webstore/detail/g-chrome/cdjgbghobmfmfcenhoahgfnfpcadddag) if you're using Unity**
 
-# Execution
-* **Windows:** Double click G-Earth.exe, which will be delivered in the release. Double clicking the .jar file might work as well.
-* **Linux** Execute `sudo java -jar G-Earth.jar` on the command line. You can include the `t` flag to log packets in your terminal
-* **Mac** Follow the [MacOs Installation guide](https://github.com/sirjonasxx/G-Earth/wiki/macOs-Installation-guide) (flash only)
+# Installation and execution
+
+* **Windows:** Double-click `G-Earth.exe` from the Windows release package.
+* **Linux:** Start G-Earth from the launcher included in the Linux package for your architecture.
+
+## macOS — Apple Silicon and Intel
+
+The macOS build no longer requires a system Java installation, manual signing of G-Mem or disabling System Integrity Protection. Download the artifact matching your Mac:
+
+- `mac-aarch64` for Apple Silicon (`M1`, `M2`, `M3`, `M4` and later);
+- `mac-x64` for Intel Macs.
+
+Extract the package and keep `G-Earth.app` and `G-Earth.command` together in the same directory. G-Earth includes its own Java 21 runtime; do not replace it with Java 8 and do not start it with `java -jar`.
+
+### Nitro and normal use
+
+Open the application from Finder or run:
+
+```shell
+open "G-Earth.app"
+```
+
+If Gatekeeper blocks the first launch, open **System Settings > Privacy & Security** and select **Open Anyway**.
+
+### Habbo AIR/Flash memory mode
+
+AIR memory inspection needs a locally signed development copy of Habbo. Quit Habbo and Habbo Launcher completely, then locate the current application:
+
+```shell
+find "$HOME/Library/Application Support/Habbo Launcher/downloads/air" \
+    -maxdepth 3 -type d -name Habbo.app
+```
+
+Create and prepare a copy without `sudo`, replacing `/actual/path/to/Habbo.app` with the path returned above:
+
+```shell
+cd "G-Earth.app/Contents/Resources"
+mkdir -p Habbo-Development
+ditto "/actual/path/to/Habbo.app" "Habbo-Development/Habbo.app"
+./Prepare-Habbo-for-G-Mem.command "Habbo-Development/Habbo.app"
+./Prepare-Habbo-for-G-Mem.command --check "Habbo-Development/Habbo.app"
+```
+
+Back up `~/Library/Application Support/Habbo Launcher/versions.json`. In its `installations` array, change only the `path` of the entry whose `client` is `air`; it must point to the absolute `Habbo-Development` directory, not to `Habbo.app`. Restart Habbo Launcher after saving the file.
+
+Start G-Earth from the directory that contains the application:
+
+```shell
+./G-Earth.command
+```
+
+Then click **Connect** in G-Earth before starting the AIR client from Habbo Launcher. `G-Earth.command` pins the main application to its bundled Java 21 runtime and requests administrator privileges for the required loopback configuration.
+
+### Java 8 extensions
+
+Legacy graphical extensions can use an isolated Java 8/JavaFX 8 runtime while G-Earth remains on Java 21:
+
+```shell
+cd "G-Earth.app/Contents/Resources"
+./Install-Extension-Java.command
+cd ../../..
+./G-Earth.command --check-extension-java
+```
+
+The installer selects the correct architecture, verifies the download checksum and installs the secondary runtime under `G-Earth.app/Contents/Resources/ExtensionRuntime`.
+
+For detailed verification, updates, restoration and troubleshooting, see the [current macOS installation guide](wiki/macOs-Installation-guide.md). The current setup does **not** require disabling SIP.
 
 # Features
 * Log outgoing and incoming packets
