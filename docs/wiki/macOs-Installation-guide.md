@@ -1,89 +1,229 @@
-**NOTE: Currently supported browsers: ONLY Firefox and Chromium, works on Habbo AIR too**
+# macOS installation guide
 
-# MacOS Installation Guide
+G-Earth is packaged as a native macOS application with its own Java 21 runtime. The application and its memory helper support both Apple Silicon (`arm64`) and Intel (`x86_64`) without Rosetta.
 
-G-Earth depends on an application named [G-Mem](https://github.com/sirjonasxx/G-Mem), 
-this application scans the memory contents of the Habbo client applicaton and extracts a cipher key 
-that is used to decrypt packets coming from the Habbo server.
+This guide covers the additional steps required for Habbo AIR memory inspection and legacy Java 8 extensions.
 
-There is a few steps u have to complete in order to get it to work on MacOS.
+## Package components
 
-## Code-Sign G-Mem file and make it executable 
+Inside `G-Earth.app/Contents/Resources` you will find:
 
-### Certificate Creation
-1. Open `Keychain Access` (press `⌘ + Enter`, type `KeyChain Access` to open it from spotlight)
-2. Navigate from the top menu to `Keychain Access > Certificate Assistant > Create Certificate...`
-![Screenshot 2023-03-30 at 14 36 47](https://user-images.githubusercontent.com/102377087/228837955-81182786-ac47-46e5-a5e2-1ca2e257751f.png)
-3. In the `Create Your Certificate` do the following:
-* Set `Name:` to `gmem-cert`
-* Set `Cerificate Type:` to `Code Signing`
-* Toggle the `Let me override default` button
+- `G-MemZ`: the universal helper that locates Habbo and reads the RC4 state.
+- `Install-Extension-Java.command`: installs an independent Java 8/JavaFX 8 runtime.
+- `Prepare-Habbo-for-G-Mem.command`: prepares a local Habbo AIR development copy.
+- `ExtensionRuntime`: the optional Java 8 runtime directory used only by extensions.
 
-![Screenshot 2023-03-30 at 14 40 28](https://user-images.githubusercontent.com/102377087/228838867-57e465bc-5b83-4b1a-a8cc-3dd6d1e95353.png)
+The application itself always uses the Java 21 runtime bundled in `G-Earth.app`. Do not replace it with Java 8.
 
-5. Press `Continue` until you reach the `Specify a Location For The Certificate`, now do the following:
-* Set `Keychain:` to `System`
+The package also places `G-Earth.command` next to `G-Earth.app`. This Terminal launcher pins the main process to the bundled Java 21 runtime and requests administrator privileges when Flash/AIR mode needs them.
 
-![Screenshot 2023-03-30 at 14 42 50](https://user-images.githubusercontent.com/102377087/228839468-982365d9-925c-44cf-a87d-fc6c268d05c8.png)
+## Starting G-Earth
 
-6. Enter your login credentials when prompted and press `Done`
+For Nitro or normal use, open `G-Earth.app` from Finder:
 
-### Signing of G-Mem
-1. Open `Terminal` (press `⌘ + Enter`, type `Terminal` to open it from spotlight)
-2. Type `codesign -fs "gmem-cert" ` (do not press enter yet)
-3. Drag the `G-Mem` file into your terminal window *(this will append the path to the terminal)*
+```shell
+open "G-Earth.app"
+```
 
-Your terminal window should now resemble the following:
+Flash/AIR mode modifies loopback aliases and may need administrator privileges. Run the packaged launcher from Terminal:
 
-![Screenshot 2023-03-30 at 14 49 28](https://user-images.githubusercontent.com/102377087/228841126-77b0184b-4c7d-44e0-9f7c-56103a957a81.png)
+```shell
+./G-Earth.command
+```
 
-4. Now press enter and enter your login credentials when prompted.
+Calling `sudo ./G-Earth.command` explicitly is also supported. Do not run the internal native launcher or `java -jar G-Earth.jar` directly, because doing so can select an incompatible system JVM.
 
-### Making G-Mem executable
-1. Open `Terminal` (press `⌘ + Enter`, type `Terminal` to open it from spotlight)
-2. Type `chmod 755 ` (do not press enter yet)
-3. Drag the `G-Mem` file into your terminal window *(this will append the path to the terminal)*
+If Gatekeeper blocks the application after the first launch, open **System Settings > Privacy & Security** and choose **Open Anyway**.
 
-Your terminal window should now resemble the following:
+## Java 8 for legacy extensions
 
-![Screenshot 2023-03-30 at 14 52 29](https://user-images.githubusercontent.com/102377087/228841918-3205014b-5de8-431d-ae4d-d10b8ceeed03.png)
+Legacy graphical extensions may require Java 8 and JavaFX 8 even though G-Earth itself requires Java 21. Both runtimes can coexist because extensions run in separate processes.
 
-4. Now press enter and verify the `Kind` of the `G-Mem` file is now `Unix Executable File`
+Install the secondary runtime without `sudo`:
 
-![Screenshot 2023-03-30 at 14 54 15](https://user-images.githubusercontent.com/102377087/228842389-78ea857e-3414-43d0-8270-91f8185ab57f.png)
+```shell
+cd "G-Earth.app/Contents/Resources"
+./Install-Extension-Java.command
+```
 
-## Disabling SIP 
+The installer:
 
-Modern machines running MacOS have a security feature that shields of the memory of processes from other processes. 
-Depending on your machine you may have to disable SIP. 
+1. detects Apple Silicon or Intel;
+2. requests the matching Azul Zulu Java 8u442 JRE with JavaFX 8;
+3. accepts only an HTTPS download returned by Azul's metadata API;
+4. verifies the SHA-256 checksum from the package metadata;
+5. checks the archive paths before extraction;
+6. validates Java 8 and `jfxrt.jar`; and
+7. preserves any existing runtime in a timestamped backup.
 
-**For M1 macs it is required to disable SIP.**
+Java 8u442 is suitable for extensions compiled for Java 8, including extensions whose manifest reports Oracle Java 8u441. The bytecode target and JavaFX 8 availability matter; the exact vendor build number does not.
 
-### :warning: CAUTION :warning:
-Turning off SIP allows any program with sudo privileges to modify memory contents of other processes. If you use pirated software, or other unverified apps, DO NOT DO THIS for your own safety! See the following stackoverflow post for some more info: https://apple.stackexchange.com/a/412281.
+Verify the selected extension runtime:
 
-A guide for disabling SIP can be found here: https://developer.apple.com/documentation/security/disabling_and_enabling_system_integrity_protection
+```shell
+./G-Earth.command --check-extension-java
+```
 
-## Launching G-Earth
-1. Open `Terminal` (press `⌘ + Enter`, type `Terminal` to open it from spotlight)
-2. Type `sudo java -jar `
-3. Drag the `G-Earth.jar` file into your terminal window *(this will append the path to the terminal)*
+The resolver checks these locations in order:
 
-Your terminal window should now resemble the following:
+1. `-Dgearth.extension.java=/path/to/java8`;
+2. `GEARTH_EXTENSION_JAVA`;
+3. `JAVA8_HOME`;
+4. the adjacent `ExtensionRuntime` directory;
+5. known Java installation directories; and
+6. `PATH`, only if the executable is actually Java 8.
 
-![Screenshot 2023-03-30 at 15 00 59](https://user-images.githubusercontent.com/102377087/228843994-f7713373-9f19-49b0-b7e7-0645a16c4fce.png)
+An explicit absolute Java command in an extension is respected. Unqualified `java` and `javaw` commands for legacy JavaFX extensions are redirected to the validated Java 8 runtime, with `JAVA_HOME` and `PATH` updated for the child process.
 
-5. Press enter and fill in your password if prompted
+## G-MemZ on Apple Silicon
+
+The packaged `G-MemZ` is built as a universal `arm64`/`x86_64` executable. It is ad-hoc signed with Hardened Runtime and the debugger-side entitlement `com.apple.security.cs.debugger`.
+
+Verify it without changing its signature:
+
+```shell
+cd "G-Earth.app/Contents/Resources"
+lipo -archs G-MemZ
+codesign --verify --strict G-MemZ
+codesign -d --entitlements :- G-MemZ
+./G-MemZ --self-test
+```
+
+The architecture list must contain both `arm64` and `x86_64`, and the entitlement output must contain `com.apple.security.cs.debugger`.
+
+A custom helper can be selected before starting G-Earth:
+
+```shell
+export GEARTH_GMEM_PATH="/absolute/path/to/G-MemZ"
+```
+
+## Why Habbo AIR must be prepared
+
+macOS requires permission on both sides of a debugging connection:
+
+- `G-MemZ` needs `com.apple.security.cs.debugger`.
+- The Habbo application being inspected needs `com.apple.security.get-task-allow`.
+
+Running G-Earth with `sudo` does not add the target-side entitlement. Disabling System Integrity Protection is not required and is not part of this setup.
+
+The recommended method uses a user-owned development copy. It does not modify or delete Habbo Launcher's managed download.
+
+## Create a Habbo development copy
+
+Quit Habbo and Habbo Launcher with **Command-Q**. Closing only their windows is not enough.
+
+Locate the current AIR application:
+
+```shell
+find "$HOME/Library/Application Support/Habbo Launcher/downloads/air" \
+    -maxdepth 3 -type d -name Habbo.app
+```
+
+The AIR version directory can change after updates. Use the current path returned by the command.
+
+Create the development copy next to the packaged resources:
+
+```shell
+cd "G-Earth.app/Contents/Resources"
+mkdir -p Habbo-Development
+ditto "$HOME/Library/Application Support/Habbo Launcher/downloads/air/<version>/Habbo.app" \
+    "Habbo-Development/Habbo.app"
+./Prepare-Habbo-for-G-Mem.command "Habbo-Development/Habbo.app"
+./Prepare-Habbo-for-G-Mem.command --check "Habbo-Development/Habbo.app"
+```
+
+Run the preparation command without `sudo`. It:
+
+1. validates the `com.sulake.habboair` bundle identifier;
+2. refuses to modify a running Habbo process;
+3. preserves a `.gearth-original` backup when preparing an application directly;
+4. keeps the Adobe AIR permissions required for JIT and executable memory;
+5. adds `com.apple.security.get-task-allow`;
+6. signs nested Adobe AIR and Discord frameworks from the inside out; and
+7. performs a deep signature verification.
+
+The final check must report that Habbo is prepared for G-Mem.
+
+You can also verify it manually:
+
+```shell
+codesign --verify --deep --strict --verbose=2 "Habbo-Development/Habbo.app"
+codesign -d --entitlements :- "Habbo-Development/Habbo.app"
+lipo -archs "Habbo-Development/Habbo.app/Contents/MacOS/Habbo"
+```
+
+Do not redistribute the prepared Habbo application. The development entitlement weakens process isolation only for that local copy.
+
+## Point Habbo Launcher to the copy
+
+Habbo Launcher reads the AIR installation from:
+
+```text
+~/Library/Application Support/Habbo Launcher/versions.json
+```
+
+Back it up before editing:
+
+```shell
+cp -n "$HOME/Library/Application Support/Habbo Launcher/versions.json" \
+    "$HOME/Library/Application Support/Habbo Launcher/versions.json.gearth-original"
+```
+
+In the `installations` array, find the entry whose `client` is `air`. Change only its `path` to the absolute directory containing the prepared `Habbo.app`.
+
+The value must end with `Habbo-Development`, not `Habbo-Development/Habbo.app`:
+
+```json
+{
+  "version": "12",
+  "path": "/Users/your-name/path/to/G-Earth.app/Contents/Resources/Habbo-Development",
+  "client": "air",
+  "lastModified": 1787327986088
+}
+```
+
+Keep the existing version and timestamp values. Quit and reopen Habbo Launcher so it reloads the file.
+
+## Connection order
+
+1. Start G-Earth from Terminal with administrator privileges for Flash/AIR mode.
+2. Click **Connect** in G-Earth.
+3. Start the AIR client from Habbo Launcher.
+4. Wait for `G-MemZ` to identify the connection and extract the RC4 state.
+
+Starting Habbo before clicking **Connect** can prevent the connection from being intercepted correctly.
+
+## Updates and restoration
+
+After a Habbo AIR update:
+
+1. quit Habbo and Habbo Launcher;
+2. locate the new managed `Habbo.app`;
+3. replace the development copy with a fresh copy;
+4. run `Prepare-Habbo-for-G-Mem.command` again; and
+5. confirm that `versions.json` still points to `Habbo-Development`.
+
+Restore Habbo Launcher's original configuration with:
+
+```shell
+cp "$HOME/Library/Application Support/Habbo Launcher/versions.json.gearth-original" \
+   "$HOME/Library/Application Support/Habbo Launcher/versions.json"
+```
+
+Restart Habbo Launcher afterward.
 
 ## Troubleshooting
 
-### 🚫 Apple can’t check app for malicious software
-In this case, you can grant an exception for a blocked app by clicking the `Open Anyway` button in Privacy & Security settings. 
-This button is available for about an hour after you try to open the app. Where it appears exactly depends on the OS version u are running,
-more details about it can be found here: https://support.apple.com/en-gb/guide/mac-help/mchleab3a043/mac
+- **Unable to locate a Java Runtime:** use the packaged `G-Earth.app` or `G-Earth.command`; both select the included Java 21 runtime and do not require a system JVM.
+- **JVM crash with Java 26:** do not run the JAR or internal launcher directly. Use `G-Earth.command` for Terminal/administrator mode.
+- **No Java 8 runtime was found for extensions:** run `Install-Extension-Java.command` from `G-Earth.app/Contents/Resources`.
+- **JavaFX classes are missing in an extension:** the selected Java 8 installation lacks JavaFX 8. Use the provided installer.
+- **Permission denied for G-MemZ:** restore its executable bit with `chmod 755 G-MemZ`, then verify its signature.
+- **G-MemZ exit code 4, `task_for_pid` failure or `(os/kern) failure`:** the running Habbo copy does not contain `com.apple.security.get-task-allow`, or Habbo Launcher started its managed copy instead of `Habbo-Development`.
+- **Operation not permitted while signing Habbo:** create the user-owned development copy. `sudo` does not bypass macOS App Management protection.
+- **Connection is detected but packets cannot be decrypted:** verify the running Habbo path, restart Habbo Launcher after editing `versions.json`, and click **Connect** before launching Habbo.
+- **Bad CPU type in executable:** verify that `lipo -archs G-MemZ` reports the current architecture.
+- **Nitro proxy does not start:** ensure at least one network service is enabled and approve the macOS administrator dialog.
+- **A proxy remains enabled after an abnormal exit:** disable **Web proxy (HTTP)** and **Secure web proxy (HTTPS)** under **System Settings > Network > Details > Proxies**.
 
-### Other
-If you experience any other issues and the [Troubleshooting Page](https://github.com/sirjonasxx/G-Earth/wiki/Troubleshooting) doesn't help, 
-
-it might be useful to have a look at the following issues: [#67](../issues/67) [#10](../issues/10)
-
+When reporting a problem, include the log lines around `G-MemZ`, `RC4`, `task_for_pid`, `(os/kern)` and `exit code`.

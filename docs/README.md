@@ -1,7 +1,7 @@
 # G-Earth
 Feature-rich habbo packet logger & manipulator for Windows, Linux and Mac.
 
-- Requires Java 8
+- The packaged application includes Java 21. Java 8 is only needed as a separate runtime for legacy extensions.
 
 [CLICK HERE FOR TROUBLESHOOTING](https://github.com/sirjonasxx/G-Earth/wiki/Troubleshooting)
 
@@ -12,7 +12,18 @@ Join the G-Earth [Discord server](https://discord.gg/AVkcF8y)
 # Execution
 * **Windows:** Double click G-Earth.exe, which will be delivered in the release. Double clicking the .jar file might work as well.
 * **Linux** Execute `sudo java -jar G-Earth.jar` on the command line. You can include the `t` flag to log packets in your terminal
-* **Mac** Follow the [MacOs Installation guide](https://github.com/sirjonasxx/G-Earth/wiki/macOs-Installation-guide) (flash only)
+* **Mac:** Open `G-Earth.app`. For Flash/AIR memory inspection and legacy Java 8 extensions, follow the [macOS installation guide](wiki/macOs-Installation-guide.md).
+
+## macOS and Apple Silicon
+
+The macOS package supports both Apple Silicon (`arm64`) and Intel (`x86_64`) without Rosetta. It includes:
+
+- a bundled Java 21 runtime for G-Earth;
+- a universal, signed `G-MemZ` helper built from source;
+- `Prepare-Habbo-for-G-Mem.command`, which prepares a user-owned Habbo AIR development copy without disabling SIP; and
+- `Install-Extension-Java.command`, which installs a separate Java 8/JavaFX 8 runtime for legacy extensions.
+
+G-Earth must remain on Java 21. Legacy extension processes can use Java 8 independently through `ExtensionRuntime`, `GEARTH_EXTENSION_JAVA`, `JAVA8_HOME` or the `gearth.extension.java` system property.
 
 # Features
 * Log outgoing and incoming packets
