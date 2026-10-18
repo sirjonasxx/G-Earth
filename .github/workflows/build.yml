@@ -2,6 +2,11 @@ name: Build G-Earth
 
 on:
   workflow_dispatch:
+    inputs:
+      artifact_run_id:
+        description: 'Reuse artifacts from this tag build run and skip rebuilding (leave blank for a normal build)'
+        required: false
+        type: string
   push:
     paths:
       - '.github/workflows/**'
@@ -12,6 +17,7 @@ on:
 
 jobs:
   build:
+    if: github.event_name != 'workflow_dispatch' || inputs.artifact_run_id == ''
     strategy:
       fail-fast: false
       matrix:
@@ -121,21 +127,56 @@ jobs:
         retention-days: 30
 
   release:
-    if: github.ref_type == 'tag'
+    if: >-
+      always() && !cancelled() &&
+      ((needs.build.result == 'success' && github.ref_type == 'tag') ||
+       (needs.build.result == 'skipped' && github.event_name == 'workflow_dispatch' && inputs.artifact_run_id != ''))
     needs: build
     runs-on: ubuntu-latest
     permissions:
+      actions: read
       contents: write
       id-token: write
       attestations: write
 
     steps:
+    - name: Resolve release tag
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+        GH_REPO: ${{ github.repository }}
+        ARTIFACT_RUN_ID: ${{ inputs.artifact_run_id }}
+      run: |
+        RELEASE_TAG="${GITHUB_REF_NAME}"
+
+        if [[ -n "${ARTIFACT_RUN_ID}" ]]; then
+          [[ "${ARTIFACT_RUN_ID}" =~ ^[0-9]+$ ]] || { echo "Artifact run ID must be numeric" >&2; exit 1; }
+          SOURCE_RUN=$(gh api "repos/${GH_REPO}/actions/runs/${ARTIFACT_RUN_ID}")
+          SOURCE_WORKFLOW=$(jq -r .path <<< "${SOURCE_RUN}")
+          SOURCE_STATUS=$(jq -r .status <<< "${SOURCE_RUN}")
+          RELEASE_TAG=$(jq -r .head_branch <<< "${SOURCE_RUN}")
+          SOURCE_SHA=$(jq -r .head_sha <<< "${SOURCE_RUN}")
+
+          [[ "${SOURCE_WORKFLOW}" == '.github/workflows/build.yml' && "${SOURCE_STATUS}" == 'completed' ]] || {
+            echo "Source must be a completed Build G-Earth workflow run" >&2
+            exit 1
+          }
+          TAG_REF=$(jq -rn --arg tag "${RELEASE_TAG}" '$tag | @uri')
+          gh api "repos/${GH_REPO}/git/ref/tags/${TAG_REF}" > /dev/null
+          TAG_SHA=$(gh api "repos/${GH_REPO}/commits/${TAG_REF}" --jq .sha)
+          [[ "${SOURCE_SHA}" == "${TAG_SHA}" ]] || { echo "Source run commit does not match the tag" >&2; exit 1; }
+        fi
+
+        echo "RELEASE_TAG=${RELEASE_TAG}" >> "$GITHUB_ENV"
+
     - name: Download platform artifacts
       uses: actions/download-artifact@v8
       with:
         pattern: G-Earth-*
         path: release
         merge-multiple: true
+        github-token: ${{ github.token }}
+        run-id: ${{ inputs.artifact_run_id || github.run_id }}
 
     - name: Attest release assets
       uses: actions/attest@v4
@@ -146,18 +187,19 @@ jobs:
       shell: bash
       env:
         GH_TOKEN: ${{ github.token }}
+        GH_REPO: ${{ github.repository }}
       run: |
-        RELEASE_IS_DRAFT=$(gh release view "${GITHUB_REF_NAME}" --json isDraft --jq .isDraft 2>/dev/null || true)
+        RELEASE_IS_DRAFT=$(gh release view "${RELEASE_TAG}" --json isDraft --jq .isDraft 2>/dev/null || true)
 
         if [[ "${RELEASE_IS_DRAFT}" == "true" ]]; then
-          gh release upload "${GITHUB_REF_NAME}" release/* --clobber
+          gh release upload "${RELEASE_TAG}" release/* --clobber
         elif [[ "${RELEASE_IS_DRAFT}" == "false" ]]; then
-          echo "A published release already exists for ${GITHUB_REF_NAME}" >&2
+          echo "A published release already exists for ${RELEASE_TAG}" >&2
           exit 1
         else
-          gh release create "${GITHUB_REF_NAME}" release/* \
+          gh release create "${RELEASE_TAG}" release/* \
             --draft \
             --generate-notes \
-            --title "${GITHUB_REF_NAME}" \
+            --title "${RELEASE_TAG}" \
             --verify-tag
         fi
